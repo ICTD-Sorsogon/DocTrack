@@ -234,12 +234,12 @@ export default {
                 this.$router.push({ name: "Dashboard"});
             }
         },
-        getNewDocumentRecordForm() {
-            if(this.$route.name !== 'New Document') {
-                this.$store.dispatch('setLoader');
-                this.$router.push({ name: "New Document"});
-            }
-        },
+        // getNewDocumentRecordForm() {
+        //     if(this.$route.name !== 'New Document') {
+        //         this.$store.dispatch('setLoader');
+        //         this.$router.push({ name: "New Document"});
+        //     }
+        // },
 
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {

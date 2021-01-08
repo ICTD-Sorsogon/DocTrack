@@ -3,7 +3,13 @@
     <v-card-title primary-title>
         All Active Documents
     </v-card-title>
+
     <v-card-text>
+
+        <v-row align="center" justify="end">
+            <v-btn @click.prevent="getNewDocumentRecordForm">Create</v-btn>
+        </v-row>
+
         <v-data-table
             v-if="documents"
             :headers="headers"
@@ -521,6 +527,12 @@ export default {
             this.$store.dispatch('getActiveDocuments', page_number).then(() => {
                 this.$store.dispatch('unsetDataTableLoader');
             });
+        },
+        getNewDocumentRecordForm() {
+            if(this.$route.name !== 'New Document') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "New Document"});
+            }
         },
         redirectToReceivePage(document) {
             /**
