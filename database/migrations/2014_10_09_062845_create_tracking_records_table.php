@@ -18,7 +18,7 @@ class CreateTrackingRecordsTable extends Migration
             $table->foreignId('document_id')->constrained('documents');
             $table->unsignedTinyInteger('actions');
             $table->unsignedTinyInteger('status');
-            $table->foreignId('approved_by')->nullable()->constrained('users');
+            $table->foreignId('approved_by')->nullable()->constrained('personnels');
             $table->foreignId('touched_by')->nullable()->constrained('users');
             $table->dateTime('last_touched');
             $table->foreignId('forwarded_by')->nullable()->constrained('offices');

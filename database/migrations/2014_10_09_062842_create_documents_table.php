@@ -16,17 +16,17 @@ class CreateDocumentsTable extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string('tracking_code', 120);
-            $table->string('title');
+            $table->string('subject');
             $table->boolean('is_external')->default(false);
-            $table->foreignId('document_type_id');
-            $table->foreignId('originating_office')->nullable()->constrained('offices');
-            $table->foreignId('current_office')->nullable()->constrained('offices');
+            $table->foreignId('document_type_id')->constrained('document_types');
+            $table->string('originating_office')->nullable();
+            $table->foreignId('current_office_id')->nullable()->constrained('offices');
             $table->string('sender_name')->nullable();
             $table->unsignedInteger('page_count');
-            $table->date('date_filed');
+            $table->dateTime('date_filed');
             $table->unsignedTinyInteger('is_terminal')->default(0);
             $table->string('remarks')->nullable();
-            $table->unsignedTinyInteger('attachment_page_count')->default(0);
+            $table->unsignedInteger('attachment_page_count')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -40,12 +40,9 @@ class CreateDocumentsTable extends Migration
     public function down()
     {
         Schema::table('documents', function (Blueprint $table) {
-            $table->dropIndex(['originating_office']);
-            $table->dropForeign(['originating_office']);
-            $table->dropColumn('originating_office');
-            $table->dropIndex(['current_office']);
-            $table->dropForeign(['current_office']);
-            $table->dropColumn('current_office');
+            $table->dropIndex(['current_office_id']);
+            $table->dropForeign(['current_office_id']);
+            $table->dropColumn('current_office_id');
             $table->dropIndex(['document_type_id']);
             $table->dropForeign(['document_type_id']);
             $table->dropColumn('document_type_id');

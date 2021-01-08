@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             DivisionsTableSeeder::class,
             UnitsTableSeeder::class,
             SectorsTableSeeder::class,
-            UsersTableSeeder::class
+            UsersTableSeeder::class,
+            DocumentTypesSeeder::class,
+            DocumentsTableSeeder::class,
         ]);
     }
 }

@@ -29,6 +29,7 @@ class CreateUsersTable extends Migration
             $table->foreignId('division_id')->nullable()->constrained('divisions');
             $table->foreignId('unit_id')->nullable()->constrained('units');
             $table->foreignId('sector_id')->nullable()->constrained('sectors');
+            // $table->foreignId('track_id')->nullable()->constrained('tracking_records');
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();

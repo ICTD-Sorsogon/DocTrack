@@ -12,7 +12,7 @@ class Document extends Model
     use SoftDeletes;
 
     protected $guarded = [
-        'tracking_code', 'title', 'document_type_id',
+        'tracking_code', 'subject', 'document_type_id',
         'originating_office', 'current_office', 'sender_name',
         'page_count', 'date_filed', 'is_terminal',
         'remarks', 'attachment_page_count'
