@@ -38,7 +38,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-group
+            <!-- <v-list-group
                 prepend-icon="mdi-file-document-multiple-outline"
                 no-action
             >
@@ -53,6 +53,7 @@
                     </v-list-item-icon>
                     <v-list-item-title>View</v-list-item-title>
                 </v-list-item>
+
                 <v-list-item link @click.prevent="getNewDocumentRecordForm" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
                     <v-icon>mdi-file-document-edit-outline</v-icon>
@@ -77,7 +78,17 @@
                     </v-list-item-icon>
                     <v-list-item-title>Terminal</v-list-item-title>
                 </v-list-item>
-            </v-list-group>
+            </v-list-group> -->
+
+            <v-list-item link @click.prevent="getAllDocuments">
+                <v-list-item-icon>
+                    <v-icon>mdi-file-document-multiple-outline</v-icon>
+                </v-list-item-icon>
+
+                <v-list-item-content>
+                    <v-list-item-title>Document</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
 
             <v-list-group
                 prepend-icon="mdi-timeline-check-outline"
