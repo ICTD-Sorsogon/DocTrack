@@ -3,8 +3,8 @@
     <v-card-title primary-title>
         All Active Documents
     </v-card-title>
-        <v-card-text>
-            <v-data-table
+    <v-card-text>
+        <v-data-table
             v-if="documents"
             :headers="headers"
             :items="documents.data"
@@ -104,6 +104,7 @@
                         </v-col>
                         <v-col cols="12" sm="3">
                             <v-btn
+                                @click.prevent="redirectToReceivePage(item)"
                                 text
                                 color="#FFCA28"
                                 block
@@ -116,6 +117,7 @@
                         </v-col>
                         <v-col cols="12" sm="3">
                             <v-btn
+                                link @click.prevent="redirectToReceivePage(item)"
                                 text
                                 color="#9575CD"
                                 block
@@ -153,74 +155,247 @@
     <v-dialog
       v-model="dialog"
       persistent
-      max-width="1200px"
+      scrollable
+      max-width="1000px"
     >
         <v-card v-if="selected_document">
             <v-card-title primary-title>
-                Document Details : {{selected_document[0].tracking_code}}
+                Document Details
             </v-card-title>
             <v-card-text>
-                <v-data-table
-                    id="inverse_table"
-                    :headers="inner_table_header"
-                    :items="selected_document"
-                    hide-default-footer
-                    disable-filtering
-                    disable-pagination
-                    disable-sort
-                >
-                    <template v-slot:[`item.tracking_code`] = "{ item }">
-                            <v-chip
-                                label
-                                dark
-                                :color="item.color"
-                            >
-                                {{ item.tracking_code }}
-                            </v-chip>
-                    </template>
-                    <template v-slot:[`item.is_external`] = "{ item }">
-                        <div v-if="item.is_external">
-                            External
-                        </div>
-                        <div v-else>
-                            Internal
-                        </div>
-                    </template>
-                    <template v-slot:[`item.document_type_id`] = "{ item }">
-                        <div v-if="item">
-                            {{ item.type_name}}
-                        </div>
-                    </template>
-                    <template v-slot:[`item.originating_office`] = "{ item }">
-                        <div v-if="item && checkIfID(item.originating_office)">
-                            {{ item.originating_office_name}}
-                        </div>
-                        <div v-else>
-                            {{ item.originating_office }}
-                        </div>
-                    </template>
-                    <template v-slot:[`item.current_office_id`] = "{ item }">
-                        <div v-if="item">
-                            {{ item.current_office_name }}
-                        </div>
-                    </template>
-                    <template v-slot:[`item.sender_name`] = "{ item }">
-                        <div v-if="item && checkIfID(item.sender_name)">
-                            {{ item.sender_fullname }}
-                        </div>
-                        <div v-else>
-                            {{ item.sender_name }}
-                        </div>
-                    </template>
-                    <template v-slot:[`item.is_terminal`] = "{ item }">
-                        <div v-if="item.is_terminal">
-                            Yes
-                        </div>
-                        <div v-else>
-                            No
-                        </div>
-                    </template>
-                </v-data-table>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Tracking ID</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        <v-chip
+                                            label
+                                            dark
+                                            :color="selected_document.color"
+                                            id="document_label"
+                                        >
+                                            {{ selected_document.tracking_code }}
+                                        </v-chip>
+                                    </v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Subject</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.subject}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Source</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title v-if="selected_document.is_external">External</v-list-item-title>
+                                    <v-list-item-title v-else>Internal</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Type</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.type_name}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Originating Office</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.originating_office_name}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Current Office</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.current_office_name}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Sender</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.sender_fullname}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Date Filed</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.date_filed}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col cols="12" xl="4" lg="4" md="4" sm="12">
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Page Count</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.page_count}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                    <v-col cols="12" xl="4" lg="4" md="4" sm="12">
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Attachment Page Count</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.attachment_page_count}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                    <v-col cols="12" xl="4" lg="4" md="4" sm="12">
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Terminal</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title v-if="selected_document.is_terminal">Yes</v-list-item-title>
+                                    <v-list-item-title v-else>No</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
+                <v-divider inset/>
+                <v-row>
+                    <v-col>
+                        <v-list
+                            flat
+                            subheader
+                        >
+                            <v-subheader>Remarks</v-subheader>
+                            <v-list-item>
+                                <v-list-item-action>
+                                    <v-icon>mdi-square-medium</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{selected_document.remarks}}</v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
+                    </v-col>
+                </v-row>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -261,20 +436,6 @@ export default {
                 { text: 'Date Filed', value: 'date_filed', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
                 { text: 'Actions', value: 'data-table-expand', sortable: false },
-            ],
-            inner_table_header: [
-                { text: 'Tracking ID', value: 'tracking_code', sortable: false },
-                { text: 'Subject', value: 'subject', sortable: false },
-                { text: 'Source', value: 'is_external', sortable: false },
-                { text: 'Type', value: 'document_type_id', sortable: false },
-                { text: 'Originating Office', value: 'originating_office', sortable: false },
-                { text: 'Current Office', value: 'current_office_id', sortable: false },
-                { text: 'Sender', value: 'sender_name', sortable: false },
-                { text: 'Page Count', value: 'page_count', sortable: false },
-                { text: 'Attachment Page Count', value: 'attachment_page_count' },
-                { text: 'Terminal', value: 'is_terminal', sortable: false },
-                { text: 'Date Filed', value: 'date_filed', sortable: false },
-                { text: 'Remarks', value: 'remarks', sortable: false },
             ],
             dialog: false,
             selected_document: '',
@@ -352,9 +513,7 @@ export default {
             }
         },
         seeDocumentDetails(document) {
-            var document_array = [];
-            document_array.push(document);
-            this.selected_document = document_array;
+            this.selected_document = document;
             this.dialog = true;
         },
         paginateDocuments(page_number) {
@@ -362,7 +521,16 @@ export default {
             this.$store.dispatch('getActiveDocuments', page_number).then(() => {
                 this.$store.dispatch('unsetDataTableLoader');
             });
-        }
+        },
+        redirectToReceivePage(document) {
+            /**
+            * TODO:
+            * Save the document id or the document object to Vuex instead because the dynamic routing is messing
+            * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
+            **/
+            this.$store.dispatch('setDocument', document);
+            this.$router.push(`receive_document`);
+        },
     },
     mounted() {
         this.$store.dispatch('unsetLoader');
@@ -376,38 +544,10 @@ export default {
 </script>
 
 <style>
-    #inverse_table {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    #inverse_table table tr {
-        display:flex;
-        flex-direction: column;
-        float: left;
-    }
-
-    #inverse_table thead, #inverse_table tbody {
-        float: left;
-    }
-
-    /* fix for the missing border on last column*/
-    #inverse_table tbody tr td {
-        border-bottom: 1px solid rgba(0,0,0,.12);
-    }
-
-    #inverse_table tbody tr:hover {
-        background-color: transparent !important;
-    }
-    #inverse_table th {
-        width: 300px;
-        display: flex;
-        align-items: center;
-    }
-    #inverse_table td {
-        display: flex;
-        align-items: center;
+    /* TODO: Add media queries for tablet sized devices */
+    @media screen and (max-width: 600px) {
+        #document_label {
+            font-size: 0.8em;
+        }
     }
 </style>

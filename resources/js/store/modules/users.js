@@ -14,6 +14,7 @@ function buildName(first_name, middle_name, last_name, suffix) {
 const state = {
     user: {},
     all_users: [],
+    all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
     form_requests : {
@@ -28,6 +29,7 @@ const getters = {
     auth_user_full_name: state => state.user_full_name,
     form_requests_status: state => state.form_requests,
     all_users: state => state.all_users,
+    all_users_complete: state => state.all_users_complete,
 }
 
 const actions = {
@@ -40,7 +42,8 @@ const actions = {
         commit('UNSET_AUTH_USER');
     },
     async getAllUsers({ commit }) {
-        await axios.get('all_users').then(response => {
+        await axios.get('all_users')
+        .then(response => {
             response.data.forEach(element => {
                 element.full_name = '';
                 element.full_name = buildName(
@@ -52,7 +55,20 @@ const actions = {
             });
             commit('FETCH_ALL_USERS', response.data);
         });
-
+    },
+    async getAllUsersComplete({ commit }) {
+        await axios.get(all_users_complete)
+        .then(response => {
+            response.data.forEach(element => {
+                element.full_name = '';
+                element.full_name = buildName(
+                    element.first_name,
+                    element.middle_name,
+                    element.last_name,
+                    element.suffix
+                );
+            });
+        });
     },
     async editUserCredentials({ commit }, updates) {
         const response = await axios.put(`update_user/${updates.id}`, updates.form);
@@ -64,19 +80,6 @@ const actions = {
             commit('UPDATE_PASSWORD', {response: response.data, form_type: updates.form_type});
         }
     },
-    // TODO: Clean, remove if no problems occur
-    // async editUserCompleteName({ commit }, updates) {
-    //     const response = await axios.put(`/api/users/${updates.id}`, updates.form);
-    //     commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
-    // },
-    // async editUsername({ commit }, updates) {
-    //     const response = await axios.put(`/api/users/${updates.id}`, updates.form);
-    //     commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
-    // },
-    // async editPassword({ commit }, updates) {
-    //     const response = await axios.put(`/api/users/${updates.id}`, updates.form);
-    //     commit('UPDATE_PASSWORD', {response: response.data, form_type: updates.form_type});
-    // },
     async removeRequestStatus({commit}) {
         commit('UNSET_REQUEST_STATUS');
     }
@@ -85,7 +88,7 @@ const actions = {
 const mutations = {
     SET_AUTH_USER: (state, user) => {
         state.user = user
-        state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
+        // state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
         state.username = user.username;
     },
     UNSET_AUTH_USER: (state) => {

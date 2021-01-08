@@ -26,6 +26,13 @@ class UserController extends Controller
         return User::where('role_id', 2)->get();
     }
 
+    public function getAllUserComplete(): Collection
+    {
+        return User::where('role_id', '<>', 1)
+            ->with('office', 'division', 'sector', 'unit', 'role')
+            ->get();
+    }
+
     public function updateUser(Request $request, string $userId)
     {
         // TODO: Add Log entry for each change

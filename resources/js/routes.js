@@ -1,9 +1,11 @@
 import Dashboard from './components/user/Dashboard';
 import DocumentRecords from './components/user/DocumentRecords';
 import AccountSettings from './components/user/AccountSettings';
+import UserManagement from './components/user/UserManagement';
 
 import AllDocument from './components/user/components/AllDocument'
 import NewDocument from './components/user/components/NewDocument';
+import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
 import ReportAging from './components/user/ReportAging';
 import ReportMasterList from './components/user/ReportMasterList';
@@ -12,7 +14,7 @@ import Login from './components/Login';
 import HomeContainer from './components/HomeContainer';
 import NotFound from './components/NotFound';
 
-// TODO: Fix routes structure
+// TODO: Fix navigation guards
 export default {
     base: '/',
     mode: 'history',
@@ -63,38 +65,19 @@ export default {
                     component: AllDocument,
                     name: 'All Active Documents',
                 },
-                // {
-                //     path: 'document_details/:id',
-                //     component: DocumentDetails,
-                //     name: 'Document Details',
-                //     beforeEnter: (to, from, next) => {
-                //         if (to.params.id) {
-                //             axios.get(`get_document_details/${to.params.id}`).then((response) => {
-                //                 next()
-                //             }).catch(() => {
-                //                 return next('All Active Documents');
-                //             });
-                //         }else {
-                //             return next(
-                //                 vm => {
-                //                     vm.prevRoute = from;
-                //                 }
-                //             );
-                //         }
-                //     },
-                // },
                 {
-                    path: 'receive_document/:routing_number',
-                    component: DocumentAction,
-                    name: 'Receive Document'
+                    path: 'receive_document',
+                    component: ReceiveDocument,
+                    name: 'Receive Document',
                 },
                 {
-                    path: 'forward_document/:routing_number',
+                    path: 'forward_document',
                     component: DocumentAction,
-                    name: 'Forward Document'
+                    name: 'Forward Document',
+                    props: true,
                 },
                 {
-                    path: 'terminal_document/:routing_number',
+                    path: 'terminal_document',
                     component: DocumentAction,
                     name: 'Terminal Document'
                 },
@@ -107,6 +90,11 @@ export default {
                     path: 'reports/master_list',
                     component: ReportMasterList,
                     name: 'Document Master List'
+                },
+                {
+                    path: 'user_management',
+                    component: UserManagement,
+                    name: 'User Management'
                 }
             ]
         },

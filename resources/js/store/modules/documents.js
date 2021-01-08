@@ -15,6 +15,7 @@ const getters = {
     documents: state => state.documents,
     document_types: state => state.document_types,
     form_requests: state => state.form_requests,
+    selected_document: state => state.selected_document,
 }
 
 const actions = {
@@ -85,7 +86,7 @@ const mutations = {
     SET_SELECTED_DOCUMENT(state, document) {
         state.selected_document = document;
     },
-    UNSET_SELECTED_DOCUMENT() {
+    UNSET_SELECTED_DOCUMENT(state) {
         state.selected_document = {};
     }
 }

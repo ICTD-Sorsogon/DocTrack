@@ -14,10 +14,10 @@
                                 v-bind="attrs"
                                 v-on="on"
                             >
-                                {{auth_user_full_name}}
+                                {{authUserFullName}}
                             </v-list-item-title>
                         </template>
-                        <span>{{auth_user_full_name}}</span>
+                        <span>{{authUserFullName}}</span>
                     </v-tooltip>
                     <v-list-item-subtitle>{{auth_user.username}}</v-list-item-subtitle>
                 </v-list-item-content>
@@ -29,13 +29,13 @@
         <v-list>
 
             <v-list-item link @click.prevent="getDashboard">
-            <v-list-item-icon>
-                <v-icon>mdi-view-dashboard-outline</v-icon>
-            </v-list-item-icon>
+                <v-list-item-icon>
+                    <v-icon>mdi-view-dashboard-outline</v-icon>
+                </v-list-item-icon>
 
-            <v-list-item-content>
-                <v-list-item-title>Dashboard</v-list-item-title>
-            </v-list-item-content>
+                <v-list-item-content>
+                    <v-list-item-title>Dashboard</v-list-item-title>
+                </v-list-item-content>
             </v-list-item>
 
             <v-list-group
@@ -112,6 +112,16 @@
                 </v-list-item-content>
             </v-list-item>
 
+            <v-list-item link @click.prevent="getUserManagement">
+                <v-list-item-icon>
+                    <v-icon>mdi-account-supervisor-circle</v-icon>
+                </v-list-item-icon>
+
+                <v-list-item-content>
+                    <v-list-item-title>User Management</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
             <v-list-item link @click.prevent="logout">
                 <v-list-item-icon>
                     <v-icon>mdi-logout-variant</v-icon>
@@ -165,21 +175,35 @@
 </template>
 
 <script>
-// TODO: Migrate to Vuex
+// TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
 export default {
     computed: {
-        ...mapGetters(['auth_user', 'auth_user_full_name', 'page_loader']),
+        ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
             return this.$route.name;
         },
         placeholderImage() {
             return `${this.image_source+(this.getRandomInt(0,2) == 1 ? 'men':'women')}/${this.getRandomInt(1, 100)}.jpg`;
+        },
+        authUserFullName() {
+            var f_name = '', m_name = '',l_name = '',s_name = '';
+            f_name = (this.auth_user.first_name.trim()).charAt(0).toUpperCase() +
+                (this.auth_user.first_name.trim()).slice(1);
+            m_name = (this.auth_user.middle_name.trim()).charAt(0).toUpperCase() +
+                (this.auth_user.middle_name.trim()).slice(1);
+            l_name = (this.auth_user.last_name.trim()).charAt(0).toUpperCase() +
+                (this.auth_user.last_name.trim()).slice(1);
+            if(this.auth_user.suffix != null && typeof suffix !== 'undefined') {
+                s_name = (this.auth_user.suffix.trim()).charAt(0).toUpperCase() +
+                    (this.auth_user.suffix.trim()).slice(1);
+            }
+            return `${f_name} ${m_name} ${l_name} ${s_name}`;
         }
     },
     data() {
         return {
-            drawer: true,
+            drawer: null,
             group: null,
             image_source: 'https://randomuser.me/api/portraits/'
         }
@@ -196,50 +220,44 @@ export default {
         getDashboard() {
             if(this.$route.name !== 'Dashboard') {
                 this.$store.dispatch('setLoader');
-                axios.get('/').then(()=>{
-                    this.$router.push({ name: "Dashboard"});
-                })
+                this.$router.push({ name: "Dashboard"});
             }
         },
         getNewDocumentRecordForm() {
             if(this.$route.name !== 'New Document') {
                 this.$store.dispatch('setLoader');
-                axios.get('new_document').then(() => {
-                    this.$router.push({ name: "New Document"});
-                });
+                this.$router.push({ name: "New Document"});
             }
         },
 
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
-                axios.get('all_active_document').then(() => {
-                    this.$router.push({ name: "All Active Documents"});
-                });
+                this.$router.push({ name: "All Active Documents"});
             }
         },
         getAgingReport() {
             if(this.$route.name !== 'Document Aging Report') {
                 this.$store.dispatch('setLoader');
-                axios.get('reports/aging').then(()=>{
-                    this.$router.push({ name: "Document Aging Report"});
-                });
+                this.$router.push({ name: "Document Aging Report"});
             }
         },
         getMasterListReport() {
             if(this.$route.name !== 'Document Master List') {
                 this.$store.dispatch('setLoader');
-                axios.get('reports/master_list').then(()=>{
-                    this.$router.push({ name: "Document Master List"});
-                });
+                this.$router.push({ name: "Document Master List"});
             }
         },
         getAccountSettings() {
             if(this.$route.name !== 'Account Settings') {
                 this.$store.dispatch('setLoader');
-                axios.get('account_settings').then(()=>{
-                    this.$router.push({ name: "Account Settings",  params: { user: this.user }});
-                })
+                this.$router.push({ name: "Account Settings",  params: { user: this.user }});
+            }
+        },
+        getUserManagement() {
+            if(this.$route.name !== 'User Management') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "User Management",  params: { user: this.user }});
             }
         },
         getRandomInt(min, max) {
