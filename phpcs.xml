@@ -2,7 +2,9 @@
 <ruleset name="PHP_CodeSniffer">
     <description>The coding standard for our project.</description>
     <rule ref="PSR2"/>
-
+    <rule ref="Generic.Files.LineEndings">
+        <exclude name="Generic.Files.LineEndings.InvalidEOLChar"/>
+    </rule>
     <file>app</file>
     <file>bootstrap</file>
     <file>config</file>

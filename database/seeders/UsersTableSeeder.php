@@ -16,7 +16,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run(Faker $faker)
     {
-        for($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             DB::table('users')->insert([
                 'role_id' => '1',
                 'username' => $faker->username,
@@ -34,7 +34,7 @@ class UsersTableSeeder extends Seeder
             ]);
         }
 
-        for($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             DB::table('users')->insert([
                 'role_id' => '2',
                 'username' => $faker->username,
@@ -52,7 +52,7 @@ class UsersTableSeeder extends Seeder
             ]);
         }
 
-        for($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             DB::table('users')->insert([
                 'role_id' => '3',
                 'username' => $faker->username,
