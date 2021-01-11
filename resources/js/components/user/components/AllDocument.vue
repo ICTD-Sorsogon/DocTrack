@@ -2,13 +2,13 @@
 <v-card flat>
     <v-card-title primary-title>
         All Active Documents
+        <v-row align="center" justify="end" class="pr-4">
+            <v-btn color="primary" @click.prevent="getNewDocumentRecordForm">Create</v-btn>
+        </v-row>
     </v-card-title>
 
     <v-card-text>
 
-        <v-row align="center" justify="end">
-            <v-btn color="primary" @click.prevent="getNewDocumentRecordForm">Create</v-btn>
-        </v-row>
 
         <v-data-table
             v-if="documents"
@@ -168,12 +168,12 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
-                    color="white"
-                    text
+                    x-large
+                    color="gray"
                     @click="dialog = false"
-                    class="btn_close"
+                    icon
                 >
-                   X 
+                <v-icon>mdi-close</v-icon>
                 </v-btn>
             </v-card-actions>
             <v-card-title primary-title>
@@ -414,16 +414,6 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <!-- <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                    color="primary"
-                    text
-                    @click="dialog = false"
-                >
-                    Close
-                </v-btn>
-            </v-card-actions> -->
         </v-card>
     </v-dialog>
 </v-card>
