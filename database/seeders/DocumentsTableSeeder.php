@@ -27,6 +27,7 @@ class DocumentsTableSeeder extends Seeder
                     $document = Document::factory()->make();
 
                     $document = Document::factory()->create([
+                            'current_office_id' => $user->office->id,
                             'tracking_code' => $this->buildTrackingNumber(
                                 $document->source,
                                 $user->office->office_code,
@@ -45,6 +46,7 @@ class DocumentsTableSeeder extends Seeder
                 $document = Document::factory()->make();
 
                 $document = Document::factory()->create([
+                        'current_office_id' => $user->office->id,
                         'tracking_code' => $this->buildTrackingNumber(
                             $document->source,
                             $user->office->office_code,
