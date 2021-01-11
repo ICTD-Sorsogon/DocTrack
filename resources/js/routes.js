@@ -5,6 +5,7 @@ import UserManagement from './components/user/UserManagement';
 
 import AllDocument from './components/user/components/AllDocument'
 import NewDocument from './components/user/components/NewDocument';
+import EditDocument from './components/user/components/EditDocument';
 import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
 import ReportAging from './components/user/ReportAging';
@@ -59,6 +60,11 @@ export default {
                     path: 'new_document',
                     component: NewDocument,
                     name: 'New Document'
+                },
+                {
+                    path: 'edit_document',
+                    component: EditDocument,
+                    name: 'Edit Document'
                 },
                 {
                     path: 'all_active_document',
