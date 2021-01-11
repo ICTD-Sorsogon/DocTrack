@@ -83,7 +83,7 @@
           <td :colspan="headers.length">
             <v-row>
               <v-col cols="12" sm="3">
-                <v-btn text color="#26A69A" block>
+                <v-btn text color="#26A69A" @click="editDocument()" block>
                   <v-icon left> mdi-pencil </v-icon>
                   Edit
                 </v-btn>
@@ -375,49 +375,98 @@
  * TODO:
  * Build documents before inserting to table
  * FIXME: Search only displays rows from the current page
- **/
-import { colors } from "../../../constants";
+**/
+
+import TableModal from './TableModal'
+import { colors } from '../../../constants';
 import { mapGetters, mapActions } from "vuex";
 export default {
-  data() {
-    return {
-      search: "",
-      expanded: [],
-      headers: [
-        { text: "Tracking ID", value: "tracking_code", sortable: false },
-        { text: "Subject", value: "subject", sortable: false },
-        { text: "Source", value: "is_external", sortable: false },
-        { text: "Type", value: "document_type_id", sortable: false },
-        {
-          text: "Originating Office",
-          value: "originating_office",
-          sortable: false,
-        },
-        { text: "Current Office", value: "current_office_id", sortable: false },
-        { text: "Sender", value: "sender_name", sortable: false },
-        { text: "Date Filed", value: "date_filed", sortable: false },
-        { text: "View More", value: "view_more", sortable: false },
-        { text: "Actions", value: "data-table-expand", sortable: false },
-      ],
-      dialog: false,
-      selected_document: "",
-    };
-  },
-  watch: {
-    current_page(new_value, old_value) {
-      this.paginateDocuments(new_value);
+    components: {TableModal},
+    data() {
+        return {
+            search: '',
+            expanded: [],
+            headers: [
+                { text: 'Tracking ID', value: 'tracking_code', sortable: false },
+                { text: 'Subject', value: 'subject', sortable: false },
+                { text: 'Source', value: 'is_external', sortable: false },
+                { text: 'Type', value: 'document_type.name', sortable: false },
+                { text: 'Originating Office', value: 'origin_office.name', sortable: false },
+                { text: 'Current Office', value: 'current_office.name', sortable: false },
+                { text: 'Sender', value: 'sender.name', sortable: false },
+                { text: 'Date Filed', value: 'date_filed', sortable: false },
+                { text: 'View More', value: 'view_more', sortable: false },
+                { text: 'Actions', value: 'data-table-expand', sortable: false },
+            ],
+            dialog: false,
+            selected_document: '',
+        }
     },
-  },
   computed: {
     ...mapGetters(["documents", "datatable_loader"]),
     offices() {
       return this.$store.state.offices.offices;
     },
-    document_types() {
-      return this.$store.state.documents.document_types;
+    computed: {
+        ...mapGetters(['documents', 'datatable_loader']),
+        offices() {
+            return this.$store.state.offices.offices;
+        },
+        document_types() {
+            return this.$store.state.documents.document_types;
+        },
+        current_page: {
+            get() {
+                return this.$store.state.documents.documents.current_page;
+            },
+            set(value) {
+                return this.$store.commit('SET_CURRENT_PAGE', value);
+            }
+        },
+        last_page: {
+            get() {
+                return this.$store.state.documents.documents.last_page;
+            },
+        },
+
     },
-    users() {
-      return this.$store.state.users.all_users;
+    methods: {
+        checkIfID(string) {
+            return /^-?\d+$/.test(string);
+        },
+        getTrackingCodeColor(document, document_type_id) {
+            document.color = '';
+            document.color = colors[document_type_id];
+            return colors[document_type_id];
+        },
+        seeDocumentDetails(document) {
+            this.selected_document = document;
+            this.dialog = true;
+        },
+        closeDialog(){
+            this.dialog = false;
+       },
+        paginateDocuments(page_number) {
+            this.$store.dispatch('setDataTableLoader');
+            this.$store.dispatch('getActiveDocuments', page_number).then(() => {
+                this.$store.dispatch('unsetDataTableLoader');
+            });
+        },
+        getNewDocumentRecordForm() {
+            if(this.$route.name !== 'New Document') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "New Document"});
+            }
+        },
+        redirectToReceivePage(document) {
+            /**
+            * TODO:
+            * Save the document id or the document object to Vuex instead because the dynamic routing is messing
+            * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
+            **/
+            this.$store.dispatch('setDocument', document);
+            this.$router.push(`receive_document`);
+        },
     },
     current_page: {
       get() {
@@ -491,6 +540,12 @@ export default {
       if (this.$route.name !== "New Document") {
         this.$store.dispatch("setLoader");
         this.$router.push({ name: "New Document" });
+      }
+    },
+    editDocument() {
+      if (this.$route.name !== "Edit Document") {
+        this.$store.dispatch("setLoader");
+        this.$router.push({ name: "Edit Document" });
       }
     },
     redirectToReceivePage(document) {

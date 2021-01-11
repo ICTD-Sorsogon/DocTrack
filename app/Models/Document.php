@@ -18,9 +18,14 @@ class Document extends Model
         'remarks', 'attachment_page_count'
     ];
 
-    public function office()
+    public function current_office()
     {
-        return $this->belongsTo('App\Models\Office');
+        return $this->belongsTo('App\Models\Office', 'current_office_id');
+    }
+
+    public function origin_office()
+    {
+        return $this->belongsTo('App\Models\Office', 'originating_office');
     }
 
     public function tracking_records()
@@ -31,5 +36,10 @@ class Document extends Model
     public function document_type()
     {
         return $this->belongsTo('App\Models\DocumentType');
+    }
+
+    public function sender() 
+    {
+        return $this->belongsTo('App\Models\Personnel', 'sender_name');
     }
 }
