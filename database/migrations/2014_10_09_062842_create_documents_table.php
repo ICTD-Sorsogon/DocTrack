@@ -19,7 +19,7 @@ class CreateDocumentsTable extends Migration
             $table->string('subject');
             $table->boolean('is_external')->default(false);
             $table->foreignId('document_type_id')->constrained('document_types');
-            $table->string('originating_office')->nullable();
+            $table->string('originating_office')->nullable()->contrained('offices');
             $table->foreignId('current_office_id')->nullable()->constrained('offices');
             $table->string('sender_name')->nullable();
             $table->unsignedInteger('page_count');
