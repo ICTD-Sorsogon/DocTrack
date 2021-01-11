@@ -27,7 +27,8 @@ class DocumentController extends Controller
 
     public function getAllActiveDocuments(): LengthAwarePaginator
     {
-        $documents = Document::with('document_type')->where('current_office_id', Auth::user()->office_id)
+        $documents = Document::with('document_type', 'current_office', 'origin_office', 'sender')
+                    ->where('current_office_id', Auth::user()->office_id)
                     ->where('is_terminal', false)
                     ->orderBy('date_filed', 'desc')
                     ->paginate(10);
