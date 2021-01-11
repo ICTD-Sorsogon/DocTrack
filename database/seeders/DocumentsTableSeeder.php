@@ -23,7 +23,7 @@ class DocumentsTableSeeder extends Seeder
         $users = User::with('office')->where('role_id', 2)->get();
         foreach ($users as $user) {
             if ($user->id%2 == 0) {
-                for ($i = 0; $i < 60000; $i++) {
+                for ($i = 0; $i < 100; $i++) {
                     DB::beginTransaction();
                     try {
                         $source = rand(0, 1);
@@ -70,7 +70,7 @@ class DocumentsTableSeeder extends Seeder
                     DB::commit();
                 }
             }
-            for ($i = 0; $i < 50000; $i++) {
+            for ($i = 0; $i < 100; $i++) {
                 DB::beginTransaction();
                 try {
                     $source = rand(0, 1);
