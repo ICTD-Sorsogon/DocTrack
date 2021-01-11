@@ -12,7 +12,14 @@ const state = {
 }
 
 const getters = {
-    documents: state => state.documents,
+    documents: ({documents}) => {
+        for( let doc of documents.data){
+            console.log(doc.is_external)
+            doc.is_external = doc.is_external ? 'External' : 'Internal' 
+            doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'
+        }
+        return documents
+    },
     document_types: state => state.document_types,
     form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
