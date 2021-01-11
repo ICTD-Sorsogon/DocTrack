@@ -7,7 +7,7 @@
     <v-card-text>
 
         <v-row align="center" justify="end">
-            <v-btn @click.prevent="getNewDocumentRecordForm">Create</v-btn>
+            <v-btn color="primary" @click.prevent="getNewDocumentRecordForm">Create</v-btn>
         </v-row>
 
         <v-data-table
@@ -165,6 +165,17 @@
       max-width="1000px"
     >
         <v-card v-if="selected_document">
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="white"
+                    text
+                    @click="dialog = false"
+                    class="btn_close"
+                >
+                   X 
+                </v-btn>
+            </v-card-actions>
             <v-card-title primary-title>
                 Document Details
             </v-card-title>
@@ -403,7 +414,7 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-actions>
+            <!-- <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
                     color="primary"
@@ -412,7 +423,7 @@
                 >
                     Close
                 </v-btn>
-            </v-card-actions>
+            </v-card-actions> -->
         </v-card>
     </v-dialog>
 </v-card>
@@ -562,4 +573,8 @@ export default {
             font-size: 0.8em;
         }
     }
+    .btn_close{
+        background: blue;
+        opacity: 0.7;
+   }
 </style>
