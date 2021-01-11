@@ -1,8 +1,15 @@
 <template>
 <v-card flat>
+
     <v-card-title primary-title>
-        Add New Document
+      Add New Documents
+      <v-row align="center" justify="end" class="pr-4">
+        <v-btn color="primary" @click.prevent="getAllDocuments"
+          >Back</v-btn
+        >
+      </v-row>
     </v-card-title>
+
     <v-card-text>
         <ValidationObserver ref="observer" v-slot="{ invalid }">
             <v-form ref="form" @submit.prevent="createNewDocument">
@@ -292,6 +299,12 @@ export default {
         }
     },
     methods: {
+        getAllDocuments() {
+            if(this.$route.name !== 'All Active Documents') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "All Active Documents"});
+            }
+        },
         generateTrackingCode(document_data) {
             var tracking_number = '';
             var origin = 'I';
