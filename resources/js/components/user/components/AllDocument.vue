@@ -383,50 +383,50 @@ import TableModal from './TableModal'
 import { colors } from '../../../constants';
 import { mapGetters, mapActions } from "vuex";
 export default {
-    components: {TableModal},
-    data() {
-        return {
-            search: '',
-            expanded: [],
-            headers: [
-                { text: 'Tracking ID', value: 'tracking_code', sortable: false },
-                { text: 'Subject', value: 'subject', sortable: false },
-                { text: 'Source', value: 'is_external', sortable: false },
-                { text: 'Type', value: 'document_type.name', sortable: false },
-                { text: 'Originating Office', value: 'origin_office.name', sortable: false },
-                { text: 'Current Office', value: 'current_office.name', sortable: false },
-                { text: 'Sender', value: 'sender.name', sortable: false },
-                { text: 'Date Filed', value: 'date_filed', sortable: false },
-                { text: 'View More', value: 'view_more', sortable: false },
-                { text: 'Actions', value: 'data-table-expand', sortable: false },
-            ],
-            dialog: false,
-            selected_document: '',
-        }
-    },
-    computed: {
-        ...mapGetters(['documents', 'datatable_loader']),
-        offices() {
-            return this.$store.state.offices.offices;
-        },
-        document_types() {
-            return this.$store.state.documents.document_types;
-        },
-        current_page: {
-            get() {
-                return this.$store.state.documents.documents.current_page;
-            },
-            set(value) {
-                return this.$store.commit('SET_CURRENT_PAGE', value);
-            }
-        },
-        last_page: {
-            get() {
-                return this.$store.state.documents.documents.last_page;
-            },
-        },
+  components: {TableModal},
+  data() {
+      return {
+          search: '',
+          expanded: [],
+          headers: [
+              { text: 'Tracking ID', value: 'tracking_code', sortable: false },
+              { text: 'Subject', value: 'subject', sortable: false },
+              { text: 'Source', value: 'is_external', sortable: false },
+              { text: 'Type', value: 'document_type.name', sortable: false },
+              { text: 'Originating Office', value: 'origin_office.name', sortable: false },
+              { text: 'Current Office', value: 'current_office.name', sortable: false },
+              { text: 'Sender', value: 'sender.name', sortable: false },
+              { text: 'Date Filed', value: 'date_filed', sortable: false },
+              { text: 'View More', value: 'view_more', sortable: false },
+              { text: 'Actions', value: 'data-table-expand', sortable: false },
+          ],
+          dialog: false,
+          selected_document: '',
+      }
+  },
+  computed: {
+      ...mapGetters(['documents', 'datatable_loader']),
+      offices() {
+          return this.$store.state.offices.offices;
+      },
+      document_types() {
+          return this.$store.state.documents.document_types;
+      },
+      current_page: {
+          get() {
+              return this.$store.state.documents.documents.current_page;
+          },
+          set(value) {
+              return this.$store.commit('SET_CURRENT_PAGE', value);
+          }
+      },
+      last_page: {
+        get() {
+              return this.$store.state.documents.documents.last_page;
+          },
+      },
 
-    },
+  },
   methods: {
     checkIfID(string) {
       return /^-?\d+$/.test(string);
@@ -506,19 +506,6 @@ export default {
       this.$router.push(`receive_document`);
     },
   },
-    current_page: {
-      get() {
-        return this.$store.state.documents.documents.current_page;
-      },
-      set(value) {
-        return this.$store.commit("SET_CURRENT_PAGE", value);
-      },
-    },
-    last_page: {
-      get() {
-        return this.$store.state.documents.documents.last_page;
-      },
-    },
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("getActiveDocuments").then(() => {
