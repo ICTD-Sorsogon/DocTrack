@@ -33,7 +33,7 @@ export default {
             path: '/',
             component: HomeContainer,
             beforeEnter: (to, from, next) => {
-                axios.get('/authenticated').then((response) => {
+                axios.get('api/authenticated').then((response) => {
                     next()
                 }).catch(() => {
                     return next({ name: 'Login'})
