@@ -53,14 +53,24 @@
                             single-line
                             required
                         >
-                            <v-radio
+                        <v-radio value="Internal">
+                            <template v-slot:label>
+                            <div>Internal</div>
+                            </template>
+                        </v-radio>
+                        <v-radio value="External">
+                            <template v-slot:label>
+                            <div>External </div>
+                            </template>
+                        </v-radio>
+                            <!-- <v-radio
                                 label="Internal"
                                 value=false
                             ></v-radio>
                             <v-radio
                                 label="External"
                                 value=true
-                            ></v-radio>
+                            ></v-radio> -->
                         </v-radio-group>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
@@ -382,9 +392,17 @@ export default {
         createAndForward() {
             // TODO: Create new document then forward to office
         },
+        fillForm(){
+            let item = this.$store.getters.getDocument(this.$route.params.id);
+            console.log(item);
+            this.form.document_title = item[0].subject;
+            this.form.document_type = item[0].document_type;
+            this.form.is_external = item[0].is_external;
+            this.form.originating_office = item[0].origin_office.name;
+        },
     },
     mounted() {
-        console.log(this.$store.getters.getDocument(this.$route.params.id));
+        this.fillForm();
         this.$store.dispatch('getAllUsers');
         this.$store.dispatch('getDocumentTypes');
         this.$store.dispatch('getOffices');
