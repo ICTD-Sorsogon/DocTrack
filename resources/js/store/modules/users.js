@@ -38,7 +38,7 @@ const actions = {
         commit('SET_AUTH_USER', response.data);
     },
     async removeAuthUser({ commit }) {
-        await axios.post('/api/logout');
+        await axios.post('logout');
         commit('UNSET_AUTH_USER');
     },
     async getAllUsers({ commit }) {
