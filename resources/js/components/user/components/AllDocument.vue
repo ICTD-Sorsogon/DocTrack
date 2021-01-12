@@ -404,11 +404,6 @@ export default {
             selected_document: '',
         }
     },
-  computed: {
-    ...mapGetters(["documents", "datatable_loader"]),
-    offices() {
-      return this.$store.state.offices.offices;
-    },
     computed: {
         ...mapGetters(['documents', 'datatable_loader']),
         offices() {
@@ -432,45 +427,7 @@ export default {
         },
 
     },
-    methods: {
-        checkIfID(string) {
-            return /^-?\d+$/.test(string);
-        },
-        getTrackingCodeColor(document, document_type_id) {
-            document.color = '';
-            document.color = colors[document_type_id];
-            return colors[document_type_id];
-        },
-        seeDocumentDetails(document) {
-            this.selected_document = document;
-            this.dialog = true;
-        },
-        closeDialog(){
-            this.dialog = false;
-       },
-        paginateDocuments(page_number) {
-            this.$store.dispatch('setDataTableLoader');
-            this.$store.dispatch('getActiveDocuments', page_number).then(() => {
-                this.$store.dispatch('unsetDataTableLoader');
-            });
-        },
-        getNewDocumentRecordForm() {
-            if(this.$route.name !== 'New Document') {
-                this.$store.dispatch('setLoader');
-                this.$router.push({ name: "New Document"});
-            }
-        },
-        redirectToReceivePage(document) {
-            /**
-            * TODO:
-            * Save the document id or the document object to Vuex instead because the dynamic routing is messing
-            * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
-            **/
-            this.$store.dispatch('setDocument', document);
-            this.$router.push(`receive_document`);
-        },
-    },
-    current_page: {
+  current_page: {
       get() {
         return this.$store.state.documents.documents.current_page;
       },
@@ -483,7 +440,6 @@ export default {
         return this.$store.state.documents.documents.last_page;
       },
     },
-  },
   methods: {
     checkIfID(string) {
       return /^-?\d+$/.test(string);
