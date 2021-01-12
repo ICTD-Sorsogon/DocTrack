@@ -9,6 +9,7 @@ const state = {
     document_loading: false,
     document_type_loading: false,
     selected_document: {},
+    id: '',
 }
 
 const getters = {
@@ -23,9 +24,17 @@ const getters = {
     document_types: state => state.document_types,
     form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
+    getDocument: ({documents})=> (id) =>{
+        return documents.data.filter(item=>
+            item.id == id
+            );
+    }
 }
 
 const actions = {
+    async setImmediate({commit}, id) {
+        commit('SET_ID_DOCUMENT', id);
+    },
     async getActiveDocuments({ commit }, page_number) {
         const response = await axios.get(`get_active_documents?page=${page_number}`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
@@ -67,6 +76,9 @@ const actions = {
 }
 
 const mutations = {
+    SET_ID_DOCUMENT(state, id){
+        state.id = id;
+    },
     GET_ALL_ACTIVE_DOCUMENTS(state, response) {
         state.documents = response;
     },

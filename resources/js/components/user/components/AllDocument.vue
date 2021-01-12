@@ -83,10 +83,12 @@
           <td :colspan="headers.length">
             <v-row>
               <v-col cols="12" sm="3">
-                <v-btn text color="#26A69A" @click="editDocument()" block>
+            <v-list-item link @click="editDocument(item.id)">
+                <v-btn text color="#26A69A" block>
                   <v-icon left> mdi-pencil </v-icon>
                   Edit
                 </v-btn>
+            </v-list-item>
               </v-col>
               <v-col cols="12" sm="3">
                 <v-btn
@@ -542,10 +544,10 @@ export default {
         this.$router.push({ name: "New Document" });
       }
     },
-    editDocument() {
+    editDocument(id) {
       if (this.$route.name !== "Edit Document") {
         this.$store.dispatch("setLoader");
-        this.$router.push({ name: "Edit Document" });
+        this.$router.push({ name:"Edit Document", params: {id}});
       }
     },
     redirectToReceivePage(document) {
