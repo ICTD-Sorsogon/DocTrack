@@ -34,16 +34,17 @@ const getters = {
 
 const actions = {
     async getAuthUser({ commit }) {
-        const response = await axios.get('auth_user');
+        const response = await axios.get('/api/auth_user');
         commit('SET_AUTH_USER', response.data);
     },
     async removeAuthUser({ commit }) {
-        await axios.post('logout');
+        await axios.post('/api/logout');
         commit('UNSET_AUTH_USER');
     },
     async getAllUsers({ commit }) {
-        await axios.get('all_users')
+        await axios.get('/api/all_users')
         .then(response => {
+            debugger
             response.data.forEach(element => {
                 element.full_name = '';
                 element.full_name = buildName(

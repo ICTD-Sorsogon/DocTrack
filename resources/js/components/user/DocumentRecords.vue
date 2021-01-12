@@ -215,13 +215,13 @@ export default {
 
         },
         getNewDocumentPage() {
-            axios.get('new_document').then(() => {
+            axios.get('/api/new_document').then(() => {
                 this.$router.push({ name: "New Document"})
             })
         },
         getReceiveDocumentPage() {
             if(this.routing_number){
-                axios.get('receive_document').then(() => {
+                axios.get('/api/receive_document').then(() => {
                     this.$router.push({
                         name: "Receive Document",
                         params: { routing_number: this.receive_routing_number }
@@ -231,7 +231,7 @@ export default {
         },
         getForwardDocumentPage() {
             if(this.routing_number){
-                axios.get('forward_document').then(() => {
+                axios.get('/api/forward_document').then(() => {
                     this.$router.push({
                         name: "Forward Document",
                         params: { routing_number: this.forward_routing_number }
