@@ -28,6 +28,13 @@ export default {
             path: '/',
             component: Login,
             name: 'Login',
+            beforeEnter: (to, from, next) => {
+                axios.get('api/authenticated').then((response) => {
+                    next({name: 'Dashboard' })
+                }).catch(() => {
+                    return next()
+                });
+            },
         },
         {
             path: '/',
