@@ -4,7 +4,7 @@
     <v-card-title primary-title>
       Edit Document
       <v-row align="center" justify="end" class="pr-4">
-        <v-btn color="primary" @click.prevent="getAllDocuments"
+        <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
         >
       </v-row>
@@ -299,7 +299,7 @@ export default {
         }
     },
     methods: {
-        getAllDocuments() {
+        navigateAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
                 this.$router.push({ name: "All Active Documents"});
