@@ -12,6 +12,7 @@ use App\Models\Log;
 use Illuminate\Http\Request;
 use App\Models\TrackingRecord;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class DocumentController extends Controller
 {
@@ -27,12 +28,21 @@ class DocumentController extends Controller
 
     public function getAllActiveDocuments(): LengthAwarePaginator
     {
+        $officeId = Auth::user()->office_id;
         $documents = Document::with('document_type', 'current_office', 'origin_office', 'sender')
-                    ->where('current_office_id', Auth::user()->office_id)
+                    ->whereRaw("(destination_office_id = {$officeId} OR originating_office = {$officeId} )")
                     ->where('is_terminal', false)
                     ->orderBy('date_filed', 'desc')
-                    ->paginate(10);
+                    ->paginate();
         return $documents;
+    }
+
+    public function getAllIncomingDocuments() 
+    {
+        return Document::with('document_type', 'current_office', 'origin_office', 'sender')
+                    ->where('destination_office', Auth::user()->office_id) ->where('is_terminal', false)
+                    ->orderBy('date_filed', 'desc')
+                    ->paginate(10);
     }
 
     public function getNonPaginatedActiveDocuments()
