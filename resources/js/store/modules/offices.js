@@ -9,7 +9,7 @@ const getters = {
 
 const actions = {
     async getOffices({ commit }) {
-        const response = await axios.get('office_list');
+        const response = await axios.get('/api/office_list');
         commit('GET_ALL_OFFICES', response.data);
     },
 }

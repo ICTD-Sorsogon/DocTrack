@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SectorsTableSeeder::class,
             UsersTableSeeder::class,
             DocumentTypesSeeder::class,
+            PersonnelSeeder::class,
             DocumentsTableSeeder::class,
         ]);
     }

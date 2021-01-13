@@ -109,7 +109,7 @@ export default {
            this.$store.dispatch('setLoader');
            this.submitStatus = '';
            axios.get('/sanctum/csrf-cookie').then(response => {
-                axios.post('/login', this.form)
+                axios.post('login', this.form)
                 .then(response => {
                     this.$router.push({
                         name: 'Dashboard'
