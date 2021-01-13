@@ -15,7 +15,7 @@ class LoginController extends Controller
             'password' => 'required'
         ]);
 
-        if(Auth::attempt($request->only('username', 'password'))) {
+        if (Auth::attempt($request->only('username', 'password'))) {
             return response()->json(Auth::user(), 200);
         }
 

@@ -1,8 +1,8 @@
 <?php
 
 namespace Database\Seeders;
-use DB;
 
+use DB;
 use App\Models\Document;
 use App\Models\TrackingRecord;
 use App\Models\User;
@@ -27,7 +27,7 @@ class DocumentsTableSeeder extends Seeder
                     $document = Document::factory()->make();
 
                     $document = Document::factory()->create([
-                            'current_office_id' => $user->office->id,
+                            'originating_office' =>  $document->originating_office == 0 ? $user->office->id : $faker->company,
                             'tracking_code' => $this->buildTrackingNumber(
                                 $document->source,
                                 $user->office->office_code,
@@ -46,7 +46,7 @@ class DocumentsTableSeeder extends Seeder
                 $document = Document::factory()->make();
 
                 $document = Document::factory()->create([
-                        'current_office_id' => $user->office->id,
+                        'originating_office' =>  $document->originating_office == 0 ? $user->office->id : $faker->company,
                         'tracking_code' => $this->buildTrackingNumber(
                             $document->source,
                             $user->office->office_code,
@@ -63,13 +63,24 @@ class DocumentsTableSeeder extends Seeder
         }
     }
 
-    private function buildTrackingNumber($source, $office_code, $attachment, $date) {
+    private function buildTrackingNumber($source, $office_code, $attachment, $date)
+    {
         $origin = 'I';
         if ($source) {
             $origin = 'E';
         }
         $parsed_date = Carbon::parse($date);
-        $tracking = $origin.'-'.$office_code.'-'.$parsed_date->year.$parsed_date->month.$parsed_date->day.'-'.substr(str_shuffle("0123456789"), 0, 5).'-'.$attachment;
+        $tracking = $origin.
+            '-'.
+            $office_code.
+            '-'.
+            $parsed_date->year.
+            $parsed_date->month.
+            $parsed_date->day.
+            '-'.
+            substr(str_shuffle("0123456789"), 0, 5).
+            '-'.
+            $attachment;
         return $tracking;
     }
 }
