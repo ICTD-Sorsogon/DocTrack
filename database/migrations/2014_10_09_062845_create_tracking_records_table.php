@@ -16,8 +16,7 @@ class CreateTrackingRecordsTable extends Migration
         Schema::create('tracking_records', function (Blueprint $table) {
             $table->id();
             $table->foreignId('document_id')->constrained('documents');
-            $table->unsignedTinyInteger('actions');
-            $table->unsignedTinyInteger('status');
+            $table->enum('action', ['create', 'receive', 'forward', 'processing', 'on hold', 'rejected', 'terminate']);
             $table->foreignId('approved_by')->nullable()->constrained('personnels');
             $table->foreignId('touched_by')->nullable()->constrained('users');
             $table->dateTime('last_touched');
