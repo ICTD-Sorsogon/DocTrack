@@ -26,23 +26,9 @@ class DocumentController extends Controller
         return DocumentType::get();
     }
 
-    public function getAllActiveDocuments()
+    public function getAllActiveDocuments(Document $documents)
     {
-        $officeId = Auth::user()->office_id;
-        $documents = Document::with('document_type', 'current_office', 'origin_office', 'sender')
-                    ->whereRaw("(destination_office_id = {$officeId} OR originating_office = {$officeId} )")
-                    ->where('is_terminal', false)
-                    ->orderBy('date_filed', 'desc')
-                    ->get();
-        return $documents;
-    }
-
-    public function getAllIncomingDocuments() 
-    {
-        return Document::with('document_type', 'current_office', 'origin_office', 'sender')
-                    ->where('destination_office', Auth::user()->office_id) ->where('is_terminal', false)
-                    ->orderBy('date_filed', 'desc')
-                    ->paginate(10);
+        return $documents->allDocuments(Auth::user());
     }
 
     public function getNonPaginatedActiveDocuments()
