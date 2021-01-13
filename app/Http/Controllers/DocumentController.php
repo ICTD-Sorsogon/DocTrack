@@ -26,14 +26,14 @@ class DocumentController extends Controller
         return DocumentType::get();
     }
 
-    public function getAllActiveDocuments(): LengthAwarePaginator
+    public function getAllActiveDocuments()
     {
         $officeId = Auth::user()->office_id;
         $documents = Document::with('document_type', 'current_office', 'origin_office', 'sender')
                     ->whereRaw("(destination_office_id = {$officeId} OR originating_office = {$officeId} )")
                     ->where('is_terminal', false)
                     ->orderBy('date_filed', 'desc')
-                    ->paginate();
+                    ->get();
         return $documents;
     }
 

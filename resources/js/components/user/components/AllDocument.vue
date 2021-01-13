@@ -24,8 +24,9 @@
         <v-data-table
             v-if="documents"
             :headers="headers"
-            :items="tableData"
-            :items-per-page="10"
+            :items="documents"
+            :page.sync="page"
+            :items-per-page="itemsPerPage"
             item-key="id"
             hide-default-footer
             :loading="datatable_loader"
@@ -77,11 +78,7 @@
                             </v-btn>
                         </v-col>
                         <v-col cols="12" sm="3">
-                            <v-btn
-                                @click.prevent="redirectToReceivePage(item)"
-                                text
-                                color="#FFCA28"
-                                block
+                            <v-btn @click.prevent="redirectToReceivePage(item)" text color="#FFCA28" block
                             >
                                 <v-icon left>
                                     mdi-email-send-outline
@@ -91,10 +88,7 @@
                         </v-col>
                         <v-col cols="12" sm="3">
                             <v-btn
-                                link @click.prevent="redirectToReceivePage(item)"
-                                text
-                                color="#9575CD"
-                                block
+                                link @click.prevent="redirectToReceivePage(item)" text color="#9575CD" block
                             >
                                 <v-icon left>
                                     mdi-email-receive-outline
@@ -103,10 +97,7 @@
                             </v-btn>
                         </v-col>
                         <v-col cols="12" sm="3">
-                            <v-btn
-                                text
-                                color="#F06292"
-                                block
+                            <v-btn text color="#F06292" block
                             >
                                 <v-icon left>
                                     mdi-email-off-outline
@@ -120,9 +111,8 @@
         </v-data-table>
         <div class="text-center pt-2">
             <v-pagination
-                v-model="current_page"
-                :length="last_page"
-                :total-visible="10"
+                v-model="page"
+                :length="pageCount"
             ></v-pagination>
         </div>
             </v-tab-item>
@@ -153,6 +143,8 @@ export default {
         return {
             tab: 0,
             search: '',
+            page: 1,
+            itemsPerPage: 10,
             expanded: [],
             headers: [
                 { text: 'Tracking ID', value: 'tracking_code', sortable: false },
@@ -177,9 +169,8 @@ export default {
     },
     computed: {
         ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
-        tableData() {
-            let type = this.tab ? 'originating_office' : 'destination_office_id'
-             return this.documents.data.filter( doc => doc[type] == this.auth_user.office_id )
+        pageCount() {
+            return parseInt(this.documents?.length / this.itemsPerPage)
         },
         offices() {
             return this.$store.state.offices.offices;
@@ -218,12 +209,7 @@ export default {
         closeDialog(){
             this.dialog = false;
        },
-        paginateDocuments(page_number) {
-            this.$store.dispatch('setDataTableLoader');
-            this.$store.dispatch('getActiveDocuments', page_number).then(() => {
-                this.$store.dispatch('unsetDataTableLoader');
-            });
-        },
+
         redirectToReceivePage(document) {
             /**
             * TODO:
