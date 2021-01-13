@@ -74,6 +74,7 @@
                                 text
                                 color="#26A69A"
                                 block
+                                @click.prevent="editDocument(item.id)"
                             >
                                 <v-icon left>
                                     mdi-pencil
@@ -433,19 +434,6 @@ export default {
             },
         },
 
-    },
-  current_page: {
-      get() {
-        return this.$store.state.documents.documents.current_page;
-      },
-      set(value) {
-        return this.$store.commit("SET_CURRENT_PAGE", value);
-      },
-    },
-    last_page: {
-      get() {
-        return this.$store.state.documents.documents.last_page;
-      },
     },
   methods: {
     checkIfID(string) {

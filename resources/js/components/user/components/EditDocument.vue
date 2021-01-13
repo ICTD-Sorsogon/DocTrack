@@ -399,6 +399,11 @@ export default {
             this.form.document_type = item[0].document_type;
             this.form.is_external = item[0].is_external;
             this.form.originating_office = item[0].origin_office.name;
+            this.form.remarks = item[0].remarks;
+            this.form.page_count = item[0].page_count;
+            let datetime = item[0].date_filed.split(" ");
+            this.form.date_filed = datetime[0];
+            this.form.time_filed = datetime[1];
         },
     },
     mounted() {
