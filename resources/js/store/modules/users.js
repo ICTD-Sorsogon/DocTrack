@@ -44,7 +44,6 @@ const actions = {
     async getAllUsers({ commit }) {
         await axios.get('/api/all_users')
         .then(response => {
-            debugger
             response.data.forEach(element => {
                 element.full_name = '';
                 element.full_name = buildName(

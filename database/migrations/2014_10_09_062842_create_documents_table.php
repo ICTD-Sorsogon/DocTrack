@@ -20,7 +20,8 @@ class CreateDocumentsTable extends Migration
             $table->boolean('is_external')->default(false);
             $table->foreignId('document_type_id')->constrained('document_types');
             $table->string('originating_office')->nullable()->contrained('offices');
-            $table->foreignId('current_office_id')->nullable()->constrained('offices');
+            $table->foreignId('destination_office_id')->nullable()->constrained('offices');
+            $table->enum('status', ['receive', 'forward', 'processing', 'on hold', 'rejected', 'terminated']);
             $table->string('sender_name')->nullable();
             $table->unsignedInteger('page_count');
             $table->dateTime('date_filed');
@@ -40,9 +41,9 @@ class CreateDocumentsTable extends Migration
     public function down()
     {
         Schema::table('documents', function (Blueprint $table) {
-            $table->dropIndex(['current_office_id']);
-            $table->dropForeign(['current_office_id']);
-            $table->dropColumn('current_office_id');
+            $table->dropIndex(['destination_office_id']);
+            $table->dropForeign(['destination_office_id']);
+            $table->dropColumn('destination_office_id');
             $table->dropIndex(['document_type_id']);
             $table->dropForeign(['document_type_id']);
             $table->dropColumn('document_type_id');

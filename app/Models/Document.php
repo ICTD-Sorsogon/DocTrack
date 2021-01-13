@@ -42,4 +42,9 @@ class Document extends Model
     {
         return $this->belongsTo('App\Models\Personnel', 'sender_name');
     }
+
+    public function tracker() 
+    {
+        return $this->hasMany('App\Models\TrackingRecord');
+    }
 }
