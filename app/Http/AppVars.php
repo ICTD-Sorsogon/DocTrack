@@ -2,10 +2,12 @@
 declare(strict_types=1);
 
 namespace App\Http;
+
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
-class AppVars {
+class AppVars
+{
 
     public static function getAppJSON(): string
     {
@@ -16,5 +18,4 @@ class AppVars {
         $encoded = addslashes($encoded);
         return $encoded;
     }
-
 }
