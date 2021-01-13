@@ -4,7 +4,7 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 require('./bootstrap');
-import 'es6-promise/auto'
+import 'es6-promise/auto';
 import Vuetify from 'vuetify';
 import VueRouter from 'vue-router';
 import Vuex from 'vuex'
