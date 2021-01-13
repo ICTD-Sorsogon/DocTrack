@@ -36,7 +36,7 @@ class UserController extends Controller
     public function updateUser(Request $request, string $userId)
     {
         // TODO: Add Log entry for each change
-        if($request->form_type == 'account_details') {
+        if ($request->form_type == 'account_details') {
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required|max:255',
                 'middle_name' => 'required|max:255',
@@ -55,7 +55,7 @@ class UserController extends Controller
             $user->first_name = ucfirst(trim($request->first_name));
             $user->middle_name = ucfirst(trim($request->middle_name));
             $user->last_name = ucfirst(trim($request->last_name));
-            if($request->name_suffix) {
+            if ($request->name_suffix) {
                 $user->suffix = ucfirst(trim($request->name_suffix));
             }
             $user->save();
@@ -63,7 +63,7 @@ class UserController extends Controller
                 'message' => 'Account details successfully updated',
                 'code' => 'SUCCESS',
             ]);
-        } else if($request->form_type == 'account_username') {
+        } elseif ($request->form_type == 'account_username') {
             $validator = Validator::make($request->all(), [
                 'new_username' => 'required|max:255',
                 'confirm_username' => 'required|max:255',
@@ -90,7 +90,6 @@ class UserController extends Controller
                     'code' => 'FAILED',
                 ]);
             }
-
         } else {
             $validator = Validator::make($request->all(), [
                 'old_password' => 'required|max:255',
@@ -105,7 +104,7 @@ class UserController extends Controller
                 ]);
             }
 
-            if($request->confirm_password != $request->new_password) {
+            if ($request->confirm_password != $request->new_password) {
                 return response()->json([
                     'message' => 'Password update failed, password confirmation and new password do not match',
                     'code' => 'FAILED'
@@ -120,7 +119,7 @@ class UserController extends Controller
                     'message' => 'Password successfully updated',
                     'code' => 'SUCCESS'
                 ]);
-            }else {
+            } else {
                 return response()->json([
                     'message' => 'Password update failed',
                     'code' => 'FAILED'

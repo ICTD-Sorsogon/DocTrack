@@ -22,8 +22,7 @@ use Illuminate\Support\Facades\Route;
 //     return view('auth/login');
 // });
 
-Route::get('/{any}', function()
-{
+Route::get('/{any}', function () {
     return view('welcome');
 })->where('any', '.*');
 Auth::routes();
