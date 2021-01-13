@@ -3,11 +3,29 @@
     <v-card-title primary-title>
         All Active Documents
     </v-card-title>
+        <v-tabs v-model="tab"
+        full-width
+        grow
+        centered
+         >
+      <v-tab
+        v-for="item in ['Incoming','Outgoing']"
+        :key="item"
+      >
+        {{ item }}
+      </v-tab>
+    </v-tabs>
     <v-card-text>
+        <v-tabs-items v-model="tab">
+    <v-tab-item
+        v-for="item in ['Incoming','Outgoing']"
+        :key="item"
+        >
         <v-data-table
             v-if="documents"
             :headers="headers"
-            :items="documents.data"
+            :items="tableData"
+            :items-per-page="10"
             item-key="id"
             hide-default-footer
             :loading="datatable_loader"
@@ -18,6 +36,8 @@
             :expanded.sync="expanded"
             show-expand
         >
+        <template v-slot:top>
+        </template>
             <template v-slot:top>
                 <v-text-field
                     v-model="search"
@@ -105,6 +125,8 @@
                 :total-visible="10"
             ></v-pagination>
         </div>
+            </v-tab-item>
+    </v-tabs-items>
     </v-card-text>
 <table-modal 
     @close-dialog="closeDialog"
@@ -129,6 +151,7 @@ export default {
     components: {TableModal},
     data() {
         return {
+            tab: 0,
             search: '',
             expanded: [],
             headers: [
@@ -137,7 +160,7 @@ export default {
                 { text: 'Source', value: 'is_external', sortable: false },
                 { text: 'Type', value: 'document_type.name', sortable: false },
                 { text: 'Originating Office', value: 'origin_office.name', sortable: false },
-                { text: 'Current Office', value: 'current_office.name', sortable: false },
+                { text: 'Current Office', value: 'destination_office.name', sortable: false },
                 { text: 'Sender', value: 'sender.name', sortable: false },
                 { text: 'Date Filed', value: 'date_filed', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
@@ -153,7 +176,11 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['documents', 'datatable_loader']),
+        ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
+        tableData() {
+            let type = this.tab ? 'originating_office' : 'destination_office_id'
+             return this.documents.data.filter( doc => doc[type] == this.auth_user.office_id )
+        },
         offices() {
             return this.$store.state.offices.offices;
         },
