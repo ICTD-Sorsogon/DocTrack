@@ -22,7 +22,7 @@ export default {
         },
         last_page: {
             get() {
-                return this.$store.state[this.store][this.collection].last_page;
+
             }
         }
     }
