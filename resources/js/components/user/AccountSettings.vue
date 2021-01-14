@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import ChangeUsernameForm from './components/ChangeUsernameForm';
 import ChangeAccountDetailsForm from './components/ChangeAccountDetailsForm';
 import ChangePasswordForm from './components/ChangePasswordForm';
@@ -70,9 +71,16 @@ export default {
         ChangeAccountDetailsForm,
         ChangePasswordForm
     },
+    computed: mapGetters(['auth_user']),
     data () {
         return {
-            panel: [0],
+            panel: [],
+        }
+    },
+    methods: {
+        fillForm() {
+            let user = this.$store.getters.auth_user;
+            this.panel.push(user);
         }
     },
     mounted() {
