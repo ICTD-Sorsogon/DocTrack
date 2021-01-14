@@ -14,7 +14,7 @@ const state = {
 
 const getters = {
     documents: ({documents}) => {
-        for( let doc of documents.data){
+        for( let doc of documents){
             console.log(doc.is_external)
             doc.is_external = doc.is_external ? 'External' : 'Internal'
             doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'

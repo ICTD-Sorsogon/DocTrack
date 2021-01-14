@@ -8,7 +8,7 @@
         >
       </v-row>
     </v-card-title>
-        <v-tabs v-model="tab"
+        <v-tabs v-if="auth_user.role_id != 1" v-model="tab"
         full-width
         grow
         centered
@@ -20,359 +20,22 @@
         {{ item }}
       </v-tab>
     </v-tabs>
-    <v-card-text>
-        <v-tabs-items v-model="tab">
-    <v-tab-item
-        v-for="item in ['Incoming','Outgoing']"
-        :key="item"
-        >
-        <v-data-table
-            v-if="documents"
-            :headers="headers"
-            :items="tableData"
-            :items-per-page="10"
-            item-key="id"
-            hide-default-footer
-            :loading="datatable_loader"
-            loading-text="Loading... Please wait"
-            class="elevation-1"
-            :search="search"
-            :single-expand="false"
-            :expanded.sync="expanded"
-            show-expand
-        >
-        <template v-slot:top>
-        </template>
-            <template v-slot:top>
-                <v-text-field
-                    v-model="search"
-                    label="Search"
-                    class="mx-4"
-                />
-            </template>
-            <template v-slot:[`item.tracking_code`] = "{ item }">
-                        <v-chip label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
-                            {{ item.tracking_code }}
-                        </v-chip>
-            </template>
-            <template v-slot:[`item.view_more`]="{ item }">
-                <td>
-                    <v-btn
-                        color="primary"
-                        icon
-                        @click="seeDocumentDetails(item)"
-                    >
-                        <v-icon>mdi-more</v-icon>
-                    </v-btn>
-                </td>
-            </template>
-            <template v-slot:expanded-item="{ headers, item }">
-                <td :colspan="headers.length">
-                    <v-row>
-                        <v-col cols="12" sm="3">
-                            <v-btn
-                                text
-                                color="#26A69A"
-                                block
-                                @click.prevent="editDocument(item.id)"
-                            >
-                                <v-icon left>
-                                    mdi-pencil
-                                </v-icon>
-                                Edit
-                            </v-btn>
-                        </v-col>
-                        <v-col cols="12" sm="3">
-                            <v-btn
-                                @click.prevent="redirectToReceivePage(item)"
-                                text
-                                color="#FFCA28"
-                                block
-                            >
-                                <v-icon left>
-                                    mdi-email-send-outline
-                                </v-icon>
-                                Receive
-                            </v-btn>
-                        </v-col>
-                        <v-col cols="12" sm="3">
-                            <v-btn
-                                link @click.prevent="redirectToReceivePage(item)"
-                                text
-                                color="#9575CD"
-                                block
-                            >
-                                <v-icon left>
-                                    mdi-email-receive-outline
-                                </v-icon>
-                                Forward
-                            </v-btn>
-                        </v-col>
-                        <v-col cols="12" sm="3">
-                            <v-btn
-                                text
-                                color="#F06292"
-                                block
-                            >
-                                <v-icon left>
-                                    mdi-email-off-outline
-                                </v-icon>
-                                Terminal
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </td>
-            </template>
-        </v-data-table>
-        <div class="text-center pt-2">
-            <v-pagination
-                v-model="current_page"
-                :length="last_page"
-                :total-visible="10"
-            ></v-pagination>
-        </div>
-            </v-tab-item>
+    <data-table v-if="auth_user.role_id === 1" :documents="documents" :datatable_loader="datatable_loader"></data-table>
+    <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
+        <v-tab-item
+            v-for="item in ['Incoming','Outgoing']"
+            :key="item"
+            >
+        <data-table :documents="userDocuments" :datatable_loader="datatable_loader"></data-table>
+        </v-tab-item>
     </v-tabs-items>
-    </v-card-text>
-    <v-dialog v-model="dialog" persistent scrollable max-width="1000px">
-      <v-card v-if="selected_document">
-        <v-container>
-          <v-row>
-            <v-col cols="6" sm="6">
-              <v-card-title primary-title> Document Details </v-card-title>
-            </v-col>
-            <v-col cols="6" sm="6">
-                <v-card-actions class="mr-4">
-                    <v-spacer></v-spacer>
-                    <v-btn x-large color="gray" @click="dialog = false" icon>
-                    <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </v-card-actions>
-            </v-col>
-          </v-row>
-        </v-container>
-        <v-card-text>
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Tracking ID</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      <v-chip
-                        label
-                        dark
-                        :color="selected_document.color"
-                        id="document_label"
-                      >
-                        {{ selected_document.tracking_code }}
-                      </v-chip>
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Subject</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.subject
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Source</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title v-if="selected_document.is_external"
-                      >External</v-list-item-title
-                    >
-                    <v-list-item-title v-else>Internal</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Type</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.type_name
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Originating Office</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.originating_office_name
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Current Office</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.current_office_name
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Sender</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.sender_fullname
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Date Filed</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.date_filed
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col cols="12" xl="4" lg="4" md="4" sm="12">
-              <v-list flat subheader>
-                <v-subheader>Page Count</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.page_count
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-            <v-col cols="12" xl="4" lg="4" md="4" sm="12">
-              <v-list flat subheader>
-                <v-subheader>Attachment Page Count</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.attachment_page_count
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-            <v-col cols="12" xl="4" lg="4" md="4" sm="12">
-              <v-list flat subheader>
-                <v-subheader>Terminal</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title v-if="selected_document.is_terminal"
-                      >Yes</v-list-item-title
-                    >
-                    <v-list-item-title v-else>No</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-          <v-divider inset />
-          <v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Remarks</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.remarks
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </v-card>
+    <table-modal 
+        @close-dialog="closeDialog"
+        :dialog="dialog" 
+        v-if="selected_document" 
+        :selected_document="selected_document"
+    ></table-modal>
+</v-card>
 </template>
 
 <script>
@@ -382,37 +45,23 @@
  * FIXME: Search only displays rows from the current page
 **/
 
-import TableModal from './TableModal'
-import { colors } from '../../../constants';
+import TableModal from './TableModal';
+import DataTable from './DataTable';
 import { mapGetters, mapActions } from "vuex";
+
 export default {
-    components: {TableModal},
+    components: {TableModal, DataTable},
     data() {
         return {
             tab: 0,
-            search: '',
-            expanded: [],
-            headers: [
-                { text: 'Tracking ID', value: 'tracking_code', sortable: false },
-                { text: 'Subject', value: 'subject', sortable: false },
-                { text: 'Source', value: 'is_external', sortable: false },
-                { text: 'Type', value: 'document_type.name', sortable: false },
-                { text: 'Originating Office', value: 'origin_office.name', sortable: false },
-                { text: 'Current Office', value: 'destination_office.name', sortable: false },
-                { text: 'Sender', value: 'sender.name', sortable: false },
-                { text: 'Date Filed', value: 'date_filed', sortable: false },
-                { text: 'View More', value: 'view_more', sortable: false },
-                { text: 'Actions', value: 'data-table-expand', sortable: false },
-            ],
-            dialog: false,
-            selected_document: '',
+            selected_document: ''
         }
     },
     computed: {
         ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
-        tableData() {
+        userDocuments() {
             let type = this.tab ? 'originating_office' : 'destination_office_id'
-             return this.documents.data.filter( doc => doc[type] == this.auth_user.office_id )
+            return this.documents.filter( doc => doc[type] == this.auth_user.office_id )
         },
         offices() {
             return this.$store.state.offices.offices;
@@ -420,24 +69,29 @@ export default {
         document_types() {
             return this.$store.state.documents.document_types;
         },
-        current_page: {
-            get() {
-                return this.$store.state.documents.documents.current_page;
-            },
-            set(value) {
-                return this.$store.commit('SET_CURRENT_PAGE', value);
-            }
-        },
-        last_page: {
-            get() {
-                return this.$store.state.documents.documents.last_page;
-            },
+    },
+    methods: {
+        checkIfID(string) {
+            return /^-?\d+$/.test(string);
         },
 
-    },
-  methods: {
-    checkIfID(string) {
-      return /^-?\d+$/.test(string);
+        seeDocumentDetails(document) {
+            this.selected_document = document;
+            this.dialog = true;
+        },
+        closeDialog(){
+            this.dialog = false;
+       },
+
+        redirectToReceivePage(document) {
+            /**
+            * TODO:
+            * Save the document id or the document object to Vuex instead because the dynamic routing is messing
+            * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
+            **/
+            this.$store.dispatch('setDocument', document);
+            this.$router.push(`receive_document`);
+        },
     },
     getTrackingCodeColor(document, document_type_id) {
       document.color = "";
@@ -510,7 +164,6 @@ export default {
       this.$store.dispatch("setDocument", document);
       this.$router.push(`receive_document`);
     },
-  },
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("getActiveDocuments").then(() => {

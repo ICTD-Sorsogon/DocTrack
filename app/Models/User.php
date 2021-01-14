@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Role');
     }
 
+    public function isUser()
+    {
+        return $this->role->name === 'user';
+    }
+
     public function office()
     {
         return $this->belongsTo('App\Models\Office');

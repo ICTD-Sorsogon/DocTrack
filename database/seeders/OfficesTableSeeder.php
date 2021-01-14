@@ -267,6 +267,13 @@ class OfficesTableSeeder extends Seeder
                 'contact_number' => '(056) 255 0390',
                 'contact_email' => 'ssc@sorsogonstatecollege.edu.ph',
             ],
+            [
+                'name' => 'Docking Office',
+                'address' => 'Capitol Compound, Burabod, Sorsogon City, Sorsogon',
+                'office_code' => 'DO',
+                'contact_number' => '09104111426',
+                'contact_email' => 'docking@sorsogon.gov.ph',
+            ],
         ];
         DB::table('offices')->insert($offices);
     }
