@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      Add New Documents
+      Edit Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
@@ -12,7 +12,7 @@
 
     <v-card-text>
         <ValidationObserver ref="observer" v-slot="{ invalid }">
-            <v-form ref="form" @submit.prevent="createNewDocument">
+            <v-form ref="form" @submit.prevent="editDocument">
                 <v-row>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
@@ -53,14 +53,24 @@
                             single-line
                             required
                         >
-                            <v-radio
+                        <v-radio value="Internal">
+                            <template v-slot:label>
+                            <div>Internal</div>
+                            </template>
+                        </v-radio>
+                        <v-radio value="External">
+                            <template v-slot:label>
+                            <div>External </div>
+                            </template>
+                        </v-radio>
+                            <!-- <v-radio
                                 label="Internal"
                                 value=false
                             ></v-radio>
                             <v-radio
                                 label="External"
                                 value=true
-                            ></v-radio>
+                            ></v-radio> -->
                         </v-radio-group>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
@@ -246,7 +256,6 @@
                             <v-btn
                                 color="primary"
                                 :dark="!invalid"
-                                :disabled="invalid"
                                 :loading="loading_create_new_document"
                                 @click="button_loader = 'loading_create_new_document'"
                                 type="submit"
@@ -305,25 +314,25 @@ export default {
                 this.$router.push({ name: "All Active Documents"});
             }
         },
-        generateTrackingCode(document_data) {
-            var tracking_number = '';
-            var origin = 'I';
-            var salt = '';
-            for(var iterator = 0; iterator < 5; iterator++) {
-                salt = salt + (~~(Math.random() * 10)).toString();
-            }
-            if(document_data.is_external) {
-                origin = 'E'
-            }
-            var date_stripped = document_data.date_filed.split('-');
-            tracking_number = tracking_number +
-                origin + '-' +
-                this.auth_user.office.office_code + '-' +
-                date_stripped[0]+date_stripped[1]+date_stripped[2] + '-' +
-                salt + '-' +
-                document_data.attachment_page_count;
-            return tracking_number;
-        },
+        // generateTrackingCode(document_data) {
+        //     var tracking_number = '';
+        //     var origin = 'I';
+        //     var salt = '';
+        //     for(var iterator = 0; iterator < 5; iterator++) {
+        //         salt = salt + (~~(Math.random() * 10)).toString();
+        //     }
+        //     if(document_data.is_external) {
+        //         origin = 'E'
+        //     }
+        //     var date_stripped = document_data.date_filed.split('-');
+        //     tracking_number = tracking_number +
+        //         origin + '-' +
+        //         this.auth_user.office.office_code + '-' +
+        //         date_stripped[0]+date_stripped[1]+date_stripped[2] + '-' +
+        //         salt + '-' +
+        //         document_data.attachment_page_count;
+        //     return tracking_number;
+        // },
         sanitizeInputs() {
             this.form.is_external = this.form.is_external == 'true' ? true : false;
             this.form.tracking_id = this.generateTrackingCode(this.form);
@@ -341,6 +350,12 @@ export default {
             this.form.sender_name = this.form.sender_name.toString();
             this.form.remarks = this.form.remarks != null && typeof this.form.remarks != 'undefined' ?
                 this.form.remarks.toString() : null;
+        },
+        editDocument() {
+            console.log(this.form)
+            this.$store.dispatch('updateDocument', this.form);
+            console.log(this.$store.state.documents.documents.data);
+
         },
         createNewDocument() {
             this.sanitizeInputs();
@@ -373,14 +388,33 @@ export default {
                 }
             });
         },
+        getDocumentDetails(id){
+            console.log(this.$store.getters.getDocument(this.$route.params.id));
+        },
         debuggerButton() {
             // console.log(this.form);
         },
         createAndForward() {
             // TODO: Create new document then forward to office
         },
+        fillForm(){
+            let item = this.$store.getters.getDocument(this.$route.params.id);
+            this.form.form_type = "edit_document";
+            this.form.tracking_id = item[0].tracking_code;
+            this.form.document_title = item[0].subject;
+            this.form.document_type = item[0].document_type;
+            this.form.is_external = item[0].is_external;
+            this.form.originating_office = item[0].origin_office.name;
+            this.form.remarks = item[0].remarks;
+            this.form.page_count = item[0].page_count;
+            let datetime = item[0].date_filed.split(" ");
+            this.form.date_filed = datetime[0];
+            this.form.time_filed = datetime[1];
+            console.log("form " ,this.form , "row " , item)
+        },
     },
     mounted() {
+        this.fillForm();
         this.$store.dispatch('getAllUsers');
         this.$store.dispatch('getDocumentTypes');
         this.$store.dispatch('getOffices');
