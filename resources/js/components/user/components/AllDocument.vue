@@ -93,12 +93,6 @@ export default {
             this.$router.push(`receive_document`);
         },
     },
-    paginateDocuments(page_number) {
-      this.$store.dispatch("setDataTableLoader");
-      this.$store.dispatch("getActiveDocuments", page_number).then(() => {
-        this.$store.dispatch("unsetDataTableLoader");
-      });
-    },
     getNewDocumentRecordForm() {
       if (this.$route.name !== "New Document") {
         this.$store.dispatch("setLoader");
@@ -120,7 +114,6 @@ export default {
       this.$store.dispatch("setDocument", document);
       this.$router.push(`receive_document`);
     },
-  },
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("getActiveDocuments").then(() => {
