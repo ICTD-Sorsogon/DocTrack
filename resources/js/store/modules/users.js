@@ -14,7 +14,7 @@ function buildName(first_name, middle_name, last_name, suffix) {
 const state = {
     user: {},
     all_users: [],
-    all_users_complete: [],
+    // all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
     form_requests : {
@@ -29,7 +29,7 @@ const getters = {
     auth_user_full_name: state => state.user_full_name,
     form_requests_status: state => state.form_requests,
     all_users: state => state.all_users,
-    all_users_complete: state => state.all_users_complete,
+    // all_users_complete: state => state.all_users_complete,
 }
 
 const actions = {
@@ -52,24 +52,30 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
+                if(element.is_active == 1){
+                    element.is_active = "Active";
+                }
+                else
+                    element.is_active = "Inactive";
             });
             commit('FETCH_ALL_USERS', response.data);
         });
     },
-    async getAllUsersComplete({ commit }) {
-        await axios.get(all_users_complete)
-        .then(response => {
-            response.data.forEach(element => {
-                element.full_name = '';
-                element.full_name = buildName(
-                    element.first_name,
-                    element.middle_name,
-                    element.last_name,
-                    element.suffix
-                );
-            });
-        });
-    },
+    // async getAllUsersComplete({ commit }) {
+    //     await axios.get('/api/all_users_complete')
+    //     .then(response => {
+    //         response.data.forEach(element => {
+    //             element.full_name = '';
+    //             element.full_name = buildName(
+    //                 element.first_name,
+    //                 element.middle_name,
+    //                 element.last_name,
+    //                 element.suffix
+    //             );
+    //         });
+    //         commit('FETCH_ALL_USERS_COMPLETE', response.data);
+    //     });
+    // },
     async editUserCredentials({ commit }, updates) {
         const response = await axios.put(`update_user/${updates.id}`, updates.form);
         if(updates.form.form_type == 'account_details') {
@@ -101,6 +107,9 @@ const mutations = {
     FETCH_ALL_USERS: (state, users) => {
         state.all_users = users;
     },
+    // FETCH_ALL_USERS_COMPLETE: (state, users) => {
+    //     state.all_users_complete = users;
+    // },
     UPDATE_USER_COMPLETE_NAME: (state, data) => {
         if(data.response.code == "SUCCESS") {
             state.first_name = data.form.first_name;
