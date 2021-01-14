@@ -23,15 +23,17 @@ class UserController extends Controller
 
     public function getAllUsers(): Collection
     {
-        return User::where('role_id', 2)->get();
+        return User::where('role_id', 2)
+        ->with('office', 'division', 'sector', 'unit', 'role')
+        ->get();
     }
 
-    public function getAllUserComplete(): Collection
-    {
-        return User::where('role_id', '<>', 1)
-            ->with('office', 'division', 'sector', 'unit', 'role')
-            ->get();
-    }
+    // public function getAllUserComplete(): Collection
+    // {
+    //     return User::where('role_id', '<>', 1)
+    //         ->with('office', 'division', 'sector', 'unit', 'role')
+    //         ->get();
+    // }
 
     public function updateUser(Request $request, string $userId)
     {
