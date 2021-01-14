@@ -68,6 +68,12 @@
                     </v-list-item-icon>
                     <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
+                <v-list-item link @click.prevent="getOfficeListReport" v-ripple="{ class: 'primary--text' }">
+                    <v-list-item-icon>
+                    <v-icon>mdi-office-building</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Offices</v-list-item-title>
+                </v-list-item>
             </v-list-group>
 
             <v-list-item link @click.prevent="getAccountSettings">
@@ -208,6 +214,12 @@ export default {
             if(this.$route.name !== 'Document Master List') {
                 this.$store.dispatch('setLoader');
                 this.$router.push({ name: "Document Master List"});
+            }
+        },
+        getOfficeListReport() {
+            if(this.$route.name !== 'Office List') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "Office List"});
             }
         },
         getAccountSettings() {
