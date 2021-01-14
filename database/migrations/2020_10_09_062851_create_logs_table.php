@@ -19,8 +19,8 @@ class CreateLogsTable extends Migration
             $table->string('action', 50);
             $table->string('table_name', 50)->nullable();
             $table->unsignedBigInteger('item_id')->nullable();
-            $table->string('original_values')->nullable();
-            $table->string('new_values')->nullable();
+            $table->longText('original_values')->nullable();
+            $table->longText('new_values')->nullable();
             $table->timestamps();
         });
     }
