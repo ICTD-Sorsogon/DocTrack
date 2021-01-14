@@ -37,7 +37,6 @@
                     <v-list-item-title>Dashboard</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-
             <v-list-item link @click.prevent="getAllDocuments">
                 <v-list-item-icon>
                     <v-icon>mdi-file-document-multiple-outline</v-icon>

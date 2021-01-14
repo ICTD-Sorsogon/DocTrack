@@ -93,56 +93,6 @@ export default {
             this.$router.push(`receive_document`);
         },
     },
-    getTrackingCodeColor(document, document_type_id) {
-      document.color = "";
-      document.color = colors[document_type_id];
-      return colors[document_type_id];
-    },
-    findDocumentTypeName(document, document_type_id) {
-      var document_type = this.document_types.find(
-        (element) => element.id == document_type_id
-      );
-      if (document_type != null) {
-        document.type_name = document_type.name;
-        return document_type.name;
-      }
-    },
-    findDocumentOriginatingOfficeName(document, originating_office) {
-      var office = this.offices.find(
-        (element) => element.id == originating_office
-      );
-      document.originating_office_name = "";
-      if (office != null) {
-        document.originating_office_name = office.name;
-        return office.name;
-      }
-    },
-    findDocumentCurrentOfficeName(document, current_office) {
-      var office = this.offices.find((element) => element.id == current_office);
-      document.current_office_name = "";
-      if (office != null) {
-        document.current_office_name = office.name;
-        return office.name;
-      }
-    },
-    findDocumentSenderName(document, sender_id) {
-      var sender = this.users.find((element) => element.id == sender_id);
-      document.sender_fullname = "";
-      if (sender != null) {
-        document.sender_fullname = sender.full_name;
-        return sender.full_name;
-      }
-    },
-    seeDocumentDetails(document) {
-      this.selected_document = document;
-      this.dialog = true;
-    },
-    paginateDocuments(page_number) {
-      this.$store.dispatch("setDataTableLoader");
-      this.$store.dispatch("getActiveDocuments", page_number).then(() => {
-        this.$store.dispatch("unsetDataTableLoader");
-      });
-    },
     getNewDocumentRecordForm() {
       if (this.$route.name !== "New Document") {
         this.$store.dispatch("setLoader");
@@ -181,9 +131,5 @@ export default {
   #document_label {
     font-size: 0.8em;
   }
-}
-.btn_close {
-  background: blue;
-  opacity: 0.7;
 }
 </style>
