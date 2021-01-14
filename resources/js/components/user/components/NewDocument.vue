@@ -374,7 +374,6 @@ export default {
             });
         },
         debuggerButton() {
-            // console.log(this.form);
         },
         createAndForward() {
             // TODO: Create new document then forward to office

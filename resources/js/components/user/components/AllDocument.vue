@@ -93,7 +93,6 @@ export default {
         },
         closeDialog(){
             this.dialog = false;
-            console.log(this.dialog)
        },
 
         redirectToReceivePage(document) {

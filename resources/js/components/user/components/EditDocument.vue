@@ -388,17 +388,14 @@ export default {
             });
         },
         getDocumentDetails(id){
-            console.log(this.$store.getters.getDocument(this.$route.params.id));
         },
         debuggerButton() {
-            // console.log(this.form);
         },
         createAndForward() {
             // TODO: Create new document then forward to office
         },
         fillForm(){
             this.form = this.$store.getters.getDocument(this.$route.params.id)[0];
-            console.log("form " ,this.form )
 
         },
     },
