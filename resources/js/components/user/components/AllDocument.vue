@@ -20,13 +20,24 @@
         {{ item }}
       </v-tab>
     </v-tabs>
-    <data-table v-if="auth_user.role_id === 1" :documents="documents" :datatable_loader="datatable_loader"></data-table>
+    <data-table 
+      @seeDocumentDetails="seeDocumentDetails" 
+      @editDocument="editDocument"
+      v-if="auth_user.role_id === 1" 
+      :documents="documents" 
+      :datatable_loader="datatable_loader"
+      ></data-table>
     <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
         <v-tab-item
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
-        <data-table @seeDocumentDetails="seeDocumentDetails" :documents="userDocuments" :datatable_loader="datatable_loader"></data-table>
+        <data-table 
+         @seeDocumentDetails="seeDocumentDetails" 
+         @editDocument="editDocument"
+         :documents="userDocuments" 
+         :datatable_loader="datatable_loader"
+         ></data-table>
         </v-tab-item>
     </v-tabs-items>
     <table-modal 
@@ -100,7 +111,6 @@ export default {
           this.$router.push({ name: "New Document" });
         }
       },
-    },
     editDocument(id) {
       if (this.$route.name !== "Edit Document") {
         this.$store.dispatch("setLoader");
@@ -116,6 +126,7 @@ export default {
       this.$store.dispatch("setDocument", document);
       this.$router.push(`receive_document`);
     },
+  },
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("getActiveDocuments").then(() => {

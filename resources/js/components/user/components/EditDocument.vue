@@ -17,7 +17,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-text-field
-                                v-model="form.document_title"
+                                v-model="form.subject"
                                 label="Document Title/Subject"
                                 prepend-inner-icon="mdi-format-title"
                                 outlined
@@ -94,7 +94,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
-                                v-model="form.sender_name"
+                                v-model="form.sender.name"
                                 :items="all_users"
                                 item-text="full_name"
                                 clearable
@@ -294,10 +294,10 @@ export default {
             form: {
                 form_type: 'new_document',
                 tracking_id: '',
-                document_title: '',
+                subject: '',
                 document_type: '',
                 originating_office: '',
-                sender_name: '',
+                sender: {},
                 page_count: '',
                 attachment_page_count: '',
                 is_external: false,
@@ -335,8 +335,8 @@ export default {
         // },
         sanitizeInputs() {
             this.form.is_external = this.form.is_external == 'true' ? true : false;
-            this.form.tracking_id = this.generateTrackingCode(this.form);
-            this.form.document_title = this.form.document_title.toString();
+            // this.form.tracking_id = this.generateTrackingCode(this.form);
+            // this.form.document_title = this.form.sub.toString();
             if(typeof this.form.originating_office === 'object' && this.form.originating_office !== null) {
                 this.form.originating_office = this.form.originating_office.id;
             } else {
@@ -352,9 +352,8 @@ export default {
                 this.form.remarks.toString() : null;
         },
         editDocument() {
-            console.log(this.form)
-            this.$store.dispatch('updateDocument', this.form);
-            console.log(this.$store.state.documents.documents.data);
+            // this.$store.dispatch('updateDocument', this.form);
+            this.createNewDocument()
 
         },
         createNewDocument() {
@@ -398,19 +397,9 @@ export default {
             // TODO: Create new document then forward to office
         },
         fillForm(){
-            let item = this.$store.getters.getDocument(this.$route.params.id);
-            this.form.form_type = "edit_document";
-            this.form.tracking_id = item[0].tracking_code;
-            this.form.document_title = item[0].subject;
-            this.form.document_type = item[0].document_type;
-            this.form.is_external = item[0].is_external;
-            this.form.originating_office = item[0].origin_office.name;
-            this.form.remarks = item[0].remarks;
-            this.form.page_count = item[0].page_count;
-            let datetime = item[0].date_filed.split(" ");
-            this.form.date_filed = datetime[0];
-            this.form.time_filed = datetime[1];
-            console.log("form " ,this.form , "row " , item)
+            this.form = this.$store.getters.getDocument(this.$route.params.id)[0];
+            console.log("form " ,this.form )
+
         },
     },
     mounted() {

@@ -25,7 +25,7 @@ const getters = {
     form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
     getDocument: ({documents})=> (id) =>{
-        return documents.data.filter(item=>
+        return documents.filter(item=>
             item.id == id
             );
     }

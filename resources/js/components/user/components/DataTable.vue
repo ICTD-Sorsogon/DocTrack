@@ -46,6 +46,7 @@
 				<v-row>
 					<v-col cols="12" sm="3">
 						<v-btn
+							@click="$emit('editDocument', item.id)"
 							text
 							color="#26A69A"
 							block
