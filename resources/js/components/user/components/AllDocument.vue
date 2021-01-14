@@ -26,11 +26,11 @@
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
-        <data-table :documents="userDocuments" :datatable_loader="datatable_loader"></data-table>
+        <data-table @seeDocumentDetails="seeDocumentDetails" :documents="userDocuments" :datatable_loader="datatable_loader"></data-table>
         </v-tab-item>
     </v-tabs-items>
     <table-modal 
-        @close-dialog="closeDialog"
+        @closeDialog="closeDialog"
         :dialog="dialog" 
         v-if="selected_document" 
         :selected_document="selected_document"
@@ -54,7 +54,8 @@ export default {
     data() {
         return {
             tab: 0,
-            selected_document: ''
+            selected_document: '',
+            dialog: false
         }
     },
     computed: {
@@ -81,6 +82,7 @@ export default {
         },
         closeDialog(){
             this.dialog = false;
+            console.log(this.dialog)
        },
 
         redirectToReceivePage(document) {
@@ -91,13 +93,13 @@ export default {
             **/
             this.$store.dispatch('setDocument', document);
             this.$router.push(`receive_document`);
-        },
-    },
-    getNewDocumentRecordForm() {
-      if (this.$route.name !== "New Document") {
-        this.$store.dispatch("setLoader");
-        this.$router.push({ name: "New Document" });
-      }
+      },
+      getNewDocumentRecordForm() {
+        if (this.$route.name !== "New Document") {
+          this.$store.dispatch("setLoader");
+          this.$router.push({ name: "New Document" });
+        }
+      },
     },
     editDocument(id) {
       if (this.$route.name !== "Edit Document") {

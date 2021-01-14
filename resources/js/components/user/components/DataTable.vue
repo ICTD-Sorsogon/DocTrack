@@ -35,7 +35,7 @@
 				<v-btn
 					color="primary"
 					icon
-					@click="seeDocumentDetails(item)"
+					@click="$emit('seeDocumentDetails',item)"
 				>
 					<v-icon>mdi-more</v-icon>
 				</v-btn>
@@ -106,7 +106,7 @@ export default {
 		return {
 			search: '',
             page: 1,
-            itemsPerPage: 10,
+            itemsPerPage: 25,
             expanded: [],
             headers: [
                 { text: 'Tracking ID', value: 'tracking_code', sortable: false },
@@ -125,6 +125,7 @@ export default {
 	},
 	computed: {
 		pageCount() {
+			console.log(this.documents.length)
             return parseInt(this.documents?.length / this.itemsPerPage)
         },
 	},
