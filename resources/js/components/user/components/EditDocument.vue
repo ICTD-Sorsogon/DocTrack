@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      Add New Documents
+      Edit Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
@@ -373,6 +373,9 @@ export default {
                 }
             });
         },
+        getDocumentDetails(id){
+            console.log(this.$store.getters.getDocument(this.$route.params.id));
+        },
         debuggerButton() {
             // console.log(this.form);
         },
@@ -381,6 +384,7 @@ export default {
         },
     },
     mounted() {
+        console.log(this.$store.getters.getDocument(this.$route.params.id));
         this.$store.dispatch('getAllUsers');
         this.$store.dispatch('getDocumentTypes');
         this.$store.dispatch('getOffices');
