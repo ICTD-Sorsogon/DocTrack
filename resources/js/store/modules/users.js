@@ -57,7 +57,7 @@ const actions = {
         });
     },
     async getAllUsersComplete({ commit }) {
-        await axios.get(all_users_complete)
+        await axios.get('/api/all_users_complete')
         .then(response => {
             response.data.forEach(element => {
                 element.full_name = '';

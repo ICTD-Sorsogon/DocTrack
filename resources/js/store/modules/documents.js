@@ -16,7 +16,7 @@ const getters = {
     documents: ({documents}) => {
         for( let doc of documents){
             console.log(doc.is_external)
-            doc.is_external = doc.is_external ? 'External' : 'Internal' 
+            doc.is_external = doc.is_external ? 'External' : 'Internal'
             doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'
         }
         return documents
@@ -32,6 +32,9 @@ const getters = {
 }
 
 const actions = {
+    async updateDocument({commit}, form) {
+        commit('UPDATE_DOCUMENT', form);
+    },
     async setImmediate({commit}, id) {
         commit('SET_ID_DOCUMENT', id);
     },
@@ -76,6 +79,17 @@ const actions = {
 }
 
 const mutations = {
+    UPDATE_DOCUMENT(state, form){
+        let document = state.documents.data.filter(item =>{
+                if (item.tracking_id == form.tracking_code) {
+                    item.subject = form.document_title;
+                }
+            }
+        );
+
+            console.log(state.documents);
+
+    },
     SET_ID_DOCUMENT(state, id){
         state.id = id;
     },
