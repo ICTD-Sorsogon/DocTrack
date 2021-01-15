@@ -24,7 +24,7 @@ class UserController extends Controller
     public function getAllUsers(): Collection
     {
         return User::where('role_id', 2)
-        ->with('office', 'division', 'sector', 'unit', 'role')
+        ->with('office')
         ->get();
     }
 
