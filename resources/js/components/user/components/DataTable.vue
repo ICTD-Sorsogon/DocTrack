@@ -41,10 +41,10 @@
 				</v-btn>
 			</td>
 		</template>
-		<template v-slot:expanded-item="{ headers, item }">
+		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row>
-					<v-col cols="12" sm="3">
+					<v-col v-if="isEditable(item.originating_office)" cols="12" sm="3">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -100,7 +100,7 @@
 
 <script>
 import { colors } from '../../../constants';
-
+import {mapGetters} from 'vuex'
 export default {
 	props: ['documents', 'datatable_loader'],
 	data() {
@@ -125,12 +125,18 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters(['auth_user']),
 		pageCount() {
-			console.log(this.documents.length)
             return parseInt(this.documents?.length / this.itemsPerPage)
-        },
+		},
+		isAdmin() {
+			return this.auth_user.role_id == 1
+		}
 	},
 	methods: {
+		isEditable(docOrigin) {
+			return this.auth_user.office_id == docOrigin || this.isAdmin
+		},
 		getTrackingCodeColor(document, document_type_id) {
             // document.color = colors[document_type_id];
             return colors[document_type_id];

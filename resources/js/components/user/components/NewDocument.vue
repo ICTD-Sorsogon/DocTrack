@@ -380,7 +380,6 @@ export default {
         },
     },
     mounted() {
-        this.$store.dispatch('getAllUsers');
         this.$store.dispatch('getDocumentTypes');
         this.$store.dispatch('getOffices');
         this.$store.dispatch('unsetLoader');
