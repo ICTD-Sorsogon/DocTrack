@@ -44,7 +44,7 @@ export default {
                 axios.get('api/authenticated').then((response) => {
                     next()
                 }).catch(() => {
-                    return next({ name: 'Login'})
+                    return next(false)
                 });
             },
             children: [
