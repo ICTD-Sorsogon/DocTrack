@@ -9,23 +9,33 @@ const state = {
     document_loading: false,
     document_type_loading: false,
     selected_document: {},
+    id: '',
 }
 
 const getters = {
     documents: ({documents}) => {
         for( let doc of documents){
-            console.log(doc.is_external)
-            doc.is_external = doc.is_external ? 'External' : 'Internal' 
-            doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'
+            doc.is_external = doc.is_external ? 'External' : 'Internal'
         }
         return documents
     },
     document_types: state => state.document_types,
     form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
+    getDocument: ({documents})=> (id) =>{
+        return documents.filter(item=>
+            item.id == id
+            );
+    }
 }
 
 const actions = {
+    async updateDocument({commit}, form) {
+        commit('UPDATE_DOCUMENT', form);
+    },
+    async setImmediate({commit}, id) {
+        commit('SET_ID_DOCUMENT', id);
+    },
     async getActiveDocuments({ commit }, page_number) {
         const response = await axios.get(`/api/get_active_documents?page=${page_number}`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
@@ -39,7 +49,7 @@ const actions = {
         commit('GET_ALL_DOCUMENT_TYPES', response.data);
     },
     async createNewDocument({ commit }, form) {
-        await axios.post('/api/add_new_document', form)
+        await axios.post(`/api/add_new_document`, form)
         .then(response => {
             const data = {
                 form_type: form.form_type,
@@ -67,6 +77,18 @@ const actions = {
 }
 
 const mutations = {
+    UPDATE_DOCUMENT(state, form){
+        let document = state.documents.data.filter(item =>{
+                if (item.tracking_id == form.tracking_code) {
+                    item.subject = form.document_title;
+                }
+            }
+        );
+
+    },
+    SET_ID_DOCUMENT(state, id){
+        state.id = id;
+    },
     GET_ALL_ACTIVE_DOCUMENTS(state, response) {
         state.documents = response;
     },

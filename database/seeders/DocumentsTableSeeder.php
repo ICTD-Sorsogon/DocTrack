@@ -48,7 +48,7 @@ class DocumentsTableSeeder extends Seeder
                 $document = Document::factory()->create([
                         'originating_office' =>  $document->originating_office == 0 ? $user->office->id : $faker->company,
                         'tracking_code' => $this->buildTrackingNumber(
-                            $document->source,
+                            $document->is_external,
                             $user->office->office_code,
                             $document->attachment_page_count,
                             $document->date_filed
@@ -69,14 +69,11 @@ class DocumentsTableSeeder extends Seeder
         if ($source) {
             $origin = 'E';
         }
-        $parsed_date = Carbon::parse($date);
         $tracking = $origin.
             '-'.
             $office_code.
             '-'.
-            $parsed_date->year.
-            $parsed_date->month.
-            $parsed_date->day.
+            date('YmdH').
             '-'.
             substr(str_shuffle("0123456789"), 0, 5).
             '-'.

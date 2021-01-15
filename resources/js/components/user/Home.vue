@@ -1,5 +1,5 @@
 <template>
-<div v-if="auth_user">
+<div v-if="auth_user.first_name">
     <v-navigation-drawer app v-model="drawer">
         <template v-slot:prepend>
             <v-list-item two-line>
@@ -37,47 +37,15 @@
                     <v-list-item-title>Dashboard</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
+            <v-list-item link @click.prevent="getAllDocuments">
+                <v-list-item-icon>
+                    <v-icon>mdi-file-document-multiple-outline</v-icon>
+                </v-list-item-icon>
 
-            <v-list-group
-                prepend-icon="mdi-file-document-multiple-outline"
-                no-action
-            >
-                <template v-slot:activator>
-                    <v-list-item-content>
-                        <v-list-item-title>Document</v-list-item-title>
-                    </v-list-item-content>
-                </template>
-                <v-list-item link @click.prevent="getAllDocuments" v-ripple="{ class: 'primary--text' }">
-                    <v-list-item-icon>
-                    <v-icon>mdi-book-search-outline</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>View</v-list-item-title>
-                </v-list-item>
-                <v-list-item link @click.prevent="getNewDocumentRecordForm" v-ripple="{ class: 'primary--text' }">
-                    <v-list-item-icon>
-                    <v-icon>mdi-file-document-edit-outline</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Create</v-list-item-title>
-                </v-list-item>
-                <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
-                    <v-list-item-icon>
-                    <v-icon>mdi-email-receive-outline</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Receive</v-list-item-title>
-                </v-list-item>
-                <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
-                    <v-list-item-icon>
-                    <v-icon>mdi-email-send-outline</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Forward</v-list-item-title>
-                </v-list-item>
-                <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
-                    <v-list-item-icon>
-                    <v-icon>mdi-check-underline-circle-outline</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Terminal</v-list-item-title>
-                </v-list-item>
-            </v-list-group>
+                <v-list-item-content>
+                    <v-list-item-title>Document</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
 
             <v-list-group
                 prepend-icon="mdi-timeline-check-outline"
@@ -112,7 +80,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item link @click.prevent="getUserManagement">
+            <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getUserManagement">
                 <v-list-item-icon>
                     <v-icon>mdi-account-supervisor-circle</v-icon>
                 </v-list-item-icon>
@@ -223,12 +191,6 @@ export default {
                 this.$router.push({ name: "Dashboard"});
             }
         },
-        getNewDocumentRecordForm() {
-            if(this.$route.name !== 'New Document') {
-                this.$store.dispatch('setLoader');
-                this.$router.push({ name: "New Document"});
-            }
-        },
 
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
@@ -269,7 +231,6 @@ export default {
     mounted() {
         this.$store.dispatch('getOffices');
         this.$store.dispatch('getDocumentTypes');
-        this.$store.dispatch('getAllUsers');
     }
 }
 </script>

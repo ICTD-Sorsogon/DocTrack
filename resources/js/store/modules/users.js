@@ -68,21 +68,20 @@ const actions = {
             commit('FETCH_ALL_USERS', response.data);
         });
     },
-    // async getAllUsersComplete({ commit }) {
-    //     await axios.get('/api/all_users_complete')
-    //     .then(response => {
-    //         response.data.forEach(element => {
-    //             element.full_name = '';
-    //             element.full_name = buildName(
-    //                 element.first_name,
-    //                 element.middle_name,
-    //                 element.last_name,
-    //                 element.suffix
-    //             );
-    //         });
-    //         commit('FETCH_ALL_USERS_COMPLETE', response.data);
-    //     });
-    // },
+    async getAllUsersComplete({ commit }) {
+        await axios.get('/api/all_users_complete')
+        .then(response => {
+            response.data.forEach(element => {
+                element.full_name = '';
+                element.full_name = buildName(
+                    element.first_name,
+                    element.middle_name,
+                    element.last_name,
+                    element.suffix
+                );
+            });
+        });
+    },
     async editUserCredentials({ commit }, updates) {
         const response = await axios.put(`update_user/${updates.id}`, updates.form);
         if(updates.form.form_type == 'account_details') {

@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      Add New Documents
+      Edit Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
@@ -12,12 +12,12 @@
 
     <v-card-text>
         <ValidationObserver ref="observer" v-slot="{ invalid }">
-            <v-form ref="form" @submit.prevent="createNewDocument">
+            <v-form ref="form" @submit.prevent="editDocument">
                 <v-row>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-text-field
-                                v-model="form.document_title"
+                                v-model="form.subject"
                                 label="Document Title/Subject"
                                 prepend-inner-icon="mdi-format-title"
                                 outlined
@@ -53,14 +53,24 @@
                             single-line
                             required
                         >
-                            <v-radio
+                        <v-radio value="Internal">
+                            <template v-slot:label>
+                            <div>Internal</div>
+                            </template>
+                        </v-radio>
+                        <v-radio value="External">
+                            <template v-slot:label>
+                            <div>External </div>
+                            </template>
+                        </v-radio>
+                            <!-- <v-radio
                                 label="Internal"
                                 value=false
                             ></v-radio>
                             <v-radio
                                 label="External"
                                 value=true
-                            ></v-radio>
+                            ></v-radio> -->
                         </v-radio-group>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
@@ -84,7 +94,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
-                                v-model="form.sender_name"
+                                v-model="form.sender.name"
                                 :items="all_users"
                                 item-text="full_name"
                                 clearable
@@ -246,7 +256,6 @@
                             <v-btn
                                 color="primary"
                                 :dark="!invalid"
-                                :disabled="invalid"
                                 :loading="loading_create_new_document"
                                 @click="button_loader = 'loading_create_new_document'"
                                 type="submit"
@@ -285,14 +294,14 @@ export default {
             form: {
                 form_type: 'new_document',
                 tracking_id: '',
-                document_title: '',
+                subject: '',
                 document_type: '',
                 originating_office: '',
-                sender_name: '',
+                sender: {},
                 page_count: '',
                 attachment_page_count: '',
                 is_external: false,
-                date_filed: '',
+                is_termninal: false,
                 time_filed: '',
                 remarks: '',
             }
@@ -305,29 +314,29 @@ export default {
                 this.$router.push({ name: "All Active Documents"});
             }
         },
-        generateTrackingCode(document_data) {
-            var tracking_number = '';
-            var origin = 'I';
-            var salt = '';
-            for(var iterator = 0; iterator < 5; iterator++) {
-                salt = salt + (~~(Math.random() * 10)).toString();
-            }
-            if(document_data.is_external) {
-                origin = 'E'
-            }
-            var date_stripped = document_data.date_filed.split('-');
-            tracking_number = tracking_number +
-                origin + '-' +
-                this.auth_user.office.office_code + '-' +
-                date_stripped[0]+date_stripped[1]+date_stripped[2] + '-' +
-                salt + '-' +
-                document_data.attachment_page_count;
-            return tracking_number;
-        },
+        // generateTrackingCode(document_data) {
+        //     var tracking_number = '';
+        //     var origin = 'I';
+        //     var salt = '';
+        //     for(var iterator = 0; iterator < 5; iterator++) {
+        //         salt = salt + (~~(Math.random() * 10)).toString();
+        //     }
+        //     if(document_data.is_external) {
+        //         origin = 'E'
+        //     }
+        //     var date_stripped = document_data.date_filed.split('-');
+        //     tracking_number = tracking_number +
+        //         origin + '-' +
+        //         this.auth_user.office.office_code + '-' +
+        //         date_stripped[0]+date_stripped[1]+date_stripped[2] + '-' +
+        //         salt + '-' +
+        //         document_data.attachment_page_count;
+        //     return tracking_number;
+        // },
         sanitizeInputs() {
             this.form.is_external = this.form.is_external == 'true' ? true : false;
-            this.form.tracking_id = this.generateTrackingCode(this.form);
-            this.form.document_title = this.form.document_title.toString();
+            // this.form.tracking_id = this.generateTrackingCode(this.form);
+            // this.form.document_title = this.form.sub.toString();
             if(typeof this.form.originating_office === 'object' && this.form.originating_office !== null) {
                 this.form.originating_office = this.form.originating_office.id;
             } else {
@@ -341,6 +350,11 @@ export default {
             this.form.sender_name = this.form.sender_name.toString();
             this.form.remarks = this.form.remarks != null && typeof this.form.remarks != 'undefined' ?
                 this.form.remarks.toString() : null;
+        },
+        editDocument() {
+            // this.$store.dispatch('updateDocument', this.form);
+            this.createNewDocument()
+
         },
         createNewDocument() {
             this.sanitizeInputs();
@@ -373,13 +387,20 @@ export default {
                 }
             });
         },
+        getDocumentDetails(id){
+        },
         debuggerButton() {
         },
         createAndForward() {
             // TODO: Create new document then forward to office
         },
+        fillForm(){
+            this.form = this.$store.getters.getDocument(this.$route.params.id)[0];
+
+        },
     },
     mounted() {
+        this.fillForm();
         this.$store.dispatch('getDocumentTypes');
         this.$store.dispatch('getOffices');
         this.$store.dispatch('unsetLoader');

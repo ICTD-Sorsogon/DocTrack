@@ -35,11 +35,9 @@ class DocumentFactory extends Factory
             'destination_office_id' => rand(1,26),
             'sender_name' => $source == 0 ? rand(3, 12) : $this->faker->name,
             'page_count' => rand(1,50),
-            'date_filed' => $dateFilled,
             'is_terminal' => $source == 0 ? false : true,
             'remarks' => $this->faker->realText(100),
             'attachment_page_count' => $attachmentPageCount,
-            'tracking_code' => null
         ];
     }
 }
