@@ -1,11 +1,11 @@
 const state = {
     documents: [],
     document_types: [],
-    form_requests : {
+    /*form_requests : {
         request_form_type: '',
         request_status: '',
         status_message: '',
-    },
+    },*/
     document_loading: false,
     document_type_loading: false,
     selected_document: {},
@@ -22,7 +22,7 @@ const getters = {
         return documents
     },
     document_types: state => state.document_types,
-    form_requests: state => state.form_requests,
+    //form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
     getDocument: ({documents})=> (id) =>{
         return documents.data.filter(item=>

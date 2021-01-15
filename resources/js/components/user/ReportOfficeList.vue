@@ -5,7 +5,7 @@
                 <v-toolbar-title>Office List Report</v-toolbar-title>
                 <v-divider class="mx-4" inset vertical></v-divider>
                 <v-spacer></v-spacer>
-            <v-btn color="primary" dark class="mb-2 ma-1" @click.stop="dialog = true">
+            <v-btn color="primary" dark class="mb-2 ma-1" @click.stop="openDialog('new_office')">
               <v-icon>mdi-plus</v-icon>ADD
             </v-btn>
 
@@ -75,6 +75,7 @@ export default {
             ],
             search: '',
             dialog: false,
+            dialog_for: 'new_office',
             items: ''
         }
     },
@@ -88,14 +89,37 @@ export default {
         editOffice(item){
             //console.log("gg", item);
             //this.dialog = true;
+            var mode = 'edit_office';
+            item.form_mode = mode;
             this.items = item;
-            this.dialog = true;
+            //this.dialog = true;
+            this.openDialog(mode);
             console.log(this.items);
         },
         deleteOffice(item){
             console.log("gg", item);
         },
+        openDialog(key){
+            switch (key) {
+                case 'new_office':
+                    this.items = {
+                        id: '',
+                        name: '',
+                        address: '',
+                        office_code: '',
+                        contact_number: '',
+                        contact_email: '',
+                        form_mode: 'new_office'
+                    };
+                    this.dialog = true
+                    break;
+                case 'edit_office':
+                    this.dialog = true
+                    break;
+            }
+        },
         closeDialog(){
+            //console.log("jj" ,item);
             this.dialog = false;
         }
     },

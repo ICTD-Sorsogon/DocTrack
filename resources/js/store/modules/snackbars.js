@@ -4,11 +4,17 @@ const state = {
         text: '',
         color: 'success',
         icon: 'mdi-checkbox-blank-circle',
+    },
+    form_requests : {
+        request_form_type: '',
+        request_status: '',
+        status_message: '',
     }
 }
 
 const getters = {
     snackbar: state => state.snackbar,
+    form_requests: state => state.form_requests,
 }
 
 const actions = {

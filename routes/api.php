@@ -29,6 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('get_non_page_active_documents', 'DocumentController@getNonPaginatedActiveDocuments');
         Route::post('add_new_document', 'DocumentController@addNewDocument');
         // Route::get('receive_document/{id}', 'DocumentController@ReceiveDocument');
+
+        Route::post('add_new_office', 'OfficeController@addNewOffice');
     });
 
     Route::get('/authenticated', function () {
