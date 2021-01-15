@@ -101,7 +101,7 @@ export default {
                     name: 'Document Aging Report'
                 },
                 {
-                    path: 'reports/log',
+                    path: 'reports/logs',
                     component: ReportLog, 
                     name: 'Log Report'
                 },
