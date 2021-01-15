@@ -11,12 +11,24 @@ class Document extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = [
+    protected $fillable = [
         'tracking_code', 'subject', 'document_type_id',
         'originating_office', 'current_office', 'sender_name',
         'page_count', 'date_filed', 'is_terminal',
         'remarks', 'attachment_page_count'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+    
+        static::creating(function ($model) {
+            // dd(User::find($model->sender_name));
+            $model->tracking_code = $model->tracking_code ?? $model->buildTrackingNumber($model);
+            $model->originating_office = $model->originating_office ??  auth()->user()->office_id;
+            $model->sender_name = User::find($model->sender_name)->id ?? $model->sender_name;
+        });
+    }
 
     public function current_office()
     {
@@ -58,5 +70,18 @@ class Document extends Model
         }
 
         return $document->get();
+    }
+
+    private function buildTrackingNumber($model)
+    {
+        $tracking = ($model->is_external ? 'E' : 'I') .
+            auth()->user()->office->office_code.
+            '-'.
+            date('YmdH').
+            '-'.
+            substr(str_shuffle("0123456789"), 0, 5).
+            '-'.
+            $model->attachment_page_count;
+        return $tracking;
     }
 }
