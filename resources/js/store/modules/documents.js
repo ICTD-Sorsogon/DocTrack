@@ -15,7 +15,6 @@ const state = {
 const getters = {
     documents: ({documents}) => {
         for( let doc of documents){
-            console.log(doc.is_external)
             doc.is_external = doc.is_external ? 'External' : 'Internal'
             doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'
         }
@@ -86,8 +85,6 @@ const mutations = {
                 }
             }
         );
-
-            console.log(state.documents);
 
     },
     SET_ID_DOCUMENT(state, id){
