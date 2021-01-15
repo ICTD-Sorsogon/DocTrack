@@ -301,7 +301,7 @@ export default {
                 page_count: '',
                 attachment_page_count: '',
                 is_external: false,
-                date_filed: '',
+                is_termninal: false,
                 time_filed: '',
                 remarks: '',
             }

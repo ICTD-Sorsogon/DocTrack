@@ -24,7 +24,6 @@ class CreateDocumentsTable extends Migration
             $table->enum('status', ['receive', 'forward', 'processing', 'on hold', 'rejected', 'terminated']);
             $table->string('sender_name')->nullable();
             $table->unsignedInteger('page_count');
-            $table->dateTime('date_filed');
             $table->unsignedTinyInteger('is_terminal')->default(0);
             $table->string('remarks')->nullable();
             $table->unsignedInteger('attachment_page_count')->default(0);

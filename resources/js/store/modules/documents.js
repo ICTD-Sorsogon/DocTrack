@@ -16,7 +16,6 @@ const getters = {
     documents: ({documents}) => {
         for( let doc of documents){
             doc.is_external = doc.is_external ? 'External' : 'Internal'
-            doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'
         }
         return documents
     },
@@ -50,7 +49,7 @@ const actions = {
         commit('GET_ALL_DOCUMENT_TYPES', response.data);
     },
     async createNewDocument({ commit }, form) {
-        await axios.post('/api/add_new_document', form)
+        await axios.post(`/api/add_new_document`, form)
         .then(response => {
             const data = {
                 form_type: form.form_type,
