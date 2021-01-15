@@ -26,18 +26,19 @@ class DocumentsTableSeeder extends Seeder
                 for ($i = 0; $i < 10; $i++) {
                     $document = Document::factory()->make();
 
-                    $document = Document::factory()->create([
-                            'originating_office' =>  $document->originating_office == 0 ? $user->office->id : $faker->company,
+                    $persistDocument = Document::factory()->create(
+                        array_merge($document->toArray(),[
+                            'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
                             'tracking_code' => $this->buildTrackingNumber(
-                                $document->source,
+                                $document->is_external,
                                 $user->office->office_code,
                                 $document->attachment_page_count,
-                                $document->date_filed
-                            )
-                        ]);
+                                $document->date_filed)
+                            ]
+                        ));
 
                     TrackingRecord::factory()->create([
-                            'document_id' => $document->id,
+                            'document_id' => $persistDocument->id,
                             'touched_by' => $user->id
                         ]);
                 }
@@ -45,18 +46,19 @@ class DocumentsTableSeeder extends Seeder
             for($i = 0; $i < 10; $i++) {
                 $document = Document::factory()->make();
 
-                $document = Document::factory()->create([
-                        'originating_office' =>  $document->originating_office == 0 ? $user->office->id : $faker->company,
+                $persistDocument = Document::factory()->create(
+                    array_merge($document->toArray(),[
+                        'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
                         'tracking_code' => $this->buildTrackingNumber(
                             $document->is_external,
                             $user->office->office_code,
                             $document->attachment_page_count,
-                            $document->date_filed
-                        )
-                    ]);
+                            $document->date_filed)
+                        ]
+                    ));
 
                 TrackingRecord::factory()->create([
-                        'document_id' => $document->id,
+                        'document_id' => $persistDocument->id,
                         'touched_by' => $user->id
                     ]); 
             }
@@ -65,10 +67,8 @@ class DocumentsTableSeeder extends Seeder
 
     private function buildTrackingNumber($source, $office_code, $attachment, $date)
     {
-        $origin = 'I';
-        if ($source) {
-            $origin = 'E';
-        }
+        
+        $origin = $source ? 'E' : 'I';
         $tracking = $origin.
             '-'.
             $office_code.
