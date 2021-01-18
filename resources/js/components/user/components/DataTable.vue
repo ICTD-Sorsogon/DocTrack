@@ -58,26 +58,26 @@
 						</v-btn>
 					</v-col>
 					<v-col cols="12" sm="3">
-						<v-btn @click.prevent="redirectToReceivePage(item)" text color="#FFCA28" block
+						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
-								mdi-email-send-outline
+                                mdi-email-receive-outline
 							</v-icon>
 							Receive
 						</v-btn>
 					</v-col>
 					<v-col cols="12" sm="3">
 						<v-btn
-							link @click.prevent="redirectToReceivePage(item)" text color="#9575CD" block
+							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
 							<v-icon left>
-								mdi-email-receive-outline
+								mdi-email-send-outline
 							</v-icon>
 							Forward
 						</v-btn>
 					</v-col>
 					<v-col cols="12" sm="3">
-						<v-btn text color="#F06292" block
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
 								mdi-email-off-outline
@@ -134,7 +134,7 @@ export default {
 		}
 	},
 	methods: {
-        redirectToReceivePage(document) {
+        redirectToReceivePage(document, types) {
             /**
             * TODO:
             * Save the document id or the document object to Vuex instead because the dynamic routing is messing
@@ -142,7 +142,8 @@ export default {
             **/
             if (this.$route.name !== "Receive Document") {
                 this.$store.dispatch('setDocument', document);
-                this.$router.push({ name: "Receive Document" });
+                this.$router.push({ name: "Receive Document" , params: {type:types}});
+                this.$store.commit('SET_TYPES', types);
             }
         },
 		isEditable(docOrigin) {
