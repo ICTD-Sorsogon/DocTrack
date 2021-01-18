@@ -21,53 +21,53 @@ class DocumentsTableSeeder extends Seeder
     public function run(Faker $faker)
     {
         $users = User::with('office')->where('role_id', 2)->get();
-        foreach($users as $user) {
+        foreach ($users as $user) {
             if ($user->id%2 == 0) {
                 for ($i = 0; $i < 10; $i++) {
                     $document = Document::factory()->make();
 
                     $persistDocument = Document::factory()->create(
-                        array_merge($document->toArray(),[
-                            'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
-                            'tracking_code' => $this->buildTrackingNumber(
-                                $document->is_external,
-                                $user->office->office_code,
-                                $document->attachment_page_count,
-                                $document->date_filed)
-                            ]
-                        ));
-
+                        array_merge($document->toArray(), [
+                        'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
+                        'tracking_code' => $this->buildTrackingNumber(
+                            $document->is_external,
+                            $user->office->office_code,
+                            $document->attachment_page_count,
+                            $document->date_filed
+                        )])
+                    );
                     TrackingRecord::factory()->create([
                             'document_id' => $persistDocument->id,
                             'touched_by' => $user->id
                         ]);
                 }
             }
-            for($i = 0; $i < 10; $i++) {
+            for ($i = 0; $i < 10; $i++) {
                 $document = Document::factory()->make();
-
                 $persistDocument = Document::factory()->create(
-                    array_merge($document->toArray(),[
+                    array_merge($document->toArray(), [
                         'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
                         'tracking_code' => $this->buildTrackingNumber(
                             $document->is_external,
                             $user->office->office_code,
                             $document->attachment_page_count,
-                            $document->date_filed)
-                        ]
-                    ));
+                            $document->date_filed
+                        )
+                    ])
+                );
 
-                TrackingRecord::factory()->create([
+                TrackingRecord::factory()->create(
+                    [
                         'document_id' => $persistDocument->id,
                         'touched_by' => $user->id
-                    ]); 
+                    ]
+                );
             }
         }
     }
 
     private function buildTrackingNumber($source, $office_code, $attachment, $date)
     {
-        
         $origin = $source ? 'E' : 'I';
         $tracking = $origin.
             '-'.
