@@ -55,7 +55,7 @@ class DocumentController extends Controller
             $document->is_external = $request->is_external;
             $document->document_type_id = $request->document_type;
             $document->originating_office = $request->originating_office;
-            $document->current_office_id = Auth::user()->office->id;
+            // $document->current_office_id = Auth::user()->office->id;
             $document->sender_name = $request->sender_name;
             $document->page_count = $request->page_count;
             $document->date_filed = Carbon::createFromFormat(
@@ -76,8 +76,8 @@ class DocumentController extends Controller
             $datetime = Carbon::now();
             $tracking_record = new TrackingRecord;
             $tracking_record->document_id = $document->id;
-            $tracking_record->actions = 10;
-            $tracking_record->status = 20;
+            $tracking_record->action = 'create';
+            // $tracking_record->status = 20;
             $tracking_record->touched_by = Auth::user()->id;
             $tracking_record->last_touched = Carbon::createFromFormat(
                 'Y-m-d H:i',
