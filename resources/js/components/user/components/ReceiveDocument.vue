@@ -188,7 +188,6 @@
                             v-if="types=='forward'"
                             v-model="sampleItems[1]"
                             item-text="name"
-                            clearable
                             hide-selected
                             outlined
                             persistent-hint
