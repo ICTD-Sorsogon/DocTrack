@@ -35,27 +35,44 @@
               </v-list>
             </v-col>
           </v-row>-->
-          <v-row>
-              <v-col cols="12" sm="8" md="8">
-                <v-text-field v-model="form.name" label="Office Name*" required ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="4" md="4">
-                <v-text-field v-model="form.office_code" label="Office Code*" required ></v-text-field>
-              </v-col>
-              <v-col cols="12">
-                <v-text-field v-model="form.address" label="Office Address*" required ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field v-model="form.contact_number" label="Contact Number"></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field v-model="form.contact_email" label="Email Address"></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row justify="end">
-                <v-btn color="primary" dark class="mb-5 mt-10 ma-5" v-if="form.form_mode == 'new_office'" @click="saveNewOffice"> SAVE </v-btn>
-                <v-btn color="primary" dark class="mb-5 mt-10 ma-5" v-if="form.form_mode == 'edit_office'" @click="saveChangesToOffice"> SAVE CHANGES </v-btn>
-            </v-row>
+            <ValidationObserver>
+                <v-row>
+                <v-col cols="12" sm="8" md="8">
+                    <ValidationProvider rules="required" v-slot="{ errors }">
+                    <v-text-field v-model="form.name" label="Office Name*" required ></v-text-field>
+                    <span>{{ errors[0] }}</span>
+                    </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="4" md="4">
+                    <ValidationProvider rules="required" v-slot="{ errors }">
+                    <v-text-field v-model="form.office_code" label="Office Code*" required ></v-text-field>
+                    <span>{{ errors[0] }}</span>
+                    </ValidationProvider>
+                </v-col>
+                <v-col cols="12">
+                    <ValidationProvider rules="required" v-slot="{ errors }">
+                    <v-text-field v-model="form.address" label="Office Address*" required ></v-text-field>
+                    <span>{{ errors[0] }}</span>
+                    </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="6">
+                    <ValidationProvider rules="required" v-slot="{ errors }">
+                    <v-text-field v-model="form.contact_number" label="Contact Number"></v-text-field>
+                    <span>{{ errors[0] }}</span>
+                    </ValidationProvider>
+                </v-col>
+                <v-col cols="12" sm="6" md="6">
+                    <ValidationProvider rules="email" v-slot="{ errors }">
+                    <v-text-field v-model="form.contact_email" label="Email Address"></v-text-field>
+                    <span>{{ errors[0] }}</span>
+                    </ValidationProvider>
+                </v-col>
+                </v-row>
+                <v-row justify="end">
+                    <v-btn color="primary" dark class="mb-5 mt-10 ma-5" v-if="form.form_mode == 'new_office'" @click="saveNewOffice"> SAVE </v-btn>
+                    <v-btn color="primary" dark class="mb-5 mt-10 ma-5" v-if="form.form_mode == 'edit_office'" @click="saveChangesToOffice"> SAVE CHANGES </v-btn>
+                </v-row>
+            </ValidationObserver>
 
         </v-card-text>
       </v-card>
@@ -63,8 +80,11 @@
 </template>
 
 <script>
+import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
+import { email, required } from '../../../validate'
 import { mapGetters } from 'vuex';
     export default {
+        components: { ValidationProvider, ValidationObserver},
         props: ['selected_office', 'dialog'],
         data() {
             return {
@@ -91,7 +111,7 @@ import { mapGetters } from 'vuex';
         computed: {
             //...mapGetters(['form_requests']),
             form_requests(){
-                return this.$store.state.offices.form_requests;
+                return this.$store.state.snackbars.form_requests;
             }
 
         },
@@ -99,7 +119,7 @@ import { mapGetters } from 'vuex';
             saveNewOffice(){
                 if(JSON.stringify(this.form) === JSON.stringify(this.form_old)){
                     //console.log("no changes found");
-                    this.$store.dispatch('setSnackbar', {
+                    this.$store.dispatch('snackbars/setSnackbar', {
                         showing: true,
                         text: 'No changes found',
                         color: '#1565C0',
@@ -119,11 +139,12 @@ import { mapGetters } from 'vuex';
                             console.log(this.form.name);
                         }*/
 
-                        console.log('STATUS:', this.form_requests.request_status)
+                        //console.log('STATUS:', this.form_requests)
+
 
 
                         if(this.form_requests.request_status == 'SUCCESS') {
-                            this.$store.dispatch('setSnackbar', {
+                            this.$store.dispatch('snackbars/setSnackbar', {
                                 showing: true,
                                 text: this.form_requests.status_message,
                                 color: '#43A047',
@@ -141,7 +162,7 @@ import { mapGetters } from 'vuex';
                             });
 
                         } else {
-                            this.$store.dispatch('setSnackbar', {
+                            this.$store.dispatch('snackbars/setSnackbar', {
                                 showing: true,
                                 text: this.form_requests.status_message,
                                 color: '#D32F2F',
@@ -159,26 +180,77 @@ import { mapGetters } from 'vuex';
                 }
 
 
-                console.log("form_request:", this.form_requests);
+                //console.log("form_request:", this.form_requests);
+                //console.log("form_request:", this.$store.state.snackbar.form_requests);
+
 
             },
             saveChangesToOffice(){
                 if(JSON.stringify(this.form) === JSON.stringify(this.form_old)){
                     //console.log("no changes found");
-                    this.$store.dispatch('setSnackbar', {
+                    this.$store.dispatch('snackbars/setSnackbar', {
                         showing: true,
                         text: 'No changes found',
                         color: '#1565C0',
                         icon: 'mdi-information-outline',
                     })
                 }else{
+                    this.$store.dispatch('updateExistingOffice', this.form).then(() => {
+
+                        /*if (this.offices) {
+                            this.$store.dispatch('setSnackbar', {
+                                showing: true,
+                                text: 'Successfully edited',
+                                color: '#43A047',
+                                icon: 'mdi-check-bold',
+                            })
+                            this.$store.dispatch("unsetDataTableLoader");
+                            console.log(this.form.name);
+                        }*/
+
+                        //console.log('STATUS:', this.form_requests)
+
+
+
+                        if(this.form_requests.request_status == 'SUCCESS') {
+                            this.$store.dispatch('snackbars/setSnackbar', {
+                                showing: true,
+                                text: this.form_requests.status_message,
+                                color: '#43A047',
+                                icon: 'mdi-check-bold',
+                            })
+                            .then(() => {
+                                //this[this.button_loader] = false
+                                //this.button_loader = null;
+                                //this.$refs.form.reset();
+                                //this.$refs.observer.reset();
+
+                             this.$store.dispatch('getOffices');
+
+
+                            });
+
+                        } else {
+                            this.$store.dispatch('snackbars/setSnackbar', {
+                                showing: true,
+                                text: this.form_requests.status_message,
+                                color: '#D32F2F',
+                                icon: 'mdi-close-thick',
+                            })
+                            .then(() => {
+                                //this[this.button_loader] = false
+                                //this.button_loader = null;
+
+                            });
+                        }
+                    });
                     //console.log('yes you have changes');
-                    this.$store.dispatch('setSnackbar', {
+                    /*this.$store.dispatch('snackbars/setSnackbar', {
                         showing: true,
                         text: 'Successfully edited',
                         color: '#43A047',
                         icon: 'mdi-check-bold',
-                    })
+                    })*/
                 }
             }
         },

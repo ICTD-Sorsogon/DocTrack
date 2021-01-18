@@ -44,14 +44,24 @@ export default {
     components: {
         UserHomeComponent
     },
-    computed: mapGetters(["auth_user", "snackbar"]),
+    computed: {
+        ...mapGetters(["auth_user"]),
+        snackbar(){
+            var snackbar = this.$store.state.snackbars.snackbar;
+            if(!snackbar.showing){
+                this.$store.dispatch('snackbars/unsetSnackbar');
+            }
+            return snackbar
+        }
+    },
     methods: {
         closeSnackbar(){
-            this.$store.dispatch('unsetSnackbar');
+            this.$store.dispatch('snackbars/unsetSnackbar');
         }
     },
     mounted() {
         this.$store.dispatch('getAuthUser');
+        console.log(this.snackbar);
     }
 }
 </script>
