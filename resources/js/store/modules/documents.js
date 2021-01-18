@@ -1,4 +1,5 @@
 const state = {
+    allDocuments: [],
     documents: [],
     document_types: [],
     form_requests : {
@@ -19,6 +20,7 @@ const getters = {
         }
         return documents
     },
+    get_alldocument: state => state.allDocuments,
     document_types: state => state.document_types,
     form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
@@ -30,6 +32,10 @@ const getters = {
 }
 
 const actions = {
+    async getDocument({commit}) {
+        const response = await axios.get(`/api/tracking_list`);
+        commit('GET_ALL_DOCUMENTS', response.data);
+    },
     async updateDocument({commit}, form) {
         commit('UPDATE_DOCUMENT', form);
     },
@@ -77,6 +83,9 @@ const actions = {
 }
 
 const mutations = {
+    GET_ALL_DOCUMENTS(state, response) {
+        state.allDocuments = response
+    },
     UPDATE_DOCUMENT(state, form){
         let document = state.documents.data.filter(item =>{
                 if (item.tracking_id == form.tracking_code) {

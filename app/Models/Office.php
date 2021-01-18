@@ -24,8 +24,8 @@ class Office extends Model
         return $this->hasMany('App\Models\Document', 'originating_office');
     }
 
-    public function tracking_records()
+    public function trackingrecords()
     {
-        return $this->hasMany('App\Models\TrackingRecord');
+        return $this->hasMany('App\Models\TrackingRecord','touched_by');
     }
 }

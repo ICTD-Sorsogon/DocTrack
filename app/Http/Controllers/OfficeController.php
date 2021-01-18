@@ -17,4 +17,9 @@ class OfficeController extends Controller
     {
         return Office::get();
     }
+
+    public function getTrackingList(): Collection
+    {
+        return Office::with('trackingrecords')->get();
+    }
 }
