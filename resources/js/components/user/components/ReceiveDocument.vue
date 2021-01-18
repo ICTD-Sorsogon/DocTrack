@@ -191,6 +191,26 @@
                             v-model="form.remarks"
                         ></v-textarea>
                     </v-col>
+                    <v-col>
+                        <div
+                            class="my-2"
+                            align="center"
+                            justify="end"
+                        >
+                            <v-btn
+                                color="primary"
+                                :loading="loading_create_new_document"
+                                @click="button_loader = 'loading_create_new_document'"
+                                type="submit"
+                            >
+                                <v-icon left dark>
+                                    mdi-email-send-outline
+                                </v-icon>
+                                Receive
+                            </v-btn>
+                        </div>
+                    </v-col>
+
                 </v-row>
             </v-form>
         </v-card-text>
@@ -210,6 +230,8 @@ export default {
     },
     data() {
         return {
+            button_loader: null,
+            loading_create_new_document: false,
             datepicker_modal: false,
             timepicker_modal: false,
             status: ['Sample', 'Sample2'],
