@@ -20,11 +20,11 @@
         {{ item }}
       </v-tab>
     </v-tabs>
-    <data-table 
-      @seeDocumentDetails="seeDocumentDetails" 
+    <data-table
+      @seeDocumentDetails="seeDocumentDetails"
       @editDocument="editDocument"
-      v-if="auth_user.role_id === 1" 
-      :documents="documents" 
+      v-if="auth_user.role_id === 1"
+      :documents="documents"
       :datatable_loader="datatable_loader"
       ></data-table>
     <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
@@ -32,18 +32,18 @@
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
-        <data-table 
-         @seeDocumentDetails="seeDocumentDetails" 
+        <data-table
+         @seeDocumentDetails="seeDocumentDetails"
          @editDocument="editDocument"
-         :documents="userDocuments" 
+         :documents="userDocuments"
          :datatable_loader="datatable_loader"
          ></data-table>
         </v-tab-item>
     </v-tabs-items>
-    <table-modal 
+    <table-modal
         @closeDialog="closeDialog"
-        :dialog="dialog" 
-        v-if="selected_document" 
+        :dialog="dialog"
+        v-if="selected_document"
         :selected_document="selected_document"
     ></table-modal>
 </v-card>
@@ -93,39 +93,31 @@ export default {
         },
         closeDialog(){
             this.dialog = false;
-       },
-
+        },
         redirectToReceivePage(document) {
             /**
             * TODO:
             * Save the document id or the document object to Vuex instead because the dynamic routing is messing
             * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
             **/
-            this.$store.dispatch('setDocument', document);
-            this.$router.push(`receive_document`);
-      },
-      getNewDocumentRecordForm() {
-        if (this.$route.name !== "New Document") {
-          this.$store.dispatch("setLoader");
-          this.$router.push({ name: "New Document" });
-        }
-      },
-    editDocument(id) {
-      if (this.$route.name !== "Edit Document") {
-        this.$store.dispatch("setLoader");
-        this.$router.push({ name:"Edit Document", params: {id}});
-      }
+            if (this.$route.name !== "Receive Document") {
+                this.$store.dispatch('setDocument', document);
+                this.$router.push({ name: "Receive Document" });
+            }
+        },
+        getNewDocumentRecordForm() {
+            if (this.$route.name !== "New Document") {
+            this.$store.dispatch("setLoader");
+            this.$router.push({ name: "New Document" });
+            }
+        },
+        editDocument(id) {
+            if (this.$route.name !== "Edit Document") {
+                this.$store.dispatch("setLoader");
+                this.$router.push({ name:"Edit Document", params: {id}});
+            }
+        },
     },
-    redirectToReceivePage(document) {
-      /**
-       * TODO:
-       * Save the document id or the document object to Vuex instead because the dynamic routing is messing
-       * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
-       **/
-      this.$store.dispatch("setDocument", document);
-      this.$router.push(`receive_document`);
-    },
-  },
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("getActiveDocuments").then(() => {
