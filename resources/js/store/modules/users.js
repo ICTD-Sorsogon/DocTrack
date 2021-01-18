@@ -52,18 +52,9 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
-                element.office_name = element.office.name;
-                if(element.gender == 1){
-                    element.is_active = "Male";
-                }
-                else
-                    element.gender = "Female";
-
-                if(element.is_active == 1){
-                    element.is_active = "Active";
-                }
-                else
-                    element.is_active = "Inactive";
+                element.office_name = element.office.name
+                element.gender = element.gender ? "Male" : "Female"
+                element.is_active = element.is_active ? "Active" : "Inactive"
             });
             commit('FETCH_ALL_USERS', response.data);
         });
