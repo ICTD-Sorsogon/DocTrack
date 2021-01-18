@@ -88,7 +88,7 @@
 				</v-row>
 			</td>
 		</template>
-	</v-data-table> 
+	</v-data-table>
 	<div class="text-center pt-2">
 		<v-pagination
 			v-model="page"
@@ -134,6 +134,17 @@ export default {
 		}
 	},
 	methods: {
+        redirectToReceivePage(document) {
+            /**
+            * TODO:
+            * Save the document id or the document object to Vuex instead because the dynamic routing is messing
+            * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
+            **/
+            if (this.$route.name !== "Receive Document") {
+                this.$store.dispatch('setDocument', document);
+                this.$router.push({ name: "Receive Document" });
+            }
+        },
 		isEditable(docOrigin) {
 			return this.auth_user.office_id == docOrigin || this.isAdmin
 		},
