@@ -149,6 +149,17 @@ export default {
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
+            if(this.$store.state.documents.types=='receive')
+            {
+                return 'Receive Document'
+            }
+            else if (this.$store.state.documents.types=='forward'){
+                return 'Forward Document'
+            }
+            else if (this.$store.state.documents.types=='terminal'){
+                return 'Terminate Document Track'
+            }
+            else
             return this.$route.name;
         },
         placeholderImage() {
