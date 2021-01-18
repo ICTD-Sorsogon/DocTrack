@@ -1,4 +1,5 @@
 const state = {
+    types: '',
     documents: [],
     document_types: [],
     form_requests : {
@@ -77,6 +78,9 @@ const actions = {
 }
 
 const mutations = {
+    SET_TYPES(state, types){
+        state.types = types;
+    },
     UPDATE_DOCUMENT(state, form){
         let document = state.documents.data.filter(item =>{
                 if (item.tracking_id == form.tracking_code) {
