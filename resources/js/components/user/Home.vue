@@ -68,6 +68,12 @@
                     </v-list-item-icon>
                     <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
+                <v-list-item link @click.prevent="getLogs" v-ripple="{ class: 'primary--text' }">
+                    <v-list-item-icon>
+                    <v-icon>mdi-timeline-clock-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Logs</v-list-item-title>
+                </v-list-item>
             </v-list-group>
 
             <v-list-item link @click.prevent="getAccountSettings">
@@ -202,6 +208,12 @@ export default {
             if(this.$route.name !== 'Document Aging Report') {
                 this.$store.dispatch('setLoader');
                 this.$router.push({ name: "Document Aging Report"});
+            }
+        },
+        getLogs() {
+            if(this.$route.name !== 'Log Report') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "Log Report"}); 
             }
         },
         getMasterListReport() {

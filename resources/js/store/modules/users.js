@@ -22,6 +22,7 @@ const state = {
         request_status: '',
         status_message: '',
     },
+    logs: [],
 }
 
 const getters = {
@@ -29,7 +30,9 @@ const getters = {
     auth_user_full_name: state => state.user_full_name,
     form_requests_status: state => state.form_requests,
     all_users: state => state.all_users,
-    // all_users_complete: state => state.all_users_complete,
+    all_users_complete: state => state.all_users_complete,
+    logs: state => state.logs,
+    is_admin: state => state.user.role_id == 1,
 }
 
 const actions = {
@@ -38,7 +41,7 @@ const actions = {
         commit('SET_AUTH_USER', response.data);
     },
     async removeAuthUser({ commit }) {
-        await axios.post('logout');
+        await axios.post('/logout');
         commit('UNSET_AUTH_USER');
     },
     async getAllUsers({ commit }) {
@@ -85,7 +88,11 @@ const actions = {
     },
     async removeRequestStatus({commit}) {
         commit('UNSET_REQUEST_STATUS');
-    }
+    },
+    async getLogs({ commit }) {
+        const response = await axios.get('/api/logs');
+        commit('GET_LOGS', response.data);
+    },
 }
 
 const mutations = {
@@ -141,6 +148,9 @@ const mutations = {
         state.form_requests.request_form_type = '';
         state.form_requests.request_status = '';
         state.form_requests.status_message = '';
+    },
+    GET_LOGS(state, response) {
+        state.logs = response;
     }
 }
 
