@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Auth;
+
 class Office extends Model
 {
     use HasFactory;
@@ -22,11 +23,5 @@ class Office extends Model
     public function documents()
     {
         return $this->hasMany('App\Models\Document', 'originating_office');
-    }
-
-
-    public function trackings()
-    {
-        return $this->users()->with('tracking_records');
     }
 }
