@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Auth;
 class Office extends Model
 {
     use HasFactory;
@@ -24,8 +24,9 @@ class Office extends Model
         return $this->hasMany('App\Models\Document', 'originating_office');
     }
 
-    public function tracking_records()
+
+    public function trackings()
     {
-        return $this->hasMany('App\Models\TrackingRecord');
+        return $this->users()->with('tracking_records');
     }
 }

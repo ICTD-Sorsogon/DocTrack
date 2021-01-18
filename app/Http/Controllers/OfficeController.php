@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\Office;
 use Illuminate\Http\Request;
-
+use Auth;
 class OfficeController extends Controller
 {
     public function __construct()
@@ -16,5 +17,9 @@ class OfficeController extends Controller
     public function getOfficeList(): Collection
     {
         return Office::get();
+    }
+
+    public function getTrackingList() {
+        return Office::with('trackings')->get();
     }
 }
