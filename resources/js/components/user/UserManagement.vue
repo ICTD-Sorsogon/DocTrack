@@ -21,7 +21,6 @@
                     </v-card-title>
                     <v-card-text>
                     <v-container>
-                        <ValidationObserver ref="observer" v-slot="{ invalid }">
                         <v-row>
                         <v-col cols="12" sm="6" md="3">
                             <ValidationProvider rules="required" v-slot="{ errors, valid }">
@@ -139,7 +138,7 @@
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue-grey lighten-1" @click="dialog = false">Close</v-btn>
-                    <v-btn :dark="!invalid" :disabled="invalid" color="green accent-4" @click="dialog = false">Save</v-btn>
+                    <v-btn color="green accent-4" @click="dialog = false">Save</v-btn>
                     </v-card-actions>
                 </v-card>
                 </v-dialog>
