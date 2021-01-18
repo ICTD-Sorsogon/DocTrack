@@ -17,12 +17,12 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-text-field
-                                v-model="form.document_title"
+                                v-model="form.subject"
                                 label="Document Title/Subject"
                                 prepend-inner-icon="mdi-format-title"
                                 outlined
                                 :error-messages="errors"
-                                :success="valid"
+                                
                                 required
                             ></v-text-field>
                         </ValidationProvider>
@@ -40,7 +40,7 @@
                                 outlined
                                 required
                                 :error-messages="errors"
-                                :success="valid"
+                                
                             ></v-select>
                         </ValidationProvider>
                     </v-col>
@@ -53,12 +53,12 @@
                             single-line
                             required
                         >
-                        <v-radio value="Internal">
+                        <v-radio value="0">
                             <template v-slot:label>
                             <div>Internal</div>
                             </template>
                         </v-radio>
-                        <v-radio value="External">
+                        <v-radio value="1">
                             <template v-slot:label>
                             <div>External </div>
                             </template>
@@ -76,7 +76,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
-                                v-model="form.originating_office"
+                                v-model="origin_office"
                                 :items="offices"
                                 item-text="name"
                                 clearable
@@ -86,7 +86,7 @@
                                 label="Originating Office"
                                 prepend-inner-icon="mdi-office-building-marker-outline"
                                 :error-messages="errors"
-                                :success="valid"
+                                
                                 required
                             ></v-combobox>
                         </ValidationProvider>
@@ -94,7 +94,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
-                                v-model="form.sender_name"
+                                v-model="sender_name"
                                 :items="all_users"
                                 item-text="full_name"
                                 clearable
@@ -104,103 +104,30 @@
                                 label="Sender Name"
                                 prepend-inner-icon="mdi-account-arrow-right-outline"
                                 :error-messages="errors"
-                                :success="valid"
+                                
                                 required
                             ></v-combobox>
                         </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-dialog
-                            ref="date_dialog"
-                            v-model="datepicker_modal"
-                            :return-value.sync="form.date_filed"
-                            persistent
-                            width="290px"
-                        >
-                            <template v-slot:activator="{ on, attrs }">
-                                <ValidationProvider rules="required" v-slot="{ errors, valid }">
-                                    <v-text-field
-                                        v-model="form.date_filed"
-                                        label="Date Filed"
-                                        prepend-inner-icon="mdi-calendar"
-                                        readonly
-                                        outlined
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        :error-messages="errors"
-                                        :success="valid"
-                                    ></v-text-field>
-                                </ValidationProvider>
-                            </template>
-                            <v-date-picker
-                                v-model="form.date_filed"
-                                scrollable
-                            >
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="datepicker_modal = false"
-                                >
-                                    Cancel
-                                </v-btn>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="$refs.date_dialog.save(form.date_filed)"
-                                >
-                                    OK
-                                </v-btn>
-                            </v-date-picker>
-                        </v-dialog>
+                        <v-text-field
+                            :value="created_at"
+                            label="Date Filed"
+                            prepend-inner-icon="mdi-calendar"
+                            outlined
+                            readonly
+                        ></v-text-field>
                     </v-col>
 
                     <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-dialog
-                            ref="time_dialog"
-                            v-model="timepicker_modal"
-                            :return-value.sync="form.time_filed"
-                            persistent
-                            width="290px"
-                        >
-                            <template v-slot:activator="{ on, attrs }">
-                                <ValidationProvider rules="required" v-slot="{ errors, valid }">
-                                    <v-text-field
-                                        v-model="form.time_filed"
-                                        label="Time Filed"
-                                        prepend-inner-icon="mdi-clock-time-four-outline"
-                                        readonly
-                                        outlined
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        :error-messages="errors"
-                                        :success="valid"
-                                    ></v-text-field>
-                                </ValidationProvider>
-                            </template>
-                            <v-time-picker
-                                v-if="timepicker_modal"
-                                v-model="form.time_filed"
-                                full-width
-                            >
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="timepicker_modal = false"
-                                >
-                                    Cancel
-                                </v-btn>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="$refs.time_dialog.save(form.time_filed)"
-                                >
-                                    OK
-                                </v-btn>
-                            </v-time-picker>
-                        </v-dialog>
-                        </v-col>
+                        <v-text-field
+                            :value="time_filed"
+                            label="Time Filed"
+                            prepend-inner-icon="mdi-clock-time-four-outline"
+                            outlined
+                            readonly
+                        ></v-text-field>
+                    </v-col>
 
                     <v-col cols="12" xl="6" lg="6" md="12">
                         <ValidationProvider rules="required|numeric|min:0" v-slot="{ errors, valid }">
@@ -210,7 +137,6 @@
                                 prepend-inner-icon="mdi-numeric"
                                 outlined
                                 :error-messages="errors"
-                                :success="valid"
                                 required
                                 type="number"
                                 min="0"
@@ -226,7 +152,6 @@
                                 prepend-inner-icon="mdi-numeric"
                                 outlined
                                 :error-messages="errors"
-                                :success="valid"
                                 required
                                 type="number"
                                 min="0"
@@ -235,6 +160,7 @@
                         </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
+                    <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-textarea
                             clearable
                             outlined
@@ -243,7 +169,10 @@
                             prepend-inner-icon="mdi-comment-text-outline"
                             label="Remarks"
                             v-model="form.remarks"
+                            required
+                            :error-messages="errors"
                         ></v-textarea>
+                    </ValidationProvider>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -259,11 +188,12 @@
                                 :loading="loading_create_new_document"
                                 @click="button_loader = 'loading_create_new_document'"
                                 type="submit"
+                                :disabled="invalid"
                             >
                                 <v-icon left dark>
                                     mdi-plus
                                 </v-icon>
-                                Create
+                                Save
                             </v-btn>
                         </div>
                     </v-col>
@@ -283,7 +213,31 @@ export default {
         ValidationProvider,
         ValidationObserver
     },
-    computed: mapGetters(['auth_user', 'document_types', 'offices', 'form_requests', 'all_users']),
+    computed: {
+        ...mapGetters(['auth_user', 'document_types', 'offices', 'form_requests', 'all_users', 'documents']),
+        created_at() {
+            return new Date(this.form.created_at).toDateString()
+        },
+        time_filed() {
+            return new Date(this.form.created_at).toLocaleTimeString()
+        },
+        sender_name: {
+            get() {
+                return isNaN(this.form.sender_name) ? this.form.sender_name : this.form.sender.name
+            },
+            set(val) {
+               this.form.sender_name = val
+            }
+        },
+        origin_office: {
+            get() {
+                return isNaN(this.form.originating_office) ? this.form.originating_office : this.form.origin_office.name
+            },
+            set(val) {
+                this.form.originating_office = typeof val === 'string' ?  val : val.id
+            }
+        }
+    },
     data() {
         return {
             current_date: new Date().toISOString().substr(0, 10),
@@ -293,15 +247,13 @@ export default {
             loading_create_new_document: false,
             form: {
                 form_type: 'new_document',
-                tracking_id: '',
-                document_title: '',
+                subject: '',
                 document_type: '',
-                originating_office: '',
-                sender_name: '',
+                sender: {},
                 page_count: '',
                 attachment_page_count: '',
                 is_external: false,
-                date_filed: '',
+                is_termninal: false,
                 time_filed: '',
                 remarks: '',
             }
@@ -314,29 +266,8 @@ export default {
                 this.$router.push({ name: "All Active Documents"});
             }
         },
-        // generateTrackingCode(document_data) {
-        //     var tracking_number = '';
-        //     var origin = 'I';
-        //     var salt = '';
-        //     for(var iterator = 0; iterator < 5; iterator++) {
-        //         salt = salt + (~~(Math.random() * 10)).toString();
-        //     }
-        //     if(document_data.is_external) {
-        //         origin = 'E'
-        //     }
-        //     var date_stripped = document_data.date_filed.split('-');
-        //     tracking_number = tracking_number +
-        //         origin + '-' +
-        //         this.auth_user.office.office_code + '-' +
-        //         date_stripped[0]+date_stripped[1]+date_stripped[2] + '-' +
-        //         salt + '-' +
-        //         document_data.attachment_page_count;
-        //     return tracking_number;
-        // },
         sanitizeInputs() {
             this.form.is_external = this.form.is_external == 'true' ? true : false;
-            this.form.tracking_id = this.generateTrackingCode(this.form);
-            this.form.document_title = this.form.document_title.toString();
             if(typeof this.form.originating_office === 'object' && this.form.originating_office !== null) {
                 this.form.originating_office = this.form.originating_office.id;
             } else {
@@ -352,9 +283,7 @@ export default {
                 this.form.remarks.toString() : null;
         },
         editDocument() {
-            console.log(this.form)
-            this.$store.dispatch('updateDocument', this.form);
-            console.log(this.$store.state.documents.documents.data);
+            this.createNewDocument()
 
         },
         createNewDocument() {
@@ -388,36 +317,14 @@ export default {
                 }
             });
         },
-        getDocumentDetails(id){
-            console.log(this.$store.getters.getDocument(this.$route.params.id));
-        },
-        debuggerButton() {
-            // console.log(this.form);
-        },
-        createAndForward() {
-            // TODO: Create new document then forward to office
-        },
         fillForm(){
-            let item = this.$store.getters.getDocument(this.$route.params.id);
-            this.form.form_type = "edit_document";
-            this.form.tracking_id = item[0].tracking_code;
-            this.form.document_title = item[0].subject;
-            this.form.document_type = item[0].document_type;
-            this.form.is_external = item[0].is_external;
-            this.form.originating_office = item[0].origin_office.name;
-            this.form.remarks = item[0].remarks;
-            this.form.page_count = item[0].page_count;
-            let datetime = item[0].date_filed.split(" ");
-            this.form.date_filed = datetime[0];
-            this.form.time_filed = datetime[1];
-            console.log("form " ,this.form , "row " , item)
+            this.form = JSON.parse(JSON.stringify(this.documents[this.$route.params.id]));
         },
     },
     mounted() {
         this.fillForm();
-        this.$store.dispatch('getAllUsers');
         this.$store.dispatch('getDocumentTypes');
-        this.$store.dispatch('getOffices');
+        this.auth_user.role_id === 1 && this.$store.dispatch('getAllUsers')
         this.$store.dispatch('unsetLoader');
     }
 }

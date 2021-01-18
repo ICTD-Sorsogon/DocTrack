@@ -374,17 +374,15 @@ export default {
             });
         },
         debuggerButton() {
-            // console.log(this.form);
         },
         createAndForward() {
             // TODO: Create new document then forward to office
         },
     },
     mounted() {
-        this.$store.dispatch('getAllUsers');
         this.$store.dispatch('getDocumentTypes');
-        this.$store.dispatch('getOffices');
         this.$store.dispatch('unsetLoader');
+        this.auth_user.role_id === 1 && this.$store.dispatch('getAllUsers')
     }
 }
 </script>

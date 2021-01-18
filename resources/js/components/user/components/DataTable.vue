@@ -3,7 +3,7 @@
 	<v-data-table
 		v-if="documents"
 		:headers="headers"
-		:items="documents"
+		:items="extendedData"
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
 		item-key="id"
@@ -16,8 +16,6 @@
 		:expanded.sync="expanded"
 		show-expand
 	>
-	<template v-slot:top>
-	</template>
 		<template v-slot:top>
 			<v-text-field
 				v-model="search"
@@ -35,17 +33,18 @@
 				<v-btn
 					color="primary"
 					icon
-					@click="seeDocumentDetails(item)"
+					@click="$emit('seeDocumentDetails',item)"
 				>
 					<v-icon>mdi-more</v-icon>
 				</v-btn>
 			</td>
 		</template>
-		<template v-slot:expanded-item="{ headers, item }">
+		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row>
-					<v-col cols="12" sm="3">
+					<v-col v-if="isEditable(item.originating_office)" cols="12" sm="3">
 						<v-btn
+							@click="$emit('editDocument', item.id)"
 							text
 							color="#26A69A"
 							block
@@ -87,7 +86,7 @@
 				</v-row>
 			</td>
 		</template>
-	</v-data-table> 
+	</v-data-table>
 	<div class="text-center pt-2">
 		<v-pagination
 			v-model="page"
@@ -99,14 +98,14 @@
 
 <script>
 import { colors } from '../../../constants';
-
+import {mapGetters} from 'vuex'
 export default {
 	props: ['documents', 'datatable_loader'],
 	data() {
 		return {
 			search: '',
             page: 1,
-            itemsPerPage: 10,
+            itemsPerPage: 25,
             expanded: [],
             headers: [
                 { text: 'Tracking ID', value: 'tracking_code', sortable: false },
@@ -124,11 +123,35 @@ export default {
 		}
 	},
 	computed: {
+		...mapGetters(['auth_user']),
 		pageCount() {
             return parseInt(this.documents?.length / this.itemsPerPage)
-        },
+		},
+		extendedData() {
+			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+				doc.is_external = doc.is_external ? 'External' : 'Internal'
+				return doc
+			})
+		},
+		isAdmin() {
+			return this.auth_user.role_id == 1
+		}
 	},
 	methods: {
+        redirectToReceivePage(document) {
+            /**
+            * TODO:
+            * Save the document id or the document object to Vuex instead because the dynamic routing is messing
+            * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
+            **/
+            if (this.$route.name !== "Receive Document") {
+                this.$store.dispatch('setDocument', document);
+                this.$router.push({ name: "Receive Document" });
+            }
+        },
+		isEditable(docOrigin) {
+			return this.auth_user.office_id == docOrigin || this.isAdmin
+		},
 		getTrackingCodeColor(document, document_type_id) {
             // document.color = colors[document_type_id];
             return colors[document_type_id];

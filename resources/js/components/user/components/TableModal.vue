@@ -9,7 +9,7 @@
             <v-col cols="6" sm="6">
                 <v-card-actions class="mr-4">
                     <v-spacer></v-spacer>
-                    <v-btn x-large color="gray" @click="dialog = false" icon>
+                    <v-btn x-large color="gray" @click="$emit('closeDialog')" icon>
                     <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </v-card-actions>
@@ -241,9 +241,8 @@
 
 <script>
     export default {
-		props: ['selected_document', 'dialog'],
+    props: ['selected_document', 'dialog'],
     }
-
 </script>
 
 <style>
