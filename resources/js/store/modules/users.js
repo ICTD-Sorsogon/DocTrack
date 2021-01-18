@@ -30,6 +30,7 @@ const getters = {
     form_requests_status: state => state.form_requests,
     all_users: state => state.all_users,
     all_users_complete: state => state.all_users_complete,
+    is_admin: state => state.user.role_id == 1,
 }
 
 const actions = {
@@ -38,7 +39,7 @@ const actions = {
         commit('SET_AUTH_USER', response.data);
     },
     async removeAuthUser({ commit }) {
-        await axios.post('logout');
+        await axios.post('/logout');
         commit('UNSET_AUTH_USER');
     },
     async getAllUsers({ commit }) {
