@@ -3,7 +3,7 @@
 	<v-data-table
 		v-if="documents"
 		:headers="headers"
-		:items="documents"
+		:items="extendedData"
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
 		item-key="id"
@@ -16,8 +16,6 @@
 		:expanded.sync="expanded"
 		show-expand
 	>
-	<template v-slot:top>
-	</template>
 		<template v-slot:top>
 			<v-text-field
 				v-model="search"
@@ -128,6 +126,12 @@ export default {
 		...mapGetters(['auth_user']),
 		pageCount() {
             return parseInt(this.documents?.length / this.itemsPerPage)
+		},
+		extendedData() {
+			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+				doc.is_external = doc.is_external ? 'External' : 'Internal'
+				return doc
+			})
 		},
 		isAdmin() {
 			return this.auth_user.role_id == 1
