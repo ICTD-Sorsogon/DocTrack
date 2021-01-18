@@ -205,7 +205,7 @@
                             hide-selected
                             outlined
                             persistent-hint
-                            label="From"
+                            label="Through"
                             prepend-inner-icon="mdi-office-building-marker-outline"
                             required
                         ></v-combobox>
@@ -246,7 +246,7 @@
                                 type="submit"
                             >
                                 <v-icon left dark>
-                                    mdi-email-off-outline
+                                    mdi-email-send-outline
                                 </v-icon>
                                 Forward
                             </v-btn>
@@ -258,7 +258,7 @@
                                 type="submit"
                             >
                                 <v-icon left dark>
-                                    mdi-email-send-outline
+                                    mdi-email-off-outline
                                 </v-icon>
                                 Terminate
                             </v-btn>
@@ -307,7 +307,7 @@ export default {
                 time_filed: '',
                 remarks: ''
             },
-            sampleItems: ['Through Docketing Office', 'Forward to Office']
+            sampleItems: ['Docketing Office', 'Forward to Office']
         }
     },
     methods: {
