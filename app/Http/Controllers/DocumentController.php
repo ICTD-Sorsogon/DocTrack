@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\TrackingRecord;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class DocumentController extends Controller
 {
@@ -46,14 +47,18 @@ class DocumentController extends Controller
         $document= Document::find($id);
     }
 
-    public function addNewDocument(Document $document, DocumentPostRequest $request): Array
+    public function addNewDocument(Document $document, DocumentPostRequest $request): Boolean
     {
         $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
         );
+
+        return true;
         /**
+         * KENNETH SOLOMON
          * TODO after save or update, dipatch events user logs and doc logs
+         * PLEASE USE LARAVEL EVENTS LIKE HERE https://laravel.com/docs/8.x/events
          */
     }
 }
