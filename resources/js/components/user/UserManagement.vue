@@ -173,9 +173,9 @@
                 <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
                 <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
             </template>
-            <template v-slot:no-data>
+            <!-- <template v-slot:no-data>
                 <v-btn color="primary" @click="initialize">Reset</v-btn>
-            </template>
+            </template> -->
             </v-data-table>
         </v-card-text>
     </v-card>
@@ -319,6 +319,8 @@ export default {
         console.log(this.users);
         this.$store.dispatch('unsetLoader');
         // this.getUserMasterList();
+        this.$store.dispatch('getAllUsers');
+        this.$store.commit('SET_TYPES', null);
     }
 }
 </script>

@@ -125,6 +125,7 @@ export default {
         this.$store.dispatch("unsetDataTableLoader");
       }
     });
+    this.$store.commit('SET_TYPES', null);
   },
 };
 </script>
