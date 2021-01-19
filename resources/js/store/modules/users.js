@@ -14,7 +14,7 @@ function buildName(first_name, middle_name, last_name, suffix) {
 const state = {
     user: {},
     all_users: [],
-    all_users_complete: [],
+    // all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
     form_requests : {
@@ -22,6 +22,7 @@ const state = {
         request_status: '',
         status_message: '',
     },
+    logs: [],
 }
 
 const getters = {
@@ -30,6 +31,8 @@ const getters = {
     form_requests_status: state => state.form_requests,
     all_users: state => state.all_users,
     all_users_complete: state => state.all_users_complete,
+    logs: state => state.logs,
+    is_admin: state => state.user.role_id == 1,
 }
 
 const actions = {
@@ -38,7 +41,7 @@ const actions = {
         commit('SET_AUTH_USER', response.data);
     },
     async removeAuthUser({ commit }) {
-        await axios.post('logout');
+        await axios.post('/logout');
         commit('UNSET_AUTH_USER');
     },
     async getAllUsers({ commit }) {
@@ -52,6 +55,9 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
+                // element.office_name = element.office.name
+                element.gender = element.gender ? "Male" : "Female"
+                element.is_active = element.is_active ? "Active" : "Inactive"
             });
             commit('FETCH_ALL_USERS', response.data);
         });
@@ -82,7 +88,11 @@ const actions = {
     },
     async removeRequestStatus({commit}) {
         commit('UNSET_REQUEST_STATUS');
-    }
+    },
+    async getLogs({ commit }) {
+        const response = await axios.get('/api/logs');
+        commit('GET_LOGS', response.data);
+    },
 }
 
 const mutations = {
@@ -101,6 +111,9 @@ const mutations = {
     FETCH_ALL_USERS: (state, users) => {
         state.all_users = users;
     },
+    // FETCH_ALL_USERS_COMPLETE: (state, users) => {
+    //     state.all_users_complete = users;
+    // },
     UPDATE_USER_COMPLETE_NAME: (state, data) => {
         if(data.response.code == "SUCCESS") {
             state.first_name = data.form.first_name;
@@ -135,6 +148,9 @@ const mutations = {
         state.form_requests.request_form_type = '';
         state.form_requests.request_status = '';
         state.form_requests.status_message = '';
+    },
+    GET_LOGS(state, response) {
+        state.logs = response;
     }
 }
 

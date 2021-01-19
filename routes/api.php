@@ -20,14 +20,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', 'LoginController@logout');
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
-        Route::get('all_users_complete', 'UserController@getAllUserComplete');
+        // Route::get('all_users_complete', 'UserController@getAllUserComplete');
         Route::put('update_user/{id}', 'UserController@updateUser');
         Route::get('document_type_list', 'DocumentController@getDocumentTypes');
         Route::get('get_active_documents', 'DocumentController@getAllActiveDocuments');
         Route::get('get_document_details/{id}', 'DocumentController@getSelectedDocument');
         Route::get('office_list', 'OfficeController@getOfficeList');
+        Route::get('tracking_list', 'OfficeController@getTrackingList');
         Route::get('get_non_page_active_documents', 'DocumentController@getNonPaginatedActiveDocuments');
         Route::post('add_new_document', 'DocumentController@addNewDocument');
+        Route::get('logs', 'LogController@index');
+        Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
         // Route::get('receive_document/{id}', 'DocumentController@ReceiveDocument');
 
         Route::post('add_new_office', 'OfficeController@addNewOffice');

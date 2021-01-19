@@ -84,4 +84,23 @@ class OfficeController extends Controller
         return [$office];
     }
 
+    public function bulkUserTrackingList(Office $office)
+    {
+        $collection = [];
+        foreach ($office->users as $users) {
+            array_push($collection, $users->tracking_records);
+        }
+        return $collection;
+    }
+
+    public function getTrackingList()
+    {
+        $offices = Office::with('users.tracking_records')->get();
+        foreach ($offices as $office) {
+            $office['tracking_records'] = collect($this->bulkUserTrackingList($office))->collapse();
+            unset($office->users);
+        }
+        return $offices;
+    }
+
 }

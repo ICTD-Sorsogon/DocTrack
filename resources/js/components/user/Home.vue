@@ -1,5 +1,5 @@
 <template>
-<div v-if="auth_user">
+<div v-if="auth_user.first_name">
     <v-navigation-drawer app v-model="drawer">
         <template v-slot:prepend>
             <v-list-item two-line>
@@ -60,7 +60,7 @@
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
-                    <v-list-item-title>Aging</v-list-item-title>
+                    <v-list-item-title>Tracking</v-list-item-title>
                 </v-list-item>
                 <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
@@ -74,6 +74,12 @@
                     </v-list-item-icon>
                     <v-list-item-title>Offices</v-list-item-title>
                 </v-list-item>
+                <v-list-item link @click.prevent="getLogs" v-ripple="{ class: 'primary--text' }">
+                    <v-list-item-icon>
+                    <v-icon>mdi-timeline-clock-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Logs</v-list-item-title>
+                </v-list-item>
             </v-list-group>
 
             <v-list-item link @click.prevent="getAccountSettings">
@@ -86,7 +92,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item link @click.prevent="getUserManagement">
+            <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getUserManagement">
                 <v-list-item-icon>
                     <v-icon>mdi-account-supervisor-circle</v-icon>
                 </v-list-item-icon>
@@ -210,6 +216,12 @@ export default {
                 this.$router.push({ name: "Document Aging Report"});
             }
         },
+        getLogs() {
+            if(this.$route.name !== 'Log Report') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "Log Report"});
+            }
+        },
         getMasterListReport() {
             if(this.$route.name !== 'Document Master List') {
                 this.$store.dispatch('setLoader');
@@ -240,10 +252,10 @@ export default {
             return Math.floor(Math.random() * (max - min) + min);
         }
     },
-    mounted() {
+    beforeCreate() {
         this.$store.dispatch('getOffices');
         this.$store.dispatch('getDocumentTypes');
-        this.$store.dispatch('getAllUsers');
+        this.$store.dispatch("getActiveDocuments")
     }
 }
 </script>

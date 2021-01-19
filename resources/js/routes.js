@@ -9,6 +9,7 @@ import EditDocument from './components/user/components/EditDocument';
 import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
 import ReportAging from './components/user/ReportAging';
+import ReportLog from './components/user/ReportLog';
 import ReportMasterList from './components/user/ReportMasterList';
 import ReportOfficeList from './components/user/ReportOfficeList';
 
@@ -30,13 +31,13 @@ export default {
             path: '/',
             component: Login,
             name: 'Login',
-            beforeEnter: (to, from, next) => {
-                axios.get('api/authenticated').then((response) => {
-                    next({name: 'Dashboard' })
-                }).catch(() => {
-                    return next()
-                });
-            },
+            // beforeEnter: (to, from, next) => {
+            //     axios.get('api/authenticated').then((response) => {
+            //         next({name: 'Dashboard' })
+            //     }).catch(() => {
+            //         return next()
+            //     });
+            // },
         },
         {
             path: '/',
@@ -45,7 +46,7 @@ export default {
                 axios.get('api/authenticated').then((response) => {
                     next()
                 }).catch(() => {
-                    return next({ name: 'Login'})
+                    return next({name: 'Login' })
                 });
             },
             children: [
@@ -70,7 +71,7 @@ export default {
                     name: 'New Document'
                 },
                 {
-                    path: 'edit_document/:id',
+                    path: 'edit_document/:id?',
                     component: EditDocument,
                     name: 'Edit Document'
                 },
@@ -99,6 +100,11 @@ export default {
                     path: 'reports/aging',
                     component: ReportAging,
                     name: 'Document Aging Report'
+                },
+                {
+                    path: 'reports/logs',
+                    component: ReportLog,
+                    name: 'Log Report'
                 },
                 {
                     path: 'reports/master_list',
