@@ -23,7 +23,7 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'role_id' => rand(1,3),
+            'role_id' => rand(1, 3),
             'username' => $this->faker->username,
             'password' => Hash::make('secret'),
             'first_name' => $this->faker->firstName,
