@@ -32,6 +32,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
         // Route::get('receive_document/{id}', 'DocumentController@ReceiveDocument');
+
+        Route::post('add_new_office', 'OfficeController@addNewOffice');
+        Route::post('update_existing_office', 'OfficeController@updateExistingOffice');
+        Route::post('delete_office/{id}', 'OfficeController@deleteOffice');
+
     });
 
     Route::get('/authenticated', function () {
