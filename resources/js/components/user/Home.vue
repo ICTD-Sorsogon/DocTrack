@@ -228,9 +228,10 @@ export default {
             return Math.floor(Math.random() * (max - min) + min);
         }
     },
-    mounted() {
+    beforeCreate() {
         this.$store.dispatch('getOffices');
         this.$store.dispatch('getDocumentTypes');
+        this.$store.dispatch("getActiveDocuments")
     }
 }
 </script>
