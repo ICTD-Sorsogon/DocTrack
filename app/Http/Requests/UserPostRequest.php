@@ -24,7 +24,11 @@ class UserPostRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'new_username' => 'required|string',
+            'confirm_username' => 'required|string',
+            'old_password' => 'required|string',
+            'new_password' => 'required|string',
+            'confirm_password' => 'required|string'
         ];
     }
 }
