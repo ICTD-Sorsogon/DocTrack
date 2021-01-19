@@ -109,21 +109,8 @@ export default {
                     form: this.name_form
                 }).then(() => {
                     if(this.form_requests_status.request_status == "SUCCESS") {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests_status.status_message,
-                            color: '#43A047',
-                            icon: 'mdi-check-bold',
-                        });
                         this.$refs.form.reset();
                         this.$refs.observer.reset();
-                    }else {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests_status.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
-                        });
                     }
                     this[this.loader] = false
                     this.loader = null;

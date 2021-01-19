@@ -7,6 +7,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 export default {
     modules: {
+        strict: true,
         users,
         documents,
         offices,

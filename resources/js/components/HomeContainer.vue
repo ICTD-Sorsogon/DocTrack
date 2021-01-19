@@ -7,7 +7,7 @@
         </div>
         <v-scroll-x-transition>
             <v-snackbar
-                :timeout="5000"
+                :timeout="30000"
                 v-model="snackbar.showing"
                 :vertical="true"
                 :color="snackbar.color"
