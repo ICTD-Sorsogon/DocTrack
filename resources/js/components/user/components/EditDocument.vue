@@ -228,6 +228,9 @@ export default {
             set(val) {
                 this.form.destination_office_id = val
             }
+        },
+        selected_document() {
+            return this.find_document(this.$route.params.id)
         }
     },
     data() {
@@ -301,7 +304,7 @@ export default {
             });
         },
         fillForm(){
-            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.documents[this.$route.params.id])) : this.form
+            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
         },
     },
     mounted() {
