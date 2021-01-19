@@ -155,17 +155,11 @@ export default {
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
-            if(this.$store.state.documents.types=='receive')
-            {
-                return 'Receive Document'
+            if (this.$route.params.type){
+                let docTypes = this.$route.params?.type.replace(/\w/, val=>val.toUpperCase())
+                return `${docTypes} Documents ${docTypes =='Terminal' ? 'Track' : ''}`
             }
-            else if (this.$store.state.documents.types=='forward'){
-                return 'Forward Document'
-            }
-            else if (this.$store.state.documents.types=='terminal'){
-                return 'Terminate Document Track'
-            }
-            else
+
             return this.$route.name;
         },
         placeholderImage() {
