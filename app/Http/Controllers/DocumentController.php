@@ -47,7 +47,7 @@ class DocumentController extends Controller
         $document= Document::find($id);
     }
 
-    public function addNewDocument(Document $document, DocumentPostRequest $request): Boolean
+    public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
         $document->updateOrCreate(
             ['id' => $document->id],
