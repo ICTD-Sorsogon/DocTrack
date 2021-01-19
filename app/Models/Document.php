@@ -67,7 +67,7 @@ class Document extends Model
 
     public static function allDocuments(User $user) 
     {
-        $document = static::with('document_type', 'current_office', 'destination', 'sender')
+        $document = static::with('document_type','origin_office', 'destination', 'sender')
                     ->where('is_terminal', false);
 
         if($user->isUser()){
