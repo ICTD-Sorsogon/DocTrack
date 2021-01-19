@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Builder;
 use App\Models\Office;
 use Illuminate\Http\Request;
-use Auth;
 
 class OfficeController extends Controller
 {
