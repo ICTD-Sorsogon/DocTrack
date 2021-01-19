@@ -61,7 +61,6 @@ export default {
     },
     mounted() {
         this.$store.dispatch('getAuthUser');
-        console.log(this.snackbar);
     }
 }
 </script>
