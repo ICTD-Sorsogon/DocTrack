@@ -6,11 +6,19 @@
         <v-row>
             <v-col cols="12">
                   <v-data-table
+                    :search="search"
                     :items="all_documents"
                     :items-per-page="5"
                     :headers="headers"
                     class="elevation-1"
                 >
+                <template v-slot:top>
+                    <v-text-field
+                        v-model="search"
+                        label="Search"
+                        class="mx-4"
+                    />
+                </template>
                 <template v-slot:[`item.efficiency`] = "{ item }">
                     {{item.efficiency}}%
                 </template>
@@ -25,15 +33,16 @@ import { mapGetters, mapActions } from "vuex";
 export default {
     data() {
         return {
+            search: '',
             headers: [
                 {
                     text: 'Office',
                     align: 'start',
                     value: 'name',
                 },
-                { text: 'All Transaction', value: 'track.length' },
+                { text: 'All Transaction', value: 'tracking_records.length' },
+                { text: 'Delayed Document', value: 'delayed' },
                 { text: 'Efficiency Rating', value: 'efficiency' },
-                // { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
     },
@@ -45,15 +54,12 @@ export default {
             alldocuments.forEach(element => {
                 element.delayed = 0;
                 element.efficiency = 0;
-                element.track.forEach(el => {
-                    // debugger
+                element.tracking_records.forEach(el => {
                     let created_at = new Date(el.created_at);
                     let now_date = new Date();
                     let difference = now_date.getDate() - created_at.getDate();
-                    let total = element.track.length;
-                    // element.efficiency = 0;
+                    let total = element.tracking_records.length;
                     if (difference > 7) {
-
                         element.delayed += 1;
                     }
                      element.efficiency = (((total - element.delayed )
