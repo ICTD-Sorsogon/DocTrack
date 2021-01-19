@@ -26,7 +26,7 @@
                     <v-btn
                         text
                         v-bind="attrs"
-                        @click="snackbar.showing = false"
+                        @click="closeSnackbar"
                     >
                         Close
                     </v-btn>
@@ -44,7 +44,21 @@ export default {
     components: {
         UserHomeComponent
     },
-    computed: mapGetters(["auth_user", "snackbar"]),
+    computed: {
+        ...mapGetters(["auth_user"]),
+        snackbar(){
+            var snackbar = this.$store.state.snackbars.snackbar;
+            if(!snackbar.showing){
+                this.$store.dispatch('snackbars/unsetSnackbar');
+            }
+            return snackbar
+        }
+    },
+    methods: {
+        closeSnackbar(){
+            this.$store.dispatch('snackbars/unsetSnackbar');
+        }
+    },
     mounted() {
         this.$store.dispatch('getAuthUser');
     }
