@@ -60,7 +60,7 @@
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
-                    <v-list-item-title>Aging</v-list-item-title>
+                    <v-list-item-title>Tracking</v-list-item-title>
                 </v-list-item>
                 <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
@@ -213,7 +213,7 @@ export default {
         getLogs() {
             if(this.$route.name !== 'Log Report') {
                 this.$store.dispatch('setLoader');
-                this.$router.push({ name: "Log Report"}); 
+                this.$router.push({ name: "Log Report"});
             }
         },
         getMasterListReport() {
