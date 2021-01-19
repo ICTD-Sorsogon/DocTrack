@@ -13,19 +13,12 @@ const state = {
 }
 
 const getters = {
-    documents: ({documents}) => {
-        for( let doc of documents){
-            console.log(doc.is_external)
-            doc.is_external = doc.is_external ? 'External' : 'Internal'
-            doc.is_terminal = doc.is_terminal ? 'Yes' : 'No'
-        }
-        return documents
-    },
+    documents: state => state.documents,
     document_types: state => state.document_types,
     form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
     getDocument: ({documents})=> (id) =>{
-        return documents.data.filter(item=>
+        return documents.filter(item=>
             item.id == id
             );
     }
@@ -51,7 +44,7 @@ const actions = {
         commit('GET_ALL_DOCUMENT_TYPES', response.data);
     },
     async createNewDocument({ commit }, form) {
-        await axios.post('/api/add_new_document', form)
+        await axios.post(`/api/add_new_document`, form)
         .then(response => {
             const data = {
                 form_type: form.form_type,
@@ -86,8 +79,6 @@ const mutations = {
                 }
             }
         );
-
-            console.log(state.documents);
 
     },
     SET_ID_DOCUMENT(state, id){

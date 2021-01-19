@@ -21,7 +21,7 @@ class Office extends Model
 
     public function documents()
     {
-        return $this->hasMany('App\Models\Document');
+        return $this->hasMany('App\Models\Document', 'originating_office');
     }
 
     public function tracking_records()

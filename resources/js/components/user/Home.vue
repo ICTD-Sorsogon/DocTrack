@@ -1,5 +1,5 @@
 <template>
-<div v-if="auth_user">
+<div v-if="auth_user.first_name">
     <v-navigation-drawer app v-model="drawer">
         <template v-slot:prepend>
             <v-list-item two-line>
@@ -86,7 +86,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item link @click.prevent="getUserManagement">
+            <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getUserManagement">
                 <v-list-item-icon>
                     <v-icon>mdi-account-supervisor-circle</v-icon>
                 </v-list-item-icon>
@@ -243,7 +243,6 @@ export default {
     mounted() {
         this.$store.dispatch('getOffices');
         this.$store.dispatch('getDocumentTypes');
-        this.$store.dispatch('getAllUsers');
     }
 }
 </script>

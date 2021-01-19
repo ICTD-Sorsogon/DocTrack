@@ -73,6 +73,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Log');
     }
 
+    public function canEditThisDoc($id)
+    {
+        return $this->office->documents->find($id) || $this->isAdmin();
+    }
 
+    public function isAdmin()
+    {
+        return $this->role_id === 1;
+    }
 
 }
