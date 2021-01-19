@@ -9,6 +9,7 @@ import EditDocument from './components/user/components/EditDocument';
 import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
 import ReportAging from './components/user/ReportAging';
+import ReportLog from './components/user/ReportLog';
 import ReportMasterList from './components/user/ReportMasterList';
 
 import Login from './components/Login';
@@ -98,6 +99,11 @@ export default {
                     path: 'reports/aging',
                     component: ReportAging,
                     name: 'Document Aging Report'
+                },
+                {
+                    path: 'reports/logs',
+                    component: ReportLog, 
+                    name: 'Log Report'
                 },
                 {
                     path: 'reports/master_list',
