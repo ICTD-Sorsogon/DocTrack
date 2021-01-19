@@ -380,7 +380,6 @@ export default {
         },
     },
     mounted() {
-        this.$store.dispatch('getDocumentTypes');
         this.$store.dispatch('unsetLoader');
         this.auth_user.role_id === 1 && this.$store.dispatch('getAllUsers')
     }

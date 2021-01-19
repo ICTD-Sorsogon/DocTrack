@@ -13,7 +13,7 @@ class Document extends Model
 
     protected $fillable = [
         'tracking_code', 'subject', 'document_type_id',
-        'originating_office', 'current_office', 'sender_name',
+        'destination_office_id', 'current_office', 'sender_name',
         'page_count', 'date_filed', 'is_terminal',
         'remarks', 'attachment_page_count'
     ];
@@ -40,6 +40,11 @@ class Document extends Model
         return $this->belongsTo('App\Models\Office', 'originating_office');
     }
 
+    public function destination() 
+    {
+        return $this->belongsTo('App\Models\Office', 'destination_office_id');
+    }
+
     public function tracking_records()
     {
         return $this->hasMany('App\Models\TrackingRecord');
@@ -62,7 +67,7 @@ class Document extends Model
 
     public static function allDocuments(User $user) 
     {
-        $document = static::with('document_type', 'current_office', 'origin_office', 'sender')
+        $document = static::with('document_type', 'current_office', 'destination', 'sender')
                     ->where('is_terminal', false);
 
         if($user->isUser()){

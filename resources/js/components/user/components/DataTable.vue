@@ -113,8 +113,8 @@ export default {
                 { text: 'Source', value: 'is_external', sortable: false },
                 { text: 'Type', value: 'document_type.name', sortable: false },
                 { text: 'Originating Office', value: 'origin_office.name', sortable: false },
-                { text: 'Current Office', value: 'destination_office.name', sortable: false },
-                { text: 'Sender', value: 'sender.name', sortable: false },
+                { text: 'Destination Office', value: 'destination.name', sortable: false },
+                { text: 'Sender', value: 'sender_name', sortable: false },
                 { text: 'Date Filed', value: 'date_filed', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
                 { text: 'Actions', value: 'data-table-expand', sortable: false },
@@ -130,6 +130,7 @@ export default {
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
 				doc.is_external = doc.is_external ? 'External' : 'Internal'
+				doc.sender_name = doc.sender?.name ?? doc.sender_name
 				return doc
 			})
 		},
