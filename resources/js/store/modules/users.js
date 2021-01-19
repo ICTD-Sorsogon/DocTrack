@@ -77,7 +77,7 @@ const actions = {
         });
     },
     async editUserCredentials({ commit }, updates) {
-        const response = await axios.put(`update_user/${updates.id}`, updates.form);
+        const response = await axios.put(`api/update_user/${updates.id}`, updates.form);
         if(updates.form.form_type == 'account_details') {
             commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
         } else if(updates.form.form_type == 'account_username') {
