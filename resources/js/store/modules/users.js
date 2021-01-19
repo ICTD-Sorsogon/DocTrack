@@ -55,7 +55,7 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
-                element.office_name = element.office.name
+                // element.office_name = element.office.name
                 element.gender = element.gender ? "Male" : "Female"
                 element.is_active = element.is_active ? "Active" : "Inactive"
             });
