@@ -4,29 +4,27 @@
             <v-card-title primary-title>
                 <v-toolbar flat>
                     <v-toolbar-title>Office List Report</v-toolbar-title>
-                    <v-divider class="mx-4" inset vertical></v-divider>
-                    <v-spacer></v-spacer>
-                <v-btn color="primary" dark class="mb-2 ma-1" @click.stop="openDialog('new_office')">
-                <v-icon>mdi-plus</v-icon>ADD
-                </v-btn>
+                    <v-divider class="mx-4" inset vertical/>
+                    <v-spacer/>
+                    <v-btn color="primary" dark class="mb-2 ma-1" @click.stop="openDialog('new_office')">
+                        <v-icon>mdi-plus</v-icon> ADD
+                    </v-btn>
 
-                <v-menu left bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        color="primary"
-                        dark
-                        class="mb-2 ma-1"
-                        v-bind="attrs"
-                        v-on="on"
-                        >
-                        <v-icon>mdi-dots-vertical</v-icon> EXCEL
-                        </v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item :key="1" @click.stop="openDialog('import_office')"> <v-icon class="ma-1">mdi-file-upload-outline</v-icon> Import </v-list-item>
-                        <v-list-item :key="2" @click.stop="openDialog('export_office')"> <v-icon  class="ma-1">mdi-file-export-outline</v-icon> Export </v-list-item>
-                    </v-list>
-                </v-menu>
+                    <v-menu left bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn color="primary" dark class="mb-2 ma-1" v-bind="attrs" v-on="on">
+                                <v-icon>mdi-dots-vertical</v-icon> EXCEL
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item :key="1" @click.stop="openDialog('import_office')">
+                                <v-icon class="ma-1">mdi-file-upload-outline</v-icon> Import
+                            </v-list-item>
+                            <v-list-item :key="2" @click.stop="openDialog('export_office')">
+                                <v-icon  class="ma-1">mdi-file-export-outline</v-icon> Export
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
 
                 </v-toolbar>
             </v-card-title>
@@ -86,8 +84,8 @@
         <office-table-modal
             @close-dialog="closeDialog('form')"
             :form_dialog="form_dialog"
-            v-if="items && form_dialog == true"
-            :selected_office="items"
+            v-if="office_info && form_dialog == true"
+            :selected_office="office_info"
             :dialog_title="dialog_title"
         />
 
@@ -104,144 +102,121 @@
 
 <script>
 
-import OfficeTableModal from './components/OfficeTableModal';
-import OfficeExcelDialog from './components/OfficeExcelDialog';
-import { mapGetters, mapActions } from "vuex";
-import { colors } from '../../constants';
+    import OfficeTableModal from './components/OfficeTableModal';
+    import OfficeExcelDialog from './components/OfficeExcelDialog';
+    import { mapGetters, mapActions } from "vuex";
+    import { colors } from '../../constants';
 
-export default {
-    components: { OfficeTableModal, OfficeExcelDialog },
-    data() {
-        return {
-            headers: [
-                { text: 'Office', value: 'name' },
-                { text: 'Office Code', value: 'office_code' },
-                { text: 'Contact Number', value: 'contact_number' },
-                { text: 'Contact Email', value: 'contact_email' },
-                { text: 'Action', value: 'actions' },
-            ],
-            search: '',
-            form_dialog: false,
-            excel_dialog: false,
-            dialog_for: 'new_office',
-            dialog_title: '',
-            items: '',
-            delete_dialog: false,
-            delete_info: {
-                id: '',
-                name: ''
-            }
-        }
-    },
-    computed: {
-        ...mapGetters(['datatable_loader']),
-        offices() {
-            return this.$store.state.offices.offices;
-        },
-        form_requests(){
-            return this.$store.state.snackbars.form_requests;
-        }
-    },
-    methods: {
-        editOffice(item){
-            //console.log("gg", item);
-            //this.dialog = true;
-            var mode = 'edit_office';
-            item.form_mode = mode;
-            this.items = item;
-            //this.dialog = true;
-            this.openDialog(mode);
-            console.log(this.items);
-        },
-        deleteConfirmationDialog(item){
-            console.log("gg", item);
-            //this.delete_info = [];
-            Object.assign(this.delete_info, item);
-            this.delete_dialog = true;
-
-            console.log(this.delete_info);
-        },
-        deleteOffice(){
-            console.log('gg', this.delete_info.id);
-            this.$store.dispatch('deleteOffice', this.delete_info.id).then(() => {
-                if(this.form_requests.request_status == 'SUCCESS') {
-                    this.$store.dispatch('snackbars/setSnackbar', {
-                        showing: true,
-                        text: this.form_requests.status_message,
-                        color: '#43A047',
-                        icon: 'mdi-check-bold',
-                    })
-                    .then(() => {
-                        //this[this.button_loader] = false
-                        //this.button_loader = null;
-                        //this.$refs.form.reset();
-                        //this.$refs.observer.reset();
-
-                        this.$store.dispatch('getOffices');
-
-
-                    });
-
-                } else {
-                    this.$store.dispatch('snackbars/setSnackbar', {
-                        showing: true,
-                        text: this.form_requests.status_message,
-                        color: '#D32F2F',
-                        icon: 'mdi-close-thick',
-                    })
-                    .then(() => {
-                        //this[this.button_loader] = false
-                        //this.button_loader = null;
-
-                    });
+    export default {
+        components: { OfficeTableModal, OfficeExcelDialog },
+        data() {
+            return {
+                headers: [
+                    { text: 'Office', value: 'name' },
+                    { text: 'Office Code', value: 'office_code' },
+                    { text: 'Contact Number', value: 'contact_number' },
+                    { text: 'Contact Email', value: 'contact_email' },
+                    { text: 'Action', value: 'actions' },
+                ],
+                search: '',
+                form_dialog: false,
+                excel_dialog: false,
+                dialog_for: 'new_office',
+                dialog_title: '',
+                office_info: '',
+                delete_dialog: false,
+                delete_info: {
+                    id: '',
+                    name: ''
                 }
-                this.delete_dialog = false;
-            });
-        },
-        openDialog(key){
-            switch (key) {
-                case 'new_office':
-                    this.items = {
-                        id: '',
-                        name: '',
-                        address: '',
-                        office_code: '',
-                        contact_number: '',
-                        contact_email: '',
-                        form_mode: 'new_office'
-                    };
-                    this.dialog_title = 'Office Details';
-                    this.form_dialog = true
-                    break;
-                case 'edit_office':
-                    this.dialog_title = 'Office Details';
-                    this.form_dialog = true
-                    break;
-                case 'import_office':
-                    this.dialog_title = 'Import Office List Via Excel File';
-                    this.excel_dialog = true
-                    break;
-                case 'export_office':
-                    this.dialog_title = 'Export Office List Via Excel File';
-                    this.excel_dialog = true
-                    break;
             }
         },
-        closeDialog(key){
-            //console.log("jj" ,item);
-            switch (key) {
-                case 'form':
-                     this.form_dialog = false;
-                    break;
-                case 'excel':
-                     this.excel_dialog = false;
-                    break;
+        computed: {
+            ...mapGetters(['datatable_loader']),
+            offices() {
+                return this.$store.state.offices.offices;
+            },
+            form_requests(){
+                return this.$store.state.snackbars.form_requests;
             }
-
+        },
+        methods: {
+            editOffice(item){
+                var mode = 'edit_office';
+                item.form_mode = mode;
+                this.office_info = item;
+                this.openDialog(mode);
+            },
+            deleteConfirmationDialog(item){
+                Object.assign(this.delete_info, item);
+                this.delete_dialog = true;
+            },
+            deleteOffice(){
+                this.$store.dispatch('deleteOffice', this.delete_info.id).then(() => {
+                    if(this.form_requests.request_status == 'SUCCESS') {
+                        this.$store.dispatch('snackbars/setSnackbar', {
+                            showing: true,
+                            text: this.form_requests.status_message,
+                            color: '#43A047',
+                            icon: 'mdi-check-bold',
+                        })
+                        .then(() => {
+                            this.$store.dispatch('getOffices');
+                        });
+                    } else {
+                        this.$store.dispatch('snackbars/setSnackbar', {
+                            showing: true,
+                            text: this.form_requests.status_message,
+                            color: '#D32F2F',
+                            icon: 'mdi-close-thick',
+                        })
+                        .then(() => { });
+                    }
+                    this.delete_dialog = false;
+                });
+            },
+            openDialog(key){
+                switch (key) {
+                    case 'new_office':
+                        this.office_info = {
+                            id: '',
+                            name: '',
+                            address: '',
+                            office_code: '',
+                            contact_number: '',
+                            contact_email: '',
+                            form_mode: 'new_office'
+                        };
+                        this.dialog_title = 'Office Details';
+                        this.form_dialog = true
+                        break;
+                    case 'edit_office':
+                        this.dialog_title = 'Office Details';
+                        this.form_dialog = true
+                        break;
+                    case 'import_office':
+                        this.dialog_title = 'Import Office List Via Excel File';
+                        this.excel_dialog = true
+                        break;
+                    case 'export_office':
+                        this.dialog_title = 'Export Office List Via Excel File';
+                        this.excel_dialog = true
+                        break;
+                }
+            },
+            closeDialog(key){
+                switch (key) {
+                    case 'form':
+                        this.form_dialog = false;
+                        break;
+                    case 'excel':
+                        this.excel_dialog = false;
+                        break;
+                }
+            }
+        },
+        mounted() {
+            this.$store.dispatch('unsetLoader');
         }
-    },
-    mounted() {
-        this.$store.dispatch('unsetLoader');
     }
-}
 </script>
