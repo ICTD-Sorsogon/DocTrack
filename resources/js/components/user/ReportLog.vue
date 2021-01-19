@@ -1,119 +1,113 @@
 <template>
-    <v-card flat>
-        <v-card-title primary-title>
-            Logs 
-            <v-row align="center" justify="end" class="pr-4">
-                <v-btn color="primary" @click.prevent="getAllDocuments"
-                >
-                <v-icon
-                  small
-                  class="mr-2"
-                >
-                  mdi-export
-                </v-icon>
-                Export</v-btn
-                >
-            </v-row>
-        </v-card-title>
+<v-container>
+  <v-card flat>
+          <v-card-title primary-title>
+              Logs 
+              <v-row align="center" justify="end" class="pr-4">
+                  <v-btn color="primary" @click="test"
+                  >
+                  <v-icon
+                    small
+                    class="mr-2"
+                  >
+                    mdi-export
+                  </v-icon>
+                  Export</v-btn
+                  >
+              </v-row>
+          </v-card-title>
 
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
 
-<template>
-  <v-data-table
-    :headers="headers"
-    :items="logs"
-    :search="search"
-    sort-by="calories"
-    class="elevation-1"
-  >
-    <template v-slot:top>
-      <v-toolbar
-        flat
-      >
-     
-        <v-dialog
-          :headers="headers2"
-          v-model="dialog"
-          max-width="90vw"
+  <template>
+    <v-data-table
+      :headers="headers"
+      :items="logs"
+      :search="search"
+      sort-by="calories"
+      class="elevation-1"
+    >
+      <template v-slot:top>
+      
+          <v-dialog
+            :headers="headers2"
+            v-model="dialog"
+            max-width="80vw"
+          >
+            <v-card>
+              <v-card-title>
+                <span class="headline">{{ formTitle }}</span>
+
+                <v-spacer></v-spacer>
+                  <v-icon 
+                      @click="close"
+                        large
+                        class="ml-4"
+                      >
+                    mdi-close
+                  </v-icon>
+              </v-card-title>
+
+            <v-simple-table>
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">
+                        Label
+                      </th>
+                      <th class="text-left">
+                        New
+                      </th>
+                      <th class="text-left">
+                        Old
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(item, index) in final_data"
+                      :key="index"
+                    >
+                      <td>{{ item['key'] }}</td>
+                      <td>{{ item['new'] }}</td>
+                      <td>{{ item['old'] }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+            </v-simple-table>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-icon 
+          medium
+          class="ml-3"
+          color="blue"
+          @click="editItem(item)"
         >
-        
-          <v-card>
-            <v-card-title>
-              <span class="headline">{{ formTitle }}</span>
-            </v-card-title>
-
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
-<v-textarea
-      auto-grow
-          class="mx-2"
-          readonly
-          label="Old Values"
-          rows="1"
-          prepend-icon="mdi-comment"
-          v-model="editedItem.original_values"
-        ></v-textarea>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="6"
-                  >
-<v-textarea
-      auto-grow
-          class="mx-2"
-          readonly
-          label="New Values"
-          rows="1"
-          prepend-icon="mdi-comment"
-          v-model="editedItem.new_values"
-        ></v-textarea>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="close"
-              >
-                Cancel
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        
-      </v-toolbar>
-    </template>
-    <!-- <template v-slot:item.actions="{ item }">
-      <v-icon 
-        small
-        class="ml-4"
-        @click="editItem(item)"
-      >
-        mdi-more
-      </v-icon>
-    </template> -->
-  </v-data-table>
-</template>
+          mdi-more
+        </v-icon>
+      </template>
+    </v-data-table>
+  </template>
 
 
- </v-card>
+
+  </v-card>
+</v-container>
+    
 
 </template>
 
@@ -133,6 +127,7 @@ export default {
               table_name: 0,
               item_id: 0,
             },
+            final_data: [],
             defaultItem: {
               action: 0,
               table_name: 0,
@@ -155,10 +150,47 @@ export default {
       initialize () {this.logs},
       editItem (item) {
         this.editedIndex = this.logs.indexOf(item)
-        this.editedItem = Object.assign({}, item)
+        this.editedItem = Object.assign(item)
         this.dialog = true
-      },
 
+        let log_data = this.editedItem;
+
+        var log_new_key = [];
+        var log_view_new = [];
+
+        var log_view_old = [];
+        var log_old_key = [];
+
+        this.final_data = [];
+    
+        log_new_key = Object.keys(JSON.parse(log_data.new_values));
+        log_view_new = Object.values(JSON.parse(log_data.new_values));
+
+        if(log_data.original_values != null){
+
+          log_old_key = Object.keys(JSON.parse(log_data.original_values));
+          log_view_old = Object.values(JSON.parse(log_data.original_values));
+            for (var i = 0 ; i < log_old_key.length; i++){
+              this.final_data.push({
+                'key': log_new_key[i],
+                'new': log_view_new[i],
+                'old': log_view_old[i]
+              })
+            }
+
+
+        }else{
+          for (var i = 0 ; i < log_new_key.length; i++){
+            this.final_data.push({
+              'key': log_new_key[i],
+              'new': log_view_new[i]
+            })
+          }
+
+
+        }
+
+      },
       close () {
         this.dialog = false
         this.$nextTick(() => {
@@ -170,6 +202,9 @@ export default {
     },
 
       computed: {
+      test(){
+        return this.editedItem;
+      },
         ...mapGetters(['logs']),
   
         formTitle () {
@@ -186,9 +221,10 @@ export default {
     },
 
     created () {
-      this.initialize()
+      this.initialize();
     },
     mounted() {
+
       this.$store.dispatch('unsetLoader');
       this.$store.dispatch('getLogs');
     }
