@@ -23,8 +23,8 @@
                         </v-btn>
                     </template>
                     <v-list>
-                        <v-list-item :key="1" @click="() => {}"> <v-icon class="ma-1">mdi-file-upload-outline</v-icon> Import </v-list-item>
-                        <v-list-item :key="2" @click="() => {}"> <v-icon  class="ma-1">mdi-file-export-outline</v-icon> Export </v-list-item>
+                        <v-list-item :key="1" @click.stop="openDialog('import_office')"> <v-icon class="ma-1">mdi-file-upload-outline</v-icon> Import </v-list-item>
+                        <v-list-item :key="2" @click.stop="openDialog('export_office')"> <v-icon  class="ma-1">mdi-file-export-outline</v-icon> Export </v-list-item>
                     </v-list>
                 </v-menu>
 
@@ -84,10 +84,18 @@
         </v-row>
 
         <office-table-modal
-            @close-dialog="closeDialog"
-            :dialog="dialog"
-            v-if="items && dialog == true"
+            @close-dialog="closeDialog('form')"
+            :form_dialog="form_dialog"
+            v-if="items && form_dialog == true"
             :selected_office="items"
+            :dialog_title="dialog_title"
+        />
+
+        <office-excel-dialog
+            @close-dialog="closeDialog('excel')"
+            :excel_dialog="excel_dialog"
+            v-if="dialog_title && excel_dialog == true"
+            :dialog_title="dialog_title"
         />
 
     </div>
@@ -97,11 +105,12 @@
 <script>
 
 import OfficeTableModal from './components/OfficeTableModal';
+import OfficeExcelDialog from './components/OfficeExcelDialog';
 import { mapGetters, mapActions } from "vuex";
 import { colors } from '../../constants';
 
 export default {
-    components: {OfficeTableModal},
+    components: { OfficeTableModal, OfficeExcelDialog },
     data() {
         return {
             headers: [
@@ -112,8 +121,10 @@ export default {
                 { text: 'Action', value: 'actions' },
             ],
             search: '',
-            dialog: false,
+            form_dialog: false,
+            excel_dialog: false,
             dialog_for: 'new_office',
+            dialog_title: '',
             items: '',
             delete_dialog: false,
             delete_info: {
@@ -184,6 +195,7 @@ export default {
 
                     });
                 }
+                this.delete_dialog = false;
             });
         },
         openDialog(key){
@@ -198,16 +210,34 @@ export default {
                         contact_email: '',
                         form_mode: 'new_office'
                     };
-                    this.dialog = true
+                    this.dialog_title = 'Office Details';
+                    this.form_dialog = true
                     break;
                 case 'edit_office':
-                    this.dialog = true
+                    this.dialog_title = 'Office Details';
+                    this.form_dialog = true
+                    break;
+                case 'import_office':
+                    this.dialog_title = 'Import Office List Via Excel File';
+                    this.excel_dialog = true
+                    break;
+                case 'export_office':
+                    this.dialog_title = 'Export Office List Via Excel File';
+                    this.excel_dialog = true
                     break;
             }
         },
-        closeDialog(){
+        closeDialog(key){
             //console.log("jj" ,item);
-            this.dialog = false;
+            switch (key) {
+                case 'form':
+                     this.form_dialog = false;
+                    break;
+                case 'excel':
+                     this.excel_dialog = false;
+                    break;
+            }
+
         }
     },
     mounted() {

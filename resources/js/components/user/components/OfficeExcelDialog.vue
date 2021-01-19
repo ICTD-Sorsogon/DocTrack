@@ -1,10 +1,11 @@
 <template>
-<v-dialog v-model="form_dialog" persistent scrollable max-width="1000px">
-      <v-card v-if="selected_office">
-        <v-container>
+<v-dialog v-model="excel_dialog" persistent scrollable fullscreen>
+    <v-container fluid  class="pr-0 pl-0"  style="padding:0px;">
+      <v-card v-if="selected_office" style="height:100%; width:100%; overflow:hidden;">
+
           <v-row>
             <v-col cols="6" sm="6">
-              <v-card-title primary-title> {{ dialog_title}} </v-card-title>
+              <v-card-title primary-title> {{ dialog_title }} </v-card-title>
             </v-col>
             <v-col cols="6" sm="6">
                 <v-card-actions class="mr-1">
@@ -15,56 +16,17 @@
                 </v-card-actions>
             </v-col>
           </v-row>
-        </v-container>
-        <v-card-text>
 
-          <!--<v-row>
-            <v-col>
-              <v-list flat subheader>
-                <v-subheader>Subject</v-subheader>
-                <v-list-item>
-                  <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_office.name
-                    }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-col>
-          </v-row>-->
+        <v-card-text>
             <ValidationObserver ref="observer" v-slot="{ valid }">
                 <v-form
                     ref="form"
                     lazy-validation
                 >
                 <v-row>
-                <v-col cols="12" sm="8" md="8">
+                <v-col cols="12" sm="12" md="12">
                     <ValidationProvider rules="required" v-slot="{ errors }">
-                        <v-text-field v-model="form.name" label="Office Name*" required />
-                        <span>{{ errors[0] }}</span>
-                    </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="4" md="4">
-                    <ValidationProvider rules="required" v-slot="{ errors }">
-                        <v-text-field v-model="form.office_code" label="Office Code*" required />
-                        <span>{{ errors[0] }}</span>
-                    </ValidationProvider>
-                </v-col>
-                <v-col cols="12">
-                    <ValidationProvider rules="required" v-slot="{ errors }">
-                        <v-text-field v-model="form.address" label="Office Address*" required />
-                        <span>{{ errors[0] }}</span>
-                    </ValidationProvider>
-                </v-col>
-                <v-col cols="12" sm="6" md="6">
-                    <v-text-field v-model="form.contact_number" label="Contact Number"/>
-                </v-col>
-                <v-col cols="12" sm="6" md="6">
-                    <ValidationProvider rules="email" v-slot="{ errors }">
-                        <v-text-field v-model="form.contact_email" label="Email Address"/>
+                        <v-file-input label="File input" outlined dense ></v-file-input>
                         <span>{{ errors[0] }}</span>
                     </ValidationProvider>
                 </v-col>
@@ -78,6 +40,7 @@
 
         </v-card-text>
       </v-card>
+      </v-container>
     </v-dialog>
 </template>
 
@@ -87,7 +50,7 @@ import { email, required } from '../../../validate'
 import { mapGetters } from 'vuex';
     export default {
         components: { ValidationProvider, ValidationObserver },
-        props: ['selected_office', 'form_dialog', 'dialog_title'],
+        props: ['excel_dialog', 'dialog_title'],
         data() {
             return {
                 form_old: {
@@ -108,7 +71,7 @@ import { mapGetters } from 'vuex';
                     contact_email: '',
                     form_mode: ''
                 },
-                valid: false,
+                valid: true,
                 btnloading: false
             }
         },
@@ -116,6 +79,15 @@ import { mapGetters } from 'vuex';
             //...mapGetters(['form_requests']),
             form_requests(){
                 return this.$store.state.snackbars.form_requests;
+            },
+            selected_office(){
+                    return {id: '',
+                    name: '',
+                    address: '',
+                    office_code: '',
+                    contact_number: '',
+                    contact_email: '',
+                    form_mode: ''}
             }
 
         },
@@ -283,6 +255,6 @@ import { mapGetters } from 'vuex';
 
 </script>
 
-<style>
+<style scoped>
 
 </style>
