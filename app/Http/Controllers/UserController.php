@@ -24,7 +24,7 @@ class UserController extends Controller
     public function getAllUsers(): Collection
     {
         abort_if(!in_array(auth()->user()->role_id, [1,2]), 403);
-        return User::where('role_id', 2)->get(['id', 'first_name', 'last_name', 'middle_name']);
+        return User::where('role_id', 2)->with('office')->get();
     }
 
     public function getAllUserComplete(): Collection
