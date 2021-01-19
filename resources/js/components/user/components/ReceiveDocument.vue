@@ -1,24 +1,8 @@
 <template>
     <!-- TODO: CONTINUE THIS WITH AUTHORIZING PERSON TABLE -->
     <v-card flat>
-        <v-card-title primary-title v-if="types=='receive'">
-            Receive Document : {{ selected_document.tracking_code }}
-            <v-row align="center" justify="end" class="pr-4">
-            <v-btn color="primary" @click.prevent="navigateAllDocuments"
-            >Back</v-btn
-            >
-            </v-row>
-        </v-card-title>
-        <v-card-title primary-title v-if="types=='forward'">
-            Forward Document : {{ selected_document.tracking_code }}
-            <v-row align="center" justify="end" class="pr-4">
-            <v-btn color="primary" @click.prevent="navigateAllDocuments"
-            >Back</v-btn
-            >
-            </v-row>
-        </v-card-title>
-        <v-card-title primary-title v-if="types=='terminal'">
-            Terminate Document : {{ selected_document.tracking_code }}
+        <v-card-title primary-title>
+            {{ $route.params.type.replace(/\w/, val=>val.toUpperCase()) }} Document : {{ selected_document.tracking_code }}
             <v-row align="center" justify="end" class="pr-4">
             <v-btn color="primary" @click.prevent="navigateAllDocuments"
             >Back</v-btn
@@ -280,9 +264,12 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['selected_document']),
-        types(){
+        ...mapGetters(['find_document']),
+        types() {
             return this.$store.state.documents.types;
+        },
+        selected_document() {
+            return this.find_document(this.$route.params.id)
         }
     },
     data() {
@@ -319,8 +306,7 @@ export default {
         },
     },
     mounted() {
-        console.log(this.selected_document);
-
     }
+
 }
 </script>
