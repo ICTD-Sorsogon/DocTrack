@@ -8,8 +8,13 @@
                   <v-data-table
                     :items="all_documents"
                     :items-per-page="5"
+                    :headers="headers"
                     class="elevation-1"
-                ></v-data-table>
+                >
+                <template v-slot:[`item.efficiency`] = "{ item }">
+                    {{item.efficiency}}%
+                </template>
+                </v-data-table>
             </v-col>
         </v-row>
     </v-card>
@@ -26,35 +31,42 @@ export default {
                     align: 'start',
                     value: 'name',
                 },
-                { text: 'All Transaction', value: 'trackingrecords.length' },
-                { text: 'Delayed Document Code', value: 'delayed' },
-                { text: 'Efficiency Rating', value: 'effiency' },
+                { text: 'All Transaction', value: 'track.length' },
+                { text: 'Efficiency Rating', value: 'efficiency' },
+                // { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
     },
     computed: {
         ...mapGetters(['getDocument']),
         all_documents(){
-            let alldocuments = this.$store.state.documents.allDocuments;
+            let alldocuments = JSON.parse(JSON.stringify(
+                this.$store.state.documents.allDocuments));
             alldocuments.forEach(element => {
                 element.delayed = 0;
-                element.effiency = 0;
-                element.tracklength = 0;
-                element.trackingrecords.forEach(el => {
-                    var last_touched = new Date(el.last_touched);
-                    var now = new Date(el.created_at);
-                    var delay = now.getDate() - last_touched.getDate();
-                    if (delay > 7) element.delayed +=1;
-                    element.tracklength = element.trackingrecords.length;
-                    element.effiency = ((element.tracklength - element.delayed)
-                    / element.tracklength) * 100;
-                })
+                element.efficiency = 0;
+                element.track.forEach(el => {
+                    // debugger
+                    let created_at = new Date(el.created_at);
+                    let now_date = new Date();
+                    let difference = now_date.getDate() - created_at.getDate();
+                    let total = element.track.length;
+                    // element.efficiency = 0;
+                    if (difference > 7) {
+
+                        element.delayed += 1;
+                    }
+                     element.efficiency = (((total - element.delayed )
+                     / total) * 100);
+                });
             });
             return alldocuments;
         }
     },
     mounted() {
         this.$store.dispatch('getDocument');
+        console.log(this.all_documents)
+        this.$store.dispatch('getAllUsers');
         this.$store.dispatch('unsetLoader');
     }
 }
