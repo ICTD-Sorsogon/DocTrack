@@ -80,7 +80,7 @@ export default {
                     name: 'All Active Documents',
                 },
                 {
-                    path: 'receive_document',
+                    path: 'receive_document/:type/:id?',
                     component: ReceiveDocument,
                     name: 'Receive Document',
                 },
