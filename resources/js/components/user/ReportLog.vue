@@ -222,8 +222,6 @@ export default {
 
     created () {
       this.initialize();
-      console.log(this.test);
-
     },
     mounted() {
 
