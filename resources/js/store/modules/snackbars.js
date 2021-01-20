@@ -48,6 +48,11 @@ const mutations = {
         state.form_requests.request_status = error.code;
         state.form_requests.status_message = error.message;
     },
+    CLEAR_FORM_REQUEST(){
+        state.form_requests.request_form_type = '';
+        state.form_requests.request_status = '';
+        state.form_requests.status_message = '';
+    }
 }
 
 export default {

@@ -99,11 +99,6 @@ const mutations = {
     GET_ALL_DOCUMENT_TYPES(state, document_types) {
         state.document_types = document_types;
     },
-    THROW_SERVER_ERROR(state, error) {
-        state.form_requests.request_form_type = error.form_type;
-        state.form_requests.request_status = error.code;
-        state.form_requests.status_message = error.message;
-    },
     SET_SELECTED_DOCUMENT(state, document) {
         state.selected_document = document;
     },
