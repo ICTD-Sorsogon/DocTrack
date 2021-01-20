@@ -20,7 +20,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', 'LoginController@logout');
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
-        // Route::get('all_users_complete', 'UserController@getAllUserComplete');
+        Route::post('add_new_user', 'UserController@addNewUser');
+        Route::post('update_existing_user', 'UserController@updateExistingUser');
+        Route::post('delete_existing_user/{id}', 'UserController@deleteExistingUser');
         Route::put('update_user/{id}', 'UserController@updateUser');
         Route::get('document_type_list', 'DocumentController@getDocumentTypes');
         Route::get('get_active_documents', 'DocumentController@getAllActiveDocuments');
