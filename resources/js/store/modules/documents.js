@@ -46,16 +46,10 @@ const actions = {
         const response = await axios.get('/api/document_type_list');
         commit('GET_ALL_DOCUMENT_TYPES', response.data);
     },
-    async createNewDocument({ commit }, form) {
+    async createNewDocument({ commit, dispatch }, form) {
         await axios.post(`/api/add_new_document`, form)
         .then(response => {
-            const data = {
-                form_type: form.form_type,
-                code: 'SUCCESS',
-                message: `Document ${form.tracking_id} created!`,
-                response_data: response.data
-            }
-            commit('UPDATE_DOCUMENT_LIST', data);
+            dispatch('getActiveDocuments')
         })
         .catch(error => {
             const error_data = {
