@@ -15,14 +15,16 @@ class NewDocumentHasAddedEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user_id;
+    public $request;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user_id)
+    public function __construct($user_id, $request)
     {
         $this->user_id = $user_id;
+        $this->request = $request;
     }
 
     /**

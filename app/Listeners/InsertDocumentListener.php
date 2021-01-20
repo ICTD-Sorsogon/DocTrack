@@ -26,10 +26,12 @@ class InsertDocumentListener
      */
     public function handle($event)
     {
+        $subject = $event->request->subject;
+
         $log = new Log;
         $log->user_id = $event->user_id;
         $log->action = 'Document Created';
-        $log->remarks = 'Document Created with ID of 1';
+        $log->remarks = 'New Document has been Created with Subject of : '.$subject;
         return $log->save();
     }
 }
