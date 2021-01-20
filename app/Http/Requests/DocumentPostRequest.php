@@ -28,9 +28,8 @@ class DocumentPostRequest extends FormRequest
             'is_external' => 'required|boolean',
             'document_type_id' => 'required|digits_between: 1, 999',
             'destination_office_id' => 'required|digits_between:1,999',
-            'sender_name' => 'required|string',
+            'sender_name' => 'required',
             'page_count' => 'required|digits_between:1, 99999',
-            'is_terminal' => 'required|boolean',
             'remarks' => 'required|string',
             'attachment_page_count' => 'required|digits_between:1,99999',
         ];

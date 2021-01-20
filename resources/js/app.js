@@ -40,5 +40,5 @@ new Vue({
     el: '#app',
     vuetify: new Vuetify(),
     router: new VueRouter(routes),
-    store: new Vuex.Store({...store, strict: true}),
+    store: new Vuex.Store(store),
 });

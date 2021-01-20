@@ -25,7 +25,7 @@ class PersonnelFactory extends Factory
         return [
             'id' => $id++,
             'name' => $this->faker->name,
-            'office_id' => rand(1,36),
+            'office_id' => rand(1, 36),
         ];
     }
 }

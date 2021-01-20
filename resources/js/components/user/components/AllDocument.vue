@@ -106,9 +106,9 @@ export default {
             }
         },
         getNewDocumentRecordForm() {
-            if (this.$route.name !== "New Document") {
+            if (this.$route.name !== "Edit Document") {
             this.$store.dispatch("setLoader");
-            this.$router.push({ name: "New Document" });
+            this.$router.push({ name: "Edit Document" });
             }
         },
         editDocument(id) {

@@ -11,6 +11,7 @@ import DocumentAction from './components/user/DocumentAction';
 import ReportAging from './components/user/ReportAging';
 import ReportLog from './components/user/ReportLog';
 import ReportMasterList from './components/user/ReportMasterList';
+import ReportOfficeList from './components/user/ReportOfficeList';
 
 import Login from './components/Login';
 import HomeContainer from './components/HomeContainer';
@@ -30,13 +31,13 @@ export default {
             path: '/',
             component: Login,
             name: 'Login',
-            beforeEnter: (to, from, next) => {
-                axios.get('api/authenticated').then((response) => {
-                    next({name: 'Dashboard' })
-                }).catch(() => {
-                    return next()
-                });
-            },
+            // beforeEnter: (to, from, next) => {
+            //     axios.get('api/authenticated').then((response) => {
+            //         next({name: 'Dashboard' })
+            //     }).catch(() => {
+            //         return next()
+            //     });
+            // },
         },
         {
             path: '/',
@@ -45,7 +46,7 @@ export default {
                 axios.get('api/authenticated').then((response) => {
                     next()
                 }).catch(() => {
-                    return next(false)
+                    return next({name: 'Login' })
                 });
             },
             children: [
@@ -70,7 +71,7 @@ export default {
                     name: 'New Document'
                 },
                 {
-                    path: 'edit_document/:id',
+                    path: 'edit_document/:id?',
                     component: EditDocument,
                     name: 'Edit Document'
                 },
@@ -80,7 +81,7 @@ export default {
                     name: 'All Active Documents',
                 },
                 {
-                    path: 'receive_document',
+                    path: 'receive_document/:type/:id?',
                     component: ReceiveDocument,
                     name: 'Receive Document',
                 },
@@ -102,13 +103,18 @@ export default {
                 },
                 {
                     path: 'reports/logs',
-                    component: ReportLog, 
+                    component: ReportLog,
                     name: 'Log Report'
                 },
                 {
                     path: 'reports/master_list',
                     component: ReportMasterList,
                     name: 'Document Master List'
+                },
+                {
+                    path: 'reports/office_list',
+                    component: ReportOfficeList,
+                    name: 'Office List'
                 },
                 {
                     path: 'user_management',

@@ -4,11 +4,17 @@ const state = {
         text: '',
         color: 'success',
         icon: 'mdi-checkbox-blank-circle',
+    },
+    form_requests : {
+        request_form_type: '',
+        request_status: '',
+        status_message: '',
     }
 }
 
 const getters = {
     snackbar: state => state.snackbar,
+    form_requests: state => state.form_requests,
 }
 
 const actions = {
@@ -32,9 +38,20 @@ const mutations = {
         state.color = 'success';
         state.icon = 'mdi-checkbox-blank-circle';
     },
+    UPDATE_SNACKBAR_MESSAGE_STATUS(state, data){
+        state.form_requests.request_form_type = data.form_type;
+        state.form_requests.request_status = data.code;
+        state.form_requests.status_message = data.message;
+    },
+    THROW_SNACKBAR_SERVER_ERROR(state, error) {
+        state.form_requests.request_form_type = error.form_type;
+        state.form_requests.request_status = error.code;
+        state.form_requests.status_message = error.message;
+    },
 }
 
 export default {
+    namespaced: true,
     state,
     getters,
     actions,

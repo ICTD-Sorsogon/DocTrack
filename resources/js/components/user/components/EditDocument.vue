@@ -30,7 +30,7 @@
                     <v-col cols="12" xl="8" lg="8" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-select
-                                v-model="form.document_type"
+                                v-model="form.document_type_id"
                                 :items="document_types"
                                 item-text="name"
                                 item-value="id"
@@ -63,14 +63,6 @@
                             <div>External </div>
                             </template>
                         </v-radio>
-                            <!-- <v-radio
-                                label="Internal"
-                                value=false
-                            ></v-radio>
-                            <v-radio
-                                label="External"
-                                value=true
-                            ></v-radio> -->
                         </v-radio-group>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
@@ -83,10 +75,10 @@
                                 hide-selected
                                 outlined
                                 persistent-hint
-                                label="Originating Office"
-                                prepend-inner-icon="mdi-office-building-marker-outline"
+                                label="Destination Office"
+                                prepend-inner-icon="mdi-account-arrow-right-outline"
                                 :error-messages="errors"
-                                
+
                                 required
                             ></v-combobox>
                         </ValidationProvider>
@@ -104,7 +96,7 @@
                                 label="Sender Name"
                                 prepend-inner-icon="mdi-account-arrow-right-outline"
                                 :error-messages="errors"
-                                
+
                                 required
                             ></v-combobox>
                         </ValidationProvider>
@@ -231,11 +223,14 @@ export default {
         },
         origin_office: {
             get() {
-                return isNaN(this.form.originating_office) ? this.form.originating_office : this.form.origin_office.name
+                return this.form.destination.name ?? this.form.destination_office_id
             },
             set(val) {
-                this.form.originating_office = typeof val === 'string' ?  val : val.id
+                this.form.destination_office_id = val
             }
+        },
+        selected_document() {
+            return this.find_document(this.$route.params.id)
         }
     },
     data() {
@@ -248,12 +243,14 @@ export default {
             form: {
                 form_type: 'new_document',
                 subject: '',
-                document_type: '',
+                document_type_id: '',
                 sender: {},
+                destination_office_id: NaN,
+                destination:{},
+                sender_name: NaN,
                 page_count: '',
                 attachment_page_count: '',
                 is_external: false,
-                is_termninal: false,
                 time_filed: '',
                 remarks: '',
             }
@@ -267,29 +264,18 @@ export default {
             }
         },
         sanitizeInputs() {
-            this.form.is_external = this.form.is_external == 'true' ? true : false;
-            if(typeof this.form.originating_office === 'object' && this.form.originating_office !== null) {
-                this.form.originating_office = this.form.originating_office.id;
-            } else {
-                this.form.originating_office = this.form.originating_office.toString();
-            }
-            if(typeof this.form.sender_name === 'object' && this.form.sender_name !== null) {
-                this.form.sender_name = this.form.sender_name.id;
-            } else {
-                this.form.sender_name = this.form.sender_name.toString();
-            }
-            this.form.sender_name = this.form.sender_name.toString();
-            this.form.remarks = this.form.remarks != null && typeof this.form.remarks != 'undefined' ?
-                this.form.remarks.toString() : null;
+            let dataPayload = JSON.parse(JSON.stringify(this.form))
+            dataPayload.destination_office_id = dataPayload.destination_office_id.id
+            dataPayload.sender_name = dataPayload.sender_name.id ?? dataPayload.sender_name
+            return dataPayload
         },
         editDocument() {
             this.createNewDocument()
-
         },
         createNewDocument() {
-            this.sanitizeInputs();
+            let body = this.sanitizeInputs();
             this[this.button_loader] = !this[this.button_loader];
-            this.$store.dispatch('createNewDocument', this.form).then(() => {
+            this.$store.dispatch('createNewDocument', body).then(() => {
                 if(this.form_requests.request_status == 'SUCCESS') {
                     this.$store.dispatch('setSnackbar', {
                         showing: true,
@@ -318,12 +304,11 @@ export default {
             });
         },
         fillForm(){
-            this.form = JSON.parse(JSON.stringify(this.documents[this.$route.params.id]));
+            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
         },
     },
     mounted() {
         this.fillForm();
-        this.$store.dispatch('getDocumentTypes');
         this.auth_user.role_id === 1 && this.$store.dispatch('getAllUsers')
         this.$store.dispatch('unsetLoader');
     }

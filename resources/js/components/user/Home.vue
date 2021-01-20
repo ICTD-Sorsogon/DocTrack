@@ -60,13 +60,19 @@
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
-                    <v-list-item-title>Aging</v-list-item-title>
+                    <v-list-item-title>Tracking</v-list-item-title>
                 </v-list-item>
                 <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-text</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Master List</v-list-item-title>
+                </v-list-item>
+                <v-list-item link @click.prevent="getOfficeListReport" v-ripple="{ class: 'primary--text' }">
+                    <v-list-item-icon>
+                    <v-icon>mdi-office-building</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Offices</v-list-item-title>
                 </v-list-item>
                 <v-list-item link @click.prevent="getLogs" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
@@ -155,17 +161,11 @@ export default {
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
-            if(this.$store.state.documents.types=='receive')
-            {
-                return 'Receive Document'
+            if (this.$route.params.type){
+                let docTypes = this.$route.params?.type.replace(/\w/, val=>val.toUpperCase())
+                return `${docTypes} Documents ${docTypes =='Terminal' ? 'Track' : ''}`
             }
-            else if (this.$store.state.documents.types=='forward'){
-                return 'Forward Document'
-            }
-            else if (this.$store.state.documents.types=='terminal'){
-                return 'Terminate Document Track'
-            }
-            else
+
             return this.$route.name;
         },
         placeholderImage() {
@@ -224,13 +224,19 @@ export default {
         getLogs() {
             if(this.$route.name !== 'Log Report') {
                 this.$store.dispatch('setLoader');
-                this.$router.push({ name: "Log Report"}); 
+                this.$router.push({ name: "Log Report"});
             }
         },
         getMasterListReport() {
             if(this.$route.name !== 'Document Master List') {
                 this.$store.dispatch('setLoader');
                 this.$router.push({ name: "Document Master List"});
+            }
+        },
+        getOfficeListReport() {
+            if(this.$route.name !== 'Office List') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "Office List"});
             }
         },
         getAccountSettings() {
@@ -251,9 +257,10 @@ export default {
             return Math.floor(Math.random() * (max - min) + min);
         }
     },
-    mounted() {
+    beforeCreate() {
         this.$store.dispatch('getOffices');
         this.$store.dispatch('getDocumentTypes');
+        this.$store.dispatch("getActiveDocuments")
     }
 }
 </script>
