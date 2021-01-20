@@ -74,7 +74,7 @@ class Document extends Model
             $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
         }
 
-        return $document->get();
+        return $document->orderBy('created_at', 'DESC')->get();
     }
 
     private function buildTrackingNumber($model)
