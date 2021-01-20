@@ -93,13 +93,14 @@ export default {
                 middle_name: '',
                 last_name: '',
                 name_suffix: '' ,
+                id : ''
             },
             loader: null,
             loading_edit_details: false,
         }
     },
     methods: {
-        ...mapActions(["editUserCredentials"]),
+        ...mapActions(["editUserCredentials", "unsetSnackbar"]),
         updateAccountDetails() {
             this[this.loader] = !this[this.loader];
             const isValid = this.$refs.observer.validate();
@@ -111,12 +112,28 @@ export default {
                     if(this.form_requests_status.request_status == "SUCCESS") {
                         this.$refs.form.reset();
                         this.$refs.observer.reset();
+                        this.$store.dispatch('unsetSnackbar');
+                    }else {
+                        this.$store.dispatch('setSnackbar', {
+                            showing: true,
+                            text: this.form_requests_status.status_message,
+                            color: '#D32F2F',
+                            icon: 'mdi-close-thick',
+                        });
                     }
                     this[this.loader] = false
                     this.loader = null;
                 });
             }
         }
+    },
+    mounted(){
+        this.name_form.first_name = this.$store.state.users.user.first_name;
+        this.name_form.middle_name = this.$store.state.users.user.middle_name;
+        this.name_form.last_name = this.$store.state.users.user.last_name;
+        this.name_form.name_suffix = this.$store.state.users.user.name_suffix;
+        this.name_form.id = this.$store.state.users.user.id;
+        console.log(this.$store.state.users.user)
     }
 }
 </script>

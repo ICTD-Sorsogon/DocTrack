@@ -76,31 +76,15 @@ const actions = {
             });
         });
     },
-    async editUserCredentials({ commit }, updates) {
-        await axios.put(`api/update_user/${updates.id}`, updates.form)
-        .then(response => {
-            var snackbar = {
-                showing: true,
-                text: response.data.message,
-                color: '',
-                icon: '',
-            };
-            if (response.data.code == 'SUCCESS') {
-                snackbar.color = '#43A047';
-                snackbar.icon = 'mdi-check-bold';
-            }else {
-                snackbar.color = '#D32F2F';
-                snackbar.icon = 'mdi-close-thick';
-            }
-            if(updates.form.form_type == 'account_details') {
-                commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
-            } else if(updates.form.form_type == 'account_username') {
-                commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
-            } else if(updates.form.form_type == 'account_password') {
-                commit('UPDATE_PASSWORD', {response: response.data, form_type: updates.form_type});
-            }
-            commit('snackbars/SET_SNACKBAR', snackbar);
-        });
+    async editUserCredentials({ commit }, updates ) {
+        const response = await axios.put(`api/update_user/${updates.id}`, updates.form );
+        if(updates.form.form_type == 'account_details') {
+            commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
+        } else if(updates.form.form_type == 'account_username') {
+            commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
+        } else if(updates.form.form_type == 'account_password') {
+            commit('UPDATE_PASSWORD', {response: response.data, form_type: updates.form_type});
+        }
     },
     async removeRequestStatus({commit}) {
         commit('UNSET_REQUEST_STATUS');
@@ -114,7 +98,7 @@ const actions = {
 const mutations = {
     SET_AUTH_USER: (state, user) => {
         state.user = user
-        // state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
+        state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
         state.username = user.username;
     },
     UNSET_AUTH_USER: (state) => {

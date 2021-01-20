@@ -14,10 +14,10 @@
                                 v-bind="attrs"
                                 v-on="on"
                             >
-                                {{authUserFullName}}
+                                {{userFullName}}
                             </v-list-item-title>
                         </template>
-                        <span>{{authUserFullName}}</span>
+                        <span>{{userFullName}}</span>
                     </v-tooltip>
                     <v-list-item-subtitle>{{auth_user.username}}</v-list-item-subtitle>
                 </v-list-item-content>
@@ -165,6 +165,9 @@ export default {
         },
         placeholderImage() {
             return `${this.image_source+(this.getRandomInt(0,2) == 1 ? 'men':'women')}/${this.getRandomInt(1, 100)}.jpg`;
+        },
+        userFullName(){
+            return this.$store.getters.auth_user_full_name;
         },
         authUserFullName() {
             var f_name = '', m_name = '',l_name = '',s_name = '';
