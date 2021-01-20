@@ -22,7 +22,7 @@
                                 prepend-inner-icon="mdi-format-title"
                                 outlined
                                 :error-messages="errors"
-                                
+
                                 required
                             ></v-text-field>
                         </ValidationProvider>
@@ -40,7 +40,7 @@
                                 outlined
                                 required
                                 :error-messages="errors"
-                                
+
                             ></v-select>
                         </ValidationProvider>
                     </v-col>
@@ -186,7 +186,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['auth_user', 'document_types', 'offices', 'form_requests', 'all_users', 'documents', 'find_document']),
+        ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'find_document']),
         created_at() {
             return new Date(this.form.created_at).toDateString()
         },
@@ -256,12 +256,10 @@ export default {
             let body = this.sanitizeInputs();
             this[this.button_loader] = !this[this.button_loader];
             this.$store.dispatch('createNewDocument', body).then(() => {
-                if(this.form_requests.request_status == 'SUCCESS') {
+                if(this.request.status == 'success') {
                     this.$store.dispatch('setSnackbar', {
-                        showing: true,
-                        text: this.form_requests.status_message,
-                        color: '#43A047',
-                        icon: 'mdi-check-bold',
+                        type: 'success',
+                        text: this.request.message
                     })
                     .then(() => {
                         this[this.button_loader] = false
@@ -269,12 +267,10 @@ export default {
                         this.$refs.form.reset();
                         this.$refs.observer.reset();
                     });
-                } else {
+                } else if(this.request.status == 'failed'){
                     this.$store.dispatch('setSnackbar', {
-                        showing: true,
-                        text: this.form_requests.status_message,
-                        color: '#D32F2F',
-                        icon: 'mdi-close-thick',
+                        type: 'error',
+                        message: this.request.message
                     })
                     .then(() => {
                         this[this.button_loader] = false

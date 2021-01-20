@@ -100,28 +100,24 @@
             }
         },
         computed: {
-            form_requests(){
-                return this.$store.state.snackbars.form_requests;
+            request(){
+                return this.$store.state.snackbars.request;
             }
         },
         methods: {
             saveNewOffice(){
                 if(JSON.stringify(this.form) === JSON.stringify(this.form_old)){
-                    this.$store.dispatch('snackbars/setSnackbar', {
-                        showing: true,
-                        text: 'No changes found',
-                        color: '#1565C0',
-                        icon: 'mdi-information-outline',
+                    this.$store.dispatch('setSnackbar', {
+                        type: 'info',
+                        message: 'No changes found',
                     })
                 }else{
                     this.btnloading = true;
                     this.$store.dispatch("createNewOffice", this.form).then(() => {
-                        if(this.form_requests.request_status == 'SUCCESS') {
-                            this.$store.dispatch('snackbars/setSnackbar', {
-                                showing: true,
-                                text: this.form_requests.status_message,
-                                color: '#43A047',
-                                icon: 'mdi-check-bold',
+                        if(this.request.status == 'success') {
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'success',
+                                message: this.request.message,
                             })
                             .then(() => {
                                 this.btnloading = false;
@@ -129,12 +125,10 @@
                                 this.$refs.observer.reset();
                                 this.$store.dispatch('getOffices');
                             });
-                        } else {
-                            this.$store.dispatch('snackbars/setSnackbar', {
-                                showing: true,
-                                text: this.form_requests.status_message,
-                                color: '#D32F2F',
-                                icon: 'mdi-close-thick',
+                        } else if(this.request.status == 'failed'){
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'error',
+                                message: this.request.message,
                             })
                             .then(() => {
                                 this.btnloading = false;
@@ -145,33 +139,27 @@
             },
             saveChangesToOffice(){
                 if(JSON.stringify(this.form) === JSON.stringify(this.form_old)){
-                    this.$store.dispatch('snackbars/setSnackbar', {
-                        showing: true,
-                        text: 'No changes found',
-                        color: '#1565C0',
-                        icon: 'mdi-information-outline',
+                    this.$store.dispatch('setSnackbar', {
+                        type: 'info',
+                        message: 'No changes found'
                     })
                 }else{
                     this.btnloading = true;
                     this.$store.dispatch('updateExistingOffice', this.form).then(() => {
-                        if(this.form_requests.request_status == 'SUCCESS') {
-                            this.$store.dispatch('snackbars/setSnackbar', {
-                                showing: true,
-                                text: this.form_requests.status_message,
-                                color: '#43A047',
-                                icon: 'mdi-check-bold',
+                        if(this.request.status == 'success') {
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'success',
+                                message: this.request.message
                             })
                             .then(() => {
                                 Object.assign(this.form_old, this.form)
                                 this.btnloading = false;
                                 this.$store.dispatch('getOffices');
                             });
-                        } else {
-                            this.$store.dispatch('snackbars/setSnackbar', {
-                                showing: true,
-                                text: this.form_requests.status_message,
-                                color: '#D32F2F',
-                                icon: 'mdi-close-thick',
+                        } else if(this.request.status == 'failed'){
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'error',
+                                message: this.request.message
                             })
                             .then(() => {
                                 this.btnloading = false;
