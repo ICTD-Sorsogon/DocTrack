@@ -1,7 +1,7 @@
 <template>
 <v-dialog v-model="excel_dialog" persistent scrollable fullscreen>
     <v-container fluid  class="pr-0 pl-0"  style="padding:0px;">
-      <v-card v-if="selected_office" style="height:100%; width:100%; overflow:hidden;">
+      <v-card v-if="selected_office" style="height:100%; width:100%; overflow-x:hidden; overflow-y:auto">
 
           <v-row>
             <v-col cols="6" sm="6">
@@ -24,12 +24,83 @@
                     lazy-validation
                 >
                 <v-row>
-                <v-col cols="12" sm="12" md="12">
-                    <ValidationProvider rules="required" v-slot="{ errors }">
-                        <v-file-input label="File input" @change="fileSelected" outlined dense/>
-                        <span>{{ errors[0] }}</span>
-                    </ValidationProvider>
-                </v-col>
+                    <v-col cols="12" sm="12" md="12">
+                        <ValidationProvider rules="required" v-slot="{ errors }">
+                            <v-file-input
+                                label="Browse Excel File"
+                                prepend-icon="mdi-file-excel"
+                                accept=".csv, .xlsx"
+                                @change="fileSelected"
+                                chips
+                                show-size
+                                counter
+                                outlined
+                                dense
+                            />
+                            <span>{{ errors[0] }}</span>
+                        </ValidationProvider>
+                    </v-col>
+                    <v-col v-show="is_preview && excel_data.length > 0">
+                        <v-card>
+                            <v-tabs
+                            v-model="tab"
+                            background-color="primary"
+                            dark
+                            >
+                                <v-tab
+                                    v-for="item in excel_data"
+                                    :key="item.tab"
+                                >
+                                    {{ item.tab }}
+                                </v-tab>
+                            </v-tabs>
+
+                            <v-tabs-items v-model="tab">
+                                <v-tab-item
+                                    v-for="item in excel_data"
+                                    :key="item.id"
+                                >
+                                    <v-card flat>
+                                    <!--<v-card-text>{{ item.content }}</v-card-text>-->
+                                        <v-data-table
+                                            :headers="excel_table_headers"
+                                            :items="item.content"
+                                            class="elevation-1"
+                                        >
+                                            <template v-slot:header.Office_Name="{ header }">
+                                                {{ header.text.toUpperCase() }}
+                                            </template>
+                                        </v-data-table>
+                                    </v-card>
+                                </v-tab-item>
+                            </v-tabs-items>
+                        </v-card>
+                    </v-col>
+                    <v-col v-show="!is_preview && excel_data.length > 0">
+                        <v-alert dense outlined type="error">
+                             ERROR FOUND, Please see error log bellow
+                        </v-alert>
+                        <ul>
+                            <dl>
+                                <dt>HEADER</dt>
+                                    <ol>
+                                        <li v-for="error in excel_error[0]" :key="error.id">
+                                            <strong>{{error.value}}</strong>
+                                                    {{error.message}}
+                                            <strong>[{{error.cell_position}}]</strong>
+                                        </li>
+                                    </ol>
+                                <dt>CONTENT</dt>
+                                    <ol>
+                                        <li v-for="error in excel_error[1]" :key="error.id">
+                                            <strong>{{error.value}}</strong>
+                                                    {{error.message}}
+                                            <strong>[{{error.cell_position}}]</strong>
+                                        </li>
+                                    </ol>
+                            </dl>
+                        </ul>
+                    </v-col>
                 </v-row>
                 <v-row justify="end">
                     <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="form.form_mode == 'new_office'" @click="saveNewOffice"> SAVE </v-btn>
@@ -50,6 +121,7 @@
     import { mapGetters } from 'vuex';
 
     import XLSX from 'xlsx';
+    import { colors } from '../../../constants';
 
     export default {
         components: { ValidationProvider, ValidationObserver },
@@ -76,8 +148,34 @@
                 },
                 valid: true,
                 btnloading: false,
-                excel_error:[[], [], []],
+                excel_data: [],
+                excel_error:[[], []],
                 //file: []
+                tab: null,
+                /*items: [
+                    { tab: 'One', content: 'Tab 1 Content' },
+                    { tab: 'Two', content: 'Tab 2 Content' },
+                    { tab: 'Three', content: 'Tab 3 Content' },
+                    { tab: 'Four', content: 'Tab 4 Content' },
+                    { tab: 'Five', content: 'Tab 5 Content' },
+                    { tab: 'Six', content: 'Tab 6 Content' },
+                    { tab: 'Seven', content: 'Tab 7 Content' },
+                    { tab: 'Eight', content: 'Tab 8 Content' },
+                    { tab: 'Nine', content: 'Tab 9 Content' },
+                    { tab: 'Ten', content: 'Tab 10 Content' },
+                ],*/
+                excel_table_headers: [
+                    {
+                        text: 'Office Name',
+                        align: 'start',
+                        value: 'Office_Name',
+                    },
+                    { text: 'Office Code', value: 'Office_Code' },
+                    { text: 'Address', value: 'Address' },
+                    { text: 'Contact Number', value: 'Contact_Number' },
+                    { text: 'Email Address', value: 'Email_Address' }
+                ],
+                is_preview: false
             }
         },
         computed: {
@@ -103,125 +201,178 @@
             cellPosition(sheet_index, column_index, row_index){
                 return "#"+ (sheet_index + 1) + " " + ((column_index + 1) + 9).toString(36).toUpperCase() + (row_index + 1)
             },
+            /*clickFileInput($event){
+                //console.log('clicked')
+                //this.excel_data = [];
+                //this.excel_error = [[], []];
+                //if(this.excel_data.length > 0){
+                  //  alert('please remove the current file and re-select');
+                //}
+                //this.$refs.fileupload.reset()
+
+                //this.$refs.fileupload.value = null
+
+                //console.log(this.$refs.fileupload);
+
+               // console.log($event);
+
+               // console.log(this.excel_data);
+              // this.excel_data = [];
+               //this.excel_error = [[], []];
+
+               //this.fileSelected();
+
+
+            },*/
             fileSelected(file){
 
-                var required_header = [
-                    'Office_Name',
-                    'Office_Code',
-                    'Address',
-                    'Contact_Number',
-                    'Email_Address'
-                ];
-
                 try {
-                    //console.log(this.randomKey());
-
-                   // debugger
-
-                    //console.log(file);
-                    var reader = new FileReader();
-                    reader.readAsArrayBuffer(file);
-                    reader.onloadend = function(e) {
-                        var data = new Uint8Array(reader.result);
-                        var wb = XLSX.read(data,{type:'array', cellDates:true, dateNF:'dd.mm.yyyy h:mm:ss AM/PM'});
 
 
-                        this.sheet_length = wb.SheetNames.length;
-                        for (let i = 0; i < wb.SheetNames.length; i++) {
-                            let sheetName = wb.SheetNames[i];
-                            let worksheet = wb.Sheets[sheetName];
+                    if (file.name.split(".").pop().toLowerCase() == 'xlsx'){
 
-                            //console.log(worksheet);
+                        var required_header = [
+                            'Office_Name',
+                            'Office_Code',
+                            'Address',
+                            'Contact_Number',
+                            'Email_Address'
+                        ];
+
+                        this.excel_data = [];
+                        this.excel_error = [[], []];
 
 
-                            /*if(_this.checkSheetName(sheetName ,i) == "invalid"){
-                                this.excel_error[0].push({
-                                    id: this.randomKey(),
-                                    value: sheetName + " - ",
-                                    message: "invalid format ",
-                                    cell_position: 'worksheet #' + (i + 1),
-                                });
-                            }*/
-                            try {
-                                var range = XLSX.utils.decode_range(worksheet['!ref']);
-                                if(range.e.r < 1){
-                                    this.excel_error[2].push({
-                                        id: this.randomKey(),
-                                        value: '',
-                                        message: "It looks like you don't have any data in this page ",
-                                        cell_position: 'worksheet #' + (i + 1),
-                                    });
-                                }
-                            } catch (error) {}
-                            for(var R = range.s.r; R <= range.e.r; ++R) {
-                                for(var C = range.s.c; C <= range.e.c; ++C) {
-                                    var cellref = XLSX.utils.encode_cell({c:C, r:R});
-                                    if(!worksheet[cellref]){
-                                        if(R == 0 && C < 6){
-                                            this.excel_error[1].push({
-                                                id: this.randomKey(),
-                                                value: '',
-                                                message: "Header must have 5 column.",
-                                                cell_position: this.cellPosition(i, C, R),
-                                            });
-                                        }
-                                        if(R > 0 && C < 3){
-                                            this.excel_error[2].push({
-                                                id: this.randomKey(),
-                                                value: '',
-                                                message: "This cell is required ",
-                                                cell_position: this.cellPosition(i, C, R),
-                                            });
-                                        }
-                                        continue;
-                                    }
-                                    var cell = worksheet[cellref];
-                                    /*
-                                    if(R > 0 && C < 3 && cell.v == ''){
-                                        this.excel_error[2].push({
+                        //console.log(file);
+
+
+
+
+                        try {
+                            //console.log(this.randomKey());
+
+                        // debugger
+
+                            //console.log(file);
+                            var reader = new FileReader();
+                            reader.readAsArrayBuffer(file);
+                            reader.onloadend = function(e) {
+                                var data = new Uint8Array(reader.result);
+                                var wb = XLSX.read(data,{type:'array', cellDates:true, dateNF:'dd.mm.yyyy h:mm:ss AM/PM'});
+
+
+
+                                this.sheet_length = wb.SheetNames.length;
+                                for (let i = 0; i < wb.SheetNames.length; i++) {
+                                    let sheetName = wb.SheetNames[i];
+                                    let worksheet = wb.Sheets[sheetName];
+
+                                    //console.log(worksheet);
+
+
+                                    /*if(_this.checkSheetName(sheetName ,i) == "invalid"){
+                                        this.excel_error[0].push({
                                             id: this.randomKey(),
-                                            value: '',
-                                            message: "This cell is required ",
-                                            cell_position: this.cellPosition(i, C, R),
+                                            value: sheetName + " - ",
+                                            message: "invalid format ",
+                                            cell_position: 'worksheet #' + (i + 1),
                                         });
                                     }*/
-                                    if(R == 0 && C < 6){
-                                        if(!required_header.includes(cell.v)){
+                                    try {
+                                        var range = XLSX.utils.decode_range(worksheet['!ref']);
+                                        if(range.e.r < 1){
                                             this.excel_error[1].push({
                                                 id: this.randomKey(),
-                                                value: cell.v,
-                                                message: "Required header did not match, download the sample excel file" + ' suggestion: ' + required_header[C],
-                                                cell_position: this.cellPosition(i, C, R),
+                                                value: '',
+                                                message: "It looks like you don't have any data in this page ",
+                                                cell_position: 'worksheet #' + (i + 1),
                                             });
                                         }
+                                    } catch (error) {}
+                                    for(var R = range.s.r; R <= range.e.r; ++R) {
+                                        for(var C = range.s.c; C <= range.e.c; ++C) {
+                                            var cellref = XLSX.utils.encode_cell({c:C, r:R});
+                                            if(!worksheet[cellref]){
+                                                if(R == 0 && C < 6){
+                                                    this.excel_error[0].push({
+                                                        id: this.randomKey(),
+                                                        value: '',
+                                                        message: "Header must have 5 column.",
+                                                        cell_position: this.cellPosition(i, C, R),
+                                                    });
+                                                }
+                                                if(R > 0 && C < 3){
+                                                    this.excel_error[1].push({
+                                                        id: this.randomKey(),
+                                                        value: '',
+                                                        message: "This cell is required ",
+                                                        cell_position: this.cellPosition(i, C, R),
+                                                    });
+                                                }
+                                                continue;
+                                            }
+                                            var cell = worksheet[cellref];
+                                            /*
+                                            if(R > 0 && C < 3 && cell.v == ''){
+                                                this.excel_error[2].push({
+                                                    id: this.randomKey(),
+                                                    value: '',
+                                                    message: "This cell is required ",
+                                                    cell_position: this.cellPosition(i, C, R),
+                                                });
+                                            }*/
+                                            if(R == 0 && C < 6){
+                                                if(!required_header.includes(cell.v)){
+                                                    this.excel_error[0].push({
+                                                        id: this.randomKey(),
+                                                        value: cell.v,
+                                                        message: "Required header did not match, download the sample excel file" + ' / Suggestion: "' + required_header[C] + '"',
+                                                        cell_position: this.cellPosition(i, C, R),
+                                                    });
+                                                }
+                                            }
+                                        }
                                     }
+                                    this.excel_data.push({
+                                        id: i,
+                                        content: XLSX.utils.sheet_to_json(worksheet),
+                                        tab: sheetName.replace(/\s/g, '')
+                                    });
+                                    /*_this.current_tab_content.push(XLSX.utils.sheet_to_json(worksheet));*/
                                 }
-                            }
-                            /*_this.preview_excel_sheet_data.push({
-                                title: sheetName,
-                                name: i,
-                                content: XLSX.utils.sheet_to_json(worksheet),
-                                nameoftab: sheetName.replace(/\s/g, ''),
-                                batch: ''
-                            });
-                            _this.current_tab_content.push(XLSX.utils.sheet_to_json(worksheet));*/
+                                if(this.excel_error[0].length < 1 &&
+                                    this.excel_error[1].length < 1
+                                ){
+                                    this.is_preview = true;
+                                }else{
+                                    this.is_preview = false;
+                                }
+                                /*_this.defaultTabSelected();
+                                _this.is_hasfile = true;
+                                _this.is_import = false;*/
+                            }.bind(this)
+
+                        } catch (error) {
+                            //console.log('error found');
+                            //this.excel_data = [];
+                            //this.excel_error = [[], []];
                         }
-                        /*if(_this.excel_validation_error[0].length < 1 &&
-                            _this.excel_validation_error[1].length < 1 &&
-                            _this.excel_validation_error[2].length < 1
-                        ){
-                            _this.is_preview = true;
-                        }else{
-                            _this.is_preview = false;
-                        }
-                        _this.defaultTabSelected();
-                        _this.is_hasfile = true;
-                        _this.is_import = false;*/
-                    }.bind(this)
+
+                    }else{
+                        this.$store.dispatch('snackbars/setSnackbar', {
+                            showing: true,
+                            text: 'To avoid error required file extension "xlsx" or "csv" ',
+                            color: '#1565C0',
+                            icon: 'mdi-information-outline',
+                        })
+                    }
 
                 } catch (error) {
-                    console.log('error found');
+                    this.excel_data = [];
+                    this.excel_error = [[], []];
                 }
+
+                //console.log(this.excel_data);
 
             },
             saveNewOffice(){
