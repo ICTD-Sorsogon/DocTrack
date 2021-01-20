@@ -3,11 +3,6 @@ const state = {
     allDocuments: [],
     documents: [],
     document_types: [],
-    /*form_requests : {
-        request_form_type: '',
-        request_status: '',
-        status_message: '',
-    },*/
     document_loading: false,
     document_type_loading: false,
     selected_document: {},
@@ -19,7 +14,6 @@ const getters = {
     get_alldocument: state => state.allDocuments,
     documents: state => state.documents,
     document_types: state => state.document_types,
-    //form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
 }
 
@@ -47,17 +41,23 @@ const actions = {
         commit('GET_ALL_DOCUMENT_TYPES', response.data);
     },
     async createNewDocument({ commit, dispatch }, form) {
-        await axios.post(`/api/add_new_document`, form)
+        await axios.post(`/api/add_new_document/${form.id ?? ''}`, form)
         .then(response => {
+            const data = {
+                form_type: form.form_type,
+                code: 'SUCCESS',
+                message: `Document ${form.tracking_code} saved!`,
+            }
+            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data);
             dispatch('getActiveDocuments')
         })
         .catch(error => {
             const error_data = {
                 form_type: form.form_type,
                 code: 'FAILED',
-                message: `The server replied with an error! Please Contact your administrator\nException Type : ${error.response.data.exception}`,
+                message: `The server replied with an error! Please Contact your administrator\nException Type : ${error.response?.data.exception}`,
             }
-            commit('THROW_SERVER_ERROR', error_data)
+            commit('THROW_SNACKBAR_SERVER_ERROR', error_data)
         });
     },
     async setDocument({ commit }, document) {
@@ -98,12 +98,6 @@ const mutations = {
     },
     GET_ALL_DOCUMENT_TYPES(state, document_types) {
         state.document_types = document_types;
-    },
-    UPDATE_DOCUMENT_LIST(state, data) {
-        // TODO: Update documents list and document tracking list
-        state.form_requests.request_form_type = data.form_type;
-        state.form_requests.request_status = data.code;
-        state.form_requests.status_message = data.message;
     },
     THROW_SERVER_ERROR(state, error) {
         state.form_requests.request_form_type = error.form_type;

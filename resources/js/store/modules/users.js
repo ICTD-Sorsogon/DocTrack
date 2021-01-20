@@ -17,11 +17,6 @@ const state = {
     // all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
-    form_requests : {
-        request_form_type: '',
-        request_status: '',
-        status_message: '',
-    },
     logs: [],
 }
 
