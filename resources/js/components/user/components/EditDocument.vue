@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      Edit Document
+      {{$route.params.type}} Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
