@@ -47,7 +47,6 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['getDocument']),
         all_documents(){
             let alldocuments = JSON.parse(JSON.stringify(
                 this.$store.state.documents.allDocuments));

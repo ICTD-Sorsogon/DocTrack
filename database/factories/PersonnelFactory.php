@@ -21,7 +21,7 @@ class PersonnelFactory extends Factory
      */
     public function definition()
     {
-        static $id = 3;
+        static $id = 1;
         return [
             'id' => $id++,
             'name' => $this->faker->name,

@@ -33,9 +33,10 @@ export default {
             name: 'Login',
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
-                    next({ name: 'Dashboard' })
-                }).catch(() => {
-                    return next();
+                    next({name: 'All Active Documents' })
+                }).then(()=>{}).catch((error) => {
+                    console.log(error)
+                    return next()
                 });
             },
         },
@@ -45,16 +46,11 @@ export default {
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
                     next()
-                }).catch(() => {
-                    return next({ name: 'Login' })
+                }).catch((error) => {
+                    return next({name: 'Login' })
                 });
             },
             children: [
-                {
-                    path: 'dashboard',
-                    component: Dashboard,
-                    name: 'Dashboard',
-                },
                 {
                     path: 'document_records',
                     component: DocumentRecords,
@@ -81,7 +77,7 @@ export default {
                     name: 'All Active Documents',
                 },
                 {
-                    path: 'receive_document',
+                    path: 'receive_document/:type/:id?',
                     component: ReceiveDocument,
                     name: 'Receive Document',
                 },
