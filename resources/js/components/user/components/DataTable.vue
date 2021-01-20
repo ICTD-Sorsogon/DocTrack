@@ -33,7 +33,7 @@
 				<v-btn
 					color="primary"
 					icon
-					@click="$emit('seeDocumentDetails',item)"
+					@click.prevent="selectDoc(item.id)"
 				>
 					<v-icon>mdi-more</v-icon>
 				</v-btn>
@@ -93,16 +93,26 @@
 			:length="pageCount"
 		></v-pagination>
 	</div>
+	<table-modal
+		@closeDialog="closeDialog"
+        :dialog="dialog"
+        v-if="selected_document"
+        :selected_document="selected_document"
+    ></table-modal>
 </v-card-text>
 </template>
 
 <script>
+import TableModal from './TableModal';
 import { colors } from '../../../constants';
 import {mapGetters} from 'vuex'
+
 export default {
+	components: {TableModal},
 	props: ['documents', 'datatable_loader'],
 	data() {
 		return {
+			activeDoc: null,
 			search: '',
             page: 1,
             itemsPerPage: 25,
@@ -135,11 +145,21 @@ export default {
 				return doc
 			})
 		},
+		selected_document() {
+			return this.extendedData.find(data=>data.id == this.activeDoc)
+		},
 		isAdmin() {
 			return this.auth_user.role_id == 1
 		}
 	},
 	methods: {
+		closeDialog(){
+			this.dialog = false
+		},
+		selectDoc(id){
+			this.activeDoc = id
+			this.dialog = true
+		},
         redirectToReceivePage(id, type) {
             /**
             * TODO:

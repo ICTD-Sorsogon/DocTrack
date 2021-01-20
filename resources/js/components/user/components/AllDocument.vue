@@ -21,7 +21,6 @@
       </v-tab>
     </v-tabs>
     <data-table
-      @seeDocumentDetails="seeDocumentDetails"
       @editDocument="editDocument"
       v-if="auth_user.role_id === 1"
       :documents="documents"
@@ -33,19 +32,12 @@
             :key="item"
             >
         <data-table
-         @seeDocumentDetails="seeDocumentDetails"
          @editDocument="editDocument"
          :documents="userDocuments"
          :datatable_loader="datatable_loader"
          ></data-table>
         </v-tab-item>
     </v-tabs-items>
-    <table-modal
-        @closeDialog="closeDialog"
-        :dialog="dialog"
-        v-if="selected_document"
-        :selected_document="selected_document"
-    ></table-modal>
 </v-card>
 </template>
 
@@ -56,43 +48,26 @@
  * FIXME: Search only displays rows from the current page
 **/
 
-import TableModal from './TableModal';
 import DataTable from './DataTable';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    components: {TableModal, DataTable},
+    components: {DataTable},
     data() {
         return {
             tab: 0,
-            selected_document: '',
-            dialog: false
         }
     },
     computed: {
         ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
         userDocuments() {
             let type = this.tab ? 'originating_office' : 'destination_office_id'
-            return this.documents.filter( doc => doc[type] == this.auth_user.office_id )
-        },
-        offices() {
-            return this.$store.state.offices.offices;
-        },
-        document_types() {
-            return this.$store.state.documents.document_types;
+            return JSON.parse(JSON.stringify(this.documents)).filter( doc => doc[type] == this.auth_user.office_id )
         },
     },
     methods: {
         checkIfID(string) {
             return /^-?\d+$/.test(string);
-        },
-
-        seeDocumentDetails(document) {
-            this.selected_document = document;
-            this.dialog = true;
-        },
-        closeDialog(){
-            this.dialog = false;
         },
         redirectToReceivePage(document) {
             /**
@@ -108,24 +83,19 @@ export default {
         getNewDocumentRecordForm() {
             if (this.$route.name !== "Edit Document") {
             this.$store.dispatch("setLoader");
-            this.$router.push({ name: "Edit Document" });
+            this.$router.push({ name: "Edit Document", params:{type: 'Create'} });
             }
         },
         editDocument(id) {
             if (this.$route.name !== "Edit Document") {
                 this.$store.dispatch("setLoader");
-                this.$router.push({ name:"Edit Document", params: {id}});
+                this.$router.push({ name:"Edit Document", params: {id: id, type: 'Edit'}});
             }
         },
     },
   mounted() {
     this.$store.dispatch("unsetLoader");
-    this.$store.dispatch("getActiveDocuments").then(() => {
-      if (this.offices && this.document_types) {
-        this.$store.dispatch("unsetDataTableLoader");
-      }
-    });
-    this.$store.commit('SET_TYPES', null);
+    this.$store.dispatch("unsetDataTableLoader");
   },
 };
 </script>

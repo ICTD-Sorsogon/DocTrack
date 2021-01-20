@@ -31,13 +31,14 @@ export default {
             path: '/',
             component: Login,
             name: 'Login',
-            // beforeEnter: (to, from, next) => {
-            //     axios.get('api/authenticated').then((response) => {
-            //         next({name: 'Dashboard' })
-            //     }).catch(() => {
-            //         return next()
-            //     });
-            // },
+            beforeEnter: (to, from, next) => {
+                axios.get('api/authenticated').then((response) => {
+                    next({name: 'All Active Documents' })
+                }).then(()=>{}).catch((error) => {
+                    console.log(error)
+                    return next()
+                });
+            },
         },
         {
             path: '/',
@@ -45,16 +46,11 @@ export default {
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
                     next()
-                }).catch(() => {
+                }).catch((error) => {
                     return next({name: 'Login' })
                 });
             },
             children: [
-                {
-                    path: 'dashboard',
-                    component: Dashboard,
-                    name: 'Dashboard',
-                },
                 {
                     path: 'document_records',
                     component: DocumentRecords,
@@ -71,7 +67,7 @@ export default {
                     name: 'New Document'
                 },
                 {
-                    path: 'edit_document/:id?',
+                    path: 'edit_document/:type/:id?',
                     component: EditDocument,
                     name: 'Edit Document'
                 },

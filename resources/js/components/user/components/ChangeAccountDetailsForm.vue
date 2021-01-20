@@ -80,7 +80,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
 export default {
-    computed: mapGetters(["auth_user", "form_requests_status"]),
+    computed: mapGetters(["auth_user", "form_requests"]),
     components: {
         ValidationProvider,
         ValidationObserver
@@ -108,10 +108,10 @@ export default {
                     id: this.auth_user.id,
                     form: this.name_form
                 }).then(() => {
-                    if(this.form_requests_status.request_status == "SUCCESS") {
+                    if(this.form_requests.request_status == "SUCCESS") {
                         this.$store.dispatch('setSnackbar', {
                             showing: true,
-                            text: this.form_requests_status.status_message,
+                            text: this.form_requests.status_message,
                             color: '#43A047',
                             icon: 'mdi-check-bold',
                         });
@@ -120,7 +120,7 @@ export default {
                     }else {
                         this.$store.dispatch('setSnackbar', {
                             showing: true,
-                            text: this.form_requests_status.status_message,
+                            text: this.form_requests.status_message,
                             color: '#D32F2F',
                             icon: 'mdi-close-thick',
                         });
