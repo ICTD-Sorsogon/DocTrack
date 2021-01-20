@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\NewDocumentHasAddedEvent;
+use App\Listeners\InsertDocumentListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -15,9 +17,12 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
+        NewDocumentHasAddedEvent::class => [
+            InsertDocumentListener::class,
         ],
+        // Registered::class => [
+        //     SendEmailVerificationNotification::class,
+        // ],
     ];
 
     /**
