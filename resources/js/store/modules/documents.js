@@ -35,7 +35,7 @@ const actions = {
         commit('SET_ID_DOCUMENT', id);
     },
     async getActiveDocuments({ commit }, page_number) {
-        const response = await axios.get(`/api/get_active_documents?page=${page_number}`);
+        const response = await axios.get(`/api/get_active_documents`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
     },
     async getNonPaginatedActiveDocuments({ commit }) {

@@ -258,8 +258,8 @@ export default {
         }
     },
     beforeCreate() {
-        this.$store.dispatch('getOffices');
-        this.$store.dispatch('getDocumentTypes');
+        this.$store.dispatch('getOffices')
+        this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
     }
 }
