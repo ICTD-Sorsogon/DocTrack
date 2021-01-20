@@ -240,17 +240,19 @@
         dense
       >
         <v-timeline-item
-          color="pink"
           small
+          v-for="{id,action, created_at, remarks} in selected_document.tracking_records"
+          :color="dotColor(action)"
+          :key="id"
         >
           <v-row class="pt-1">
             <v-col cols="3">
-              <strong>5pm</strong>
+              <strong>{{ created_at }}</strong>
             </v-col>
             <v-col>
-              <strong>New Icon</strong>
+              <strong>{{ action.toUpperCase() }}</strong>
               <div class="caption">
-                Mobile App
+                {{ remarks }}
               </div>
             </v-col>
              <v-col>
@@ -289,9 +291,15 @@
       },
       sender_name({selected_document}) {
         return selected_document.sender?.name ?? selected_document.sender_name 
+      },
+    },
+    methods: {
+      dotColor(action){
+        let colors = {terminate: 'grey', rejected:'pink', create: 'cyan', processing: 'deep-purple', recieve: 'teal'}
+        return colors[action] ?? 'amber'
       }
-    }
-    }
+    },
+  }
 </script>
 
 <style>
