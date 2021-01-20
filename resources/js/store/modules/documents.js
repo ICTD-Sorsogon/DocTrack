@@ -1,4 +1,5 @@
 const state = {
+    types: '',
     allDocuments: [],
     documents: [],
     document_types: [],
@@ -14,16 +15,12 @@ const state = {
 }
 
 const getters = {
+    find_document: ({documents}) => (id) => documents.find(doc => doc.id == id),
     get_alldocument: state => state.allDocuments,
     documents: state => state.documents,
     document_types: state => state.document_types,
     //form_requests: state => state.form_requests,
     selected_document: state => state.selected_document,
-    getDocument: ({documents})=> (id) =>{
-        return documents.filter(item=>
-            item.id == id
-            );
-    }
 }
 
 const actions = {
@@ -78,6 +75,9 @@ const actions = {
 }
 
 const mutations = {
+    SET_TYPES(state, types){
+        state.types = types;
+    },
     GET_ALL_DOCUMENTS(state, response) {
         state.allDocuments = response
     },

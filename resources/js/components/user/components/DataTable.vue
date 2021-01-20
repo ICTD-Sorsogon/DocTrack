@@ -56,26 +56,26 @@
 						</v-btn>
 					</v-col>
 					<v-col cols="12" sm="3">
-						<v-btn @click.prevent="redirectToReceivePage(item)" text color="#FFCA28" block
+						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
-								mdi-email-send-outline
+                                mdi-email-receive-outline
 							</v-icon>
 							Receive
 						</v-btn>
 					</v-col>
 					<v-col cols="12" sm="3">
 						<v-btn
-							link @click.prevent="redirectToReceivePage(item)" text color="#9575CD" block
+							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
 							<v-icon left>
-								mdi-email-receive-outline
+								mdi-email-send-outline
 							</v-icon>
 							Forward
 						</v-btn>
 					</v-col>
 					<v-col cols="12" sm="3">
-						<v-btn text color="#F06292" block
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
 								mdi-email-off-outline
@@ -112,7 +112,7 @@ export default {
                 { text: 'Subject', value: 'subject', sortable: false },
                 { text: 'Source', value: 'is_external', sortable: false },
                 { text: 'Type', value: 'document_type.name', sortable: false },
-                { text: 'Originating Office', value: 'origin_office.name', sortable: false },
+                { text: 'Originating Office', value: 'originating_office', sortable: false },
                 { text: 'Destination Office', value: 'destination.name', sortable: false },
                 { text: 'Sender', value: 'sender_name', sortable: false },
                 { text: 'Date Filed', value: 'date_filed', sortable: false },
@@ -131,6 +131,7 @@ export default {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
 				doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
+				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
 				return doc
 			})
 		},
@@ -139,15 +140,14 @@ export default {
 		}
 	},
 	methods: {
-        redirectToReceivePage(document) {
+        redirectToReceivePage(id, type) {
             /**
             * TODO:
             * Save the document id or the document object to Vuex instead because the dynamic routing is messing
             * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
             **/
             if (this.$route.name !== "Receive Document") {
-                this.$store.dispatch('setDocument', document);
-                this.$router.push({ name: "Receive Document" });
+                this.$router.push({ name: "Receive Document" , params: {type:type, id: id}});
             }
         },
 		isEditable(docOrigin) {
