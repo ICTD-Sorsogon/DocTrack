@@ -4,17 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DocumentPostRequest;
 use Auth;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use DB;
 use App\Models\Document;
 use App\Models\DocumentType;
-use App\Models\Log;
-use Illuminate\Http\Request;
-use App\Models\TrackingRecord;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class DocumentController extends Controller
 {

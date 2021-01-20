@@ -161,6 +161,11 @@ export default {
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
+            if (this.$route.params.type){
+                let docTypes = this.$route.params?.type.replace(/\w/, val=>val.toUpperCase())
+                return `${docTypes} Documents ${docTypes =='Terminal' ? 'Track' : ''}`
+            }
+
             return this.$route.name;
         },
         placeholderImage() {
@@ -256,8 +261,8 @@ export default {
         }
     },
     beforeCreate() {
-        this.$store.dispatch('getOffices');
-        this.$store.dispatch('getDocumentTypes');
+        this.$store.dispatch('getOffices')
+        this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
     }
 }

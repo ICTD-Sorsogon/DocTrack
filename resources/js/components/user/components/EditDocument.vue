@@ -102,26 +102,6 @@
                         </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-text-field
-                            :value="created_at"
-                            label="Date Filed"
-                            prepend-inner-icon="mdi-calendar"
-                            outlined
-                            readonly
-                        ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-text-field
-                            :value="time_filed"
-                            label="Time Filed"
-                            prepend-inner-icon="mdi-clock-time-four-outline"
-                            outlined
-                            readonly
-                        ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" xl="6" lg="6" md="12">
                         <ValidationProvider rules="required|numeric|min:0" v-slot="{ errors, valid }">
                             <v-text-field
                                 v-model="form.page_count"
@@ -206,7 +186,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['auth_user', 'document_types', 'offices', 'form_requests', 'all_users', 'documents']),
+        ...mapGetters(['auth_user', 'document_types', 'offices', 'form_requests', 'all_users', 'documents', 'find_document']),
         created_at() {
             return new Date(this.form.created_at).toDateString()
         },
@@ -228,6 +208,9 @@ export default {
             set(val) {
                 this.form.destination_office_id = val
             }
+        },
+        selected_document() {
+            return this.find_document(this.$route.params.id)
         }
     },
     data() {
@@ -301,7 +284,7 @@ export default {
             });
         },
         fillForm(){
-            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.documents[this.$route.params.id])) : this.form
+            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
         },
     },
     mounted() {
