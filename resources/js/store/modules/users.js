@@ -14,7 +14,6 @@ function buildName(first_name, middle_name, last_name, suffix) {
 const state = {
     user: {},
     all_users: [],
-    // all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
     form_requests : {
@@ -55,8 +54,11 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
-                // element.office_name = element.office.name
-                element.gender = element.gender ? "Male" : "Female"
+                if(element.gender==1) {
+                    element.gender="Male";
+                }
+                else
+                    element.gender="Female"
                 element.is_active = element.is_active ? "Active" : "Inactive"
             });
             commit('FETCH_ALL_USERS', response.data);
@@ -74,6 +76,69 @@ const actions = {
                     element.suffix
                 );
             });
+        });
+    },
+    async addNewUser({ commit }, form) {
+        await axios.post('/api/add_new_user', form)
+        .then(response => {
+            const data = {
+                form_type: 'new_user',
+                code: 'SUCCESS',
+                message: `${form.username} was successfully added!`,
+                response_data: response.data
+            }
+            console.log(form)
+            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+
+        })
+        .catch(error => {
+            const error_data = {
+                form_type: 'new_user',
+                code: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+        });
+    },
+    async updateExistingUser({ commit }, form) {
+        await axios.post('/api/update_existing_user', form)
+        .then(response => {
+            const data = {
+                form_type: 'update_user',
+                code: 'SUCCESS',
+                message: `${form.username} was successfully updated!`,
+                response_data: response.data
+            }
+            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+        })
+        .catch(error => {
+            const error_data = {
+                form_type: 'update_user',
+                code: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+        });
+    },
+    async deleteExistingUser({ commit }, id) {
+        await axios.post(`/api/delete_existing_user/${id}`)
+        .then(response => {
+            const data = {
+                form_type: 'delete_user',
+                code: 'SUCCESS',
+                message: `${response.data[0].username} \nwas successfully deleted!`,
+                response_data: response.data
+            }
+            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+        })
+        .catch(error => {
+            console.log(error);
+            const error_data = {
+                form_type: 'delete_user',
+                code: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
         });
     },
     async editUserCredentials({ commit }, updates) {
@@ -111,9 +176,6 @@ const mutations = {
     FETCH_ALL_USERS: (state, users) => {
         state.all_users = users;
     },
-    // FETCH_ALL_USERS_COMPLETE: (state, users) => {
-    //     state.all_users_complete = users;
-    // },
     UPDATE_USER_COMPLETE_NAME: (state, data) => {
         if(data.response.code == "SUCCESS") {
             state.first_name = data.form.first_name;
