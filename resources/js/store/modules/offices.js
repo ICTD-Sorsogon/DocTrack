@@ -15,62 +15,52 @@ const actions = {
     async createNewOffice({ commit }, form) {
         await axios.post('/api/add_new_office', form)
         .then(response => {
-            const data = {
-                form_type: 'new_office',
-                code: 'SUCCESS',
-                message: `${form.name} was successfully added!`,
-                response_data: response.data
+            let res = {
+                status: 'success',
+                message: `${form.name} was successfully added!`
             }
-            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('SNACKBAR_STATUS', res)
         })
         .catch(error => {
-            const error_data = {
-                form_type: 'new_office',
-                code: 'FAILED',
-                message: `The server replied with an error! Please Contact your administrator.`,
+            let res = {
+                status: 'failed',
+                message: 'The server replied with an error! Please Contact your administrator.'
             }
-            commit('THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('SNACKBAR_STATUS', res)
         });
     },
     async updateExistingOffice({ commit }, form) {
         await axios.post('/api/update_existing_office', form)
         .then(response => {
-            const data = {
-                form_type: 'update_office',
-                code: 'SUCCESS',
-                message: `${form.name} was successfully updated!`,
-                response_data: response.data
+            let res = {
+                status: 'success',
+                message: `${form.name} was successfully updated!`
             }
-            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('SNACKBAR_STATUS', res)
         })
         .catch(error => {
-            const error_data = {
-                form_type: 'update_office',
-                code: 'FAILED',
-                message: `The server replied with an error! Please Contact your administrator.`,
+            let res = {
+                status: 'failed',
+                message: 'The server replied with an error! Please Contact your administrator.'
             }
-            commit('THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('SNACKBAR_STATUS', res)
         });
     },
     async deleteOffice({ commit }, id) {
         await axios.post(`/api/delete_office/${id}`)
         .then(response => {
-            const data = {
-                form_type: 'delete_office',
-                code: 'SUCCESS',
-                message: `${response.data[0].name} \nwas successfully deleted!`,
-                response_data: response.data
+            let res = {
+                status: 'success',
+                message: `${response.data[0].name} \nwas successfully deleted!`
             }
-            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('SNACKBAR_STATUS', res)
         })
         .catch(error => {
-            console.log(error);
-            const error_data = {
-                form_type: 'delete_office',
-                code: 'FAILED',
-                message: `The server replied with an error! Please Contact your administrator.`,
+            let res = {
+                status: 'failed',
+                message: 'The server replied with an error! Please Contact your administrator.'
             }
-            commit('THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('SNACKBAR_STATUS', res)
         });
     },
 }
