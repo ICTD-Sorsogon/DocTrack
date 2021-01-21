@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      Edit Document
+      {{$route.params.type}} Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
@@ -245,7 +245,7 @@ export default {
         },
         sanitizeInputs() {
             let dataPayload = JSON.parse(JSON.stringify(this.form))
-            dataPayload.destination_office_id = dataPayload.destination_office_id.id
+            dataPayload.destination_office_id = dataPayload.destination_office_id.id ?? dataPayload.destination_office_id
             dataPayload.sender_name = dataPayload.sender_name.id ?? dataPayload.sender_name
             return dataPayload
         },
@@ -266,8 +266,10 @@ export default {
                     .then(() => {
                         this[this.button_loader] = false
                         this.button_loader = null;
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
+                        if(this.$route.params.type == 'Create'){
+                            this.$refs.form.reset();
+                            this.$refs.observer.reset();
+                        }
                     });
                 } else {
                     this.$store.dispatch('setSnackbar', {

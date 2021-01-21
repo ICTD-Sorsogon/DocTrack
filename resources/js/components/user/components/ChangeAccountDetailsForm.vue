@@ -80,7 +80,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
 export default {
-    computed: mapGetters(["auth_user", "form_requests_status"]),
+    computed: mapGetters(["auth_user", "form_requests"]),
     components: {
         ValidationProvider,
         ValidationObserver

@@ -17,18 +17,12 @@ const state = {
     // all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
-    form_requests : {
-        request_form_type: '',
-        request_status: '',
-        status_message: '',
-    },
     logs: [],
 }
 
 const getters = {
     auth_user: state => state.user,
     auth_user_full_name: state => state.user_full_name,
-    form_requests_status: state => state.form_requests,
     all_users: state => state.all_users,
     all_users_complete: state => state.all_users_complete,
     logs: state => state.logs,
@@ -43,6 +37,7 @@ const actions = {
     async removeAuthUser({ commit }) {
         await axios.post('/logout');
         commit('UNSET_AUTH_USER');
+        commit('CLEAR_FORM_REQUEST');
     },
     async getAllUsers({ commit }) {
         await axios.get('/api/all_users')
@@ -103,6 +98,7 @@ const actions = {
         });
     },
     async removeRequestStatus({commit}) {
+        commit('CLEAR_FORM_REQUEST');
         commit('UNSET_REQUEST_STATUS');
     },
     async getLogs({ commit }) {
@@ -137,9 +133,7 @@ const mutations = {
     UNSET_AUTH_USER: (state) => {
         state.user = {};
         state.user_full_name = '';
-        state.form_requests.request_form_type = '';
-        state.form_requests.request_status = '';
-        state.form_requests.status_message = '';
+
     },
     FETCH_ALL_USERS: (state, users) => {
         state.all_users = users;
@@ -160,9 +154,6 @@ const mutations = {
                 data.form.name_suffix
             );
         }
-        state.form_requests.request_form_type = data.form.form_type;
-        state.form_requests.request_status = data.response.code;
-        state.form_requests.status_message = data.response.message;
     },
     UPDATE_USERNAME: (state, data) => {
         console.log(data);

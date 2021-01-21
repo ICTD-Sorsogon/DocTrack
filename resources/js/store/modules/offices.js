@@ -21,7 +21,7 @@ const actions = {
                 message: `${form.name} was successfully added!`,
                 response_data: response.data
             }
-            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
         })
         .catch(error => {
             const error_data = {
@@ -29,7 +29,7 @@ const actions = {
                 code: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
         });
     },
     async updateExistingOffice({ commit }, form) {
@@ -41,7 +41,7 @@ const actions = {
                 message: `${form.name} was successfully updated!`,
                 response_data: response.data
             }
-            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
         })
         .catch(error => {
             const error_data = {
@@ -49,7 +49,7 @@ const actions = {
                 code: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
         });
     },
     async deleteOffice({ commit }, id) {
@@ -61,7 +61,7 @@ const actions = {
                 message: `${response.data[0].name} \nwas successfully deleted!`,
                 response_data: response.data
             }
-            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
         })
         .catch(error => {
             console.log(error);
@@ -70,7 +70,7 @@ const actions = {
                 code: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
         });
     },
 }

@@ -8,10 +8,10 @@ import createPersistedState from 'vuex-persistedstate'
 export default {
     modules: {
         strict: true,
+        snackbars,
         users,
         documents,
         offices,
-        snackbars,
         loader,
     },
     plugins: [createPersistedState({

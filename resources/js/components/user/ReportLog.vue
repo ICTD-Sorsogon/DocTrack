@@ -4,7 +4,7 @@
           <v-card-title primary-title>
               Logs 
               <v-row align="center" justify="end" class="pr-4">
-                  <v-btn color="primary" @click="test"
+                  <v-btn color="primary" @click="exportExcel"
                   >
                   <v-icon
                     small
@@ -30,7 +30,6 @@
       :headers="headers"
       :items="logs"
       :search="search"
-      sort-by="calories"
       class="elevation-1"
     >
       <template v-slot:top>
@@ -113,6 +112,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import XLSX from 'xlsx';
 export default {
     data() {
         return {
@@ -144,9 +144,36 @@ export default {
                 { text: 'New Values ', value: 'new_values' },
                 { text: 'Original Values ', value: 'original_values' },
             ],
+            export_excel: [],
+            data: []
         }
     },
     methods:{
+      exportExcel(){
+        var currentDate = new Date();
+        var day = currentDate.getDate()
+        var month = currentDate.getMonth() + 1
+        var year = currentDate.getFullYear()
+        let date_format = month+"/"+day+"/"+year;
+        this.export_excel = [];
+        this.logs.forEach((log)=>{
+          console.log(log);
+          this.export_excel.push({
+            Username: log.user.username,
+            Action: log.action,
+            Table_Name: log.table_name,
+            Item_ID: log.item_id,
+            New_Values: log.new_values,
+            Old_Values: log.original_values,
+          })
+        })
+        var sheet_name = "Logs";
+        var logs_rec = XLSX.utils.json_to_sheet(this.export_excel);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, logs_rec, sheet_name);
+        XLSX.writeFile(wb, date_format+' - Record_List.xlsx');
+      },
+
       initialize () {this.logs},
       editItem (item) {
         this.editedIndex = this.logs.indexOf(item)
