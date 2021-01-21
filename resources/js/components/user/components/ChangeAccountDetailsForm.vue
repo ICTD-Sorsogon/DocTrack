@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
 export default {
     computed: mapGetters(["auth_user", "form_requests_status"]),
@@ -100,7 +100,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["editUserCredentials", "unsetSnackbar"]),
+        ...mapActions(["editUserCredentials", "snackbars/unsetSnackbar"]),
         updateAccountDetails() {
             this[this.loader] = !this[this.loader];
             const isValid = this.$refs.observer.validate();
@@ -110,16 +110,23 @@ export default {
                     form: this.name_form
                 }).then(() => {
                     if(this.form_requests_status.request_status == "SUCCESS") {
+                        var snackbar = {
+                            showing: true,
+                            text: 'hi',
+                            color: 'success',
+                            icon: 'mdi-checkbox-blank-circle',
+                        }
+                        // this.$store.dispatch('snackbars/setSnackbar', {
+                        //     showing: true,
+                        //     text: this.form_requests_status.status_message,
+                        //     color: 'success',
+                        //     icon: 'mdi-checkbox-blank-circle',
+                        // });
+                        this.$store.commit('snackbars/SET_SNACKBAR', snackbar);
+                        // this.$store.dispatch('snackbars/unsetSnackbar');
                         this.$refs.form.reset();
                         this.$refs.observer.reset();
-                        this.$store.dispatch('unsetSnackbar');
-                    }else {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests_status.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
-                        });
+
                     }
                     this[this.loader] = false
                     this.loader = null;
