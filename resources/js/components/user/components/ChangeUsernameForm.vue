@@ -120,9 +120,9 @@ export default {
                 this.$store.dispatch('updateUsername', this.username_form)
                 .then(()=> {
                     this.$store.dispatch('setSnackbar', this.request);
-                    this.dialog = false;
                     this.$refs.form.reset();
                     this.$refs.observer.reset();
+                    this.dialog = false;
                 });
             }
         },
