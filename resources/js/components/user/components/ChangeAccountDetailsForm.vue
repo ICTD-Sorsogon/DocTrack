@@ -106,31 +106,13 @@ export default {
             if(isValid) {
                 this.$store.dispatch('updateFullname', this.name_form)
                 .then(() => {
-
-                    // if(this.form_requests_status.request_status == "SUCCESS") {
-                    //     var snackbar = {
-                    //         showing: true,
-                    //         text: 'hi',
-                    //         color: 'success',
-                    //         icon: 'mdi-checkbox-blank-circle',
-                    //     }
-                        // this.$store.dispatch('snackbars/setSnackbar', {
-                        //     showing: true,
-                        //     text: this.form_requests_status.status_message,
-                        //     color: 'success',
-                        //     icon: 'mdi-checkbox-blank-circle',
-                        // });
-                        console.log('asdasd')
-                        // this.$store.commit('SET_SNACKBAR', snackbar);
-                        // this.$store.dispatch('snackbars/unsetSnackbar');
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
-
-                    // }
+                    this.$refs.form.reset();
+                    this.$refs.observer.reset();
                     this[this.loader] = false
                     this.loader = null;
                 });
             }
+
         }
     },
     mounted(){
