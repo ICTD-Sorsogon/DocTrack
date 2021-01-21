@@ -24,8 +24,8 @@ class ChangeUsernamePutRequest extends FormRequest
     public function rules()
     {
         return [
-            'new_username' => 'required|string|confirmed|max:255',
-            'new_username_confirmation' => 'required|max:255',
+            'new_username' => 'required|string|confirmed|max:50',
+            'new_username_confirmation' => 'required|max:50',
         ];
     }
 }
