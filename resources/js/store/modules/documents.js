@@ -43,21 +43,19 @@ const actions = {
     async createNewDocument({ commit, dispatch }, form) {
         await axios.post(`/api/add_new_document/${form.id ?? ''}`, form)
         .then(response => {
-            const data = {
-                form_type: form.form_type,
-                code: 'SUCCESS',
-                message: `Document ${form.tracking_code} saved!`,
+            let res = {
+                status: 'success',
+                message: `Document ${form.tracking_code} created!`
             }
-            commit('UPDATE_SNACKBAR_MESSAGE_STATUS', data);
+            commit('SNACKBAR_STATUS', res)
             dispatch('getActiveDocuments')
         })
         .catch(error => {
-            const error_data = {
-                form_type: form.form_type,
-                code: 'FAILED',
-                message: `The server replied with an error! Please Contact your administrator\nException Type : ${error.response?.data.exception}`,
+            let res = {
+                status: 'failed',
+                message: `The server replied with an error! Please Contact your administrator\nException Type : ${error.response.data.exception}`
             }
-            commit('THROW_SNACKBAR_SERVER_ERROR', error_data)
+            commit('SNACKBAR_STATUS', res)
         });
     },
     async setDocument({ commit }, document) {
