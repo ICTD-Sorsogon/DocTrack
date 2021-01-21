@@ -57,17 +57,18 @@ class UserController extends Controller
         $user->save();
         if($user->wasChanged()) {
             return response()->json([
-                'type' => 'success',
+                'message' => 'Your new username has been set',
                 'status' => 'success',
                 'title' => 'Username Changed',
-                'message' => 'Your new username has been set'
+                'type' => 'success'
             ]);
         }
         return response()->json([
-            'type' => 'info',
+            'message' => 'No changes were made to your username',
             'status' => 'success',
             'title' => 'Username Not Changed',
-            'message' => 'No changes were made to your username'
+            'type' => 'info'
+
         ]);
     }
 
@@ -78,17 +79,18 @@ class UserController extends Controller
             $user->password = Hash::make($request->new_password);
             $user->save();
             return response()->json([
-                'type' => 'success',
+                'message' => 'Password was changed successfully',
                 'status' => 'success',
                 'title' => 'Password Change Success',
-                'message' => 'Password was changed successfully'
+                'type' => 'success'
+
             ]);
         }
         return response()->json([
-            'type' => 'error',
+            'message' => 'The input for old password is incorrect',
             'status' => 'error',
             'title' => 'Password Change Failed',
-            'message' => 'The input for old password is incorrect'
+            'type' => 'error'
         ]);
     }
 
