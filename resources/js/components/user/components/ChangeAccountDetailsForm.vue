@@ -100,34 +100,33 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["editUserCredentials", "snackbars/unsetSnackbar"]),
         updateAccountDetails() {
             this[this.loader] = !this[this.loader];
             const isValid = this.$refs.observer.validate();
             if(isValid) {
-                this.editUserCredentials({
-                    id: this.auth_user.id,
-                    form: this.name_form
-                }).then(() => {
-                    if(this.form_requests_status.request_status == "SUCCESS") {
-                        var snackbar = {
-                            showing: true,
-                            text: 'hi',
-                            color: 'success',
-                            icon: 'mdi-checkbox-blank-circle',
-                        }
+                this.$store.dispatch('updateFullname', this.name_form)
+                .then(() => {
+
+                    // if(this.form_requests_status.request_status == "SUCCESS") {
+                    //     var snackbar = {
+                    //         showing: true,
+                    //         text: 'hi',
+                    //         color: 'success',
+                    //         icon: 'mdi-checkbox-blank-circle',
+                    //     }
                         // this.$store.dispatch('snackbars/setSnackbar', {
                         //     showing: true,
                         //     text: this.form_requests_status.status_message,
                         //     color: 'success',
                         //     icon: 'mdi-checkbox-blank-circle',
                         // });
-                        this.$store.commit('snackbars/SET_SNACKBAR', snackbar);
+                        console.log('asdasd')
+                        // this.$store.commit('SET_SNACKBAR', snackbar);
                         // this.$store.dispatch('snackbars/unsetSnackbar');
                         this.$refs.form.reset();
                         this.$refs.observer.reset();
 
-                    }
+                    // }
                     this[this.loader] = false
                     this.loader = null;
                 });

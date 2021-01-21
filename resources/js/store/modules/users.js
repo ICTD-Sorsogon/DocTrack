@@ -106,6 +106,18 @@ const actions = {
         commit('GET_LOGS', response.data);
     },
 
+    async updateFullname({ commit }, form) {
+        const response = await axios.put('api/update_fullname', form)
+        .then(response => {
+            commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, changes: form});
+        })
+        .catch(error => {
+            // TODO: Display error message
+            // console.log(error.response.data.errors.new_username[0]);
+        });
+        // TODO: Call snackbar
+    },
+
     async updateUsername({ commit }, form) {
         const response = await axios.put('api/update_username', form)
         .then(response => {
