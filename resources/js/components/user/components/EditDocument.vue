@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      Edit Document
+      {{$route.params.type}} Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments"
           >Back</v-btn
@@ -22,7 +22,7 @@
                                 prepend-inner-icon="mdi-format-title"
                                 outlined
                                 :error-messages="errors"
-                                
+
                                 required
                             ></v-text-field>
                         </ValidationProvider>
@@ -40,7 +40,7 @@
                                 outlined
                                 required
                                 :error-messages="errors"
-                                
+
                             ></v-select>
                         </ValidationProvider>
                     </v-col>
@@ -101,26 +101,6 @@
                             ></v-combobox>
                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-text-field
-                            :value="created_at"
-                            label="Date Filed"
-                            prepend-inner-icon="mdi-calendar"
-                            outlined
-                            readonly
-                        ></v-text-field>
-                    </v-col>
-
-                    <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-text-field
-                            :value="time_filed"
-                            label="Time Filed"
-                            prepend-inner-icon="mdi-clock-time-four-outline"
-                            outlined
-                            readonly
-                        ></v-text-field>
-                    </v-col>
-
                     <v-col cols="12" xl="6" lg="6" md="12">
                         <ValidationProvider rules="required|numeric|min:0" v-slot="{ errors, valid }">
                             <v-text-field
@@ -206,7 +186,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['auth_user', 'document_types', 'offices', 'form_requests', 'all_users', 'documents']),
+        ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'find_document']),
         created_at() {
             return new Date(this.form.created_at).toDateString()
         },
@@ -228,6 +208,9 @@ export default {
             set(val) {
                 this.form.destination_office_id = val
             }
+        },
+        selected_document() {
+            return this.find_document(this.$route.params.id)
         }
     },
     data() {
@@ -262,7 +245,7 @@ export default {
         },
         sanitizeInputs() {
             let dataPayload = JSON.parse(JSON.stringify(this.form))
-            dataPayload.destination_office_id = dataPayload.destination_office_id.id
+            dataPayload.destination_office_id = dataPayload.destination_office_id.id ?? dataPayload.destination_office_id
             dataPayload.sender_name = dataPayload.sender_name.id ?? dataPayload.sender_name
             return dataPayload
         },
@@ -273,25 +256,23 @@ export default {
             let body = this.sanitizeInputs();
             this[this.button_loader] = !this[this.button_loader];
             this.$store.dispatch('createNewDocument', body).then(() => {
-                if(this.form_requests.request_status == 'SUCCESS') {
+                if(this.request.status == 'success') {
                     this.$store.dispatch('setSnackbar', {
-                        showing: true,
-                        text: this.form_requests.status_message,
-                        color: '#43A047',
-                        icon: 'mdi-check-bold',
+                        type: 'success',
+                        message: this.request.message
                     })
                     .then(() => {
                         this[this.button_loader] = false
                         this.button_loader = null;
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
+                        if(this.$route.params.type == 'Create'){
+                            this.$refs.form.reset();
+                            this.$refs.observer.reset();
+                        }
                     });
-                } else {
+                } else if(this.request.status == 'failed'){
                     this.$store.dispatch('setSnackbar', {
-                        showing: true,
-                        text: this.form_requests.status_message,
-                        color: '#D32F2F',
-                        icon: 'mdi-close-thick',
+                        type: 'error',
+                        message: this.request.message
                     })
                     .then(() => {
                         this[this.button_loader] = false
@@ -301,7 +282,7 @@ export default {
             });
         },
         fillForm(){
-            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.documents[this.$route.params.id])) : this.form
+            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
         },
     },
     mounted() {

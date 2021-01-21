@@ -23,7 +23,6 @@ class Document extends Model
         parent::boot();
     
         static::creating(function ($model) {
-            // dd(User::find($model->sender_name));
             $model->tracking_code = $model->tracking_code ?? $model->buildTrackingNumber($model);
             $model->originating_office = $model->originating_office ??  auth()->user()->office_id;
             $model->sender_name = User::find($model->sender_name)->id ?? $model->sender_name;
@@ -67,14 +66,14 @@ class Document extends Model
 
     public static function allDocuments(User $user) 
     {
-        $document = static::with('document_type', 'current_office', 'destination', 'sender')
+        $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
                     ->where('is_terminal', false);
 
         if($user->isUser()){
             $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
         }
 
-        return $document->get();
+        return $document->orderBy('created_at', 'DESC')->get();
     }
 
     private function buildTrackingNumber($model)

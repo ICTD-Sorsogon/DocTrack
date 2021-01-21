@@ -27,16 +27,6 @@
         <v-divider></v-divider>
 
         <v-list>
-
-            <v-list-item link @click.prevent="getDashboard">
-                <v-list-item-icon>
-                    <v-icon>mdi-view-dashboard-outline</v-icon>
-                </v-list-item-icon>
-
-                <v-list-item-content>
-                    <v-list-item-title>Dashboard</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
             <v-list-item link @click.prevent="getAllDocuments">
                 <v-list-item-icon>
                     <v-icon>mdi-file-document-multiple-outline</v-icon>
@@ -161,6 +151,11 @@ export default {
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
+            if (this.$route.params.type){
+                let docTypes = this.$route.params?.type.replace(/\w/, val=>val.toUpperCase())
+                return `${docTypes} Documents ${docTypes =='Terminal' ? 'Track' : ''}`
+            }
+
             return this.$route.name;
         },
         placeholderImage() {
@@ -196,12 +191,6 @@ export default {
             this.$store.dispatch('setLoader');
             sessionStorage.clear();
             this.$router.push({ name: "Login"});
-        },
-        getDashboard() {
-            if(this.$route.name !== 'Dashboard') {
-                this.$store.dispatch('setLoader');
-                this.$router.push({ name: "Dashboard"});
-            }
         },
 
         getAllDocuments() {
@@ -253,8 +242,8 @@ export default {
         }
     },
     beforeCreate() {
-        this.$store.dispatch('getOffices');
-        this.$store.dispatch('getDocumentTypes');
+        this.$store.dispatch('getOffices')
+        this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
     }
 }

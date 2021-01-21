@@ -112,7 +112,7 @@ export default {
                 axios.post('login', this.form)
                 .then(response => {
                     this.$router.push({
-                        name: 'Dashboard'
+                        path: 'all_active_document'
                     });
                 })
                 .catch(error => {

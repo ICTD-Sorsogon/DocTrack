@@ -2,7 +2,7 @@
     <!-- TODO: CONTINUE THIS WITH AUTHORIZING PERSON TABLE -->
     <v-card flat>
         <v-card-title primary-title>
-            Receive Document : {{ selected_document.tracking_code }}
+            {{ $route.params.type.replace(/\w/, val=>val.toUpperCase()) }} Document : {{ selected_document.tracking_code }}
             <v-row align="center" justify="end" class="pr-4">
             <v-btn color="primary" @click.prevent="navigateAllDocuments"
             >Back</v-btn
@@ -169,20 +169,33 @@
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <v-combobox
-                            v-model="sampleItems"
+                            v-if="types=='forward'"
+                            v-model="sampleItems[1]"
                             item-text="name"
                             clearable
                             hide-selected
                             outlined
                             persistent-hint
-                            label="From"
+                            label="To"
+                            prepend-inner-icon="mdi-office-building-marker-outline"
+                            required
+                        ></v-combobox>
+                    </v-col>
+                    <v-col cols="12" xl="12" lg="12" md="12">
+                        <v-combobox
+                            v-if="['forward', 'receive'].includes(types)"
+                            v-model="sampleItems[0]"
+                            item-text="name"
+                            hide-selected
+                            outlined
+                            persistent-hint
+                            label="Through"
                             prepend-inner-icon="mdi-office-building-marker-outline"
                             required
                         ></v-combobox>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <v-textarea
-                            clearable
                             outlined
                             auto-grow
                             clear-icon="mdi-close-circle"
@@ -198,6 +211,19 @@
                             justify="end"
                         >
                             <v-btn
+                                    v-if="types=='receive'"
+                                    color="primary"
+                                    :loading="loading_create_new_document"
+                                    @click="button_loader = 'loading_create_new_document'"
+                                    type="submit"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-receive-outline
+                                    </v-icon>
+                                    Receive
+                                </v-btn>
+                            <v-btn
+                                v-if="types=='forward'"
                                 color="primary"
                                 :loading="loading_create_new_document"
                                 @click="button_loader = 'loading_create_new_document'"
@@ -206,7 +232,19 @@
                                 <v-icon left dark>
                                     mdi-email-send-outline
                                 </v-icon>
-                                Receive
+                                Forward
+                            </v-btn>
+                             <v-btn
+                                v-if="types=='terminal'"
+                                color="primary"
+                                :loading="loading_create_new_document"
+                                @click="button_loader = 'loading_create_new_document'"
+                                type="submit"
+                            >
+                                <v-icon left dark>
+                                    mdi-email-off-outline
+                                </v-icon>
+                                Terminate
                             </v-btn>
                         </div>
                     </v-col>
@@ -226,7 +264,13 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['selected_document']),
+        ...mapGetters(['find_document']),
+        types() {
+            return this.$store.state.documents.types;
+        },
+        selected_document() {
+            return this.find_document(this.$route.params.id)
+        }
     },
     data() {
         return {
@@ -250,7 +294,7 @@ export default {
                 time_filed: '',
                 remarks: ''
             },
-            sampleItems: ['Through Docketing Office']
+            sampleItems: ['Docketing Office', 'Forward to Office']
         }
     },
     methods: {
@@ -262,7 +306,7 @@ export default {
         },
     },
     mounted() {
-        console.log(this.selected_document)
     }
+
 }
 </script>

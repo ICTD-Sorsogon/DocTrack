@@ -88,7 +88,7 @@
                   </v-list-item-action>
                   <v-list-item-content>
                     <v-list-item-title>{{
-                      selected_document.type_name
+                      selected_document.document_type.name
                     }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -105,9 +105,7 @@
                     <v-icon>mdi-square-medium</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.originating_office_name
-                    }}</v-list-item-title>
+                    <v-list-item-title>{{ originating_office_name }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -117,14 +115,14 @@
           <v-row>
             <v-col>
               <v-list flat subheader>
-                <v-subheader>Current Office</v-subheader>
+                <v-subheader>Destination Office</v-subheader>
                 <v-list-item>
                   <v-list-item-action>
                     <v-icon>mdi-square-medium</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
                     <v-list-item-title>{{
-                      selected_document.current_office_name
+                      selected_document.destination.name
                     }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -142,7 +140,7 @@
                   </v-list-item-action>
                   <v-list-item-content>
                     <v-list-item-title>{{
-                      selected_document.sender_fullname
+                      selected_document.sender_name
                     }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -160,7 +158,7 @@
                   </v-list-item-action>
                   <v-list-item-content>
                     <v-list-item-title>{{
-                      selected_document.date_filed
+                      selected_document.created_at
                     }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -234,6 +232,51 @@
               </v-list>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col>
+              <v-subheader>History</v-subheader>
+    <v-timeline
+        align-top
+        dense
+      >
+        <v-timeline-item
+          small
+          v-for="{id,action, created_at, remarks} in selected_document.tracking_records"
+          :color="dotColor(action)"
+          :key="id"
+        >
+          <v-row class="pt-1">
+            <v-col cols="3">
+              <strong>{{ created_at }}</strong>
+            </v-col>
+            <v-col>
+              <strong>{{ action.toUpperCase() }}</strong>
+              <div class="caption">
+                {{ remarks }}
+              </div>
+            </v-col>
+             <v-col>
+              <v-avatar>
+                <v-img
+                  src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
+                ></v-img>
+              </v-avatar>
+              <v-avatar>
+                <v-img
+                  src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairFrizzle&accessoriesType=Prescription02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=BlazerSweater&clotheColor=Black&eyeType=Default&eyebrowType=FlatNatural&mouthType=Default&skinColor=Tanned"
+                ></v-img>
+              </v-avatar>
+              <v-avatar>
+                <v-img
+                  src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
+                ></v-img>
+              </v-avatar>
+            </v-col>
+          </v-row>
+        </v-timeline-item>
+      </v-timeline>
+        </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -242,7 +285,21 @@
 <script>
     export default {
     props: ['selected_document', 'dialog'],
-    }
+    computed: {
+      originating_office_name({selected_document}) {
+        return selected_document.origin_office?.name ?? selected_document.originating_office
+      },
+      sender_name({selected_document}) {
+        return selected_document.sender?.name ?? selected_document.sender_name 
+      },
+    },
+    methods: {
+      dotColor(action){
+        let colors = {terminate: 'grey', rejected:'pink', create: 'cyan', processing: 'deep-purple', recieve: 'teal'}
+        return colors[action] ?? 'amber'
+      }
+    },
+  }
 </script>
 
 <style>
