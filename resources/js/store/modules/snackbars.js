@@ -1,3 +1,6 @@
+
+import { snackbar_status, snackbar_icon } from './../../constants'
+
 const state = {
     snackbar: {
         showing: false,
@@ -5,22 +8,41 @@ const state = {
         color: 'success',
         icon: 'mdi-checkbox-blank-circle',
     },
-    form_requests : {
-        request_form_type: '',
-        request_status: '',
-        status_message: '',
+    request : {
+        status: '',
+        message: '',
     }
 }
 
 const getters = {
     snackbar: state => state.snackbar,
-    form_requests: state => state.form_requests,
+    request: state => state.request,
 }
 
 const actions = {
     setSnackbar({commit}, snackbar) {
-        snackbar.color = snackbar.color || 'success';
-        commit('SET_SNACKBAR', snackbar);
+        const type = snackbar.type;
+        const hasKey = type in snackbar_status;
+        if(hasKey) {
+            var color = snackbar_status[type];
+            var icon = snackbar_icon[type];
+            commit('SET_SNACKBAR',
+            {
+                showing: true,
+                text: snackbar.message,
+                color: color,
+                icon : icon
+            });
+        }
+        else {
+            commit('SET_SNACKBAR',
+            {
+                showing: true,
+                text: `The snackbar does not have, type of: '${type}'`,
+                color: snackbar_status.error,
+                icon : snackbar_icon.error
+            });
+        }
     },
     unsetSnackbar({ commit }) {
         commit('UNSET_SNACKBAR');
@@ -34,24 +56,12 @@ const mutations = {
     UNSET_SNACKBAR(state) {
         state.snackbar.showing = false;
         state.snackbar.text = '';
-        state.text = '',
-        state.color = 'success';
-        state.icon = 'mdi-checkbox-blank-circle';
+        state.snackbar.color = '#FFFFFF';
+        state.snackbar.icon = 'mdi-checkbox-blank-circle';
     },
-    UPDATE_SNACKBAR_MESSAGE_STATUS(state, data){
-        state.form_requests.request_form_type = data.form_type;
-        state.form_requests.request_status = data.code;
-        state.form_requests.status_message = data.message;
-    },
-    THROW_SNACKBAR_SERVER_ERROR(state, error) {
-        state.form_requests.request_form_type = error.form_type;
-        state.form_requests.request_status = error.code;
-        state.form_requests.status_message = error.message;
-    },
-    CLEAR_FORM_REQUEST(){
-        state.form_requests.request_form_type = '';
-        state.form_requests.request_status = '';
-        state.form_requests.status_message = '';
+    SNACKBAR_STATUS(state, response){
+        state.request.status = response.status;
+        state.request.message = response.message;
     }
 }
 

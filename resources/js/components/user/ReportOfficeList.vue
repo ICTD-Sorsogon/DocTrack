@@ -136,8 +136,8 @@
             offices() {
                 return this.$store.state.offices.offices;
             },
-            form_requests(){
-                return this.$store.state.snackbars.form_requests;
+            request(){
+                return this.$store.state.snackbars.request;
             }
         },
         methods: {
@@ -153,22 +153,18 @@
             },
             deleteOffice(){
                 this.$store.dispatch('deleteOffice', this.delete_info.id).then(() => {
-                    if(this.form_requests.request_status == 'SUCCESS') {
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#43A047',
-                            icon: 'mdi-check-bold',
+                    if(this.request.status == 'success') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'success',
+                            message: this.request.message
                         })
                         .then(() => {
                             this.$store.dispatch('getOffices');
                         });
-                    } else {
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
+                    } else if(this.request.status == 'failed') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message
                         })
                         .then(() => { });
                     }
