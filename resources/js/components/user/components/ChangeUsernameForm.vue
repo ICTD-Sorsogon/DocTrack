@@ -28,7 +28,7 @@
                     >
                         <v-text-field
                             outlined
-                            v-model="username_form.confirm_username"
+                            v-model="username_form.new_username_confirmation"
                             label="Confirm New Username"
                             :error-messages="errors"
                             :success="valid"
@@ -107,7 +107,7 @@ export default {
             username_form: {
                 form_type: 'account_username',
                 new_username: '',
-                confirm_username: '',
+                new_username_confirmation: '',
             },
             loader: null,
             loading_edit_username: false,
@@ -118,14 +118,13 @@ export default {
         editUsernameHandler() {
             const isValid = this.$refs.observer.validate();
             if(isValid) {
-                this.editUserCredentials({
-                    id: this.auth_user.id,
-                    form: this.username_form
-                }).then(() => {
-                    if(this.form_requests_status.request_status == "SUCCESS") {
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
-                    }
+                this.$store.dispatch('updateUsername', this.username_form)
+                .then(() => {
+                    // TODO: Call this lines when snackbar shows success message
+                    // if(this.form_requests_status.request_status == "SUCCESS") {
+                    //     this.$refs.form.reset();
+                    //     this.$refs.observer.reset();
+                    // }
                     this.dialog = false;
                 });
             }

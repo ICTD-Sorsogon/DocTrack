@@ -86,10 +86,10 @@ const actions = {
                 icon: '',
             };
             if (response.data.code == 'SUCCESS') {
-                snackbar.color = '#43A047';
+                snackbar.color = 'success';
                 snackbar.icon = 'mdi-check-bold';
             }else {
-                snackbar.color = '#D32F2F';
+                snackbar.color = 'error';
                 snackbar.icon = 'mdi-close-thick';
             }
             if(updates.form.form_type == 'account_details') {
@@ -109,6 +109,23 @@ const actions = {
         const response = await axios.get('/api/logs');
         commit('GET_LOGS', response.data);
     },
+
+    async updateUsername({ commit }, form) {
+        const response = await axios.put('api/update_username', form)
+        .then(response => {
+            commit('UPDATE_USERNAME', {response: response.data, changes: form});
+        })
+        .catch(error => {
+            // TODO: Display error message
+            // console.log(error.response.data.errors.new_username[0]);
+        });
+        // TODO: Call snackbar
+    },
+
+    async updatePassword({ commit }, form) {
+        const response = await axios.put('api/update_password', form);
+        // TODO: Call snackbar
+    }
 }
 
 const mutations = {
@@ -148,17 +165,15 @@ const mutations = {
         state.form_requests.status_message = data.response.message;
     },
     UPDATE_USERNAME: (state, data) => {
-        if(data.response.code == "SUCCESS") {
-            state.user.username = data.form.new_username;
-        }
-        state.form_requests.request_form_type = data.form.form_type;
-        state.form_requests.request_status = data.response.code;
-        state.form_requests.status_message = data.response.message;
-    },
-    UPDATE_PASSWORD: (state, data) => {
-        state.form_requests.request_form_type = data.form_type;
-        state.form_requests.request_status = data.response.code;
-        state.form_requests.status_message = data.response.message;
+        console.log(data);
+        state.user.username = data.changes.new_username;
+        // if(data.response.code == "SUCCESS") {
+        //     state.user.username = data.form.new_username;
+        // }
+        // Snackbar data
+        // state.form_requests.request_form_type = data.form.form_type;
+        // state.form_requests.request_status = data.response.code;
+        // state.form_requests.status_message = data.response.message;
     },
     UNSET_REQUEST_STATUS: (state) => {
         state.form_requests.request_form_type = '';

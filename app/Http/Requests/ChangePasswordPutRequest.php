@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Auth;
 
 class ChangePasswordPutRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class ChangePasswordPutRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -24,9 +25,9 @@ class ChangePasswordPutRequest extends FormRequest
     public function rules()
     {
         return [
-            'old_password' => 'required|string|max255',
-            'new_password' => 'required|string|confirmed|max255',
-            'new_password_confirmation' => 'required|string|max255',
+            'old_password' => 'required|string|max:255',
+            'new_password' => 'required|string|confirmed|max:255',
+            'new_password_confirmation' => 'required|string|max:255',
         ];
     }
 }

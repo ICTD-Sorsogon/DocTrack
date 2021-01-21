@@ -21,7 +21,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
         // Route::get('all_users_complete', 'UserController@getAllUserComplete');
-        Route::put('update_user/{id}', 'UserController@updateUser');
+        Route::put('update_fullname', 'UserController@updateFullname');
+        Route::put('update_username', 'UserController@updateUsername');
+        Route::put('update_password', 'UserController@updatePassword');
         Route::get('document_type_list', 'DocumentController@getDocumentTypes');
         Route::get('get_active_documents', 'DocumentController@getAllActiveDocuments');
         Route::get('get_document_details/{id}', 'DocumentController@getSelectedDocument');

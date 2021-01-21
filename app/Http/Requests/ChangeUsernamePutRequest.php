@@ -13,7 +13,7 @@ class ChangeUsernamePutRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -24,7 +24,7 @@ class ChangeUsernamePutRequest extends FormRequest
     public function rules()
     {
         return [
-            'new_username' => 'required|string|confirmed|max255',
+            'new_username' => 'required|string|confirmed|max:255',
             'new_username_confirmation' => 'required|max:255',
         ];
     }

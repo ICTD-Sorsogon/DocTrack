@@ -47,7 +47,7 @@
                 >
                     <v-text-field
                         outlined
-                        v-model="password_form.confirm_password"
+                        v-model="password_form.new_password_confirmation"
                         label="Confirm New Password"
                         :append-icon="show_confirm_password ? 'mdi-eye' : 'mdi-eye-off'"
                         :type="show_confirm_password ? 'text' : 'password'"
@@ -131,7 +131,7 @@ export default {
                 form_type: 'account_password',
                 old_password: '',
                 new_password: '',
-                confirm_password: '',
+                new_password_confirmation: '',
             },
             show_old_password: false,
             show_new_password: false,
@@ -139,18 +139,16 @@ export default {
         }
     },
     methods: {
-
         handleEditPassword() {
             const isValid = this.$refs.observer.validate();
             if(isValid) {
-                this.editUserCredentials({
-                    id: this.auth_user.id,
-                    form: this.password_form
-                }).then(() => {
-                    if(this.form_requests_status.request_status == "SUCCESS") {
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
-                    }
+                this.$store.dispatch('updatePassword', this.password_form)
+                .then(() => {
+                    // TODO: Call this lines when snackbar shows success message
+                    // if(this.form_requests_status.request_status == "SUCCESS") {
+                    //     this.$refs.form.reset();
+                    //     this.$refs.observer.reset();
+                    // }
                     this.dialog = false;
                 });
             }
