@@ -27,16 +27,6 @@
         <v-divider></v-divider>
 
         <v-list>
-
-            <v-list-item link @click.prevent="getDashboard">
-                <v-list-item-icon>
-                    <v-icon>mdi-view-dashboard-outline</v-icon>
-                </v-list-item-icon>
-
-                <v-list-item-content>
-                    <v-list-item-title>Dashboard</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
             <v-list-item link @click.prevent="getAllDocuments">
                 <v-list-item-icon>
                     <v-icon>mdi-file-document-multiple-outline</v-icon>
@@ -204,12 +194,6 @@ export default {
             this.$store.dispatch('setLoader');
             sessionStorage.clear();
             this.$router.push({ name: "Login"});
-        },
-        getDashboard() {
-            if(this.$route.name !== 'Dashboard') {
-                this.$store.dispatch('setLoader');
-                this.$router.push({ name: "Dashboard"});
-            }
         },
 
         getAllDocuments() {

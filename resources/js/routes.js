@@ -67,7 +67,7 @@ export default {
                     name: 'New Document'
                 },
                 {
-                    path: 'edit_document/:id?',
+                    path: 'edit_document/:type/:id?',
                     component: EditDocument,
                     name: 'Edit Document'
                 },

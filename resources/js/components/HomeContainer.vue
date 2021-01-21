@@ -49,14 +49,14 @@ export default {
         snackbar(){
             var snackbar = this.$store.state.snackbars.snackbar;
             if(!snackbar.showing){
-                this.$store.dispatch('snackbars/unsetSnackbar');
+                this.$store.dispatch('unsetSnackbar');
             }
             return snackbar
         }
     },
     methods: {
         closeSnackbar(){
-            this.$store.dispatch('snackbars/unsetSnackbar');
+            this.$store.dispatch('unsetSnackbar');
         }
     },
     mounted() {
