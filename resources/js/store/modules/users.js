@@ -106,6 +106,18 @@ const actions = {
         commit('GET_LOGS', response.data);
     },
 
+    async updateFullname({ commit }, form) {
+        const response = await axios.put('api/update_fullname', form)
+        .then(response => {
+            commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, changes: form});
+        })
+        .catch(error => {
+            // TODO: Display error message
+            // console.log(error.response.data.errors.new_username[0]);
+        });
+        // TODO: Call snackbar
+    },
+
     async updateUsername({ commit }, form) {
         await axios.put('api/update_username', form)
         .then(response => {
@@ -144,7 +156,7 @@ const actions = {
 const mutations = {
     SET_AUTH_USER: (state, user) => {
         state.user = user
-        // state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
+        state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
         state.username = user.username;
     },
     UNSET_AUTH_USER: (state) => {

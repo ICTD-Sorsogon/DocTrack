@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests\ChangePasswordPutRequest;
 use App\Http\Requests\ChangeUsernamePutRequest;
+use App\Http\Requests\ChangeFullnamePutRequest;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -37,9 +38,16 @@ class UserController extends Controller
             ->get();
     }
 
-    public function updateFullname()
+    public function updateFullname(ChangeFullnamePutRequest $request)
     {
-
+        $user = User::findOrFail(Auth::user()->id);
+        $user->first_name=$request->first_name;
+        $user->middle_name=$request->middle_name;
+        $user->last_name=$request->last_name;
+        $user->suffix=$request->name_suffix;
+        $user->save();
+        $response = $user->wasChanged() ? 'Changed' : 'No changes were made';
+        return $response;
     }
 
     public function updateUsername(ChangeUsernamePutRequest $request)
