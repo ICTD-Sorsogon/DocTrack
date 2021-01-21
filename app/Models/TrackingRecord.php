@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +17,11 @@ class TrackingRecord extends Model
         'approved_by', 'touched_by', 'last_touched',
         'forwarded_by', 'forwarded_to', 'remarks'
     ];
+
+    public function getCreatedAtAttribute($value) 
+    {
+        return Carbon::parse($value)->diffForHumans();
+    }
 
     public function user()
     {

@@ -83,13 +83,13 @@ export default {
         getNewDocumentRecordForm() {
             if (this.$route.name !== "Edit Document") {
             this.$store.dispatch("setLoader");
-            this.$router.push({ name: "Edit Document" });
+            this.$router.push({ name: "Edit Document", params:{type: 'Create'} });
             }
         },
         editDocument(id) {
             if (this.$route.name !== "Edit Document") {
                 this.$store.dispatch("setLoader");
-                this.$router.push({ name:"Edit Document", params: {id}});
+                this.$router.push({ name:"Edit Document", params: {id: id, type: 'Edit'}});
             }
         },
     },
