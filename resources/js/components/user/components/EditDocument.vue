@@ -259,7 +259,7 @@ export default {
                 if(this.request.status == 'success') {
                     this.$store.dispatch('setSnackbar', {
                         type: 'success',
-                        text: this.request.message
+                        message: this.request.message
                     })
                     .then(() => {
                         this[this.button_loader] = false
