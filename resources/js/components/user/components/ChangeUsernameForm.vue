@@ -100,7 +100,7 @@ export default {
         ValidationProvider,
         ValidationObserver
     },
-    computed: mapGetters(["auth_user", "form_requests"]),
+    computed: mapGetters(["auth_user", "request"]),
     data() {
         return {
             dialog: false,
@@ -114,18 +114,15 @@ export default {
         }
     },
     methods: {
-        ...mapActions(["editUserCredentials"]),
         editUsernameHandler() {
             const isValid = this.$refs.observer.validate();
             if(isValid) {
                 this.$store.dispatch('updateUsername', this.username_form)
-                .then(() => {
-                    // TODO: Call this lines when snackbar shows success message
-                    // if(this.form_requests_status.request_status == "SUCCESS") {
-                    //     this.$refs.form.reset();
-                    //     this.$refs.observer.reset();
-                    // }
+                .then(()=> {
+                    this.$store.dispatch('setSnackbar', this.request);
                     this.dialog = false;
+                    this.$refs.form.reset();
+                    this.$refs.observer.reset();
                 });
             }
         },

@@ -55,8 +55,20 @@ class UserController extends Controller
         $user = User::findOrFail(Auth::user()->id);
         $user->username = $request->new_username;
         $user->save();
-        $response = $user->wasChanged() ? 'Changed' : 'No changes were made';
-        return $response;
+        if($user->wasChanged()) {
+            return response()->json([
+                'type' => 'success',
+                'status' => 'success',
+                'title' => 'Username Changed',
+                'message' => 'Your new username has been set'
+            ]);
+        }
+        return response()->json([
+            'type' => 'info',
+            'status' => 'success',
+            'title' => 'Username Not Changed',
+            'message' => 'No changes were made to your username'
+        ]);
     }
 
     public function updatePassword(ChangePasswordPutRequest $request)
@@ -65,9 +77,19 @@ class UserController extends Controller
         if (Hash::check($request->old_password, Auth::user()->password)) {
             $user->password = Hash::make($request->new_password);
             $user->save();
-            return 'EDITED';
+            return response()->json([
+                'type' => 'success',
+                'status' => 'success',
+                'title' => 'Password Change Success',
+                'message' => 'Password was changed successfully'
+            ]);
         }
-        return 'INCORRECT PASSWORD';
+        return response()->json([
+            'type' => 'error',
+            'status' => 'error',
+            'title' => 'Password Change Failed',
+            'message' => 'The input for old password is incorrect'
+        ]);
     }
 
     // public function updateUser(Request $request, string $userId)

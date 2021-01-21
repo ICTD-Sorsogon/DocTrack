@@ -119,20 +119,37 @@ const actions = {
     },
 
     async updateUsername({ commit }, form) {
-        const response = await axios.put('api/update_username', form)
+        await axios.put('api/update_username', form)
         .then(response => {
             commit('UPDATE_USERNAME', {response: response.data, changes: form});
+            commit('SNACKBAR_STATUS', response.data);
         })
         .catch(error => {
-            // TODO: Display error message
-            // console.log(error.response.data.errors.new_username[0]);
+            console.log(error.response.data.errors);
+            var snackbar_error ={
+                title: error.response.data.message,
+                type: 'error',
+                status: 'error',
+                message: error.response.data.errors
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
         });
-        // TODO: Call snackbar
     },
 
     async updatePassword({ commit }, form) {
-        const response = await axios.put('api/update_password', form);
-        // TODO: Call snackbar
+        await axios.put('api/update_password', form)
+        .then(response => {
+            commit('SNACKBAR_STATUS', response.data);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                title: error.response.data.message,
+                type: 'error',
+                status: 'error',
+                message: error.response.data.errors
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
     }
 }
 
@@ -168,8 +185,9 @@ const mutations = {
         }
     },
     UPDATE_USERNAME: (state, data) => {
-        console.log(data);
-        state.user.username = data.changes.new_username;
+        if (data.response.status == 'success') {
+            state.user.username = data.changes.new_username;
+        }
         // if(data.response.code == "SUCCESS") {
         //     state.user.username = data.form.new_username;
         // }

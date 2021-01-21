@@ -15,12 +15,23 @@
                 top
             >
                 <v-alert
-                    dense
                     prominent
                     color="transparent"
                     :icon="snackbar.icon"
                 >
-                    {{snackbar.text}}
+                    <div class="title">
+                        {{snackbar.title}}
+                    </div>
+                    <div v-if="typeof snackbar.text === 'object' && snackbar.text !== null">
+                        <div v-for="(text, index) in snackbar.text" :key="index">
+                            <ul>
+                                <li>{{text[0]}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div v-else>
+                        {{snackbar.text}}
+                    </div>
                 </v-alert>
                 <template v-slot:action="{ attrs }">
                     <v-btn
