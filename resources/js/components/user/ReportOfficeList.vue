@@ -165,7 +165,8 @@
                         this.$store.dispatch('setSnackbar', {
                             type: 'error',
                             message: this.request.message
-                        }).then(() => { });
+                        })
+                        .then(() => { });
                     }
                     this.delete_dialog = false;
                 });
