@@ -50,11 +50,7 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
-                if(element.gender==1) {
-                    element.gender="Male";
-                }
-                else
-                    element.gender="Female"
+                element.gender = element.gender ? "Male" : "Female"
                 element.is_active = element.is_active ? "Active" : "Inactive"
             });
             commit('FETCH_ALL_USERS', response.data);
