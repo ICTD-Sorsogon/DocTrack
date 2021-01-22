@@ -23,8 +23,9 @@ const getters = {
 const actions = {
     setSnackbar({commit}, snackbar) {
         if (snackbar.constructor.toString().indexOf("Object") != -1) {
-            const required = { type: '', message: '' }
-            if (JSON.stringify(Object.keys(snackbar)) === JSON.stringify(Object.keys(required))) {
+            //const required = { type: '', message: '' }
+            //if (JSON.stringify(Object.keys(snackbar)) === JSON.stringify(Object.keys(required))) {
+            if (snackbar.hasOwnProperty('type')? true : false && snackbar.hasOwnProperty('message')? true : false) {
                 var color = snackbar_status[snackbar.type];
                 var icon = snackbar_icon[snackbar.type];
                 commit('SET_SNACKBAR',
@@ -64,8 +65,9 @@ const mutations = {
     },
     SET_SNACKBAR2(state, snackbar) {
         if (snackbar.constructor.toString().indexOf("Object") != -1) {
-            const required = { type: '', message: '' }
-            if (JSON.stringify(Object.keys(snackbar)) === JSON.stringify(Object.keys(required))) {
+            //const required = { type: '', message: '' }
+            //if (JSON.stringify(Object.keys(snackbar)) === JSON.stringify(Object.keys(required))) {
+            if (snackbar.hasOwnProperty('type')? true : false && snackbar.hasOwnProperty('message')? true : false) {
                 state.snackbar.showing = true;
                 state.snackbar.text = snackbar.message;
                 state.snackbar.color = snackbar_status[snackbar.type];
@@ -91,8 +93,9 @@ const mutations = {
     },
     SNACKBAR_STATUS(state, response){
         if (response.constructor.toString().indexOf("Object") != -1) {
-            const required = { status: '', message: '' }
-            if (JSON.stringify(Object.keys(response)) === JSON.stringify(Object.keys(required))) {
+            //const required = { status: '', message: '' }
+            //if (JSON.stringify(Object.keys(response)) === JSON.stringify(Object.keys(required))) {
+            if (response.hasOwnProperty('status')? true : false && response.hasOwnProperty('message')? true : false) {
                 state.request.type = response.type;
                 state.request.status = response.status;
                 state.request.message = response.message;

@@ -94,6 +94,7 @@
             :excel_dialog="excel_dialog"
             v-if="dialog_title && excel_dialog == true"
             :dialog_title="dialog_title"
+            :dialog_for="dialog_for"
         />
 
     </div>
@@ -191,10 +192,12 @@
                         this.form_dialog = true
                         break;
                     case 'import_office':
+                        this.dialog_for = 'import_office';
                         this.dialog_title = 'Import Office List Via Excel File';
                         this.excel_dialog = true
                         break;
                     case 'export_office':
+                        this.dialog_for = 'export_office';
                         this.dialog_title = 'Export Office List Via Excel File';
                         this.excel_dialog = true
                         break;

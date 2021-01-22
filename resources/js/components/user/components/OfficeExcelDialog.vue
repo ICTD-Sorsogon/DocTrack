@@ -18,14 +18,15 @@
           </v-row>
 
         <v-card-text>
-            <ValidationObserver ref="observer" v-slot="{ valid }">
+           <!-- <ValidationObserver ref="observer" v-slot="{ valid }">-->
                 <v-form
                     ref="form"
                     lazy-validation
                 >
                 <v-row>
-                    <v-col cols="12" sm="12" md="12">
-                        <ValidationProvider rules="required" v-slot="{ errors }">
+
+                    <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
+                        <!--<ValidationProvider rules="required" v-slot="{ errors }">-->
                             <v-file-input
                                 label="Browse Excel File"
                                 prepend-icon="mdi-file-excel"
@@ -37,8 +38,13 @@
                                 outlined
                                 dense
                             />
-                            <span>{{ errors[0] }}</span>
-                        </ValidationProvider>
+                           <!-- <span>{{ errors[0] }}</span>
+                        </ValidationProvider>-->
+                    </v-col>
+                    <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
+                         <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'import_office'" @click="uploadToDatabase"> UPLOAD </v-btn>
+                         <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'export_office'" @click="saveChangesToOffice"> EXPORT </v-btn>
+
                     </v-col>
                     <v-col v-show="is_preview && excel_data.length > 0">
                         <v-card>
@@ -102,12 +108,16 @@
                         </ul>
                     </v-col>
                 </v-row>
-                <v-row justify="end">
+                <!--<v-row justify="end">
+
+                    <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'import_office'" @click="uploadToDatabase"> UPLOAD </v-btn>
+                    <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'export_office'" @click="saveChangesToOffice"> EXPORT </v-btn>
+
                     <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="form.form_mode == 'new_office'" @click="saveNewOffice"> SAVE </v-btn>
                     <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="form.form_mode == 'edit_office'" @click="saveChangesToOffice"> SAVE CHANGES </v-btn>
-                </v-row>
+                </v-row>-->
                 </v-form >
-            </ValidationObserver>
+            <!--</ValidationObserver-->
 
         </v-card-text>
       </v-card>
@@ -116,16 +126,16 @@
 </template>
 
 <script>
-    import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
-    import { email, required } from '../../../validate'
+    //import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
+    //import { email, required } from '../../../validate'
     import { mapGetters } from 'vuex';
 
     import XLSX from 'xlsx';
     import { colors } from '../../../constants';
 
     export default {
-        components: { ValidationProvider, ValidationObserver },
-        props: ['excel_dialog', 'dialog_title'],
+        //components: { ValidationProvider, ValidationObserver },
+        props: ['excel_dialog', 'dialog_title', 'dialog_for'],
         data() {
             return {
                 form_old: {
@@ -146,7 +156,7 @@
                     contact_email: '',
                     form_mode: ''
                 },
-                valid: true,
+                valid: false,
                 btnloading: false,
                 excel_data: [],
                 excel_error:[[], []],
@@ -180,8 +190,8 @@
         },
         computed: {
             //...mapGetters(['form_requests']),
-            form_requests(){
-                return this.$store.state.snackbars.form_requests;
+            request(){
+                return this.$store.state.snackbars.request;
             },
             selected_office(){
                     return {id: '',
@@ -195,6 +205,50 @@
 
         },
         methods: {
+            uploadToDatabase(){
+
+
+
+                this.btnloading = true;
+
+                if(this.excel_error[0].length < 1 &&
+                    this.excel_error[1].length < 1 &&
+                    this.excel_data.length > 0
+                ){
+                    var office_data = { office_data: this.excel_data };
+                    this.$store.dispatch("importNewOffice", office_data).then(() => {
+                        if(this.request.status == 'success') {
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'success',
+                                message: this.request.message
+                            })
+                            .then(() => {
+
+                                this.btnloading = false;
+                                //this.$refs.form.reset();
+                                //this.$refs.observer.reset();
+
+                                this.$store.dispatch('getOffices');
+                            });
+
+                        } else if(this.request.status == 'failed'){
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'error',
+                                message: this.request.message
+                            })
+                            .then(() => {
+                                this.btnloading = false;
+                            });
+                        }
+                    });
+                }else{
+                    this.$store.dispatch('setSnackbar', {
+                        type: 'warning',
+                        message: 'Upload request error, please check your file.'
+                    });
+                    this.btnloading = false;
+                }
+            },
             randomKey(){
                 return Math.random().toString(36).substring(7)
             },
@@ -230,6 +284,9 @@
 
 
                     if (file.name.split(".").pop().toLowerCase() == 'xlsx'){
+
+                        // console.log(this.$store.state.offices.offices);
+                        // Object.values(obj.toLowerCase()).includes(v.toLowerCase())
 
                         var required_header = [
                             'Office_Name',
@@ -344,8 +401,10 @@
                                     this.excel_error[1].length < 1
                                 ){
                                     this.is_preview = true;
+                                    this.valid = true;
                                 }else{
                                     this.is_preview = false;
+                                    this.valid = false;
                                 }
                                 /*_this.defaultTabSelected();
                                 _this.is_hasfile = true;
@@ -370,6 +429,7 @@
                 } catch (error) {
                     this.excel_data = [];
                     this.excel_error = [[], []];
+                    this.valid = false;
                 }
 
                 //console.log(this.excel_data);
@@ -533,6 +593,7 @@
             Object.assign(this.form_old, this.selected_office)
             Object.assign(this.form, this.selected_office)
             //console.log('ff',this.selected_office);
+
         }
     }
 

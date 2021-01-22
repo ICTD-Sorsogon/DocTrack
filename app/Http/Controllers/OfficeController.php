@@ -45,6 +45,40 @@ class OfficeController extends Controller
         return [$office];
     }
 
+    public function importNewOffice(Request $request): Array
+    {
+        /*dd($request['office_list']);
+        foreach($request['office_data'] as $office_data){
+            //dd($office_data['tab']);
+            foreach($office_data['content'] as $office){
+                //dd($office['Office_Name']);
+            }
+        }*/
+
+        DB::beginTransaction();
+        try {
+            foreach($request['office_data'] as $office_data){
+                foreach($office_data['content'] as $offices){
+                    $office = new Office;
+                    $office->name = $offices["Office_Name"];
+                    $office->address = $offices["Address"];
+                    $office->office_code = $offices["Office_Code"];
+                    $office->contact_number = $offices["Contact_Number"];
+                    $office->contact_email = $offices["Email_Address"];
+                    $office->save();
+                }
+            }
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$office];
+    }
+
     public function updateExistingOffice(Request $request): Array
     {
         DB::beginTransaction();
