@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewDocumentHasAddedEvent;
 use App\Http\Requests\DocumentPostRequest;
 use Auth;
 use Illuminate\Database\Eloquent\Collection;
@@ -45,6 +46,13 @@ class DocumentController extends Controller
             ['id' => $document->id],
             $request->validated()
         );
+
+        if(!$document->id){
+            $user_id = Auth::user()->id;
+            event(new NewDocumentHasAddedEvent($user_id, $request));
+        }
+
+        return true;
         /**
          * KENNETH SOLOMON
          * TODO after save or update, dipatch events user logs and doc logs

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OfficeCreateEvent;
+use App\Events\OfficeDeleteEvent;
+use App\Events\OfficeUpdateEvent;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -42,6 +45,18 @@ class OfficeController extends Controller
             throw $error;
         }
         DB::commit();
+
+        $request_obj = '{
+            "id":"' . $office->id . '",
+            "name":"' . $request->name . '",
+            "address":"' . $request->address . '",
+            "office_code":"' . $request->office_code . '",
+            "contact_number":"' . $request->contact_number . '",
+            "contact_email":"' . $request->contact_email . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new OfficeCreateEvent($user_id, json_decode($request_obj)));
+
         return [$office];
     }
 
@@ -81,6 +96,8 @@ class OfficeController extends Controller
 
     public function updateExistingOffice(Request $request): Array
     {
+        $old_values = Office::select('id','name','address','office_code','contact_number','contact_email')->where('id', $request->id)->get();
+
         DB::beginTransaction();
         try {
             $office = Office::find($request->id);
@@ -98,6 +115,18 @@ class OfficeController extends Controller
             throw $error;
         }
         DB::commit();
+
+        $request_obj = '{
+            "id":"' . $request->id . '",
+            "name":"' . $request->name . '",
+            "address":"' . $request->address . '",
+            "office_code":"' . $request->office_code . '",
+            "contact_number":"' . $request->contact_number . '",
+            "contact_email":"' . $request->contact_email . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new OfficeUpdateEvent($user_id, json_decode($old_values[0]), json_decode($request_obj)));
+
         return [$office];
     }
 
@@ -115,6 +144,12 @@ class OfficeController extends Controller
             throw $error;
         }
         DB::commit();
+
+
+        $user_id = Auth::user()->id;
+
+        event(new OfficeDeleteEvent($user_id,$office));
+
         return [$office];
     }
 
