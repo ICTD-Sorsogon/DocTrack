@@ -38,7 +38,6 @@ const actions = {
     async removeAuthUser({ commit }) {
         await axios.post('/logout');
         commit('UNSET_AUTH_USER');
-        commit('CLEAR_FORM_REQUEST');
     },
     async getAllUsers({ commit }) {
         await axios.get('/api/all_users')
@@ -98,10 +97,6 @@ const actions = {
             commit('snackbars/SET_SNACKBAR', snackbar);
         });
     },
-    async removeRequestStatus({commit}) {
-        commit('CLEAR_FORM_REQUEST');
-        commit('UNSET_REQUEST_STATUS');
-    },
     async getLogs({ commit }) {
         const response = await axios.get('/api/logs');
         commit('GET_LOGS', response.data);
@@ -114,7 +109,6 @@ const actions = {
             const type = response.data? 'success':'info';
             var color = snackbar_status[type];
             var icon = snackbar_icon[type];
-            console.log(response.data)
             commit('SET_SNACKBAR',
             {
                 showing: true,
@@ -125,8 +119,6 @@ const actions = {
             });
         })
         .catch(error => {
-            // TODO: Display error message
-            // console.log(error.response.data.errors.new_username[0]);
             const type = 'error';
             var color = snackbar_status[type];
             var icon = snackbar_icon[type];
@@ -139,7 +131,6 @@ const actions = {
                 icon : icon
             });
         });
-        // TODO: Call snackbar
     },
 
     async updateUsername({ commit }, form) {
@@ -208,21 +199,8 @@ const mutations = {
         }
     },
     UPDATE_USERNAME: (state, data) => {
-        if (data.response.status == 'success') {
-            state.user.username = data.changes.new_username;
-        }
-        // if(data.response.code == "SUCCESS") {
-        //     state.user.username = data.form.new_username;
-        // }
-        // Snackbar data
-        // state.form_requests.request_form_type = data.form.form_type;
-        // state.form_requests.request_status = data.response.code;
-        // state.form_requests.status_message = data.response.message;
-    },
-    UNSET_REQUEST_STATUS: (state) => {
-        state.form_requests.request_form_type = '';
-        state.form_requests.request_status = '';
-        state.form_requests.status_message = '';
+        state.user.username = data.changes.new_username;
+
     },
     GET_LOGS(state, response) {
         state.logs = response;
