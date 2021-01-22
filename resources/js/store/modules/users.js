@@ -77,63 +77,53 @@ const actions = {
         await axios.post('/api/add_new_user', form)
         .then(response => {
             const data = {
-                form_type: 'new_user',
-                code: 'SUCCESS',
+                status: 'SUCCESS',
                 message: `${form.username} was successfully added!`,
-                response_data: response.data
             }
-            console.log(form)
-            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('SNACKBAR_STATUS', data)
 
         })
         .catch(error => {
             const error_data = {
-                form_type: 'new_user',
-                code: 'FAILED',
+                status: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('SNACKBAR_STATUS', error_data)
         });
     },
     async updateExistingUser({ commit }, form) {
         await axios.post('/api/update_existing_user', form)
         .then(response => {
             const data = {
-                form_type: 'update_user',
-                code: 'SUCCESS',
+                status: 'SUCCESS',
                 message: `${form.username} was successfully updated!`,
-                response_data: response.data
             }
-            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('SNACKBAR_STATUS', data)
         })
         .catch(error => {
             const error_data = {
-                form_type: 'update_user',
-                code: 'FAILED',
+                status: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('SNACKBAR_STATUS', error_data)
         });
     },
     async deleteExistingUser({ commit }, id) {
         await axios.post(`/api/delete_existing_user/${id}`)
         .then(response => {
             const data = {
-                form_type: 'delete_user',
-                code: 'SUCCESS',
+                status: 'SUCCESS',
                 message: `${response.data[0].username} \nwas successfully deleted!`,
-                response_data: response.data
             }
-            commit('snackbars/UPDATE_SNACKBAR_MESSAGE_STATUS', data, { root: true })
+            commit('SNACKBAR_STATUS', data)
         })
         .catch(error => {
             console.log(error);
             const error_data = {
-                form_type: 'delete_user',
-                code: 'FAILED',
+                status: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/THROW_SNACKBAR_SERVER_ERROR', error_data, { root: true })
+            commit('SNACKBAR_STATUS', error_data)
         });
     },
     async editUserCredentials({ commit }, updates) {
@@ -142,7 +132,7 @@ const actions = {
             commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
         } else if(updates.form.form_type == 'account_username') {
             commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
-        } 
+        }
 
         commit('UPDATE_SNACKBAR_MESSAGE_STATUS', {response: response.data, form: updates.form});
     },
