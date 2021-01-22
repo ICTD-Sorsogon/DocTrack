@@ -40,8 +40,14 @@
                 </template>
 
                 <template v-slot:item.actions="{ item }">
-                    <v-icon small class="mr-2" @click="editOffice(item)">mdi-pencil </v-icon>
-                    <v-icon small @click="deleteConfirmationDialog(item)"> mdi-delete </v-icon>
+                    <v-row>
+                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pr-0" style="top:50%; text-align:right;">
+                            <v-icon small @click="editOffice(item)" style="margin-right:4px;">mdi-pencil </v-icon>
+                        </v-col>
+                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pl-0" style="top:50%; text-align:left;">
+                            <v-icon small @click="deleteConfirmationDialog(item)" style="margin-left:4px;"> mdi-delete </v-icon>
+                        </v-col>
+                    </v-row>
                 </template>
 
             </v-data-table>
@@ -115,9 +121,10 @@
                 headers: [
                     { text: 'Office', value: 'name' },
                     { text: 'Office Code', value: 'office_code' },
+                    { text: 'Address', value: 'address' },
                     { text: 'Contact Number', value: 'contact_number' },
-                    { text: 'Contact Email', value: 'contact_email' },
-                    { text: 'Action', value: 'actions' },
+                    { text: 'Email Address', value: 'contact_email' },
+                    { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
                 form_dialog: false,

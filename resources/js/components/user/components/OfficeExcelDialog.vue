@@ -31,12 +31,15 @@
                                 label="Browse Excel File"
                                 prepend-icon="mdi-file-excel"
                                 accept=".csv, .xlsx"
+                                ref="files"
                                 @change="fileSelected"
                                 chips
                                 show-size
                                 counter
                                 outlined
                                 dense
+                                clearable
+                                clear-icon="mdi-delete"
                             />
                            <!-- <span>{{ errors[0] }}</span>
                         </ValidationProvider>-->
@@ -133,6 +136,8 @@
     import XLSX from 'xlsx';
     import { colors } from '../../../constants';
 
+    //var _ = require('lodash');
+
     export default {
         //components: { ValidationProvider, ValidationObserver },
         props: ['excel_dialog', 'dialog_title', 'dialog_for'],
@@ -185,7 +190,8 @@
                     { text: 'Contact Number', value: 'Contact_Number' },
                     { text: 'Email Address', value: 'Email_Address' }
                 ],
-                is_preview: false
+                is_preview: false,
+                offices: []
             }
         },
         computed: {
@@ -201,13 +207,14 @@
                     contact_number: '',
                     contact_email: '',
                     form_mode: ''}
-            }
+            },
 
         },
         methods: {
+            /*hh($event){
+                console.log('clicke', $event);
+            },*/
             uploadToDatabase(){
-
-
 
                 this.btnloading = true;
 
@@ -229,6 +236,14 @@
                                 //this.$refs.observer.reset();
 
                                 this.$store.dispatch('getOffices');
+
+                                var offices = this.$store.state.offices.offices;
+                                this.offices = [];
+                                offices.forEach(office => {
+                                    this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
+                                });
+
+                                //this.$refs.files.reset();
                             });
 
                         } else if(this.request.status == 'failed'){
@@ -280,13 +295,28 @@
             },*/
             fileSelected(file){
 
+
+
                 try {
 
 
                     if (file.name.split(".").pop().toLowerCase() == 'xlsx'){
 
-                        // console.log(this.$store.state.offices.offices);
+                        var offices = this.$store.state.offices.offices;
+                        this.offices = [];
+                        offices.forEach(office => {
+                            this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
+                        });
+
+                        //console.log(this.$store.state.offices.offices);
                         // Object.values(obj.toLowerCase()).includes(v.toLowerCase())
+
+                       // console.log(_.mapValues(excel_data, _.method('toLowerCase')));
+
+                       //var j = this.$store.state.offices.offices;
+                       //console.log(_.mapValues(j, _.method('toLowerCase')));
+
+
 
                         var required_header = [
                             'Office_Name',
@@ -388,6 +418,14 @@
                                                     });
                                                 }
                                             }
+                                            if(R > 0 && C == 0 && this.offices.includes((cell.v).trim().toLowerCase().replace(/\s/g, ''))){
+                                                this.excel_error[1].push({
+                                                    id: this.randomKey(),
+                                                    value: cell.v,
+                                                    message: "already exist in the database",
+                                                    cell_position: this.cellPosition(i, C, R),
+                                                });
+                                            }
                                         }
                                     }
                                     this.excel_data.push({
@@ -402,10 +440,21 @@
                                 ){
                                     this.is_preview = true;
                                     this.valid = true;
+
+                                    var excel_data = {
+                                        name: 'KKK',
+                                        mm: 'JJ',
+                                        LL: 'll'
+                                    }
+
+                                    //console.log(_.mapValues(excel_data, _.method('toLowerCase')));
+
                                 }else{
                                     this.is_preview = false;
                                     this.valid = false;
                                 }
+
+
                                 /*_this.defaultTabSelected();
                                 _this.is_hasfile = true;
                                 _this.is_import = false;*/
@@ -416,6 +465,8 @@
                             //this.excel_data = [];
                             //this.excel_error = [[], []];
                         }
+
+
 
                     }else{
                         this.$store.dispatch('snackbars/setSnackbar', {
