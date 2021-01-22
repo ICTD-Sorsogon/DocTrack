@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\OfficeCreateEvent;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -42,6 +43,10 @@ class OfficeController extends Controller
             throw $error;
         }
         DB::commit();
+
+        $user_id = Auth::user()->id;
+        event(new OfficeCreateEvent($user_id, $request));
+
         return [$office];
     }
 

@@ -47,8 +47,10 @@ class DocumentController extends Controller
             $request->validated()
         );
 
-         $user_id = Auth::user()->id;
-         event(new NewDocumentHasAddedEvent($user_id, $request));
+        if(!$document->id){
+            $user_id = Auth::user()->id;
+            event(new NewDocumentHasAddedEvent($user_id, $request));
+        }
 
         return true;
         /**
