@@ -123,7 +123,7 @@ export default {
         ValidationProvider,
         ValidationObserver
     },
-    computed: mapGetters(["auth_user", "form_requests"]),
+    computed: mapGetters(["auth_user", "request"]),
     data() {
         return {
             dialog: false,

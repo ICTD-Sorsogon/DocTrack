@@ -30,6 +30,7 @@ const getters = {
 
 const actions = {
     setSnackbar({commit}, snackbar) {
+        console.log(snackbar);
         if (snackbar.constructor.toString().indexOf("Object") != -1) {
             const required = {message: '', status: '', title: '', type: ''};
             if (JSON.stringify(Object.keys(snackbar)) === JSON.stringify(Object.keys(required))) {
@@ -44,7 +45,6 @@ const actions = {
                     icon : icon
                 });
             } else {
-                console.log('setSnackbar');
                 commit('SET_SNACKBAR',
                 {
                     showing: true,
