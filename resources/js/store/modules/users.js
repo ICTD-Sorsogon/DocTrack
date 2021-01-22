@@ -15,7 +15,6 @@ function buildName(first_name, middle_name, last_name, suffix) {
 const state = {
     user: {},
     all_users: [],
-    // all_users_complete: [],
     all_users_loading: true,
     user_full_name: '',
     logs: [],
@@ -50,7 +49,6 @@ const actions = {
                     element.last_name,
                     element.suffix
                 );
-                // element.office_name = element.office.name
                 element.gender = element.gender ? "Male" : "Female"
                 element.is_active = element.is_active ? "Active" : "Inactive"
             });
@@ -71,30 +69,57 @@ const actions = {
             });
         });
     },
-    async editUserCredentials({ commit }, updates) {
-        await axios.put(`api/update_user/${updates.id}`, updates.form)
+    async addNewUser({ commit }, form) {
+        await axios.post('/api/add_new_user', form)
         .then(response => {
-            var snackbar = {
-                showing: true,
-                text: response.data.message,
-                color: '',
-                icon: '',
-            };
-            if (response.data.code == 'SUCCESS') {
-                snackbar.color = 'success';
-                snackbar.icon = 'mdi-check-bold';
-            }else {
-                snackbar.color = 'error';
-                snackbar.icon = 'mdi-close-thick';
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.username} was successfully added!`,
             }
-            if(updates.form.form_type == 'account_details') {
-                commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
-            } else if(updates.form.form_type == 'account_username') {
-                commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
-            } else if(updates.form.form_type == 'account_password') {
-                commit('UPDATE_PASSWORD', {response: response.data, form_type: updates.form_type});
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
             }
-            commit('snackbars/SET_SNACKBAR', snackbar);
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
+    async updateExistingUser({ commit }, form) {
+        await axios.post('/api/update_existing_user', form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.username} was successfully updated!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
+    async deleteExistingUser({ commit }, id) {
+        await axios.post(`/api/delete_existing_user/${id}`)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${response.data[0].username} \nwas successfully deleted!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+        })
+        .catch(error => {
+            console.log(error);
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
         });
     },
     async getLogs({ commit }) {
@@ -181,9 +206,6 @@ const mutations = {
     FETCH_ALL_USERS: (state, users) => {
         state.all_users = users;
     },
-    // FETCH_ALL_USERS_COMPLETE: (state, users) => {
-    //     state.all_users_complete = users;
-    // },
     UPDATE_USER_COMPLETE_NAME: (state, data) => {
         if(data.response) {
             state.first_name = data.changes.first_name;

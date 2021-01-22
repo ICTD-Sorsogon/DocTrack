@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class UserController extends Controller
     public function getAllUsers(): Collection
     {
         abort_if(!in_array(auth()->user()->role_id, [1,2]), 403);
-        return User::where('role_id', 2)->with('office')->get();
+        return User::with('office')->get();
     }
 
     public function getAllUserComplete(): Collection
@@ -36,6 +37,81 @@ class UserController extends Controller
         return User::where('role_id', '<>', 1)
             ->with('office', 'division', 'sector', 'unit', 'role')
             ->get();
+    }
+
+    public function addNewUser(Request $request): Array
+    {
+        DB::beginTransaction();
+        try {
+            $user = new User;
+            $user->role_id = $request->role_id;
+            $user->first_name = $request->first_name;
+            $user->middle_name = $request->middle_name;
+            $user->last_name = $request->last_name;
+            $user->suffix = $request->suffix;
+            $user->gender = $request->gender;
+            $user->birthday = $request->birthday;
+            $user->id_number = $request->id_number;
+            $user->office_id = $request->office_id;
+            $user->is_active = $request->is_active;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->save();
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$user];
+    }
+
+    public function updateExistingUser(Request $request): Array
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::find($request->id);
+            $user->role_id = $request->role_id;
+            $user->first_name = $request->first_name;
+            $user->middle_name = $request->middle_name;
+            $user->last_name = $request->last_name;
+            $user->suffix = $request->suffix;
+            $user->gender = $request->gender;
+            $user->birthday = $request->birthday;
+            $user->id_number = $request->id_number;
+            $user->office_id = $request->office_id;
+            $user->is_active = $request->is_active;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->save();
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$user];
+    }
+
+    public function deleteExistingUser (Request $request): Array
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::find($request->id);
+            $user->delete();
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$user];
     }
 
     public function updateFullname(ChangeFullnamePutRequest $request)

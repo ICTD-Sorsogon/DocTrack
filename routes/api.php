@@ -20,7 +20,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('logout', 'LoginController@logout');
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
-        // Route::get('all_users_complete', 'UserController@getAllUserComplete');
+        Route::post('add_new_user', 'UserController@addNewUser');
+        Route::post('update_existing_user', 'UserController@updateExistingUser');
+        Route::post('delete_existing_user/{id}', 'UserController@deleteExistingUser');
         Route::put('update_fullname', 'UserController@updateFullname');
         Route::put('update_username', 'UserController@updateUsername');
         Route::put('update_password', 'UserController@updatePassword');
@@ -34,7 +36,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('add_new_document', 'DocumentController@addNewDocument');
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
-        // Route::get('receive_document/{id}', 'DocumentController@ReceiveDocument');
+        Route::post('receive_document_confirm/{id}', 'DocumentController@receiveDocument');
+        Route::post('forward_document_confirm/{id}', 'DocumentController@forwardDocument');
 
         Route::post('add_new_office', 'OfficeController@addNewOffice');
         Route::post('update_existing_office', 'OfficeController@updateExistingOffice');

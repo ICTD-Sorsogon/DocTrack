@@ -10,6 +10,7 @@
             </v-row>
         </v-card-title>
         <v-card-text>
+            <ValidationObserver ref="observer" v-slot="{ valid }">
             <v-form ref="form">
                 <v-row>
                     <v-col cols="12" xl="12" lg="8" md="12">
@@ -23,7 +24,7 @@
                     </v-col>
                     <v-col cols="12" xl="12" lg="4" md="12">
                          <v-radio-group
-                            v-model="form.is_external"
+                            v-model="selected_document.is_external"
                             row
                             :mandatory="true"
                             label="Origin: "
@@ -46,7 +47,7 @@
                 <v-row>
                     <v-col cols="12" xl="6" lg="6" md="6">
                             <v-combobox
-                                v-model="selected_document.origin_office.name"
+                                v-model="selected_document.originating_office"
                                 item-text="name"
                                 hide-selected
                                 outlined
@@ -57,7 +58,7 @@
                     </v-col>
                     <v-col cols="12" xl="6" lg="6" md="6">
                         <v-text-field
-                            v-model="selected_document.sender.name"
+                            v-model="selected_document.sender_name"
                             label="Sender Name"
                             prepend-inner-icon="mdi-account-arrow-right-outline"
                             outlined
@@ -102,23 +103,12 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker
-                                v-model="form.date_filed"
-                                scrollable
-                            >
+                            <v-date-picker v-model="form.date_filed" scrollable>
                                 <v-spacer></v-spacer>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="datepicker_modal = false"
-                                >
+                                <v-btn text color="primary" @click="datepicker_modal = false">
                                     Cancel
                                 </v-btn>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="$refs.date_dialog.save(form.date_filed)"
-                                >
+                                <v-btn text color="primary" @click="$refs.date_dialog.save(form.date_filed)">
                                     OK
                                 </v-btn>
                             </v-date-picker>
@@ -144,78 +134,96 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-time-picker
-                                v-if="timepicker_modal"
-                                v-model="form.time_filed"
-                                full-width
-                            >
+                            <v-time-picker v-if="timepicker_modal" v-model="form.time_filed" full-width>
                                 <v-spacer></v-spacer>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="timepicker_modal = false"
-                                >
+                                <v-btn text color="primary" @click="timepicker_modal = false">
                                     Cancel
                                 </v-btn>
-                                <v-btn
-                                    text
-                                    color="primary"
-                                    @click="$refs.time_dialog.save(form.time_filed)"
-                                >
+                                <v-btn text color="primary" @click="$refs.time_dialog.save(form.time_filed)">
                                     OK
                                 </v-btn>
                             </v-time-picker>
                         </v-dialog>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="12" md="12">
-                        <v-combobox
+                    <v-col cols="12" xl="12" lg="6" md="6">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
                             v-if="types=='forward'"
-                            v-model="sampleItems[1]"
+                            v-model="form.forwarded_by"
+                            :items="offices"
                             item-text="name"
-                            clearable
-                            hide-selected
+                            item-value="id"
+                            label="Forwarded by"
                             outlined
-                            persistent-hint
-                            label="To"
-                            prepend-inner-icon="mdi-office-building-marker-outline"
+                            prepend-inner-icon="mdi-office-building-outline"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
                             required
-                        ></v-combobox>
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
+                         </ValidationProvider>
+                    </v-col>
+                     <v-col cols="12" xl="12" lg="6" md="6">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
+                            v-if="types=='forward'"
+                            v-model="form.forwarded_to"
+                            :items="offices"
+                            item-text="name"
+                            item-value="id"
+                            label="Forwarded to"
+                            outlined
+                            prepend-inner-icon="mdi-office-building-marker-outline"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
+                            required
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
+                         </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
-                        <v-combobox
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
                             v-if="['forward', 'receive'].includes(types)"
-                            v-model="sampleItems[0]"
-                            item-text="name"
-                            hide-selected
-                            outlined
-                            persistent-hint
+                            v-model="form.through"
+                            :items="coming_from"
+                            item-text="show"
+                            item-value="value"
                             label="Through"
                             prepend-inner-icon="mdi-office-building-marker-outline"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
                             required
-                        ></v-combobox>
+                            outlined
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
+                        </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-textarea
                             outlined
                             auto-grow
                             clear-icon="mdi-close-circle"
                             prepend-inner-icon="mdi-comment-text-outline"
-                            label="Remarks"
-                            v-model="form.remarks"
+                            label="Remarks*"
+                            v-model="form.documentRemarks"
+                            required
+                            :error-messages="errors"
+                            :success="valid"
                         ></v-textarea>
+                        </ValidationProvider>
                     </v-col>
-                    <v-col>
-                        <div
-                            class="my-2"
-                            align="center"
-                            justify="end"
-                        >
+                    <v-col cols="12" xl="12" lg="12" md="12">
+                        <div class="my-2" align="center" justify="end">
                             <v-btn
-                                    v-if="types=='receive'"
-                                    color="primary"
-                                    :loading="loading_create_new_document"
-                                    @click="button_loader = 'loading_create_new_document'"
-                                    type="submit"
+                                v-if="types=='receive'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="valid"
+                                :disabled="!valid"
                                 >
                                     <v-icon left dark>
                                         mdi-email-receive-outline
@@ -225,33 +233,84 @@
                             <v-btn
                                 v-if="types=='forward'"
                                 color="primary"
-                                :loading="loading_create_new_document"
-                                @click="button_loader = 'loading_create_new_document'"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
                                 type="submit"
-                            >
-                                <v-icon left dark>
-                                    mdi-email-send-outline
-                                </v-icon>
-                                Forward
+                                :dark="valid"
+                                :disabled="!valid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-send-outline
+                                    </v-icon>
+                                    Forward
                             </v-btn>
                              <v-btn
                                 v-if="types=='terminal'"
                                 color="primary"
-                                :loading="loading_create_new_document"
-                                @click="button_loader = 'loading_create_new_document'"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
                                 type="submit"
-                            >
-                                <v-icon left dark>
-                                    mdi-email-off-outline
-                                </v-icon>
-                                Terminate
+                                :dark="valid"
+                                :disabled="!valid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-off-outline
+                                    </v-icon>
+                                    Terminate
                             </v-btn>
+                            <v-btn
+                                v-if="types=='acknowledge'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="valid"
+                                :disabled="!valid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-check-outline
+                                    </v-icon>
+                                    Acknowledge
+                            </v-btn>
+
                         </div>
                     </v-col>
-
                 </v-row>
             </v-form>
+            </ValidationObserver>
         </v-card-text>
+
+        <v-row justify="center">
+            <v-dialog v-model="documentDialog" persistent max-width="450px">
+                <v-card color="grey lighten-2">
+                    <v-card-title class="headline">
+                        <v-icon class="mr-2" size="30px">mdi-information</v-icon> {{ $route.params.type.replace(/\w/, val=>val.toUpperCase()) }} Document
+                    </v-card-title>
+                    <v-card-text>
+                        Are you sure you want to {{ $route.params.type.replace(/\w/, val=>val) }} this document? <br> <strong>- {{ selected_document.subject }}</strong>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary darken-1" text @click="documentDialog = false">
+                            Cancel
+                        </v-btn>
+                        <v-btn v-if="types=='receive'" color="primary darken-1" text @click.prevent="receiveDocumentConfirm">
+                            Receive
+                        </v-btn>
+                        <v-btn v-if="types=='forward'" color="primary darken-1" text @click.prevent="forwardDocumentConfirm">
+                            Forward
+                        </v-btn>
+                        <v-btn v-if="types=='terminal'" color="primary darken-1" text @click.prevent="terminateDocumentConfirm">
+                            Terminate
+                        </v-btn>
+                         <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
+                            Acknowledge
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+        </v-row>
+
     </v-card>
 </template>
 
@@ -264,37 +323,67 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['find_document']),
+        ...mapGetters(['find_document' , 'documents' , 'find_document']),
         types() {
-            return this.$store.state.documents.types;
+            return this.$route.params.type;
         },
         selected_document() {
-            return this.find_document(this.$route.params.id)
-        }
+                return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+				doc.is_external = doc.is_external ? 'External' : 'Internal'
+				doc.sender_name = doc.sender?.name ?? doc.sender_name
+				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+				return doc
+			}).find(doc => doc.id == this.$route.params.id)
+        },
+        request(){
+            return this.$store.state.snackbars.request;
+        },
+        offices() {
+            return this.$store.state.offices.offices;
+        },
+    },
+    watch: {
+        documentDialog (val) {
+            val || this.closeDocumentDialog()
+        },
     },
     data() {
         return {
-            button_loader: null,
-            loading_create_new_document: false,
+            btnloading: false,
             datepicker_modal: false,
             timepicker_modal: false,
-            status: ['Sample', 'Sample2'],
-            action: ['Sample3', 'Sample4'],
+            documentDialog: false,
+            coming_from: [
+                { show: 'Docket Office', value: 'docket office' },
+                { show: 'Email', value: 'email' },
+                { show: 'Personal', value: 'personal' },
+                { show: 'Others', value: 'others' }
+            ],
             temp: {
                 sample_data: 'sample'
             },
             form: {
-                subject: '',
-                is_external: false,
-                originating_office: '',
-                sender: {},
-                page_count: '',
-                attachment_page_count: '',
-                date_filed: '',
-                time_filed: '',
-                remarks: ''
+                document_id: '',
+                action: '',
+                touched_by: '',
+                last_touched: '',
+                through: '',
+                documentRemarks: '',
+                forwarded_by: '',
+                forwarded_to: '',
+                status: ''
             },
-            sampleItems: ['Docketing Office', 'Forward to Office']
+            defaultItem: {
+                document_id: '',
+                action: '',
+                touched_by: '',
+                last_touched: '',
+                through: '',
+                documentRemarks: '',
+                forwarded_by: '',
+                forwarded_to: '',
+                status: ''
+            }
         }
     },
     methods: {
@@ -304,8 +393,71 @@ export default {
                 this.$router.push({ name: "All Active Documents"});
             }
         },
+        showDocumentDialog() {
+            this.documentDialog = true
+        },
+        closeDocumentDialog () {
+            this.documentDialog = false
+        },
+        receiveDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("receiveDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.form_requests.request_status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
+        forwardDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("forwardDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.form_requests.request_status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
+        terminateDocumentConfirm() {
+
+        },
+        acknowledgeDocumentConfirm() {
+
+        }
     },
     mounted() {
+        // console.log(this.selected_document)
+        this.$store.dispatch('unsetLoader');
+        this.form = this.find_document(this.$route.params.id);
     }
 
 }

@@ -7,6 +7,8 @@ const state = {
     document_type_loading: false,
     selected_document: {},
     id: '',
+
+
 }
 
 const getters = {
@@ -56,6 +58,42 @@ const actions = {
                 message: `The server replied with an error! Please Contact your administrator\nException Type : ${error.response.data.exception}`
             }
             commit('SNACKBAR_STATUS', res)
+        });
+    },
+    async receiveDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/receive_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was successfully received!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
+    async forwardDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/forward_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was successfully forwarded!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
         });
     },
     async setDocument({ commit }, document) {
