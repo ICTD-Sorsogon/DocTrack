@@ -46,7 +46,7 @@ class UserController extends Controller
         $user->last_name=$request->last_name;
         $user->suffix=$request->name_suffix;
         $user->save();
-        $response = $user->wasChanged() ? 'Changed' : 'No changes were made';
+        $response = $user->wasChanged();
         return $response;
     }
 

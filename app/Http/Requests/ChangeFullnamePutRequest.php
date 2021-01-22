@@ -25,9 +25,10 @@ class ChangeFullnamePutRequest extends FormRequest
     public function rules()
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:80',
+            'middle_name' => 'required|string|max:80',
+            'last_name' => 'required|string|max:80',
+            'name_suffix' => 'string|max:20',
         ];
     }
 }

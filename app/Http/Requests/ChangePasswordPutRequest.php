@@ -25,9 +25,9 @@ class ChangePasswordPutRequest extends FormRequest
     public function rules()
     {
         return [
-            'old_password' => 'required|string|max:255',
-            'new_password' => 'required|string|confirmed|max:255',
-            'new_password_confirmation' => 'required|string|max:255',
+            'old_password' => 'required|string|max:191',
+            'new_password' => 'required|string|confirmed|max:191',
+            'new_password_confirmation' => 'required|string|max:191',
         ];
     }
 }

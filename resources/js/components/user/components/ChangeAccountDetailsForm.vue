@@ -106,8 +106,8 @@ export default {
             if(isValid) {
                 this.$store.dispatch('updateFullname', this.name_form)
                 .then(() => {
-                    this.$refs.form.reset();
-                    this.$refs.observer.reset();
+                    // this.$refs.form.reset();
+                    // this.$refs.observer.reset();
                     this[this.loader] = false
                     this.loader = null;
                 });

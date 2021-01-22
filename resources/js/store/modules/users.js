@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { snackbar_status, snackbar_icon } from './../../constants';
 
 function buildName(first_name, middle_name, last_name, suffix) {
     var f_name = '', m_name = '',l_name = '',s_name = '';
@@ -110,10 +111,33 @@ const actions = {
         const response = await axios.put('api/update_fullname', form)
         .then(response => {
             commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, changes: form});
+            const type = response.data? 'success':'info';
+            var color = snackbar_status[type];
+            var icon = snackbar_icon[type];
+            console.log(response.data)
+            commit('SET_SNACKBAR',
+            {
+                showing: true,
+                title: type === 'info'? 'Update failed':'Update success',
+                text: response.data? 'User fullname updated':'No changes were made',
+                color: color,
+                icon : icon
+            });
         })
         .catch(error => {
             // TODO: Display error message
             // console.log(error.response.data.errors.new_username[0]);
+            const type = 'error';
+            var color = snackbar_status[type];
+            var icon = snackbar_icon[type];
+            commit('SET_SNACKBAR',
+            {
+                showing: true,
+                title: error.response.data.message,
+                text: error.response.data.errors,
+                color: color,
+                icon : icon
+            });
         });
         // TODO: Call snackbar
     },
@@ -171,16 +195,16 @@ const mutations = {
     //     state.all_users_complete = users;
     // },
     UPDATE_USER_COMPLETE_NAME: (state, data) => {
-        if(data.response.code == "SUCCESS") {
-            state.first_name = data.form.first_name;
-            state.middle_name = data.form.middle_name;
-            state.last_name = data.form.last_name;
-            state.suffix = data.form.name_suffix;
+        if(data.response) {
+            state.first_name = data.changes.first_name;
+            state.middle_name = data.changes.middle_name;
+            state.last_name = data.changes.last_name;
+            state.suffix = data.changes.name_suffix;
             state.user_full_name = buildName(
-                data.form.first_name,
-                data.form.middle_name,
-                data.form.last_name,
-                data.form.name_suffix
+                data.changes.first_name,
+                data.changes.middle_name,
+                data.changes.last_name,
+                data.changes.name_suffix
             );
         }
     },
