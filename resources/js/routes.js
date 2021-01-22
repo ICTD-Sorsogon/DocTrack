@@ -35,7 +35,6 @@ export default {
                 axios.get('api/authenticated').then((response) => {
                     next({name: 'All Active Documents' })
                 }).then(()=>{}).catch((error) => {
-                    console.log(error)
                     return next()
                 });
             },
