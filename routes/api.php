@@ -34,6 +34,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('add_new_document', 'DocumentController@addNewDocument');
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
+        Route::post('receive_document_confirm/{id}', 'DocumentController@receiveDocument');
+        Route::post('forward_document_confirm/{id}', 'DocumentController@forwardDocument');
         // Route::get('receive_document/{id}', 'DocumentController@ReceiveDocument');
 
         Route::post('add_new_office', 'OfficeController@addNewOffice');
