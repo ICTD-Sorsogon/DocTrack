@@ -7,7 +7,6 @@
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
 		item-key="id"
-		hide-default-footer
 		:loading="datatable_loader"
 		loading-text="Loading... Please wait"
 		class="elevation-1"
@@ -96,12 +95,12 @@
 			</td>
 		</template>
 	</v-data-table>
-	<div class="text-center pt-2">
+	<!-- <div class="text-center pt-2">
 		<v-pagination
 			v-model="page"
 			:length="pageCount"
 		></v-pagination>
-	</div>
+	</div> -->
 	<table-modal
 		@closeDialog="closeDialog"
         :dialog="dialog"
