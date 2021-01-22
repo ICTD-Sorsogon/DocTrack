@@ -13,15 +13,21 @@ use Illuminate\Queue\SerializesModels;
 class OfficeUpdateEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
+    
+    public $user_id;
+    public $request_obj;
+    public $old_values;
+    
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user_id, $request_obj, $old_values)
     {
-        //
+        $this->user_id = $user_id;
+        $this->request_obj = $request_obj;
+        $this->old_values = $old_values;
     }
 
     /**

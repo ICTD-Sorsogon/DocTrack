@@ -125,19 +125,18 @@ export default {
               new_values: '',
               action: 0,
               table_name: 0,
-              item_id: 0,
+              remarks: '',
             },
             final_data: [],
             defaultItem: {
               action: 0,
               table_name: 0,
-              item_id: 0,
+              remarks: 0,
             },
             headers: [
                 { text: 'Username', value: 'user.username' },
                 { text: 'Action', value: 'action' },
-                { text: 'Table Name', value: 'table_name' },
-                { text: 'Item ID', value: 'item_id' },
+                { text: 'Remarks', value: 'remarks' },
                 { text: 'View More', value: 'actions', sortable: false },
             ],
             headers2: [
@@ -161,8 +160,7 @@ export default {
           this.export_excel.push({
             Username: log.user.username,
             Action: log.action,
-            Table_Name: log.table_name,
-            Item_ID: log.item_id,
+            Remarks: log.remarks,
             New_Values: log.new_values,
             Old_Values: log.original_values,
           })

@@ -19,8 +19,8 @@ class CreateLogsTable extends Migration
             $table->string('action', 50);
             $table->longText('remarks');
             // $table->unsignedBigInteger('item_id')->nullable();
-            // $table->longText('original_values')->nullable();
-            // $table->longText('new_values')->nullable();
+            $table->longText('original_values')->nullable();
+            $table->longText('new_values')->nullable();
             $table->timestamps();
         });
     }

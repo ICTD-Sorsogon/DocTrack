@@ -14,14 +14,18 @@ class OfficeDeleteEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $user_id;
+    public $office;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user_id, $office)
     {
-        //
+        $this->user_id = $user_id;
+        $this->office = $office;
     }
 
     /**
