@@ -41,8 +41,8 @@
 		</template>
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
-				<v-row>
-					<v-col v-if="isEditable(item.originating_office)" cols="12" sm="3">
+				<v-row class="d-flex justify-space-around">
+					<v-col v-if="isEditable(item.originating_office)">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -55,7 +55,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col cols="12" sm="3">
+					<v-col>
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
@@ -64,7 +64,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col cols="12" sm="3">
+					<v-col>
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
@@ -74,13 +74,22 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col cols="12" sm="3">
+					<v-col>
 						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
 								mdi-email-off-outline
 							</v-icon>
 							Terminal
+						</v-btn>
+					</v-col>
+                    <v-col>
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'acknowledge')" text color="#4CAF50" block
+						>
+							<v-icon left>
+								mdi-email-check-outline
+							</v-icon>
+							Acknowledge
 						</v-btn>
 					</v-col>
 				</v-row>
