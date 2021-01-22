@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { snackbar_status, snackbar_icon } from './../../constants';
 
 function buildName(first_name, middle_name, last_name, suffix) {
     var f_name = '', m_name = '',l_name = '',s_name = '';
@@ -72,14 +73,30 @@ const actions = {
         });
     },
     async editUserCredentials({ commit }, updates) {
-        const response = await axios.put(`update_user/${updates.id}`, updates.form);
-        if(updates.form.form_type == 'account_details') {
-            commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
-        } else if(updates.form.form_type == 'account_username') {
-            commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
-        } 
-
-        commit('UPDATE_SNACKBAR_MESSAGE_STATUS', {response: response.data, form: updates.form});
+        await axios.put(`api/update_user/${updates.id}`, updates.form)
+        .then(response => {
+            var snackbar = {
+                showing: true,
+                text: response.data.message,
+                color: '',
+                icon: '',
+            };
+            if (response.data.code == 'SUCCESS') {
+                snackbar.color = 'success';
+                snackbar.icon = 'mdi-check-bold';
+            }else {
+                snackbar.color = 'error';
+                snackbar.icon = 'mdi-close-thick';
+            }
+            if(updates.form.form_type == 'account_details') {
+                commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, form: updates.form});
+            } else if(updates.form.form_type == 'account_username') {
+                commit('UPDATE_USERNAME', {response: response.data, form: updates.form});
+            } else if(updates.form.form_type == 'account_password') {
+                commit('UPDATE_PASSWORD', {response: response.data, form_type: updates.form_type});
+            }
+            commit('snackbars/SET_SNACKBAR', snackbar);
+        });
     },
     async removeRequestStatus({commit}) {
         commit('CLEAR_FORM_REQUEST');
@@ -89,12 +106,80 @@ const actions = {
         const response = await axios.get('/api/logs');
         commit('GET_LOGS', response.data);
     },
+
+    async updateFullname({ commit }, form) {
+        const response = await axios.put('api/update_fullname', form)
+        .then(response => {
+            commit('UPDATE_USER_COMPLETE_NAME', {response: response.data, changes: form});
+            const type = response.data? 'success':'info';
+            var color = snackbar_status[type];
+            var icon = snackbar_icon[type];
+            console.log(response.data)
+            commit('SET_SNACKBAR',
+            {
+                showing: true,
+                title: type === 'info'? 'Update failed':'Update success',
+                text: response.data? 'User fullname updated':'No changes were made',
+                color: color,
+                icon : icon
+            });
+        })
+        .catch(error => {
+            // TODO: Display error message
+            // console.log(error.response.data.errors.new_username[0]);
+            const type = 'error';
+            var color = snackbar_status[type];
+            var icon = snackbar_icon[type];
+            commit('SET_SNACKBAR',
+            {
+                showing: true,
+                title: error.response.data.message,
+                text: error.response.data.errors,
+                color: color,
+                icon : icon
+            });
+        });
+        // TODO: Call snackbar
+    },
+
+    async updateUsername({ commit }, form) {
+        await axios.put('api/update_username', form)
+        .then(response => {
+            commit('UPDATE_USERNAME', {response: response.data, changes: form});
+            commit('SNACKBAR_STATUS', response.data);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
+    async updatePassword({ commit }, form) {
+        await axios.put('api/update_password', form)
+        .then(response => {
+            commit('SNACKBAR_STATUS', response.data);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    }
 }
 
 const mutations = {
     SET_AUTH_USER: (state, user) => {
         state.user = user
-        // state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
+        state.user_full_name = buildName(user.first_name, user.middle_name, user.last_name, user.suffix);
         state.username = user.username;
     },
     UNSET_AUTH_USER: (state) => {
@@ -109,23 +194,35 @@ const mutations = {
     //     state.all_users_complete = users;
     // },
     UPDATE_USER_COMPLETE_NAME: (state, data) => {
-        if(data.response.code == "SUCCESS") {
-            state.first_name = data.form.first_name;
-            state.middle_name = data.form.middle_name;
-            state.last_name = data.form.last_name;
-            state.suffix = data.form.name_suffix;
+        if(data.response) {
+            state.first_name = data.changes.first_name;
+            state.middle_name = data.changes.middle_name;
+            state.last_name = data.changes.last_name;
+            state.suffix = data.changes.name_suffix;
             state.user_full_name = buildName(
-                data.form.first_name,
-                data.form.middle_name,
-                data.form.last_name,
-                data.form.name_suffix
+                data.changes.first_name,
+                data.changes.middle_name,
+                data.changes.last_name,
+                data.changes.name_suffix
             );
         }
     },
     UPDATE_USERNAME: (state, data) => {
-        if(data.response.code == "SUCCESS") {
-            state.user.username = data.form.new_username;
+        if (data.response.status == 'success') {
+            state.user.username = data.changes.new_username;
         }
+        // if(data.response.code == "SUCCESS") {
+        //     state.user.username = data.form.new_username;
+        // }
+        // Snackbar data
+        // state.form_requests.request_form_type = data.form.form_type;
+        // state.form_requests.request_status = data.response.code;
+        // state.form_requests.status_message = data.response.message;
+    },
+    UNSET_REQUEST_STATUS: (state) => {
+        state.form_requests.request_form_type = '';
+        state.form_requests.request_status = '';
+        state.form_requests.status_message = '';
     },
     GET_LOGS(state, response) {
         state.logs = response;
