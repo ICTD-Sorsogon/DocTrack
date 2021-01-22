@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
 export default {
     computed: mapGetters(["auth_user", "form_requests"]),
@@ -93,43 +93,33 @@ export default {
                 middle_name: '',
                 last_name: '',
                 name_suffix: '' ,
+                id : ''
             },
             loader: null,
             loading_edit_details: false,
         }
     },
     methods: {
-        ...mapActions(["editUserCredentials"]),
         updateAccountDetails() {
             this[this.loader] = !this[this.loader];
             const isValid = this.$refs.observer.validate();
             if(isValid) {
-                this.editUserCredentials({
-                    id: this.auth_user.id,
-                    form: this.name_form
-                }).then(() => {
-                    if(this.form_requests.request_status == "SUCCESS") {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#43A047',
-                            icon: 'mdi-check-bold',
-                        });
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
-                    }else {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
-                        });
-                    }
+                this.$store.dispatch('updateFullname', this.name_form)
+                .then(() => {
                     this[this.loader] = false
                     this.loader = null;
                 });
             }
+
         }
+    },
+    mounted(){
+        this.name_form.first_name = this.$store.state.users.user.first_name;
+        this.name_form.middle_name = this.$store.state.users.user.middle_name;
+        this.name_form.last_name = this.$store.state.users.user.last_name;
+        this.name_form.name_suffix = this.$store.state.users.user.name_suffix;
+        this.name_form.id = this.$store.state.users.user.id;
+        console.log(this.$store.state.users.user)
     }
 }
 </script>

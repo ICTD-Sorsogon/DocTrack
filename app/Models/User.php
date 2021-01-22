@@ -20,8 +20,7 @@ class User extends Authenticatable
     protected $guarded = [
         'username', 'password', 'first_name', 'middle_name',
         'last_name', 'suffix', 'gender', 'birthday',
-        'id_number', 'office_id', 'division_id', 'unit_id',
-        'sector_id', 'is_active'
+        'id_number', 'office_id', 'is_active'
     ];
 
     /**
