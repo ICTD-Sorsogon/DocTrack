@@ -45,9 +45,9 @@
                         left
                         dark
                     >
-                        mdi-home
+                        mdi-keyboard-backspace
                     </v-icon>
-                    Back to Home
+                    Back
                 </v-btn>
             </v-col>
         </v-row>
