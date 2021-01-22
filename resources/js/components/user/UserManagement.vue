@@ -232,6 +232,21 @@ import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
 
 export default {
     components: { ValidationProvider, ValidationObserver },
+    computed: {
+
+        offices() {
+            return this.$store.state.offices.offices;
+        },
+        users() {
+            return this.$store.state.users.all_users;
+        },
+        formTitle () {
+            return this.editedIndex === -1 ? 'Add User' : 'Edit User'
+        },
+        request(){
+            return this.$store.state.snackbars.request;
+        }
+    },
     data(){
         return {
             headers: [
@@ -290,21 +305,6 @@ export default {
             val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
         },
     },
-    computed: {
-
-        offices() {
-            return this.$store.state.offices.offices;
-        },
-        users() {
-            return this.$store.state.users.all_users;
-        },
-        formTitle () {
-            return this.editedIndex === -1 ? 'Add User' : 'Edit User'
-        },
-        form_requests(){
-            return this.$store.state.snackbars.form_requests;
-        }
-    },
     methods: {
         editUser (item) {
             this.editedIndex = this.users.indexOf(item)
@@ -338,24 +338,20 @@ export default {
             if (this.editedIndex > -1) { //edit
                 this.btnloading = true;
                     this.$store.dispatch('updateExistingUser', this.form).then(() => {
-                        if(this.form_requests.request_status == 'SUCCESS') {
-                            this.$store.dispatch('snackbars/setSnackbar', {
-                                showing: true,
-                                text: this.form_requests.status_message,
-                                color: '#43A047',
-                                icon: 'mdi-check-bold',
+                        if(this.request.status == 'SUCCESS') {
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'success',
+                                message: this.request.message,
                             })
                             .then(() => {
                                 Object.assign(this.defaultItem, this.form)
                                 this.btnloading = false;
                                 this.$store.dispatch('getAllUsers');
                             });
-                        } else {
-                            this.$store.dispatch('snackbars/setSnackbar', {
-                                showing: true,
-                                text: this.form_requests.status_message,
-                                color: '#D32F2F',
-                                icon: 'mdi-close-thick',
+                        } else if(this.request.status == 'FAILED') {
+                            this.$store.dispatch('setSnackbar', {
+                                type: 'error',
+                                message: this.request.message,
                             })
                             .then(() => {
                                 this.btnloading = false;
@@ -365,12 +361,10 @@ export default {
             } else { //add
                 this.btnloading = true;
                 this.$store.dispatch("addNewUser", this.form).then(() => {
-                    if(this.form_requests.request_status == 'SUCCESS') {
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#43A047',
-                            icon: 'mdi-check-bold',
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
                         })
 
                         .then(() => {
@@ -379,12 +373,10 @@ export default {
                             this.$refs.observer.reset();
                             this.$store.dispatch('getAllUsers');
                         });
-                    } else {
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
+                    } else if (this.form_requests.request_status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
                         })
                         .then(() => {
                             this.btnloading = false;
@@ -396,22 +388,18 @@ export default {
         },
         deleteExistingUser(){
                 this.$store.dispatch('deleteExistingUser', this.form.id).then(() => {
-                    if(this.form_requests.request_status == 'SUCCESS') {
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#43A047',
-                            icon: 'mdi-check-bold',
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'success',
+                            message: this.request.message,
                         })
                         .then(() => {
                             this.$store.dispatch('getAllUsers');
                         });
-                    } else {
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
+                    } else if (this.request.status == 'FAILED')  {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'success',
+                            message: this.request.message,
                         })
                         .then(() => { });
                     }
