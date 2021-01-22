@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use DB;
 use App\Models\Document;
+use App\Models\Log;
 use App\Models\TrackingRecord;
 use App\Models\User;
 
@@ -40,6 +41,10 @@ class DocumentsTableSeeder extends Seeder
                             'document_id' => $persistDocument->id,
                             'touched_by' => $user->id
                         ]);
+
+                    Log::factory()->create([
+                            'user_id' => $user->id,
+                        ]);
                 }
             }
             for ($i = 0; $i < 10; $i++) {
@@ -62,6 +67,10 @@ class DocumentsTableSeeder extends Seeder
                         'touched_by' => $user->id
                     ]
                 );
+
+                Log::factory()->create([
+                        'user_id' => $user->id,
+                    ]);
             }
         }
     }
