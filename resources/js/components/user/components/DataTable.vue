@@ -24,7 +24,7 @@
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip @click=" {selectDoc(item.id); printDialog = true}" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
 		</template>
@@ -33,7 +33,7 @@
 				<v-btn
 					color="primary"
 					icon
-					@click.prevent="selectDoc(item.id)"
+					@click.prevent="{selectDoc(item.id); dialog = true}"
 				>
 					<v-icon>mdi-more</v-icon>
 				</v-btn>
@@ -99,6 +99,9 @@
         v-if="selected_document"
         :selected_document="selected_document"
     ></table-modal>
+	<print-bar-code :code="selected_document" @closePrintDialog="closePrintDialog" :printDialog="printDialog">
+
+	</print-bar-code>
 </v-card-text>
 </template>
 
@@ -106,12 +109,14 @@
 import TableModal from './TableModal';
 import { colors } from '../../../constants';
 import {mapGetters} from 'vuex'
+import PrintBarCode from './PrintBarCode'
 
 export default {
-	components: {TableModal},
+	components: {TableModal, PrintBarCode},
 	props: ['documents', 'datatable_loader'],
 	data() {
 		return {
+			printDialog: false,
 			activeDoc: null,
 			search: '',
             page: 1,
@@ -153,12 +158,14 @@ export default {
 		}
 	},
 	methods: {
+		closePrintDialog(){
+			this.printDialog = false
+		},
 		closeDialog(){
 			this.dialog = false
 		},
 		selectDoc(id){
 			this.activeDoc = id
-			this.dialog = true
 		},
         redirectToReceivePage(id, type) {
             /**
