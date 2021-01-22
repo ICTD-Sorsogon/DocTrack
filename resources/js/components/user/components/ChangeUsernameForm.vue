@@ -28,7 +28,7 @@
                     >
                         <v-text-field
                             outlined
-                            v-model="username_form.confirm_username"
+                            v-model="username_form.new_username_confirmation"
                             label="Confirm New Username"
                             :error-messages="errors"
                             :success="valid"
@@ -100,44 +100,29 @@ export default {
         ValidationProvider,
         ValidationObserver
     },
-    computed: mapGetters(["auth_user", "form_requests"]),
+    computed: mapGetters(["auth_user", "request"]),
     data() {
         return {
             dialog: false,
             username_form: {
                 form_type: 'account_username',
                 new_username: '',
-                confirm_username: '',
+                new_username_confirmation: '',
             },
             loader: null,
             loading_edit_username: false,
         }
     },
     methods: {
-        ...mapActions(["editUserCredentials"]),
         editUsernameHandler() {
             const isValid = this.$refs.observer.validate();
             if(isValid) {
-                this.editUserCredentials({
-                    id: this.auth_user.id,
-                    form: this.username_form
-                }).then(() => {
-                    if(this.form_requests.request_status == "SUCCESS") {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#43A047',
-                            icon: 'mdi-check-bold',
-                        });
+                this.$store.dispatch('updateUsername', this.username_form)
+                .then(()=> {
+                    this.$store.dispatch('setSnackbar', this.request);
+                    if (this.request.type !=  'error') {
                         this.$refs.form.reset();
                         this.$refs.observer.reset();
-                    } else {
-                        this.$store.dispatch('setSnackbar', {
-                            showing: true,
-                            text: this.form_requests.status_message,
-                            color: '#D32F2F',
-                            icon: 'mdi-close-thick',
-                        });
                     }
                     this.dialog = false;
                 });
