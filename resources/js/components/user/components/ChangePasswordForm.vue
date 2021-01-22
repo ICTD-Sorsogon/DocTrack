@@ -143,12 +143,10 @@ export default {
             const isValid = this.$refs.observer.validate();
             if(isValid) {
                 this.$store.dispatch('updatePassword', this.password_form)
-                .then(() => {
-                    // TODO: Call this lines when snackbar shows success message
-                    // if(this.form_requests_status.request_status == "SUCCESS") {
-                    //     this.$refs.form.reset();
-                    //     this.$refs.observer.reset();
-                    // }
+                .then(()=> {
+                    this.$store.dispatch('setSnackbar', this.request);
+                    this.$refs.form.reset();
+                    this.$refs.observer.reset();
                     this.dialog = false;
                 });
             }

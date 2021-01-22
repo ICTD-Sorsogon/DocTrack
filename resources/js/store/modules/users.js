@@ -149,12 +149,11 @@ const actions = {
             commit('SNACKBAR_STATUS', response.data);
         })
         .catch(error => {
-            console.log(error.response.data.errors);
             var snackbar_error ={
-                title: error.response.data.message,
-                type: 'error',
+                message: error.response.data.errors,
                 status: 'error',
-                message: error.response.data.errors
+                title: error.response.data.message,
+                type: 'error'
             };
             commit('SNACKBAR_STATUS', snackbar_error);
         });
@@ -167,10 +166,10 @@ const actions = {
         })
         .catch(error => {
             var snackbar_error ={
-                title: error.response.data.message,
-                type: 'error',
+                message: error.response.data.errors,
                 status: 'error',
-                message: error.response.data.errors
+                title: error.response.data.message,
+                type: 'error'
             };
             commit('SNACKBAR_STATUS', snackbar_error);
         });
