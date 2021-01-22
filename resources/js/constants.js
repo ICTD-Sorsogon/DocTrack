@@ -9,6 +9,7 @@ export const actions = [
     {'code': 11, 'value': 'receive'},
     {'code': 12, 'value': 'forward'},
     {'code': 13, 'value': 'terminate'},
+    {'code': 14, 'value': 'acknowledge'},
 ];
 
 export const status = [
