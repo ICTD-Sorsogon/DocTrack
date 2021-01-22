@@ -9,6 +9,7 @@ export const actions = [
     {'code': 11, 'value': 'receive'},
     {'code': 12, 'value': 'forward'},
     {'code': 13, 'value': 'terminate'},
+    {'code': 14, 'value': 'acknowledge'},
 ];
 
 export const status = [
@@ -51,3 +52,17 @@ export const colors = [
     '#455A64',
     '#424242'
 ];
+
+export const snackbar_status = {
+    success: '#5BB55E',
+    info: '#359FF4',
+    warning: '#FFA117',
+    error: '#F45448'
+};
+
+export const snackbar_icon = {
+    success: 'mdi-check-bold',
+    info: 'mdi-information-outline',
+    warning: 'mdi-exclamation-thick',
+    error: 'mdi-close-thick'
+};
