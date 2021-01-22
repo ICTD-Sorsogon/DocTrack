@@ -24,8 +24,11 @@
     },
     "dependencies": {
         "@mdi/font": "^5.6.55",
+        "draggable": "^4.2.0",
         "es6-promise": "^4.2.8",
+        "jsbarcode": "^3.11.3",
         "vee-validate": "^3.4.1",
+        "vue-html-to-paper": "^1.3.1",
         "vue-router": "^3.4.9",
         "vuetify": "^2.3.13",
         "vuex": "^3.5.1",
