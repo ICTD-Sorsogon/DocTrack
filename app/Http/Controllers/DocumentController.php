@@ -42,7 +42,7 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
-        $document->updateOrCreate(
+        return $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
         );
