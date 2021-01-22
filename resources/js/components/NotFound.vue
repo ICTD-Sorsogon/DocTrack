@@ -24,7 +24,7 @@
                             align="center"
                             justify="center"
                         >
-                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                            <v-progress-circular indeterminate color="#F72e2E"></v-progress-circular>
                         </v-row>
                     </template>
                 </v-img>
@@ -39,7 +39,7 @@
                     outlined
                     color="primary"
                     link
-                    to="/"
+                    @click.prevent="goBack"
                 >
                     <v-icon
                         left
@@ -79,5 +79,10 @@ export default {
             }
         }
     },
+    methods: {
+        goBack(){
+            this.$router.back();
+        },
+    }
 }
 </script>

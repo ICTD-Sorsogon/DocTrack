@@ -3,13 +3,13 @@
 <v-app>
     <v-app-bar
         app
-        color="blue darken-3"
+        color="#0675BB"
         dark
     >
         <v-toolbar-title>Document Tracking System</v-toolbar-title>
         <v-progress-linear
             :active="page_loader"
-            color="#A83F39"
+            color="#F72e2E"
             height="8"
             indeterminate
             striped
@@ -37,7 +37,7 @@
                                             align="center"
                                             justify="center"
                                         >
-                                            <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                                            <v-progress-circular indeterminate color="#F72e2E"/>
                                         </v-row>
                                     </template>
                                 </v-img>
@@ -46,7 +46,7 @@
                                 <v-col cols="12">
                                     <v-card>
                                         <v-form @submit.prevent="login">
-                                            <v-toolbar color="blue darken-3" dark flat>
+                                            <v-toolbar color="#0675BB" dark flat>
                                                 <v-toolbar-title>Login</v-toolbar-title>
                                             </v-toolbar>
                                             <v-card-text>
@@ -87,7 +87,7 @@
                                                     class="text-center"
                                                 >
                                                     <v-col>
-                                                         <v-btn dark color="blue darken-3" type="submit">Login</v-btn>
+                                                         <v-btn dark color="#0675BB" type="submit">Login</v-btn>
                                                     </v-col>
                                                 </v-row>
                                             </v-card-actions>
@@ -153,7 +153,8 @@ export default {
                     });
                 })
                 .catch(error => {
-                    this.submitStatus = 'ERROR'
+                    this.submitStatus = 'ERROR';
+                    this.$store.dispatch('unsetLoader');
                 });
            });
        }

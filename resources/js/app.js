@@ -38,7 +38,15 @@ Vue.component('login-component', require('./components/Login.vue').default);
 
 new Vue({
     el: '#app',
-    vuetify: new Vuetify(),
+    vuetify: new Vuetify({
+        theme: {
+            themes: {
+                light: {
+                    primary: '#0675BB',
+                },
+            },
+        },
+    }),
     router: new VueRouter(routes),
     store: new Vuex.Store(store),
 });
