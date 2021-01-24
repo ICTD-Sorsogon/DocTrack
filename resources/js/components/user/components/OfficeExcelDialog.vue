@@ -19,7 +19,7 @@
 
         <v-card-text>
             
-            <button @click="exTest">DOWNLOAD</button>
+            <button @click="downloadData">DOWNLOAD</button>
 
            <!-- <ValidationObserver ref="observer" v-slot="{ valid }">-->
                 <v-form
@@ -230,11 +230,14 @@
                             console.log(workbook.worksheets[id - 1].name);
                             sheet.eachRow({ includeEmpty: true }, function(row, rowIndex) {
                             console.log(row.values, rowIndex)
-                                /*row.eachCell(function(cell, colNumber) {
-                                    console.log('Cell ' + colNumber + ' = ' + cell.value);
-                                    console.log(cell.value);
-                                });*/
+                            console.log("row here");
+
+                            if(rowIndex > 1){
+                              this.excel_data.push(row.values);
+                            }
+
                                 row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+                                    //console.log('row1:' + (row.values[rowIndex] == undefined)? 'yes unde':row.values[1]);
                                 console.log('Cell ' + colNumber + ' = ' + cell.value);
                                 console.log(cell.value);
                                 console.log('cellposition: ' + this.cellPosition((id - 1), (colNumber - 1), (rowIndex - 1)));
@@ -243,6 +246,180 @@
                         }.bind(this))
                     }.bind(this))
                 }.bind(this)
+            },
+            downloadData(){
+                const data = this.$store.state.offices.offices;
+
+                console.log(data);
+
+//const Excel = require('exceljs')
+
+// need to create a workbook object. Almost everything in ExcelJS is based off of the workbook object.
+let workbook = new Excel.Workbook()
+let worksheet = workbook.addWorksheet('Offices')
+
+worksheet.columns = [
+  {header: 'Office_Name1', key: 'Office_Name', width: 32},
+  {header: 'Office_Code', key: 'Office_Code', width: 32},
+  {header: 'Address', key: 'Address', width: 32},
+  {header: 'Contact_Number', key: 'Contact_Number', width: 32},
+  {header: 'Email_Address', key: 'Email_Address', width: 32}
+]
+
+// force the columns to be at least as long as their header row.
+// Have to take this approach because ExcelJS doesn't have an autofit property.
+/*worksheet.columns.forEach(column => {
+  column.width = column.header.length < 12 ? 12 : column.header.length
+})*/
+
+
+// Make the header bold.
+// Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
+worksheet.getRow(1).font = {bold: true}
+/*worksheet.getRow(1).fill = {
+    type: 'pattern',
+    pattern:'solid',
+    bgColor:{ argb:'FFFF0000' }
+}*/
+
+// Dump all the data into Excel
+data.forEach((e, index) => {
+  // row 1 is the header.
+  const rowIndex = index + 2
+
+  console.log(e);
+
+  // By using destructuring we can easily dump all of the data into the row without doing much
+  // We can add formulas pretty easily by providing the formula property.
+  worksheet.addRow({
+      Office_Name: e.name,
+      Office_Code: e.office_code,
+      Address: e.address,
+      Contact_Number: e.contact_number,
+      Email_Address: e.contact_email
+
+    /*...e,
+    amountRemaining: {
+      formula: `=C${rowIndex}-D${rowIndex}`
+    },
+    percentRemaining: {
+      formula: `=E${rowIndex}/C${rowIndex}`
+    }*/
+  })
+})
+/*
+const totalNumberOfRows = worksheet.rowCount
+
+// Add the total Rows
+worksheet.addRow([
+  '',
+  'Total',
+  {
+    formula: `=sum(C2:C${totalNumberOfRows})`
+  },
+  {
+    formula: `=sum(D2:D${totalNumberOfRows})`
+  },
+  {
+    formula: `=sum(E2:E${totalNumberOfRows})`
+  },
+  {
+    formula: `=E${totalNumberOfRows + 1}/C${totalNumberOfRows + 1}`
+  }
+])
+
+// Set the way columns C - F are formatted
+const figureColumns = [3, 4, 5, 6]
+figureColumns.forEach((i) => {
+  worksheet.getColumn(i).numFmt = '$0.00'
+  worksheet.getColumn(i).alignment = {horizontal: 'center'}
+})
+
+// Column F needs to be formatted as a percentage.
+worksheet.getColumn(6).numFmt = '0.00%'
+*/
+// loop through all of the rows and set the outline style.
+worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+
+  const headerColumns = ['A','B', 'C', 'D', 'E']
+
+  headerColumns.forEach((v) => {
+      if(rowNumber == 1){
+            worksheet.getCell(`${v}${rowNumber}`).style = {
+                fill: {
+                    type: 'pattern',
+                    pattern:'solid',
+                    fgColor:{ argb:'00B0F0' }
+                },
+                font: {
+                    color: {argb: "ffffff"},
+                    bold: true
+                }
+            }
+      }
+  })
+
+
+  worksheet.getCell(`A${rowNumber}`).border = {
+    top: {style: 'thin'},
+    left: {style: 'thin'},
+    bottom: {style: 'thin'},
+    right: {style: 'none'}
+  }
+
+  const insideColumns = ['B', 'C', 'D', 'E']
+
+  insideColumns.forEach((v) => {
+    worksheet.getCell(`${v}${rowNumber}`).border = {
+      top: {style: 'thin'},
+      bottom: {style: 'thin'},
+      left: {style: 'none'},
+      right: {style: 'none'}
+    }
+  })
+
+  worksheet.getCell(`F${rowNumber}`).border = {
+    top: {style: 'thin'},
+    left: {style: 'none'},
+    bottom: {style: 'thin'},
+    right: {style: 'thin'}
+  }
+})
+
+// The last A cell needs to have some of it's borders removed.
+worksheet.getCell(`A${worksheet.rowCount}`).border = {
+  top: {style: 'thin'},
+  left: {style: 'none'},
+  bottom: {style: 'none'},
+  right: {style: 'thin'}
+}
+/*
+const totalCell = worksheet.getCell(`B${worksheet.rowCount}`)
+totalCell.font = {bold: true}
+totalCell.alignment = {horizontal: 'center'}
+*/
+// Create a freeze pane, which means we'll always see the header as we scroll around.
+worksheet.views = [
+  { state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }
+]
+
+// Keep in mind that reading and writing is promise based.
+//workbook.xlsx.writeBuffer('Debtors.xlsx')
+
+var buff = workbook.xlsx.writeBuffer().then(function (data) {
+  var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  //saveAs(blob, "publications.xlsx");
+  
+  const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Offices.xlsx');
+    document.body.appendChild(link);
+    link.click();
+
+  });
+
+console.log('done');
             },
             exTest(){
  const data = [{
