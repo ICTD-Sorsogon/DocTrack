@@ -44,7 +44,6 @@ const actions = {
                     icon : icon
                 });
             } else {
-                console.log('setSnackbar');
                 commit('SET_SNACKBAR',
                 {
                     showing: true,
