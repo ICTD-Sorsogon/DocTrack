@@ -91,6 +91,15 @@
 							Acknowledge
 						</v-btn>
 					</v-col>
+                    <v-col>
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Hold or Reject')" text color="#F44336" block
+						>
+							<v-icon left>
+								mdi-email-alert-outline
+							</v-icon>
+							Hold or Reject
+						</v-btn>
+					</v-col>
 				</v-row>
 			</td>
 		</template>

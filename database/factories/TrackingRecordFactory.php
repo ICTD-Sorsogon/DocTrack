@@ -22,7 +22,7 @@ class TrackingRecordFactory extends Factory
      */
     public function definition()
     {
-        $status = ['create', 'receive', 'forward', 'processing', 'on hold', 'rejected', 'terminate', 'acknowledge'];
+        $status = ['created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
         $from = ['docket office' , 'personal', 'email', 'others'];
 
         return [

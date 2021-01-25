@@ -30,16 +30,16 @@ const getters = {
 
 const actions = {
     setSnackbar({commit}, snackbar) {
-        var color = snackbar_status[snackbar.type];
-        var icon = snackbar_icon[snackbar.type];
-        commit('SET_SNACKBAR',
-        {
-            showing: true,
-            title: snackbar.title,
-            text: snackbar.message,
-            color: color,
-            icon : icon
-        });
+                var color = snackbar_status[snackbar.type];
+                var icon = snackbar_icon[snackbar.type];
+                commit('SET_SNACKBAR',
+                {
+                    showing: true,
+                    title: snackbar.title,
+                    text: snackbar.message,
+                    color: color,
+                    icon : icon
+                });
     },
     unsetSnackbar({ commit }) {
         commit('UNSET_SNACKBAR');
@@ -51,10 +51,12 @@ const mutations = {
         state.snackbar = snackbar;
     },
     SET_SNACKBAR2(state, snackbar) {
-        state.snackbar.showing = true;
-        state.snackbar.text = snackbar.message;
-        state.snackbar.color = snackbar_status[snackbar.type];
-        state.snackbar.icon  = snackbar_icon[snackbar.type];
+
+                state.snackbar.showing = true;
+                state.snackbar.text = snackbar.message;
+                state.snackbar.color = snackbar_status[snackbar.type];
+                state.snackbar.icon  = snackbar_icon[snackbar.type];
+
     },
     UNSET_SNACKBAR(state) {
         state.snackbar.showing = false;
@@ -63,10 +65,12 @@ const mutations = {
         state.snackbar.icon = 'mdi-checkbox-blank-circle';
     },
     SNACKBAR_STATUS(state, response){
-        state.request.type = response.type;
-        state.request.status = response.status;
-        state.request.title = response.title;
-        state.request.message = response.message;
+
+                state.request.type = response.type;
+                state.request.status = response.status;
+                state.request.title = response.title;
+                state.request.message = response.message;
+
     }
 }
 

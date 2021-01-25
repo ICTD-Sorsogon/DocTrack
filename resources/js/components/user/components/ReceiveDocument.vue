@@ -10,7 +10,7 @@
             </v-row>
         </v-card-title>
         <v-card-text>
-            <ValidationObserver ref="observer" v-slot="{ valid }">
+            <ValidationObserver ref="observer" v-slot="{ valid , invalid }">
             <v-form ref="form">
                 <v-row>
                     <v-col cols="12" xl="12" lg="8" md="12">
@@ -163,7 +163,7 @@
                         ></v-select>
                          </ValidationProvider>
                     </v-col>
-                     <v-col cols="12" xl="12" lg="6" md="6">
+                    <v-col cols="12" xl="12" lg="6" md="6">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-if="types=='forward'"
@@ -173,7 +173,7 @@
                             item-value="id"
                             label="Forwarded to"
                             outlined
-                            prepend-inner-icon="mdi-office-building-marker-outline"
+                            prepend-inner-icon="mdi-office-building-outline"
                             :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
                             required
                             :error-messages="errors"
@@ -181,7 +181,7 @@
                         ></v-select>
                          </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="12" md="12">
+                    <v-col cols="12" xl="12" lg="6" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-if="['forward', 'receive'].includes(types)"
@@ -190,7 +190,38 @@
                             item-text="show"
                             item-value="value"
                             label="Through"
-                            prepend-inner-icon="mdi-office-building-marker-outline"
+                            prepend-inner-icon="mdi-transit-connection-horizontal"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
+                            required
+                            outlined
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
+                        </ValidationProvider>
+                    </v-col>
+                    <v-col cols="12" xl="12" :lg="types=='terminal'? 12 : 6" md="12">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-text-field
+                            v-if="['forward', 'receive', 'terminal'].includes(types)"
+                            v-model="form.approved_by"
+                            label="Approved by"
+                            prepend-inner-icon="mdi-account-tie-outline"
+                            outlined
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-text-field>
+                        </ValidationProvider>
+                    </v-col>
+                    <v-col cols="12" xl="12" lg="12" md="12">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
+                            v-if="types=='Hold or Reject'"
+                            v-model="form.hold_reject"
+                            :items="status_options"
+                            item-text="show"
+                            item-value="value"
+                            label="Status"
+                            prepend-inner-icon="mdi-file-document-edit-outline"
                             :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
                             required
                             outlined
@@ -222,8 +253,8 @@
                                 :loading="btnloading"
                                 @click.prevent="showDocumentDialog"
                                 type="submit"
-                                :dark="valid"
-                                :disabled="!valid"
+                                :dark="!invalid"
+                                :disabled="invalid"
                                 >
                                     <v-icon left dark>
                                         mdi-email-receive-outline
@@ -250,8 +281,8 @@
                                 :loading="btnloading"
                                 @click.prevent="showDocumentDialog"
                                 type="submit"
-                                :dark="valid"
-                                :disabled="!valid"
+                                :dark="!invalid"
+                                :disabled="invalid"
                                 >
                                     <v-icon left dark>
                                         mdi-email-off-outline
@@ -264,15 +295,28 @@
                                 :loading="btnloading"
                                 @click.prevent="showDocumentDialog"
                                 type="submit"
-                                :dark="valid"
-                                :disabled="!valid"
+                                :dark="!invalid"
+                                :disabled="invalid"
                                 >
                                     <v-icon left dark>
                                         mdi-email-check-outline
                                     </v-icon>
                                     Acknowledge
                             </v-btn>
-
+                            <v-btn
+                                v-if="types=='Hold or Reject'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="!invalid"
+                                :disabled="invalid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-alert-outline
+                                    </v-icon>
+                                    Hold or Reject
+                            </v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -303,8 +347,11 @@
                         <v-btn v-if="types=='terminal'" color="primary darken-1" text @click.prevent="terminateDocumentConfirm">
                             Terminate
                         </v-btn>
-                         <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
+                        <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
                             Acknowledge
+                        </v-btn>
+                        <v-btn v-if="types=='Hold or Reject'" color="primary darken-1" text @click.prevent="holdRejectDocumentConfirm">
+                            Hold or Reject
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -359,6 +406,10 @@ export default {
                 { show: 'Personal', value: 'personal' },
                 { show: 'Others', value: 'others' }
             ],
+            status_options: [
+                { show: 'Hold', value: 'on hold' },
+                { show: 'Reject', value: 'rejected' }
+            ],
             temp: {
                 sample_data: 'sample'
             },
@@ -368,10 +419,12 @@ export default {
                 touched_by: '',
                 last_touched: '',
                 through: '',
+                approved_by: '',
                 documentRemarks: '',
                 forwarded_by: '',
                 forwarded_to: '',
-                status: ''
+                status: '',
+                hold_reject: '',
             },
             defaultItem: {
                 document_id: '',
@@ -379,10 +432,12 @@ export default {
                 touched_by: '',
                 last_touched: '',
                 through: '',
+                approved_by: '',
                 documentRemarks: '',
                 forwarded_by: '',
                 forwarded_to: '',
-                status: ''
+                status: '',
+                hold_reject: '',
             }
         }
     },
@@ -409,9 +464,10 @@ export default {
                         })
                         .then(() => {
                             this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
                             this.$router.push({ name: "All Active Documents"});
                         });
-                    } else if (this.form_requests.request_status == 'FAILED') {
+                    } else if (this.request.status == 'FAILED') {
                         this.$store.dispatch('setSnackbar', {
                             type: 'error',
                             message: this.request.message,
@@ -433,9 +489,10 @@ export default {
                         })
                         .then(() => {
                             this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
                             this.$router.push({ name: "All Active Documents"});
                         });
-                    } else if (this.form_requests.request_status == 'FAILED') {
+                    } else if (this.request.status == 'FAILED') {
                         this.$store.dispatch('setSnackbar', {
                             type: 'error',
                             message: this.request.message,
@@ -448,14 +505,83 @@ export default {
                 this.closeDocumentDialog()
         },
         terminateDocumentConfirm() {
-
+            this.btnloading = true;
+                this.$store.dispatch("terminateDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
         },
         acknowledgeDocumentConfirm() {
-
-        }
+            this.btnloading = true;
+                this.$store.dispatch("acknowledgeDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
+        holdRejectDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("holdRejectDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
     },
     mounted() {
-        // console.log(this.selected_document)
+        console.log(this.selected_document)
         this.$store.dispatch('unsetLoader');
         this.form = this.find_document(this.$route.params.id);
     }
