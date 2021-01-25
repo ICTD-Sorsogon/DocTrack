@@ -13,15 +13,19 @@ use Illuminate\Queue\SerializesModels;
 class UserDeleteEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    
+    public $user_id;
+    public $user;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user_id, $user)
     {
-        //
+        $this->user_id = $user_id;
+        $this->user = $user;
     }
 
     /**

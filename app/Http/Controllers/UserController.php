@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\UserCreateEvent;
+use App\Events\UserDeleteEvent;
 use App\Events\UserUpdateEvent;
 use Auth;
 use DB;
@@ -141,6 +142,9 @@ class UserController extends Controller
             DB::rollback();
             throw $error;
         }
+
+        $user_id = Auth::user()->id;
+        event(new UserDeleteEvent($user_id,$user));
         DB::commit();
         return [$user];
     }
