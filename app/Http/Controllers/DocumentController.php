@@ -148,6 +148,30 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
+    public function holdRejectDocument(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $tracking_record = new TrackingRecord();
+            $tracking_record->document_id = $request->id;
+            $tracking_record->action = $request->hold_reject;
+            $tracking_record->touched_by = Auth::user()->id;
+            $tracking_record->last_touched = Carbon::now();
+            $tracking_record->remarks = $request->documentRemarks;
+            $tracking_record->save();
+            $tracking_record->document->update(['status' => $request->hold_reject]);
+
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$tracking_record];
+    }
+
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
         return $document->updateOrCreate(
