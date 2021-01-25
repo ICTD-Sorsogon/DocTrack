@@ -217,8 +217,8 @@
         methods: {
             fileSelected1(file){
                 try {
-                    if (file.name.split(".").pop().toLowerCase() == 'xlsx'){
-
+                    var fileExtension = file.name.split(".").pop().toLowerCase();
+                    if (fileExtension == 'xlsx'){
                         var offices = this.$store.state.offices.offices;
                         this.offices = [];
                         offices.forEach(office => {
@@ -226,16 +226,12 @@
                         });
                         this.excel_data = [];
                         this.excel_error = [[], []];
-
-
                         const wb = new Excel.Workbook();
                         const reader = new FileReader();
                         reader.readAsArrayBuffer(file)
                         reader.onload = function() {
                             const buffer = reader.result;
                             wb.xlsx.load(buffer).then(function(workbook) {
-                            console.log(workbook, 'workbook instance')
-                            console.log(workbook.model,  'workbook json model');
                                 workbook.eachSheet(function(sheet, id) {
                                     var sheetIndex = id - 1;
                                     this.excel_data.push({
@@ -243,15 +239,9 @@
                                         tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
                                         content: []
                                     });
-
-                                    console.log('sheet#'+ id);
-                                    console.log(workbook.worksheets[sheetIndex].name);
                                     sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
                                         var rowIndex = rowNumber - 1;
-                                        console.log(row.values, rowNumber)
-                                        console.log("row here");
-
-                                        if(rowIndex > 0){
+                                        if (rowIndex > 0) {
                                             var dataCol = row.values;
                                             this.excel_data[sheetIndex].content.push({
                                                 Office_Name: (dataCol[1] == undefined)? null : dataCol[1],
@@ -263,12 +253,11 @@
                                                     ((dataCol[5] == undefined)? null : dataCol[5])
                                             });
                                         }
-
                                         row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
                                             var colIndex = colNumber - 1;
-                                            if(rowIndex > 0 && colIndex < 3){
-                                                if(cell.value != null && cell.value.trim() !== ''){
-                                                    if(colIndex == 0 && this.offices.includes((cell.value).trim().toLowerCase().replace(/\s/g, ''))){
+                                            if (rowIndex > 0 && colIndex < 3) {
+                                                if (cell.value != null && cell.value.trim() !== '') {
+                                                    if (colIndex == 0 && this.offices.includes((cell.value).trim().toLowerCase().replace(/\s/g, ''))) {
                                                         this.excel_error[1].push({
                                                             id: this.randomKey(),
                                                             value: cell.value,
@@ -276,8 +265,8 @@
                                                             cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
                                                         });
                                                     }
-                                                }else{
-                                                    if(cell.value == null || cell.value.trim == ''){
+                                                } else {
+                                                    if (cell.value == null || cell.value.trim == '') {
                                                         this.excel_error[1].push({
                                                             id: this.randomKey(),
                                                             value: '',
@@ -287,29 +276,22 @@
                                                     }
                                                 }
                                             }
-
-                                            //console.log('row1:' + (row.values[rowIndex] == undefined)? 'yes unde':row.values[1]);
-                                            console.log('Cell ' + colNumber + ' = ' + cell.value);
-                                            console.log(cell.value);
-                                            console.log('cellposition: ' + this.cellPosition(sheetIndex, colIndex, rowIndex));
                                         }.bind(this));
                                     }.bind(this))
                                 }.bind(this))
-
-                                if(this.excel_error[0].length < 1 && this.excel_error[1].length < 1){
+                                if (this.excel_error[0].length < 1 && this.excel_error[1].length < 1) {
                                     this.is_preview = true;
                                     this.valid = true;
-                                }else{
+                                } else {
                                     this.is_preview = false;
                                     this.valid = false;
                                 }
-
                             }.bind(this))
                         }.bind(this)
-                    }else{
+                    } else {
                         this.$store.dispatch('setSnackbar', {
                             type: 'error',
-                            message: 'To avoid error required file extension "xlsx" or "csv" '
+                            message: 'To avoid error required file extension "xlsx"'
                         })
                     }
                 } catch (error) {
@@ -321,185 +303,81 @@
             downloadData(){
                 const data = this.$store.state.offices.offices;
 
-                console.log(data);
+                // need to create a workbook object. Almost everything in ExcelJS is based off of the workbook object.
+                let workbook = new Excel.Workbook()
+                let worksheet = workbook.addWorksheet('Offices')
 
-//const Excel = require('exceljs')
-
-// need to create a workbook object. Almost everything in ExcelJS is based off of the workbook object.
-let workbook = new Excel.Workbook()
-let worksheet = workbook.addWorksheet('Offices')
-
-worksheet.columns = [
-  {header: 'Office Name', key: 'Office_Name', width: 55},
-  {header: 'Office Code', key: 'Office_Code', width: 13},
-  {header: 'Address', key: 'Address', width: 60},
-  {header: 'Contact Number', key: 'Contact_Number', width: 18},
-  {header: 'Email Address', key: 'Email_Address', width: 35}
-]
-
-// force the columns to be at least as long as their header row.
-// Have to take this approach because ExcelJS doesn't have an autofit property.
-/*worksheet.columns.forEach(column => {
-  column.width = column.header.length < 12 ? 12 : column.header.length
-})*/
+                worksheet.columns = [
+                    {header: 'Office Name', key: 'Office_Name', width: 55},
+                    {header: 'Office Code', key: 'Office_Code', width: 13},
+                    {header: 'Address', key: 'Address', width: 60},
+                    {header: 'Contact Number', key: 'Contact_Number', width: 18},
+                    {header: 'Email Address', key: 'Email_Address', width: 35}
+                ]
 
 
-// Make the header bold.
-// Note: in Excel the rows are 1 based, meaning the first row is 1 instead of 0.
-worksheet.getRow(1).font = {bold: true}
-/*worksheet.getRow(1).fill = {
-    type: 'pattern',
-    pattern:'solid',
-    bgColor:{ argb:'FFFF0000' }
-}*/
+                // Dump all the data into Excel
+                data.forEach((e, index) => {
+                    // row 1 is the header.
+                    const rowIndex = index + 2
 
-// Dump all the data into Excel
-data.forEach((e, index) => {
-  // row 1 is the header.
-  const rowIndex = index + 2
+                    // By using destructuring we can easily dump all of the data into the row without doing much
+                    // We can add formulas pretty easily by providing the formula property.
+                    worksheet.addRow({
+                        Office_Name: e.name,
+                        Office_Code: e.office_code,
+                        Address: e.address,
+                        Contact_Number: e.contact_number,
+                        Email_Address: e.contact_email
+                    })
+                })
 
-  console.log(e);
+                // loop through all of the rows and set the outline style.
+                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                    const headerColumns = ['A','B', 'C', 'D', 'E']
+                    headerColumns.forEach((v) => {
+                        if(rowNumber == 1){
+                                worksheet.getCell(`${v}${rowNumber}`).style = {
+                                    fill: {
+                                        type: 'pattern',
+                                        pattern:'solid',
+                                        fgColor:{ argb:'1A73E8' }
+                                    },
+                                    font: {
+                                        color: {argb: "ffffff"},
+                                        bold: true
+                                    }
+                                }
+                        }else{
+                                worksheet.getCell(`${v}${rowNumber}`).style = {
+                                    border: {
+                                        top: { style: 'thin' },
+                                        left: { style: 'thin' },
+                                        bottom: { style: 'thin' },
+                                        right: { style: 'thin' }
+                                    }
+                                }
+                        }
+                    })
+                })
 
-  // By using destructuring we can easily dump all of the data into the row without doing much
-  // We can add formulas pretty easily by providing the formula property.
-  worksheet.addRow({
-      Office_Name: e.name,
-      Office_Code: e.office_code,
-      Address: e.address,
-      Contact_Number: e.contact_number,
-      Email_Address: e.contact_email
+                // Create a freeze pane, which means we'll always see the header as we scroll around.
+                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
 
-    /*...e,
-    amountRemaining: {
-      formula: `=C${rowIndex}-D${rowIndex}`
-    },
-    percentRemaining: {
-      formula: `=E${rowIndex}/C${rowIndex}`
-    }*/
-  })
-})
-/*
-const totalNumberOfRows = worksheet.rowCount
+                // Keep in mind that reading and writing is promise based.
+                //workbook.xlsx.writeBuffer('Debtors.xlsx')
 
-// Add the total Rows
-worksheet.addRow([
-  '',
-  'Total',
-  {
-    formula: `=sum(C2:C${totalNumberOfRows})`
-  },
-  {
-    formula: `=sum(D2:D${totalNumberOfRows})`
-  },
-  {
-    formula: `=sum(E2:E${totalNumberOfRows})`
-  },
-  {
-    formula: `=E${totalNumberOfRows + 1}/C${totalNumberOfRows + 1}`
-  }
-])
+                var buff = workbook.xlsx.writeBuffer().then(function (data) {
+                    var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+                    //saveAs(blob, "publications.xlsx");
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'Offices.xlsx');
+                    document.body.appendChild(link);
+                    link.click();
+                });
 
-// Set the way columns C - F are formatted
-const figureColumns = [3, 4, 5, 6]
-figureColumns.forEach((i) => {
-  worksheet.getColumn(i).numFmt = '$0.00'
-  worksheet.getColumn(i).alignment = {horizontal: 'center'}
-})
-
-// Column F needs to be formatted as a percentage.
-worksheet.getColumn(6).numFmt = '0.00%'
-*/
-// loop through all of the rows and set the outline style.
-worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-
-  const headerColumns = ['A','B', 'C', 'D', 'E']
-
-  headerColumns.forEach((v) => {
-      if(rowNumber == 1){
-            worksheet.getCell(`${v}${rowNumber}`).style = {
-                fill: {
-                    type: 'pattern',
-                    pattern:'solid',
-                    fgColor:{ argb:'1A73E8' }
-                },
-                font: {
-                    color: {argb: "ffffff"},
-                    bold: true
-                }
-            }
-      }else{
-            worksheet.getCell(`${v}${rowNumber}`).style = {
-                border: {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' }
-                }
-            }
-      }
-  })
-
-
-  /*worksheet.getCell(`A${rowNumber}`).border = {
-    top: {style: 'thin'},
-    left: {style: 'thin'},
-    bottom: {style: 'thin'},
-    right: {style: 'none'}
-  }
-
-  const insideColumns = ['B', 'C', 'D', 'E']
-
-  insideColumns.forEach((v) => {
-    worksheet.getCell(`${v}${rowNumber}`).border = {
-      top: {style: 'thin'},
-      bottom: {style: 'thin'},
-      left: {style: 'none'},
-      right: {style: 'none'}
-    }
-  })
-
-  worksheet.getCell(`F${rowNumber}`).border = {
-    top: {style: 'thin'},
-    left: {style: 'none'},
-    bottom: {style: 'thin'},
-    right: {style: 'thin'}
-  }*/
-})
-
-// The last A cell needs to have some of it's borders removed.
-/*worksheet.getCell(`A${worksheet.rowCount}`).border = {
-  top: {style: 'thin'},
-  left: {style: 'none'},
-  bottom: {style: 'none'},
-  right: {style: 'thin'}
-}
-
-const totalCell = worksheet.getCell(`B${worksheet.rowCount}`)
-totalCell.font = {bold: true}
-totalCell.alignment = {horizontal: 'center'}
-*/
-// Create a freeze pane, which means we'll always see the header as we scroll around.
-worksheet.views = [
-  { state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }
-]
-
-// Keep in mind that reading and writing is promise based.
-//workbook.xlsx.writeBuffer('Debtors.xlsx')
-
-var buff = workbook.xlsx.writeBuffer().then(function (data) {
-  var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-  //saveAs(blob, "publications.xlsx");
-
-  const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'Offices.xlsx');
-    document.body.appendChild(link);
-    link.click();
-
-  });
-
-console.log('done');
             },
             exTest(){
  const data = [{
