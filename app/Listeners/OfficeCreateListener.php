@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\OfficeCreateEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,7 +25,7 @@ class OfficeCreateListener
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(OfficeCreateEvent $event)
     {
         $office_name = $event->request_obj->name;
         $office_code = $event->request_obj->office_code;

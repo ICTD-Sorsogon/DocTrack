@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\NewDocumentHasAddedEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,7 +25,7 @@ class InsertDocumentListener
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(NewDocumentHasAddedEvent $event)
     {
         $subject = $event->request->subject;
 

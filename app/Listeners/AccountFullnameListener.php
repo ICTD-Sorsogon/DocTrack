@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\AccountFullnameUpdateEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,7 +25,7 @@ class AccountFullnameListener
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(AccountFullnameUpdateEvent $event)
     {
         $old_values = json_encode($event->request_obj);
         $data = json_encode($event->old_values);

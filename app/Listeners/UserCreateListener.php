@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\UserCreateEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,7 +25,7 @@ class UserCreateListener
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(UserCreateEvent $event)
     {
         $username = json_decode($event->collection)->username;
         $role_id = json_decode($event->collection)->role_id;

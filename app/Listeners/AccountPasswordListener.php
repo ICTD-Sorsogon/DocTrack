@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\AccountPasswordUpdateEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,7 +25,7 @@ class AccountPasswordListener
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(AccountPasswordUpdateEvent $event)
     {
         $log = new Log();
         $log->user_id = $event->user_id;

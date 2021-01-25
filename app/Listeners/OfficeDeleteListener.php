@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\OfficeDeleteEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,7 +25,7 @@ class OfficeDeleteListener
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(OfficeDeleteEvent $event)
     {
         $office_name = $event->office->name;
         $office_code = $event->office->office_code;
