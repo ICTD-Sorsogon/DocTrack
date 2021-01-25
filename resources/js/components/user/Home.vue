@@ -1,14 +1,15 @@
 <template>
 <div v-if="auth_user.first_name">
-    <v-navigation-drawer app v-model="drawer">
-        <template v-slot:prepend>
-            <v-list-item two-line>
-                <v-list-item-avatar>
-                    <img :src="placeholderImage">
-                </v-list-item-avatar>
-
-                <v-list-item-content>
-                    <v-tooltip bottom>
+    <v-navigation-drawer app dark v-model="drawer" id="sidebar" >
+        <v-img
+            contain
+            src="/images/provincial_logo.png"
+            height="150px"
+        >
+        </v-img>
+        <v-list-item link>
+            <v-list-item-content>
+                <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
                             <v-list-item-title
                                 v-bind="attrs"
@@ -17,15 +18,12 @@
                                 {{userFullName}}
                             </v-list-item-title>
                         </template>
-                        <span>{{userFullName}}</span>
+                        {{userFullName}}
                     </v-tooltip>
-                    <v-list-item-subtitle>{{auth_user.username}}</v-list-item-subtitle>
-                </v-list-item-content>
-            </v-list-item>
-        </template>
-
+                <v-list-item-subtitle> {{auth_user.username}} </v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
         <v-divider></v-divider>
-
         <v-list>
             <v-list-item link @click.prevent="getAllDocuments">
                 <v-list-item-icon>
@@ -40,9 +38,10 @@
             <v-list-group
                 prepend-icon="mdi-timeline-check-outline"
                 no-action
+                color="white"
             >
                 <template v-slot:activator>
-                    <v-list-item-content>
+                    <v-list-item-content id="sample">
                         <v-list-item-title>Reports</v-list-item-title>
                     </v-list-item-content>
                 </template>
@@ -105,7 +104,12 @@
 
         <template v-slot:append>
             <div class="pa-2">
-                <v-btn block @click.stop="drawer = !drawer">
+                <v-btn
+                    block
+                    @click.stop="drawer = !drawer"
+                    dark
+                    outlined
+                >
                     <v-icon left>
                         mdi-close-circle-outline
                     </v-icon>
@@ -117,7 +121,7 @@
 
     <v-app-bar
         app
-        color="blue darken-3"
+        color="#0675BB"
         dark
     >
         <v-app-bar-nav-icon class=".d-none .d-sm-flex .d-md-none" @click.stop="drawer = !drawer">
@@ -157,9 +161,6 @@ export default {
             }
 
             return this.$route.name;
-        },
-        placeholderImage() {
-            return `${this.image_source+(this.getRandomInt(0,2) == 1 ? 'men':'women')}/${this.getRandomInt(1, 100)}.jpg`;
         },
         userFullName(){
             return this.$store.getters.auth_user_full_name;
@@ -251,3 +252,9 @@ export default {
     }
 }
 </script>
+
+<style>
+#sidebar {
+    background-image: linear-gradient(180deg, #0675BB, #F72e2E);
+}
+</style>
