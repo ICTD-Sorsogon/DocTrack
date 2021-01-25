@@ -214,6 +214,24 @@
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
+                            v-if="types=='Hold or Reject'"
+                            v-model="form.hold_reject"
+                            :items="status_options"
+                            item-text="show"
+                            item-value="value"
+                            label="Status"
+                            prepend-inner-icon="mdi-file-document-edit-outline"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
+                            required
+                            outlined
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
+                        </ValidationProvider>
+                    </v-col>
+                    <v-col cols="12" xl="12" lg="12" md="12">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-textarea
                             outlined
                             auto-grow
@@ -285,7 +303,20 @@
                                     </v-icon>
                                     Acknowledge
                             </v-btn>
-
+                            <v-btn
+                                v-if="types=='Hold or Reject'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="!invalid"
+                                :disabled="invalid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-alert-outline
+                                    </v-icon>
+                                    Hold or Reject
+                            </v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -316,8 +347,11 @@
                         <v-btn v-if="types=='terminal'" color="primary darken-1" text @click.prevent="terminateDocumentConfirm">
                             Terminate
                         </v-btn>
-                         <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
+                        <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
                             Acknowledge
+                        </v-btn>
+                        <v-btn v-if="types=='Hold or Reject'" color="primary darken-1" text @click.prevent="holdRejectDocumentConfirm">
+                            Hold or Reject
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -372,6 +406,10 @@ export default {
                 { show: 'Personal', value: 'personal' },
                 { show: 'Others', value: 'others' }
             ],
+            status_options: [
+                { show: 'Hold', value: 'on hold' },
+                { show: 'Reject', value: 'rejected' }
+            ],
             temp: {
                 sample_data: 'sample'
             },
@@ -385,7 +423,8 @@ export default {
                 documentRemarks: '',
                 forwarded_by: '',
                 forwarded_to: '',
-                status: ''
+                status: '',
+                hold_reject: '',
             },
             defaultItem: {
                 document_id: '',
@@ -397,7 +436,8 @@ export default {
                 documentRemarks: '',
                 forwarded_by: '',
                 forwarded_to: '',
-                status: ''
+                status: '',
+                hold_reject: '',
             }
         }
     },
@@ -513,7 +553,32 @@ export default {
                     }
                 });
                 this.closeDocumentDialog()
-        }
+        },
+        holdRejectDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("holdRejectDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
     },
     mounted() {
         console.log(this.selected_document)
