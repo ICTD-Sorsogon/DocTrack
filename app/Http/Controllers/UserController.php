@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AccountFullnameUpdateEvent;
+use App\Events\AccountPasswordUpdateEvent;
+use App\Events\AccountUsernameUpdateEvent;
 use App\Events\UserCreateEvent;
 use App\Events\UserDeleteEvent;
 use App\Events\UserUpdateEvent;
@@ -151,6 +154,8 @@ class UserController extends Controller
 
     public function updateFullname(ChangeFullnamePutRequest $request)
     {
+        $old_values = User::select('first_name','middle_name','last_name','suffix')->where('id', $request->id)->get();
+
         $user = User::findOrFail(Auth::user()->id);
         $user->first_name=$request->first_name;
         $user->middle_name=$request->middle_name;
@@ -158,14 +163,33 @@ class UserController extends Controller
         $user->suffix=$request->name_suffix;
         $user->save();
         $response = $user->wasChanged();
+
+        $request_object = '{
+            "first_name":"' . $request->first_name . '",
+            "middle_name":"' . $request->middle_name . '",
+            "last_name":"' . $request->last_name . '",
+            "suffix":"' . $request->suffix . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new AccountFullnameUpdateEvent($user_id,json_decode($old_values[0]), json_decode($request_object)));
+
         return $response;
     }
 
     public function updateUsername(ChangeUsernamePutRequest $request)
     {
+        $old_values = Auth::user()->username;
+        
         $user = User::findOrFail(Auth::user()->id);
         $user->username = $request->new_username;
         $user->save();
+
+        $request_object = '{
+            "username":"' . $request->new_username . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new AccountUsernameUpdateEvent($user_id,$old_values, json_decode($request_object)));
+
         if($user->wasChanged()) {
             return response()->json([
                 'message' => 'Your new username has been set',
@@ -189,6 +213,10 @@ class UserController extends Controller
         if (Hash::check($request->old_password, Auth::user()->password)) {
             $user->password = Hash::make($request->new_password);
             $user->save();
+
+            $user_id = Auth::user()->id;
+            event(new AccountPasswordUpdateEvent($user_id, 'Password Updated'));
+
             return response()->json([
                 'message' => 'Password was changed successfully',
                 'status' => 'success',
