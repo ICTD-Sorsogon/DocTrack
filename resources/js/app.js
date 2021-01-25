@@ -26,6 +26,21 @@ Vue.use(Vuex);
 
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+import movable from "v-movable"
+Vue.use(movable)
+
+import VueHtmlToPaper from 'vue-html-to-paper';
+
+const options = {
+    name: '_blank',
+    specs: [
+      'fullscreen=yes',
+      'titlebar=yes',
+      'scrollbars=yes'
+    ],
+  }
+
+Vue.use(VueHtmlToPaper, options);
 
 Vue.component('welcome-component', require('./components/Welcome.vue').default);
 Vue.component('login-component', require('./components/Login.vue').default);
@@ -38,7 +53,15 @@ Vue.component('login-component', require('./components/Login.vue').default);
 
 new Vue({
     el: '#app',
-    vuetify: new Vuetify(),
+    vuetify: new Vuetify({
+        theme: {
+            themes: {
+                light: {
+                    primary: '#0675BB',
+                },
+            },
+        },
+    }),
     router: new VueRouter(routes),
     store: new Vuex.Store(store),
 });

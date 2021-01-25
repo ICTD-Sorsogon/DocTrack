@@ -40,7 +40,6 @@ const actions = {
                     color: color,
                     icon : icon
                 });
-
     },
     unsetSnackbar({ commit }) {
         commit('UNSET_SNACKBAR');

@@ -3,13 +3,13 @@
 <v-app>
     <v-app-bar
         app
-        color="blue darken-3"
+        color="#0675BB"
         dark
     >
         <v-toolbar-title>Document Tracking System</v-toolbar-title>
         <v-progress-linear
             :active="page_loader"
-            color="#A83F39"
+            color="#F72e2E"
             height="8"
             indeterminate
             striped
@@ -19,71 +19,87 @@
         <v-spacer></v-spacer>
     </v-app-bar>
     <v-main>
-        <v-layout align-center justify-center flat>
-            <v-flex xs12 sm10 md4>
-                <v-row align="center" justify="center" class="mb-5">
-                    <v-img
-                        src="/images/provincial_logo.png"
-                        lazy-src="/images/provincial_logo.png"
-                        max-width="300"
-                        max-height="350"
-                    >
-                        <template v-slot:placeholder>
-                            <v-row
-                                class="fill-height ma-0"
-                                align="center"
-                                justify="center"
-                            >
-                                <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+        <v-container fluid>
+            <v-row>
+                <v-col cols="12">
+                    <v-layout align-center justify-center flat>
+                        <v-flex xs11 sm10 md7 lg5 xl4>
+                            <v-row align="center" justify="center">
+                                <v-img
+                                    src="/images/provincial_logo.png"
+                                    lazy-src="/images/provincial_logo.png"
+                                    :max-width="max_width"
+                                    :max-height="max_height"
+                                >
+                                    <template v-slot:placeholder>
+                                        <v-row
+                                            class="fill-height ma-0"
+                                            align="center"
+                                            justify="center"
+                                        >
+                                            <v-progress-circular indeterminate color="#F72e2E"/>
+                                        </v-row>
+                                    </template>
+                                </v-img>
                             </v-row>
-                        </template>
-                    </v-img>
-                </v-row>
-                <!-- TODO: Add VeeValidate and disable button when login is pressed to prevent multiple login request -->
-                <v-form @submit.prevent="login">
-                    <v-card>
-                        <v-toolbar color="blue darken-3" dark flat>
-                            <v-toolbar-title>Login</v-toolbar-title>
-                        </v-toolbar>
-                        <v-card-text>
-                            <v-alert
-                                dense
-                                outlined
-                                dismissible
-                                v-if="submitStatus === 'ERROR'"
-                                type="error"
-                            >
-                                Login Failed. Incorrect username or password
-                            </v-alert>
-                                <v-text-field
-                                    prepend-inner-icon="mdi-account-box"
-                                    name="username"
-                                    v-model="form.username"
-                                    label="Username"
-                                    id="username"
-                                    type="text"
-                                    outlined
-                                    required
-                                ></v-text-field>
-                                <v-text-field
-                                    prepend-inner-icon="mdi-form-textbox-password"
-                                    name="password"
-                                    v-model="form.password"
-                                    label="Password"
-                                    id="password"
-                                    type="password"
-                                    required
-                                    outlined
-                                ></v-text-field>
-                        </v-card-text>
-                        <v-card-actions >
-                            <v-spacer></v-spacer>
-                            <v-btn dark color="blue darken-3" type="submit">Login</v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-form>
-            </v-flex>
-        </v-layout>
+                            <v-row>
+                                <v-col cols="12">
+                                    <v-card>
+                                        <v-form @submit.prevent="login">
+                                            <v-toolbar color="#0675BB" dark flat>
+                                                <v-toolbar-title>Login</v-toolbar-title>
+                                            </v-toolbar>
+                                            <v-card-text>
+                                                <v-alert
+                                                    dense
+                                                    outlined
+                                                    dismissible
+                                                    v-if="submitStatus === 'ERROR'"
+                                                    type="error"
+                                                >
+                                                    Login Failed. Incorrect username or password
+                                                </v-alert>
+                                                    <v-text-field
+                                                        prepend-inner-icon="mdi-account-box"
+                                                        name="username"
+                                                        v-model="form.username"
+                                                        label="Username"
+                                                        id="username"
+                                                        type="text"
+                                                        outlined
+                                                        required
+                                                    />
+                                                    <v-text-field
+                                                        prepend-inner-icon="mdi-form-textbox-password"
+                                                        name="password"
+                                                        v-model="form.password"
+                                                        label="Password"
+                                                        id="password"
+                                                        type="password"
+                                                        required
+                                                        outlined
+                                                    />
+                                            </v-card-text>
+                                            <v-card-actions>
+                                                <v-row
+                                                    align="center"
+                                                    justify="center"
+                                                    class="text-center"
+                                                >
+                                                    <v-col>
+                                                         <v-btn dark color="#0675BB" type="submit">Login</v-btn>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-card-actions>
+                                        </v-form>
+                                    </v-card>
+                                </v-col>
+                            </v-row>
+                        </v-flex>
+                    </v-layout>
+                </v-col>
+            </v-row>
+        </v-container>
     </v-main>
 </v-app>
 </div>
@@ -92,9 +108,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 export default {
-  computed: mapGetters(['page_loader']),
   data() {
       return {
           form: {
@@ -103,6 +117,29 @@ export default {
           },
           submitStatus: ''
       }
+  },
+  computed: {
+    page_loader () {
+        return this.$store.getters.page_loader;
+    },
+    max_width() {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs': return 300
+          case 'sm': return 400
+          case 'md': return 400
+          case 'lg': return 415
+          case 'xl': return 580
+        }
+    },
+    max_height() {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs': return 350
+          case 'sm': return 420
+          case 'md': return 450
+          case 'lg': return 455
+          case 'xl': return 620
+        }
+    }
   },
   methods: {
        login() {
@@ -116,7 +153,8 @@ export default {
                     });
                 })
                 .catch(error => {
-                    this.submitStatus = 'ERROR'
+                    this.submitStatus = 'ERROR';
+                    this.$store.dispatch('unsetLoader');
                 });
            });
        }
