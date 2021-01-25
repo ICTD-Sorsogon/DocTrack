@@ -8,12 +8,18 @@ use App\Events\NewDocumentHasAddedEvent;
 use App\Events\OfficeCreateEvent;
 use App\Events\OfficeUpdateEvent;
 use App\Events\OfficeDeleteEvent;
+use App\Events\UserCreateEvent;
+use App\Events\UserUpdateEvent;
+use App\Events\UserDeleteEvent;
 use App\Listeners\DocumentDeleteListener;
 use App\Listeners\DocumentUpdateListener;
 use App\Listeners\InsertDocumentListener;
 use App\Listeners\OfficeCreateListener;
 use App\Listeners\OfficeDeleteListener;
 use App\Listeners\OfficeUpdateListener;
+use App\Listeners\UserCreateListener;
+use App\Listeners\UserUpdateListener;
+use App\Listeners\UserDeleteListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -46,7 +52,19 @@ class EventServiceProvider extends ServiceProvider
         ],
             OfficeDeleteEvent::class => [
             OfficeDeleteListener::class,
+        ],
+
+        //User 
+            UserCreateEvent::class => [
+            UserCreateListener::class,
+        ],
+            UserUpdateEvent::class => [
+            UserUpdateListener::class,
+        ],
+            UserDeleteEvent::class => [
+            UserDeleteListener::class,
         ]
+
     ];
 
     /**
