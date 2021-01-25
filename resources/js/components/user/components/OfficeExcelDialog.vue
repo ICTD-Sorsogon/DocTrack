@@ -216,101 +216,107 @@
         },
         methods: {
             fileSelected1(file){
-                /*try {
+                try {
                     if (file.name.split(".").pop().toLowerCase() == 'xlsx'){
 
+                        var offices = this.$store.state.offices.offices;
+                        this.offices = [];
+                        offices.forEach(office => {
+                            this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
+                        });
+                        this.excel_data = [];
+                        this.excel_error = [[], []];
+
+
+                        const wb = new Excel.Workbook();
+                        const reader = new FileReader();
+                        reader.readAsArrayBuffer(file)
+                        reader.onload = function() {
+                            const buffer = reader.result;
+                            wb.xlsx.load(buffer).then(function(workbook) {
+                            console.log(workbook, 'workbook instance')
+                            console.log(workbook.model,  'workbook json model');
+                                workbook.eachSheet(function(sheet, id) {
+                                    var sheetIndex = id - 1;
+                                    this.excel_data.push({
+                                        id: sheetIndex,
+                                        tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
+                                        content: []
+                                    });
+
+                                    console.log('sheet#'+ id);
+                                    console.log(workbook.worksheets[sheetIndex].name);
+                                    sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+                                        var rowIndex = rowNumber - 1;
+                                        console.log(row.values, rowNumber)
+                                        console.log("row here");
+
+                                        if(rowIndex > 0){
+                                            var dataCol = row.values;
+                                            this.excel_data[sheetIndex].content.push({
+                                                Office_Name: (dataCol[1] == undefined)? null : dataCol[1],
+                                                Office_Code: (dataCol[2] == undefined)? null : dataCol[2],
+                                                Address: (dataCol[3] == undefined)? null : dataCol[3],
+                                                Contact_Number: (dataCol[4] == undefined)? null : dataCol[4],
+                                                Email_Address: (dataCol[5] instanceof Object)?
+                                                    ((dataCol[5] == undefined)? null : dataCol[5].text) :
+                                                    ((dataCol[5] == undefined)? null : dataCol[5])
+                                            });
+                                        }
+
+                                        row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+                                            var colIndex = colNumber - 1;
+                                            if(rowIndex > 0 && colIndex < 3){
+                                                if(cell.value != null && cell.value.trim() !== ''){
+                                                    if(colIndex == 0 && this.offices.includes((cell.value).trim().toLowerCase().replace(/\s/g, ''))){
+                                                        this.excel_error[1].push({
+                                                            id: this.randomKey(),
+                                                            value: cell.value,
+                                                            message: "already exist in the database",
+                                                            cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
+                                                        });
+                                                    }
+                                                }else{
+                                                    if(cell.value == null || cell.value.trim == ''){
+                                                        this.excel_error[1].push({
+                                                            id: this.randomKey(),
+                                                            value: '',
+                                                            message: "This cell is required ",
+                                                            cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
+                                                        });
+                                                    }
+                                                }
+                                            }
+
+                                            //console.log('row1:' + (row.values[rowIndex] == undefined)? 'yes unde':row.values[1]);
+                                            console.log('Cell ' + colNumber + ' = ' + cell.value);
+                                            console.log(cell.value);
+                                            console.log('cellposition: ' + this.cellPosition(sheetIndex, colIndex, rowIndex));
+                                        }.bind(this));
+                                    }.bind(this))
+                                }.bind(this))
+
+                                if(this.excel_error[0].length < 1 && this.excel_error[1].length < 1){
+                                    this.is_preview = true;
+                                    this.valid = true;
+                                }else{
+                                    this.is_preview = false;
+                                    this.valid = false;
+                                }
+
+                            }.bind(this))
+                        }.bind(this)
                     }else{
-                        this.$store.dispatch('snackbars/setSnackbar', {
-                            showing: true,
-                            text: 'To avoid error required file extension "xlsx" or "csv" ',
-                            color: '#1565C0',
-                            icon: 'mdi-information-outline',
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: 'To avoid error required file extension "xlsx" or "csv" '
                         })
                     }
                 } catch (error) {
                     this.excel_data = [];
                     this.excel_error = [[], []];
                     this.valid = false;
-                }*/
-                const wb = new Excel.Workbook();
-                const reader = new FileReader();
-
-                reader.readAsArrayBuffer(file)
-                reader.onload = function() {
-                    const buffer = reader.result;
-                    wb.xlsx.load(buffer).then(function(workbook) {
-                    console.log(workbook, 'workbook instance')
-                    console.log(workbook.model,  'workbook json model');
-                        workbook.eachSheet(function(sheet, id) {
-                            var sheetIndex = id - 1;
-                            this.excel_data.push({
-                                id: sheetIndex,
-                                tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
-                                content: []
-                            });
-
-                            console.log('sheet#'+ id);
-                            console.log(workbook.worksheets[sheetIndex].name);
-                            sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-                                var rowIndex = rowNumber - 1;
-                                console.log(row.values, rowNumber)
-                                console.log("row here");
-
-                                if(rowIndex > 0){
-                                    var dataCol = row.values;
-                                    this.excel_data[sheetIndex].content.push({
-                                        Office_Name: (dataCol[1] == undefined)? null : dataCol[1],
-                                        Office_Code: (dataCol[2] == undefined)? null : dataCol[2],
-                                        Address: (dataCol[3] == undefined)? null : dataCol[3],
-                                        Contact_Number: (dataCol[4] == undefined)? null : dataCol[4],
-                                        Email_Address: (dataCol[5] instanceof Object)?
-                                            ((dataCol[5] == undefined)? null : dataCol[5].text) :
-                                            ((dataCol[5] == undefined)? null : dataCol[5])
-                                    });
-                                }
-
-                                row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
-                                    var colIndex = colNumber - 1;
-                                    if(rowIndex > 0 && colIndex < 3){
-                                        if(cell.value != null && cell.value.trim() !== ''){
-                                            if(colIndex == 0 && this.offices.includes((cell.value).trim().toLowerCase().replace(/\s/g, ''))){
-                                                this.excel_error[1].push({
-                                                    id: this.randomKey(),
-                                                    value: cell.value,
-                                                    message: "already exist in the database",
-                                                    cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
-                                                });
-                                            }
-                                        }else{
-                                            if(cell.value == null || cell.value.trim == ''){
-                                                this.excel_error[1].push({
-                                                    id: this.randomKey(),
-                                                    value: '',
-                                                    message: "This cell is required ",
-                                                    cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
-                                                });
-                                            }
-                                        }
-                                    }
-
-                                    //console.log('row1:' + (row.values[rowIndex] == undefined)? 'yes unde':row.values[1]);
-                                    console.log('Cell ' + colNumber + ' = ' + cell.value);
-                                    console.log(cell.value);
-                                    console.log('cellposition: ' + this.cellPosition(sheetIndex, colIndex, rowIndex));
-                                }.bind(this));
-                            }.bind(this))
-                        }.bind(this))
-
-                            if(this.excel_error[0].length < 1 && this.excel_error[1].length < 1){
-                                this.is_preview = true;
-                                this.valid = true;
-                            }else{
-                                this.is_preview = false;
-                                this.valid = false;
-                            }
-
-                    }.bind(this))
-                }.bind(this)
+                }
             },
             downloadData(){
                 const data = this.$store.state.offices.offices;
