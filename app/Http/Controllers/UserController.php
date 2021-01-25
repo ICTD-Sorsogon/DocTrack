@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AccountFullnameUpdateEvent;
+use App\Events\AccountPasswordUpdateEvent;
+use App\Events\AccountUsernameUpdateEvent;
+use App\Events\UserCreateEvent;
+use App\Events\UserDeleteEvent;
+use App\Events\UserUpdateEvent;
 use Auth;
+use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
@@ -11,6 +18,7 @@ use App\Http\Requests\ChangePasswordPutRequest;
 use App\Http\Requests\ChangeUsernamePutRequest;
 use App\Http\Requests\ChangeFullnamePutRequest;
 use Illuminate\Support\Facades\Validator;
+use stdClass;
 
 class UserController extends Controller
 {
@@ -27,7 +35,7 @@ class UserController extends Controller
     public function getAllUsers(): Collection
     {
         abort_if(!in_array(auth()->user()->role_id, [1,2]), 403);
-        return User::where('role_id', 2)->with('office')->get();
+        return User::with('office')->get();
     }
 
     public function getAllUserComplete(): Collection
@@ -38,8 +46,116 @@ class UserController extends Controller
             ->get();
     }
 
+    public function addNewUser(Request $request): Array
+    {
+        DB::beginTransaction();
+        try {
+            $user = new User;
+            $user->role_id = $request->role_id;
+            $user->first_name = $request->first_name;
+            $user->middle_name = $request->middle_name;
+            $user->last_name = $request->last_name;
+            $user->suffix = $request->suffix;
+            $user->gender = $request->gender;
+            $user->birthday = $request->birthday;
+            $user->id_number = $request->id_number;
+            $user->office_id = $request->office_id;
+            $user->is_active = $request->is_active;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->save();
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+
+        $collection = collect($request->except('password'));
+
+        $user_id = Auth::user()->id;
+        event(new UserCreateEvent($user_id, json_encode($collection)));
+
+        return [$user];
+    }
+
+    public function updateExistingUser(Request $request): Array
+    {
+
+        $old_values = User::select('role_id','first_name','middle_name','last_name','suffix', 'gender', 'birthday', 'id_number', 'office_id', 'is_active', 'username')->where('id', $request->id)->get();
+
+        DB::beginTransaction();
+        try {
+            $user = User::find($request->id);
+            $user->role_id = $request->role_id;
+            $user->first_name = $request->first_name;
+            $user->middle_name = $request->middle_name;
+            $user->last_name = $request->last_name;
+            $user->suffix = $request->suffix;
+            $user->gender = $request->gender;
+            $user->birthday = $request->birthday;
+            $user->id_number = $request->id_number;
+            $user->office_id = $request->office_id;
+            $user->is_active = $request->is_active;
+            $user->username = $request->username;
+            $user->password = Hash::make($request->password);
+            $user->save();
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+
+        // $collection = collect($request->except('password', 'office', 'id', 'full_name', 'deleted_at', 'created_at', 'updated_at', 'division_id', 'unit_id', 'sector_id'));
+
+        $request_object = '{
+            "role_id":"' . $request->role_id . '",
+            "first_name":"' . $request->first_name . '",
+            "middle_name":"' . $request->middle_name . '",
+            "last_name":"' . $request->last_name . '",
+            "suffix":"' . $request->suffix . '",
+            "gender":"' . $request->gender . '",
+            "birthday":"' . $request->birthday . '",
+            "id_number":"' . $request->id_number . '",
+            "office_id":"' . $request->office_id . '",
+            "is_active":"' . $request->is_active . '",
+            "username":"' . $request->username . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new UserUpdateEvent($user_id,json_decode($old_values[0]), json_decode($request_object)));
+
+        DB::commit();
+        return [$user];
+    }
+
+    public function deleteExistingUser (Request $request): Array
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::find($request->id);
+            $user->delete();
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+
+        $user_id = Auth::user()->id;
+        event(new UserDeleteEvent($user_id,$user));
+        DB::commit();
+        return [$user];
+    }
+
     public function updateFullname(ChangeFullnamePutRequest $request)
     {
+        $old_values = User::select('first_name','middle_name','last_name','suffix')->where('id', $request->id)->get();
+
         $user = User::findOrFail(Auth::user()->id);
         $user->first_name=$request->first_name;
         $user->middle_name=$request->middle_name;
@@ -47,14 +163,33 @@ class UserController extends Controller
         $user->suffix=$request->name_suffix;
         $user->save();
         $response = $user->wasChanged();
+
+        $request_object = '{
+            "first_name":"' . $request->first_name . '",
+            "middle_name":"' . $request->middle_name . '",
+            "last_name":"' . $request->last_name . '",
+            "suffix":"' . $request->suffix . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new AccountFullnameUpdateEvent($user_id,json_decode($old_values[0]), json_decode($request_object)));
+
         return $response;
     }
 
     public function updateUsername(ChangeUsernamePutRequest $request)
     {
+        $old_values = Auth::user()->username;
+        
         $user = User::findOrFail(Auth::user()->id);
         $user->username = $request->new_username;
         $user->save();
+
+        $request_object = '{
+            "username":"' . $request->new_username . '"}';
+
+        $user_id = Auth::user()->id;
+        event(new AccountUsernameUpdateEvent($user_id,$old_values, json_decode($request_object)));
+
         if($user->wasChanged()) {
             return response()->json([
                 'message' => 'Your new username has been set',
@@ -78,6 +213,10 @@ class UserController extends Controller
         if (Hash::check($request->old_password, Auth::user()->password)) {
             $user->password = Hash::make($request->new_password);
             $user->save();
+
+            $user_id = Auth::user()->id;
+            event(new AccountPasswordUpdateEvent($user_id, 'Password Updated'));
+
             return response()->json([
                 'message' => 'Password was changed successfully',
                 'status' => 'success',

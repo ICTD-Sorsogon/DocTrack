@@ -15,13 +15,13 @@ class Document extends Model
         'tracking_code', 'subject', 'document_type_id',
         'destination_office_id', 'current_office', 'sender_name',
         'page_count', 'date_filed', 'is_terminal',
-        'remarks', 'attachment_page_count'
+        'remarks', 'attachment_page_count', 'status',
     ];
 
     public static function boot()
     {
         parent::boot();
-    
+
         static::creating(function ($model) {
             $model->tracking_code = $model->tracking_code ?? $model->buildTrackingNumber($model);
             $model->originating_office = $model->originating_office ??  auth()->user()->office_id;
@@ -39,7 +39,7 @@ class Document extends Model
         return $this->belongsTo('App\Models\Office', 'originating_office');
     }
 
-    public function destination() 
+    public function destination()
     {
         return $this->belongsTo('App\Models\Office', 'destination_office_id');
     }
@@ -54,17 +54,17 @@ class Document extends Model
         return $this->belongsTo('App\Models\DocumentType');
     }
 
-    public function sender() 
+    public function sender()
     {
         return $this->belongsTo('App\Models\Personnel', 'sender_name');
     }
 
-    public function tracker() 
+    public function tracker()
     {
         return $this->hasMany('App\Models\TrackingRecord');
     }
 
-    public static function allDocuments(User $user) 
+    public static function allDocuments(User $user)
     {
         $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
                     ->where('is_terminal', false);

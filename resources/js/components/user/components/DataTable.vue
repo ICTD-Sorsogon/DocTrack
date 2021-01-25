@@ -23,7 +23,7 @@
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip @click=" {selectDoc(item.id); printDialog = true}" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
 		</template>
@@ -32,7 +32,7 @@
 				<v-btn
 					color="primary"
 					icon
-					@click.prevent="selectDoc(item.id)"
+					@click.prevent="{selectDoc(item.id); dialog = true}"
 				>
 					<v-icon>mdi-more</v-icon>
 				</v-btn>
@@ -40,8 +40,8 @@
 		</template>
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
-				<v-row>
-					<v-col v-if="isEditable(item.originating_office)" cols="12" sm="3">
+				<v-row class="d-flex justify-space-around">
+					<v-col v-if="isEditable(item.originating_office)">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -54,7 +54,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col cols="12" sm="3">
+					<v-col>
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
@@ -63,7 +63,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col cols="12" sm="3">
+					<v-col>
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
@@ -73,13 +73,31 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col cols="12" sm="3">
+					<v-col>
 						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
 								mdi-email-off-outline
 							</v-icon>
 							Terminal
+						</v-btn>
+					</v-col>
+                    <v-col>
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'acknowledge')" text color="#4CAF50" block
+						>
+							<v-icon left>
+								mdi-email-check-outline
+							</v-icon>
+							Acknowledge
+						</v-btn>
+					</v-col>
+                    <v-col>
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Hold or Reject')" text color="#F44336" block
+						>
+							<v-icon left>
+								mdi-email-alert-outline
+							</v-icon>
+							Hold or Reject
 						</v-btn>
 					</v-col>
 				</v-row>
@@ -98,6 +116,9 @@
         v-if="selected_document"
         :selected_document="selected_document"
     ></table-modal>
+	<print-bar-code :code="selected_document" @closePrintDialog="closePrintDialog" :printDialog="printDialog">
+
+	</print-bar-code>
 </v-card-text>
 </template>
 
@@ -105,12 +126,14 @@
 import TableModal from './TableModal';
 import { colors } from '../../../constants';
 import {mapGetters} from 'vuex'
+import PrintBarCode from './PrintBarCode'
 
 export default {
-	components: {TableModal},
+	components: {TableModal, PrintBarCode},
 	props: ['documents', 'datatable_loader'],
 	data() {
 		return {
+			printDialog: false,
 			activeDoc: null,
 			search: '',
             page: 1,
@@ -152,12 +175,14 @@ export default {
 		}
 	},
 	methods: {
+		closePrintDialog(){
+			this.printDialog = false
+		},
 		closeDialog(){
 			this.dialog = false
 		},
 		selectDoc(id){
 			this.activeDoc = id
-			this.dialog = true
 		},
         redirectToReceivePage(id, type) {
             /**

@@ -1,9 +1,7 @@
 <template>
-    <div>
+    <v-app>
         <div v-if="auth_user">
-            <div>
-                <user-home-component></user-home-component>
-            </div>
+            <user-home-component></user-home-component>
         </div>
         <v-scroll-x-transition>
             <v-snackbar
@@ -44,7 +42,7 @@
                 </template>
             </v-snackbar>
         </v-scroll-x-transition>
-    </div>
+    </v-app>
 </template>
 
 <script>
