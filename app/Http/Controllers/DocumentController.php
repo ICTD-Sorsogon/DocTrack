@@ -49,7 +49,6 @@ class DocumentController extends Controller
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
-            // $tracking_record = TrackingRecord::find($request->id);
             $tracking_record->document_id = $request->id;
             $tracking_record->action = 'received';
             $tracking_record->through = $request->through;
@@ -76,7 +75,6 @@ class DocumentController extends Controller
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
-            // $tracking_record = TrackingRecord::find($request->id);
             $tracking_record->document_id = $request->id;
             $tracking_record->action = 'forwarded';
             $tracking_record->through = $request->through;
@@ -105,19 +103,39 @@ class DocumentController extends Controller
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
-            // $tracking_record = TrackingRecord::find($request->id);
             $tracking_record->document_id = $request->id;
             $tracking_record->action = 'terminated';
-            $tracking_record->through = $request->through;
             $tracking_record->approved_by = $request->approved_by;
             $tracking_record->touched_by = Auth::user()->id;
             $tracking_record->last_touched = Carbon::now();
-            $tracking_record->forwarded_by = $request->forwarded_by;
-            $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'terminated']);
             $tracking_record->document->delete();
+
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$tracking_record];
+    }
+
+    public function acknowledgeDocument(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $tracking_record = new TrackingRecord();
+            $tracking_record->document_id = $request->id;
+            $tracking_record->action = 'acknowledged';
+            $tracking_record->touched_by = Auth::user()->id;
+            $tracking_record->last_touched = Carbon::now();
+            $tracking_record->remarks = $request->documentRemarks;
+            $tracking_record->save();
+            $tracking_record->document->update(['status' => 'acknowledged']);
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -140,6 +158,15 @@ class DocumentController extends Controller
         if(!$document->id){
             $user_id = Auth::user()->id;
             event(new NewDocumentHasAddedEvent($user_id, $request));
+
+            $tracking_record = new TrackingRecord();
+            $tracking_record->document_id = $request->id;
+            $tracking_record->action = 'created';
+            $tracking_record->touched_by = Auth::user()->id;
+            $tracking_record->last_touched = Carbon::now();
+            $tracking_record->remarks = $request->documentRemarks;
+            $tracking_record->save();
+            $tracking_record->document->update(['status' => 'created']);
         }
 
         return true;

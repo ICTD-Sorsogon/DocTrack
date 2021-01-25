@@ -277,8 +277,8 @@
                                 :loading="btnloading"
                                 @click.prevent="showDocumentDialog"
                                 type="submit"
-                                :dark="valid"
-                                :disabled="!valid"
+                                :dark="!invalid"
+                                :disabled="invalid"
                                 >
                                     <v-icon left dark>
                                         mdi-email-check-outline
@@ -490,7 +490,29 @@ export default {
                 this.closeDocumentDialog()
         },
         acknowledgeDocumentConfirm() {
-
+            this.btnloading = true;
+                this.$store.dispatch("acknowledgeDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
         }
     },
     mounted() {
