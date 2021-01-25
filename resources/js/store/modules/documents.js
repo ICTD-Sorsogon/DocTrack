@@ -96,6 +96,24 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
+    async terminateDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/terminate_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was successfully terminated!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
     async setDocument({ commit }, document) {
         commit('SET_SELECTED_DOCUMENT', document);
     },
