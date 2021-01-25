@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import {map, forEach, last, mean} from 'lodash';
 export default {
     data() {
         return {
@@ -44,47 +44,87 @@ export default {
                 { text: 'Delayed Document', value: 'delayed' },
                 { text: 'Fastest Transaction', value: 'fastestTransaction' },
                 { text: 'Slowest Transaction', value: 'longestDelay' },
+                { text: 'Average Transaction Speed', value: 'speed' },
                 { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
     },
     computed: {
-        ...mapGetters(['getDocument']),
         //TOFIX elapse time for fastest and longest transaction should check
         // in b/w transaction by checking previous last_touched
         all_documents(){
-            let alldocuments = JSON.parse(JSON.stringify(
-                this.$store.state.documents.allDocuments));
-            alldocuments.forEach(element => {
-                var max = 0;
-                var min = (element.tracking_records.length === 0 ? 0 : Number.POSITIVE_INFINITY);
-                element.delayed = 0;
-                element.efficiency = 0;
-                element.longestDelay = '';
-                element.fastestTransaction  = '';
-                element.tracking_records.forEach(el => {
-                    let created_at = new Date(el.created_at);
-                    let now_date = new Date();
-                    let difference = now_date.getDate() - created_at.getDate();
-                    let total = element.tracking_records.length;
-                    if (max < difference ) {
-                        max = difference ;
-                        element.longestDelay = this.getTimeHours(created_at, now_date);
+            let offices = JSON.parse(JSON.stringify(
+                this.$store.state.documents.allDocuments
+            ));
+            offices.forEach(element => {
+                var total_average = 0;
+                var temp=0;
+                var delta = 0;
+                var days = 0;
+                forEach(element.documents, function(element) {
+                    if(last(element).action != 'receive') {
+                        var dates = map(element, 'last_touched');
+                        var start = 0;
+                        var end = 0;
+                        var difference = [];
+                         if (dates.length > 1) {
+                            for(var i = 0; i < dates.length - 1; i++) {
+                                start = new Date(dates[i]);
+                                end = new Date(dates[i+1]);
+                                difference.push(end - start);
+                            }
+                            let average = mean(difference);
+                            element.average = average;
+                            temp += average;
+                        }
                     }
-                    if (min > difference ) {
-                        min = difference;
-                        element.fastestTransaction = this.getTimeHours(created_at, now_date)
-                    }
-
-                    if (difference > 7) {
-                        element.delayed += 1;
-
-                    }
-                     element.efficiency = (((total - element.delayed )
-                     / total) * 100);
                 });
+                element.average = temp;
+                delta = Math.abs(element.average) / 1000;
+                var days = Math.floor(delta / 86400);
+                delta -= days * 86400;
+                var hours = Math.floor(delta / 3600) % 24;
+                delta -= hours * 3600;
+                var minutes = Math.floor(delta / 60) % 60;
+                delta -= minutes * 60;
+                var seconds = delta % 60;
+                element.avg_time = `${days}d${hours}h${minutes}m${seconds}s`
+                // element.tracking_records.forEach(element => {
+                //     console.log(_.meanBy(element, 'touched_by'));
+                // });
+
+                // element.tracking_records.forEach(element => {
+                //     console.log(element);
+                // })
+                // var max = 0;
+                // var min = (element.tracking_records.length === 0 ? 0 : Number.POSITIVE_INFINITY);
+                // element.delayed = 0;
+                // element.efficiency = 0;
+                // element.longestDelay = '';
+                // element.fastestTransaction  = '';
+                // element.tracking_records.forEach(el => {
+                //     let created_at = new Date(el.created_at);
+                //     let now_date = new Date();
+                //     let difference = now_date.getDate() - created_at.getDate();
+                //     let total = element.tracking_records.length;
+                //     // if (max < difference ) {
+                //     //     max = difference ;
+                //     //     element.longestDelay = this.getTimeHours(created_at, now_date);
+                //     // }
+                //     // if (min > difference ) {
+                //     //     min = difference;
+                //     //     element.fastestTransaction = this.getTimeHours(created_at, now_date)
+                //     // }
+
+                //     if (difference > 7) {
+                //         element.delayed += 1;
+
+                //     }
+                //      element.efficiency = (((total - element.delayed )
+                //      / total) * 100);
+                // });
             });
-            return alldocuments;
+            console.log(offices);
         }
     },
     methods: {
@@ -100,11 +140,24 @@ export default {
             delta -= minutes * 60;
             var seconds = delta % 60;
             return days +"d " + hours + "h " + minutes + "m";
+        },
+        averageElapsedTime(time_array) {
+            if (time_array.length < 2) {
+                return;
+            }
+            var start = 0;
+            var end = 0;
+            var difference = [];
+            for(i = 0; i < time_array.length; i++) {
+                start = new Date(time_array[i]);
+                end = new Date(time_array[i+1]);
+                difference.push(start.getTime() - end.getTime());
+            }
+            return _.mean(difference);
         }
     },
     mounted() {
         this.$store.dispatch('getDocument');
-        console.log(this.all_documents)
         this.$store.dispatch('getAllUsers');
         this.$store.dispatch('unsetLoader');
     }
