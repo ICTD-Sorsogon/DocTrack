@@ -1,133 +1,102 @@
 <template>
-<v-dialog v-model="excel_dialog" persistent scrollable fullscreen>
-    <v-container fluid  class="pr-0 pl-0"  style="padding:0px;">
-      <v-card v-if="selected_office" style="height:100%; width:100%; overflow-x:hidden; overflow-y:auto">
-
-          <v-row>
-            <v-col cols="6" sm="6">
-              <v-card-title primary-title> {{ dialog_title }} </v-card-title>
-            </v-col>
-            <v-col cols="6" sm="6">
-                <v-card-actions class="mr-1">
-                    <v-spacer></v-spacer>
-                    <v-btn x-large color="gray" @click="$emit('close-dialog')" icon>
-                    <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </v-card-actions>
-            </v-col>
-          </v-row>
-
-        <v-card-text>
-
-            <button @click="downloadData">DOWNLOAD</button>
-
-           <!-- <ValidationObserver ref="observer" v-slot="{ valid }">-->
-                <v-form
-                    ref="form"
-                    lazy-validation
-                >
+    <v-dialog v-model="excel_dialog" persistent scrollable width="900px">
+        <v-container fluid  class="pr-0 pl-0"  style="padding:0px;">
+            <v-card style="overflow-x:hidden; overflow-y:auto">
                 <v-row>
-
-                    <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
-                        <!--<ValidationProvider rules="required" v-slot="{ errors }">-->
-                            <v-file-input
-                                label="Browse Excel File"
-                                prepend-icon="mdi-file-excel"
-                                accept=".csv, .xlsx"
-                                ref="files"
-                                @change="fileSelected1"
-                                chips
-                                show-size
-                                counter
-                                outlined
-                                dense
-                                clearable
-                                clear-icon="mdi-delete"
-                            />
-                           <!-- <span>{{ errors[0] }}</span>
-                        </ValidationProvider>-->
+                    <v-col cols="6" sm="6">
+                        <v-card-title primary-title> {{ dialog_title }} </v-card-title>
                     </v-col>
-                    <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
-                         <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'import_office'" @click="uploadToDatabase"> UPLOAD </v-btn>
-                         <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'export_office'" @click="saveChangesToOffice"> EXPORT </v-btn>
-
-                    </v-col>
-                    <v-col v-show="is_preview && excel_data.length > 0">
-                        <v-card>
-                            <v-tabs
-                            v-model="tab"
-                            background-color="primary"
-                            dark
-                            >
-                                <v-tab
-                                    v-for="item in excel_data"
-                                    :key="item.tab"
-                                >
-                                    {{ item.tab }}
-                                </v-tab>
-                            </v-tabs>
-
-                            <v-tabs-items v-model="tab">
-                                <v-tab-item
-                                    v-for="item in excel_data"
-                                    :key="item.id"
-                                >
-                                    <v-card flat>
-                                    <!--<v-card-text>{{ item.content }}</v-card-text>-->
-                                        <v-data-table
-                                            :headers="excel_table_headers"
-                                            :items="item.content"
-                                            class="elevation-1"
-                                        >
-                                            <template v-slot:header.Office_Name="{ header }">
-                                                {{ header.text.toUpperCase() }}
-                                            </template>
-                                        </v-data-table>
-                                    </v-card>
-                                </v-tab-item>
-                            </v-tabs-items>
-                        </v-card>
-                    </v-col>
-                    <v-col v-show="!is_preview && excel_data.length > 0">
-                        <v-alert dense outlined type="error">
-                             ERROR FOUND, Please see error log bellow
-                        </v-alert>
-                        <ul>
-                            <dl>
-                                <dt>HEADER</dt>
-                                    <ol>
-                                        <li v-for="error in excel_error[0]" :key="error.id">
-                                            <strong>{{error.value}}</strong>
-                                                    {{error.message}}
-                                            <strong>[{{error.cell_position}}]</strong>
-                                        </li>
-                                    </ol>
-                                <dt>CONTENT</dt>
-                                    <ol>
-                                        <li v-for="error in excel_error[1]" :key="error.id">
-                                            <strong>{{error.value}}</strong>
-                                                    {{error.message}}
-                                            <strong>[{{error.cell_position}}]</strong>
-                                        </li>
-                                    </ol>
-                            </dl>
-                        </ul>
+                    <v-col cols="6" sm="6">
+                        <v-card-actions class="mr-1">
+                            <v-spacer></v-spacer>
+                            <v-btn x-large color="gray" @click="$emit('close-dialog')" icon>
+                                <v-icon>mdi-close</v-icon>
+                            </v-btn>
+                        </v-card-actions>
                     </v-col>
                 </v-row>
-                <!--<v-row justify="end">
-
-                    <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'import_office'" @click="uploadToDatabase"> UPLOAD </v-btn>
-                    <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'export_office'" @click="saveChangesToOffice"> EXPORT </v-btn>
-
-                    <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="form.form_mode == 'new_office'" @click="saveNewOffice"> SAVE </v-btn>
-                    <v-btn color="primary" class="mb-5 mt-10 ma-5" :dark="valid" :loading="btnloading" :disabled="!valid" v-if="form.form_mode == 'edit_office'" @click="saveChangesToOffice"> SAVE CHANGES </v-btn>
-                </v-row>-->
-                </v-form >
-            <!--</ValidationObserver-->
-
-        </v-card-text>
-      </v-card>
-      </v-container>
+                <v-card-text>
+                    <v-form ref="form" lazy-validation>
+                        <v-row v-if="dialog_for == 'exportOfficeList'">
+                            <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                                <v-btn @click="dowload" color="primary" style="width:100%" elevation="4" depressed large>EXPORT / DOWNLOAD</v-btn>
+                            </v-col>
+                        </v-row>
+                        <v-row v-if="dialog_for == 'importOfficeList'">
+                            <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
+                                <v-file-input
+                                    label="Browse Excel File"
+                                    prepend-icon="mdi-file-excel"
+                                    accept=".csv, .xlsx"
+                                    ref="files"
+                                    @change="upload"
+                                    chips
+                                    show-size
+                                    counter
+                                    outlined
+                                    dense
+                                    clearable
+                                    clear-icon="mdi-delete"
+                                />
+                            </v-col>
+                            <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
+                                <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'importOfficeList'" @click="uploadToDatabase"> UPLOAD </v-btn>
+                                <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'exportOfficeList'" @click="saveChangesToOffice"> EXPORT </v-btn>
+                            </v-col>
+                            <v-col v-show="is_preview && excel_data.length > 0">
+                                <v-card>
+                                    <v-tabs v-model="tab" background-color="primary" dark>
+                                        <v-tab v-for="item in excel_data" :key="item.tab">
+                                            {{ item.tab }}
+                                        </v-tab>
+                                    </v-tabs>
+                                    <v-tabs-items v-model="tab">
+                                        <v-tab-item v-for="item in excel_data" :key="item.id">
+                                            <v-card flat>
+                                                <v-data-table
+                                                    :headers="excel_table_headers"
+                                                    :items="item.content"
+                                                    class="elevation-1"
+                                                >
+                                                    <template v-slot:header.Office_Name="{ header }">
+                                                        {{ header.text.toUpperCase() }}
+                                                    </template>
+                                                </v-data-table>
+                                            </v-card>
+                                        </v-tab-item>
+                                    </v-tabs-items>
+                                </v-card>
+                            </v-col>
+                            <v-col v-show="!is_preview && excel_data.length > 0">
+                                <v-alert dense outlined type="error">
+                                    ERROR FOUND, Please see error log bellow
+                                </v-alert>
+                                <ul>
+                                    <dl>
+                                        <dt>HEADER</dt>
+                                        <ol>
+                                            <li v-for="error in excel_error[0]" :key="error.id">
+                                                <strong>{{error.value}}</strong>
+                                                        {{error.message}}
+                                                <strong>[{{error.cell_position}}]</strong>
+                                            </li>
+                                        </ol>
+                                        <dt>CONTENT</dt>
+                                        <ol>
+                                            <li v-for="error in excel_error[1]" :key="error.id">
+                                                <strong>{{error.value}}</strong>
+                                                        {{error.message}}
+                                                <strong>[{{error.cell_position}}]</strong>
+                                            </li>
+                                        </ol>
+                                    </dl>
+                                </ul>
+                            </v-col>
+                        </v-row>
+                    </v-form >
+                </v-card-text>
+            </v-card>
+        </v-container>
     </v-dialog>
 </template>
 
@@ -195,7 +164,8 @@
                     { text: 'Email Address', value: 'Email_Address' }
                 ],
                 is_preview: false,
-                offices: []
+                offices: [],
+                dia: 'ggH'
             }
         },
         computed: {
@@ -204,90 +174,24 @@
                 return this.$store.state.snackbars.request;
             },
             selected_office(){
-                    return {id: '',
+                return {
+                    id: '',
                     name: '',
                     address: '',
                     office_code: '',
                     contact_number: '',
                     contact_email: '',
-                    form_mode: ''}
+                    form_mode: ''
+                }
             },
 
         },
         methods: {
-            fileSelected1(file){
+            upload(file){
                 try {
                     var fileExtension = file.name.split(".").pop().toLowerCase();
                     if (fileExtension == 'xlsx'){
-                        var offices = this.$store.state.offices.offices;
-                        this.offices = [];
-                        offices.forEach(office => {
-                            this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
-                        });
-                        this.excel_data = [];
-                        this.excel_error = [[], []];
-                        const wb = new Excel.Workbook();
-                        const reader = new FileReader();
-                        reader.readAsArrayBuffer(file)
-                        reader.onload = function() {
-                            const buffer = reader.result;
-                            wb.xlsx.load(buffer).then(function(workbook) {
-                                workbook.eachSheet(function(sheet, id) {
-                                    var sheetIndex = id - 1;
-                                    this.excel_data.push({
-                                        id: sheetIndex,
-                                        tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
-                                        content: []
-                                    });
-                                    sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-                                        var rowIndex = rowNumber - 1;
-                                        if (rowIndex > 0) {
-                                            var dataCol = row.values;
-                                            this.excel_data[sheetIndex].content.push({
-                                                Office_Name: (dataCol[1] == undefined)? null : dataCol[1],
-                                                Office_Code: (dataCol[2] == undefined)? null : dataCol[2],
-                                                Address: (dataCol[3] == undefined)? null : dataCol[3],
-                                                Contact_Number: (dataCol[4] == undefined)? null : dataCol[4],
-                                                Email_Address: (dataCol[5] instanceof Object)?
-                                                    ((dataCol[5] == undefined)? null : dataCol[5].text) :
-                                                    ((dataCol[5] == undefined)? null : dataCol[5])
-                                            });
-                                        }
-                                        row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
-                                            var colIndex = colNumber - 1;
-                                            if (rowIndex > 0 && colIndex < 3) {
-                                                if (cell.value != null && cell.value.trim() !== '') {
-                                                    if (colIndex == 0 && this.offices.includes((cell.value).trim().toLowerCase().replace(/\s/g, ''))) {
-                                                        this.excel_error[1].push({
-                                                            id: this.randomKey(),
-                                                            value: cell.value,
-                                                            message: "already exist in the database",
-                                                            cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
-                                                        });
-                                                    }
-                                                } else {
-                                                    if (cell.value == null || cell.value.trim == '') {
-                                                        this.excel_error[1].push({
-                                                            id: this.randomKey(),
-                                                            value: '',
-                                                            message: "This cell is required ",
-                                                            cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
-                                                        });
-                                                    }
-                                                }
-                                            }
-                                        }.bind(this));
-                                    }.bind(this))
-                                }.bind(this))
-                                if (this.excel_error[0].length < 1 && this.excel_error[1].length < 1) {
-                                    this.is_preview = true;
-                                    this.valid = true;
-                                } else {
-                                    this.is_preview = false;
-                                    this.valid = false;
-                                }
-                            }.bind(this))
-                        }.bind(this)
+                        this[this.dialog_for](file)
                     } else {
                         this.$store.dispatch('setSnackbar', {
                             type: 'error',
@@ -300,7 +204,81 @@
                     this.valid = false;
                 }
             },
-            downloadData(){
+            dowload(){
+                this[this.dialog_for]()
+            },
+            importOfficeList(file){
+                var offices = this.$store.state.offices.offices;
+                this.offices = [];
+                offices.forEach(office => {
+                    this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
+                });
+                this.excel_data = [];
+                this.excel_error = [[], []];
+                const wb = new Excel.Workbook();
+                const reader = new FileReader();
+                reader.readAsArrayBuffer(file)
+                reader.onload = function() {
+                    const buffer = reader.result;
+                    wb.xlsx.load(buffer).then(function(workbook) {
+                        workbook.eachSheet(function(sheet, id) {
+                            var sheetIndex = id - 1;
+                            this.excel_data.push({
+                                id: sheetIndex,
+                                tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
+                                content: []
+                            });
+                            sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+                                var rowIndex = rowNumber - 1;
+                                if (rowIndex > 0) {
+                                    var dataCol = row.values;
+                                    this.excel_data[sheetIndex].content.push({
+                                        Office_Name: (dataCol[1] == undefined)? null : dataCol[1],
+                                        Office_Code: (dataCol[2] == undefined)? null : dataCol[2],
+                                        Address: (dataCol[3] == undefined)? null : dataCol[3],
+                                        Contact_Number: (dataCol[4] == undefined)? null : dataCol[4],
+                                        Email_Address: (dataCol[5] instanceof Object)?
+                                            ((dataCol[5] == undefined)? null : dataCol[5].text) :
+                                            ((dataCol[5] == undefined)? null : dataCol[5])
+                                    });
+                                }
+                                row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
+                                    var colIndex = colNumber - 1;
+                                    if (rowIndex > 0 && colIndex < 3) {
+                                        if (cell.value != null && cell.value.trim() !== '') {
+                                            if (colIndex == 0 && this.offices.includes((cell.value).trim().toLowerCase().replace(/\s/g, ''))) {
+                                                this.excel_error[1].push({
+                                                    id: this.randomKey(),
+                                                    value: cell.value,
+                                                    message: "already exist in the database",
+                                                    cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
+                                                });
+                                            }
+                                        } else {
+                                            if (cell.value == null || cell.value.trim == '') {
+                                                this.excel_error[1].push({
+                                                    id: this.randomKey(),
+                                                    value: '',
+                                                    message: "This cell is required ",
+                                                    cell_position: this.cellPosition(sheetIndex, colIndex, rowIndex),
+                                                });
+                                            }
+                                        }
+                                    }
+                                }.bind(this));
+                            }.bind(this))
+                        }.bind(this))
+                        if (this.excel_error[0].length < 1 && this.excel_error[1].length < 1) {
+                            this.is_preview = true;
+                            this.valid = true;
+                        } else {
+                            this.is_preview = false;
+                            this.valid = false;
+                        }
+                    }.bind(this))
+                }.bind(this)
+            },
+            exportOfficeList(){
                 const data = this.$store.state.offices.offices;
 
                 // need to create a workbook object. Almost everything in ExcelJS is based off of the workbook object.
@@ -377,7 +355,6 @@
                     document.body.appendChild(link);
                     link.click();
                 });
-
             },
             exTest(){
  const data = [{
@@ -1003,6 +980,8 @@ console.log('done');
             Object.assign(this.form_old, this.selected_office)
             Object.assign(this.form, this.selected_office)
             //console.log('ff',this.selected_office);
+
+
 
 
 

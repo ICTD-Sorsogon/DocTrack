@@ -88,19 +88,19 @@
         </v-row>
 
         <office-table-modal
-            @close-dialog="closeDialog('form')"
-            :form_dialog="form_dialog"
             v-if="office_info && form_dialog == true"
+            :form_dialog="form_dialog"
             :selected_office="office_info"
             :dialog_title="dialog_title"
+            @close-dialog="closeDialog('form')"
         />
 
         <office-excel-dialog
-            @close-dialog="closeDialog('excel')"
-            :excel_dialog="excel_dialog"
             v-if="dialog_title && excel_dialog == true"
+            :excel_dialog="excel_dialog"
             :dialog_title="dialog_title"
             :dialog_for="dialog_for"
+            @close-dialog="closeDialog('excel')"
         />
 
     </div>
@@ -199,12 +199,12 @@
                         this.form_dialog = true
                         break;
                     case 'import_office':
-                        this.dialog_for = 'import_office';
+                        this.dialog_for = 'importOfficeList';
                         this.dialog_title = 'Import Office List Via Excel File';
                         this.excel_dialog = true
                         break;
                     case 'export_office':
-                        this.dialog_for = 'export_office';
+                        this.dialog_for = 'exportOfficeList';
                         this.dialog_title = 'Export Office List Via Excel File';
                         this.excel_dialog = true
                         break;
