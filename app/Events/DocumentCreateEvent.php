@@ -10,21 +10,21 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewDocumentHasAddedEvent
+class DocumentCreateEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user_id;
-    public $request;
+    public $request_obj;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user_id, $request)
+    public function __construct($user_id, $request_obj)
     {
         $this->user_id = $user_id;
-        $this->request = $request;
+        $this->request_obj = $request_obj;
     }
 
     /**

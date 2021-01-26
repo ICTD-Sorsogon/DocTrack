@@ -2,12 +2,12 @@
 
 namespace App\Listeners;
 
-use App\Events\NewDocumentHasAddedEvent;
+use App\Events\DocumentCreateEvent;
 use App\Models\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class InsertDocumentListener
+class DocumentCreateListener
 {
     /**
      * Create the event listener.
@@ -25,12 +25,14 @@ class InsertDocumentListener
      * @param  object  $event
      * @return void
      */
-    public function handle(NewDocumentHasAddedEvent $event)
+    public function handle(DocumentCreateEvent $event)
     {
-        $subject = $event->request->subject;
+        $subject = $event->request_obj->subject;
+        $data = json_encode($event->request_obj);
 
-        $log = new Log;
+        $log = new Log();
         $log->user_id = $event->user_id;
+        $log->new_values = $data;
         $log->action = 'Document Created';
         $log->remarks = 'New Document has been Created with Subject of : '.$subject;
         return $log->save();

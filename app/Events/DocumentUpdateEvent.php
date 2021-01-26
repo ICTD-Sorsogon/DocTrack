@@ -14,14 +14,19 @@ class DocumentUpdateEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $user_id;
+    public $old_values;
+    public $request_obj;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user_id, $old_values, $request_obj)
     {
-        //
+        $this->user_id = $user_id;
+        $this->request_obj = $request_obj;
+        $this->old_values = $old_values;
     }
 
     /**
