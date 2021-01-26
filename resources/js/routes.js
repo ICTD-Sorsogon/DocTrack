@@ -17,7 +17,6 @@ import Login from './components/Login';
 import HomeContainer from './components/HomeContainer';
 import NotFound from './components/NotFound';
 
-// TODO: Fix navigation guards
 export default {
     base: '/',
     mode: 'history',
@@ -92,6 +91,7 @@ export default {
                     component: DocumentAction,
                     name: 'Terminal Document'
                 },
+                // FIXME: Fix bug for submenu when using reports/'pathname'
                 {
                     path: 'aging',
                     component: ReportAging,
