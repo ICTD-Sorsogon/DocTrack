@@ -27,7 +27,7 @@
 </template>
 <script>
 
-import Draggable from 'Draggable'
+import Draggable from 'draggable'
 import jsbarcode from 'jsbarcode'
 
 export default {

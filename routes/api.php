@@ -40,6 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('forward_document_confirm/{id}', 'DocumentController@forwardDocument');
         Route::post('terminate_document_confirm/{id}', 'DocumentController@terminateDocument');
         Route::post('acknowledge_document_confirm/{id}', 'DocumentController@acknowledgeDocument');
+        Route::post('hold_reject_document_confirm/{id}', 'DocumentController@holdRejectDocument');
 
         Route::post('add_new_office', 'OfficeController@addNewOffice');
         Route::post('update_existing_office', 'OfficeController@updateExistingOffice');

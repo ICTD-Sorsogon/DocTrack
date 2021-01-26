@@ -132,6 +132,24 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
+    async holdRejectDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/hold_reject_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was ${form.hold_reject}!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
     async setDocument({ commit }, document) {
         commit('SET_SELECTED_DOCUMENT', document);
     },

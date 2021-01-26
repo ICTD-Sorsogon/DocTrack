@@ -83,72 +83,9 @@
                             disabled
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" xl="6" lg="6" md="6">
-                        <v-dialog
-                            ref="date_dialog"
-                            v-model="datepicker_modal"
-                            :return-value.sync="form.date_filed"
-                            persistent
-                            width="290px"
-                        >
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-text-field
-                                    v-model="selected_document.date_filed"
-                                    label="Date Filed"
-                                    prepend-inner-icon="mdi-calendar"
-                                    readonly
-                                    outlined
-                                    disabled
-                                    v-bind="attrs"
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="form.date_filed" scrollable>
-                                <v-spacer></v-spacer>
-                                <v-btn text color="primary" @click="datepicker_modal = false">
-                                    Cancel
-                                </v-btn>
-                                <v-btn text color="primary" @click="$refs.date_dialog.save(form.date_filed)">
-                                    OK
-                                </v-btn>
-                            </v-date-picker>
-                        </v-dialog>
-                    </v-col>
-                     <v-col cols="12" xl="6" lg="6" md="12">
-                        <v-dialog
-                            ref="time_dialog"
-                            v-model="timepicker_modal"
-                            :return-value.sync="form.time_filed"
-                            persistent
-                            width="290px"
-                        >
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-text-field
-                                    v-model="selected_document.time_filed"
-                                    label="Time Filed"
-                                    prepend-inner-icon="mdi-clock-time-four-outline"
-                                    readonly
-                                    outlined
-                                    disabled
-                                    v-bind="attrs"
-                                    v-on="on"
-                                ></v-text-field>
-                            </template>
-                            <v-time-picker v-if="timepicker_modal" v-model="form.time_filed" full-width>
-                                <v-spacer></v-spacer>
-                                <v-btn text color="primary" @click="timepicker_modal = false">
-                                    Cancel
-                                </v-btn>
-                                <v-btn text color="primary" @click="$refs.time_dialog.save(form.time_filed)">
-                                    OK
-                                </v-btn>
-                            </v-time-picker>
-                        </v-dialog>
-                    </v-col>
-                    <v-col cols="12" xl="12" lg="6" md="6">
+                    <v-col cols="12" xl="12" lg="6" md="6" v-if="types=='forward'">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
-                            v-if="types=='forward'"
                             v-model="form.forwarded_by"
                             :items="offices"
                             item-text="name"
@@ -163,10 +100,9 @@
                         ></v-select>
                          </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="6" md="6">
+                    <v-col cols="12" xl="12" lg="6" md="6" v-if="types=='forward'">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
-                            v-if="types=='forward'"
                             v-model="form.forwarded_to"
                             :items="offices"
                             item-text="name"
@@ -181,10 +117,9 @@
                         ></v-select>
                          </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="6" md="12">
+                    <v-col cols="12" xl="12" lg="6" md="12" v-if="['forward', 'receive'].includes(types)">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
-                            v-if="['forward', 'receive'].includes(types)"
                             v-model="form.through"
                             :items="coming_from"
                             item-text="show"
@@ -199,10 +134,9 @@
                         ></v-select>
                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" :lg="types=='terminal'? 12 : 6" md="12">
+                    <v-col cols="12" xl="12" :lg="types=='terminal'? 12 : 6" md="12" v-if="['forward', 'receive', 'terminal'].includes(types)">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-text-field
-                            v-if="['forward', 'receive', 'terminal'].includes(types)"
                             v-model="form.approved_by"
                             label="Approved by"
                             prepend-inner-icon="mdi-account-tie-outline"
@@ -210,6 +144,23 @@
                             :error-messages="errors"
                             :success="valid"
                         ></v-text-field>
+                        </ValidationProvider>
+                    </v-col>
+                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='Hold or Reject'">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
+                            v-model="form.hold_reject"
+                            :items="status_options"
+                            item-text="show"
+                            item-value="value"
+                            label="Status"
+                            prepend-inner-icon="mdi-file-document-edit-outline"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
+                            required
+                            outlined
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
                         </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
@@ -285,7 +236,20 @@
                                     </v-icon>
                                     Acknowledge
                             </v-btn>
-
+                            <v-btn
+                                v-if="types=='Hold or Reject'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="!invalid"
+                                :disabled="invalid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-alert-outline
+                                    </v-icon>
+                                    Hold or Reject
+                            </v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -316,8 +280,11 @@
                         <v-btn v-if="types=='terminal'" color="primary darken-1" text @click.prevent="terminateDocumentConfirm">
                             Terminate
                         </v-btn>
-                         <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
+                        <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
                             Acknowledge
+                        </v-btn>
+                        <v-btn v-if="types=='Hold or Reject'" color="primary darken-1" text @click.prevent="holdRejectDocumentConfirm">
+                            Hold or Reject
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -363,14 +330,16 @@ export default {
     data() {
         return {
             btnloading: false,
-            datepicker_modal: false,
-            timepicker_modal: false,
             documentDialog: false,
             coming_from: [
                 { show: 'Docket Office', value: 'docket office' },
                 { show: 'Email', value: 'email' },
                 { show: 'Personal', value: 'personal' },
                 { show: 'Others', value: 'others' }
+            ],
+            status_options: [
+                { show: 'Hold', value: 'on hold' },
+                { show: 'Reject', value: 'rejected' }
             ],
             temp: {
                 sample_data: 'sample'
@@ -385,7 +354,8 @@ export default {
                 documentRemarks: '',
                 forwarded_by: '',
                 forwarded_to: '',
-                status: ''
+                status: '',
+                hold_reject: '',
             },
             defaultItem: {
                 document_id: '',
@@ -397,7 +367,8 @@ export default {
                 documentRemarks: '',
                 forwarded_by: '',
                 forwarded_to: '',
-                status: ''
+                status: '',
+                hold_reject: '',
             }
         }
     },
@@ -513,7 +484,32 @@ export default {
                     }
                 });
                 this.closeDocumentDialog()
-        }
+        },
+        holdRejectDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("holdRejectDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
     },
     mounted() {
         console.log(this.selected_document)
