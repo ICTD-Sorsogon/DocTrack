@@ -48,7 +48,7 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item.originating_office)">
+					<v-col v-if="isEditable(item)">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -61,7 +61,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col>
+					<v-col v-if="!isEditable(item)">
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
@@ -70,7 +70,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col>
+					<v-col v-if="isAdmin">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
@@ -89,7 +89,7 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col>
+                    <v-col v-if="isAdmin">
 						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
@@ -111,12 +111,7 @@
 			</td>
 		</template>
 	</v-data-table>
-	<!-- <div class="text-center pt-2">
-		<v-pagination
-			v-model="page"
-			:length="pageCount"
-		></v-pagination>
-	</div> -->
+
 	<table-modal
 		@closeDialog="closeDialog"
         :dialog="dialog"
@@ -213,7 +208,7 @@ export default {
             }
         },
 		isEditable(docOrigin) {
-			return this.auth_user.office_id == docOrigin || this.isAdmin
+			return this.auth_user.office_id == docOrigin.origin_office?.id || this.isAdmin
 		},
 		getTrackingCodeColor(document, document_type_id) {
             // document.color = colors[document_type_id];
