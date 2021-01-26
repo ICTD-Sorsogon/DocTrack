@@ -22,6 +22,7 @@
 				v-model="search"
 				label="Search"
 				class="mx-4"
+                prepend-inner-icon="mdi-magnify"
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
@@ -150,7 +151,6 @@ export default {
                 { text: 'Destination Office', value: 'destination.name', sortable: false },
                 { text: 'Sender', value: 'sender_name', sortable: false },
                 { text: 'Priority Level', value: 'priority_level', sortable: false },
-                { text: 'Date Filed', value: 'date_filed', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
                 { text: 'Actions', value: 'data-table-expand', sortable: false },
             ],
