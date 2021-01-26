@@ -92,7 +92,6 @@
 </template>
 
 <script>
-
     import { mapGetters } from 'vuex';
     import * as Excel from 'exceljs';
 
@@ -136,6 +135,19 @@
                     this.excel_data = [];
                     this.excel_error = [[]];
                     this.valid = false;
+                }
+            },
+            uploadToDatabase(){
+                this.btnloading = true;
+                if(this.excel_error[0].length < 1 && this.excel_data.length > 0){
+                    const functionName = this.dialog_for + 'ToDatabase';
+                    this[functionName]()
+                }else{
+                    this.$store.dispatch('setSnackbar', {
+                        type: 'warning',
+                        message: 'Upload request error, please check your file.'
+                    });
+                    this.btnloading = false;
                 }
             },
             dowload(){
@@ -220,6 +232,35 @@
                     }.bind(this))
                 }.bind(this)
             },
+            importOfficeListToDatabase(){
+                var office_data = { office_data: this.excel_data };
+                this.$store.dispatch("importNewOffice", office_data).then(() => {
+                    if(this.request.status == 'success') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'success',
+                            message: this.request.message
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getOffices');
+                            var offices = this.$store.state.offices.offices;
+                            this.offices = [];
+                            offices.forEach(office => {
+                                this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
+                            });
+                        });
+
+                    } else if(this.request.status == 'failed'){
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+            },
             exportOfficeList(){
                 const header_color = this.marian_blue;
                 const data = this.$store.state.offices.offices;
@@ -282,46 +323,6 @@
                     document.body.appendChild(link);
                     link.click();
                 });
-            },
-            uploadToDatabase(){
-                this.btnloading = true;
-                if(this.excel_error[0].length < 1 &&
-                    this.excel_data.length > 0
-                ){
-                    var office_data = { office_data: this.excel_data };
-                    this.$store.dispatch("importNewOffice", office_data).then(() => {
-                        if(this.request.status == 'success') {
-                            this.$store.dispatch('setSnackbar', {
-                                type: 'success',
-                                message: this.request.message
-                            })
-                            .then(() => {
-                                this.btnloading = false;
-                                this.$store.dispatch('getOffices');
-                                var offices = this.$store.state.offices.offices;
-                                this.offices = [];
-                                offices.forEach(office => {
-                                    this.offices.push(office.name.trim().toLowerCase().replace(/\s/g, ''));
-                                });
-                            });
-
-                        } else if(this.request.status == 'failed'){
-                            this.$store.dispatch('setSnackbar', {
-                                type: 'error',
-                                message: this.request.message
-                            })
-                            .then(() => {
-                                this.btnloading = false;
-                            });
-                        }
-                    });
-                }else{
-                    this.$store.dispatch('setSnackbar', {
-                        type: 'warning',
-                        message: 'Upload request error, please check your file.'
-                    });
-                    this.btnloading = false;
-                }
             },
         },
         mounted() {
