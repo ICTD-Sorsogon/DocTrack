@@ -95,7 +95,7 @@
             @close-dialog="closeDialog('form')"
         />
 
-        <office-excel-dialog
+        <excel-dialog
             v-if="dialog_title && excel_dialog == true"
             :excel_dialog="excel_dialog"
             :dialog_title="dialog_title"
@@ -108,14 +108,12 @@
 </template>
 
 <script>
-
     import OfficeTableModal from './components/OfficeTableModal';
-    import OfficeExcelDialog from './components/OfficeExcelDialog';
+    import ExcelDialog from './components/ExcelDialog';
     import { mapGetters, mapActions } from "vuex";
-    import { colors } from '../../constants';
 
     export default {
-        components: { OfficeTableModal, OfficeExcelDialog },
+        components: { OfficeTableModal, ExcelDialog },
         data() {
             return {
                 headers: [
