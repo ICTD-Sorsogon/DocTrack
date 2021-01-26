@@ -194,7 +194,7 @@ export default {
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
         logout(){
-            this.removeAuthUser();
+            this.removeAuthUser()
             this.$store.dispatch('unsetSnackbar');
             this.$store.dispatch('setLoader');
             sessionStorage.clear();

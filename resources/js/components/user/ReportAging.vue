@@ -39,13 +39,14 @@ export default {
                     text: 'Office',
                     align: 'start',
                     value: 'name',
-                },
-                { text: 'All Transaction', value: 'tracking_records.length' },
-                { text: 'Delayed Document', value: 'delayed' },
-                { text: 'Fastest Transaction', value: 'fastestTransaction' },
-                { text: 'Slowest Transaction', value: 'longestDelay' },
-                { text: 'Average Transaction Speed', value: 'speed' },
-                { text: 'Efficiency Rating', value: 'efficiency' },
+                }
+                // ,
+                // { text: 'All Transaction', value: 'tracking_records.length' },
+                // { text: 'Delayed Document', value: 'delayed' },
+                // { text: 'Fastest Transaction', value: 'fastestTransaction' },
+                // { text: 'Slowest Transaction', value: 'longestDelay' },
+                // { text: 'Average Transaction Speed', value: 'speed' },
+                // { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
     },
@@ -124,7 +125,8 @@ export default {
                 //      / total) * 100);
                 // });
             });
-            console.log(offices);
+            // console.log(offices);
+            return offices;
         }
     },
     methods: {
@@ -157,6 +159,7 @@ export default {
         }
     },
     mounted() {
+        console.log(this.all_documents)
         this.$store.dispatch('getDocument');
         this.$store.dispatch('getAllUsers');
         this.$store.dispatch('unsetLoader');

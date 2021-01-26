@@ -42,6 +42,7 @@ export default {
         {
             path: '/',
             component: HomeContainer,
+            requiresAuth: true,
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
                     next()
@@ -92,22 +93,22 @@ export default {
                     name: 'Terminal Document'
                 },
                 {
-                    path: 'reports/aging',
+                    path: 'aging',
                     component: ReportAging,
                     name: 'Document Aging Report'
                 },
                 {
-                    path: 'reports/logs',
+                    path: 'logs',
                     component: ReportLog,
                     name: 'Log Report'
                 },
                 {
-                    path: 'reports/master_list',
+                    path: 'master_list',
                     component: ReportMasterList,
                     name: 'Document Master List'
                 },
                 {
-                    path: 'reports/office_list',
+                    path: 'office_list',
                     component: ReportOfficeList,
                     name: 'Office List'
                 },
