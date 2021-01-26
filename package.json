@@ -26,6 +26,7 @@
         "@mdi/font": "^5.6.55",
         "draggable": "^4.2.0",
         "es6-promise": "^4.2.8",
+        "exceljs": "^4.2.0",
         "jsbarcode": "^3.11.3",
         "v-movable": "^0.3.2",
         "vee-validate": "^3.4.1",
