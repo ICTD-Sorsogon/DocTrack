@@ -27,6 +27,7 @@ class DocumentFactory extends Factory
         $attachmentPageCount = rand(1, 50);
         $source = rand(0, 1);
 
+
         return [
             'subject' => strtoupper($this->faker->realText(20)),
             'is_external' => $source,
@@ -34,6 +35,7 @@ class DocumentFactory extends Factory
             'originating_office' => $source,
             'destination_office_id' => rand(1, 26),
             'sender_name' => $source == 0 ? rand(3, 12) : $this->faker->name,
+            'priority_level' => rand(1,3),
             'page_count' => rand(1, 50),
             'is_terminal' => 0,
             'remarks' => $this->faker->realText(100),
