@@ -1,24 +1,3 @@
-
-/**
- * Application constants for front-end
- * Update this everytime for each database update
-**/
-
-export const actions = [
-    {'code': 10, 'value': 'create'},
-    {'code': 11, 'value': 'receive'},
-    {'code': 12, 'value': 'forward'},
-    {'code': 13, 'value': 'terminate'},
-    {'code': 14, 'value': 'acknowledge'},
-];
-
-export const status = [
-    {'code': 20, 'value': 'processing'},
-    {'code': 22, 'value': 'approved'},
-    {'code': 23, 'value': 'on hold'},
-    {'code': 24, 'value': 'rejected'},
-];
-
 export const document_types = [
     'Executive Order',
     'Provincial Ordinance',
@@ -65,4 +44,10 @@ export const snackbar_icon = {
     info: 'mdi-information-outline',
     warning: 'mdi-exclamation-thick',
     error: 'mdi-close-thick'
+};
+
+export const priority_level = {
+    3 : '#F44336',
+    2 : '#FFA726',
+    1: '#03A9F4'
 };
