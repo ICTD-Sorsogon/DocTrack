@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DocumentAcknowledgeEvent;
 use App\Events\DocumentCreateEvent;
+use App\Events\DocumentForwardEvent;
+use App\Events\DocumentHoldRejectEvent;
+use App\Events\DocumentReceiveEvent;
+use App\Events\DocumentTerminateEvent;
 use App\Events\DocumentUpdateEvent;
 use App\Events\NewDocumentHasAddedEvent;
 use App\Http\Requests\DocumentPostRequest;
@@ -48,6 +53,11 @@ class DocumentController extends Controller
 
     public function receiveDocument(Request $request)
     {
+        $remarks = $request->documentRemarks;
+        $approved_by = $request->approved_by;
+        $subject = $request->subject;
+        $through = $request->through;
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -60,6 +70,9 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'received']);
+
+            $user_id = Auth::user()->id;
+            event(new DocumentReceiveEvent($user_id,$subject,$remarks, $approved_by, $through));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -74,6 +87,13 @@ class DocumentController extends Controller
 
     public function forwardDocument(Request $request)
     {
+        $remarks = $request->documentRemarks;
+        $forwarded_by = $request->forwarded_by;
+        $forwarded_to = $request->forwarded_to;
+        $approved_by = $request->approved_by;
+        $subject = $request->subject;
+        $through = $request->through;
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -89,6 +109,10 @@ class DocumentController extends Controller
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'forwarded']);
 
+            $user_id = Auth::user()->id;
+            event(new DocumentForwardEvent($user_id,$subject,$remarks, $approved_by, $through, $forwarded_by, $forwarded_to));
+
+
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
@@ -102,6 +126,10 @@ class DocumentController extends Controller
 
     public function terminateDocument(Request $request)
     {
+        $remarks = $request->documentRemarks;
+        $approved_by = $request->approved_by;
+        $subject = $request->subject;
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -114,6 +142,9 @@ class DocumentController extends Controller
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'terminated']);
             $tracking_record->document->delete();
+
+            $user_id = Auth::user()->id;
+            event(new DocumentTerminateEvent($user_id,$subject,$remarks, $approved_by));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -128,6 +159,9 @@ class DocumentController extends Controller
 
     public function acknowledgeDocument(Request $request)
     {
+        $remarks = $request->remarks;
+        $subject = $request->subject;
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -138,6 +172,9 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
+
+            $user_id = Auth::user()->id;
+            event(new DocumentAcknowledgeEvent($user_id,$subject,$remarks));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -152,6 +189,9 @@ class DocumentController extends Controller
 
     public function holdRejectDocument(Request $request)
     {
+        $status = $request->hold_reject;
+        $subject = $request->subject;
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -162,6 +202,10 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => $request->hold_reject]);
+
+            $user_id = Auth::user()->id;
+            event(new DocumentHoldRejectEvent($user_id, $status, $subject));
+
 
         } catch (ValidationException $error) {
             DB::rollback();
