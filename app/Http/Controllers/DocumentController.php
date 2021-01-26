@@ -172,6 +172,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
+            $tracking_record->document->update(['priority_level' => $request->priority_level]);
 
             $user_id = Auth::user()->id;
             event(new DocumentAcknowledgeEvent($user_id,$subject,$remarks));
