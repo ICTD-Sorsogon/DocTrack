@@ -13,7 +13,7 @@ class DocumentPostRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->user()->canEditThisDoc($this->id);
+        return  !$this->document ?? auth()->user()->can('update', $this->document);
     }
 
     /**
