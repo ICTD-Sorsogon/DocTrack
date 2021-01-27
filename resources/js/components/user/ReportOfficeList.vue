@@ -40,8 +40,14 @@
                 </template>
 
                 <template v-slot:item.actions="{ item }">
-                    <v-icon small class="mr-2" @click="editOffice(item)">mdi-pencil </v-icon>
-                    <v-icon small @click="deleteConfirmationDialog(item)"> mdi-delete </v-icon>
+                    <v-row>
+                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pr-0" style="top:50%; text-align:right;">
+                            <v-icon small @click="editOffice(item)" style="margin-right:4px;">mdi-pencil </v-icon>
+                        </v-col>
+                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pl-0" style="top:50%; text-align:left;">
+                            <v-icon small @click="deleteConfirmationDialog(item)" style="margin-left:4px;"> mdi-delete </v-icon>
+                        </v-col>
+                    </v-row>
                 </template>
 
             </v-data-table>
@@ -82,18 +88,19 @@
         </v-row>
 
         <office-table-modal
-            @close-dialog="closeDialog('form')"
-            :form_dialog="form_dialog"
             v-if="office_info && form_dialog == true"
+            :form_dialog="form_dialog"
             :selected_office="office_info"
             :dialog_title="dialog_title"
+            @close-dialog="closeDialog('form')"
         />
 
-        <office-excel-dialog
-            @close-dialog="closeDialog('excel')"
-            :excel_dialog="excel_dialog"
+        <excel-dialog
             v-if="dialog_title && excel_dialog == true"
+            :excel_dialog="excel_dialog"
             :dialog_title="dialog_title"
+            :dialog_for="dialog_for"
+            @close-dialog="closeDialog('excel')"
         />
 
     </div>
@@ -101,22 +108,21 @@
 </template>
 
 <script>
-
     import OfficeTableModal from './components/OfficeTableModal';
-    import OfficeExcelDialog from './components/OfficeExcelDialog';
+    import ExcelDialog from './components/ExcelDialog';
     import { mapGetters, mapActions } from "vuex";
-    import { colors } from '../../constants';
 
     export default {
-        components: { OfficeTableModal, OfficeExcelDialog },
+        components: { OfficeTableModal, ExcelDialog },
         data() {
             return {
                 headers: [
                     { text: 'Office', value: 'name' },
                     { text: 'Office Code', value: 'office_code' },
+                    { text: 'Address', value: 'address' },
                     { text: 'Contact Number', value: 'contact_number' },
-                    { text: 'Contact Email', value: 'contact_email' },
-                    { text: 'Action', value: 'actions' },
+                    { text: 'Email Address', value: 'contact_email' },
+                    { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
                 form_dialog: false,
@@ -191,10 +197,12 @@
                         this.form_dialog = true
                         break;
                     case 'import_office':
+                        this.dialog_for = 'importOfficeList';
                         this.dialog_title = 'Import Office List Via Excel File';
                         this.excel_dialog = true
                         break;
                     case 'export_office':
+                        this.dialog_for = 'exportOfficeList';
                         this.dialog_title = 'Export Office List Via Excel File';
                         this.excel_dialog = true
                         break;
