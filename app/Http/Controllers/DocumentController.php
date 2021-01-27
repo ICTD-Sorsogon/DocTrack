@@ -262,14 +262,15 @@ class DocumentController extends Controller
             $request->validated()
         );
 
-
         if(!$document->id){
+            $user_id = Auth::user()->id;
+            event(new NewDocumentHasAddedEvent($user_id, $request));
             $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $request->id;
+            $tracking_record->document_id = $response->id;
             $tracking_record->action = 'created';
             $tracking_record->touched_by = Auth::user()->id;
             $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $request->documentRemarks;
+            $tracking_record->remarks = $response->remarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'created']);
 
