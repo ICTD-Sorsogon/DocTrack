@@ -1,6 +1,7 @@
 const state = {
     page_loader: true,
     datatable_loader: true,
+    submenu_opened: false,
 }
 
 const getters = {
@@ -35,6 +36,9 @@ const mutations = {
     },
     UNSET_DATATABLE_LOADER(state) {
         state.datatable_loader = false;
+    },
+    TOGGLE_SUBMENU(state, value) {
+        state.submenu_opened = value;
     }
 }
 
