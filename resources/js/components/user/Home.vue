@@ -46,7 +46,7 @@
                 prepend-icon="mdi-timeline-check-outline"
                 no-action
                 color="white"
-                :value="true"
+                :value="submenuToggle"
                 mandatory
             >
                 <template v-slot:activator>
@@ -184,6 +184,10 @@ export default {
         userFullName(){
             return this.$store.getters.auth_user_full_name;
         },
+        submenuToggle() {
+            console.log(this.$store.state.loader.submenu_opened);
+            return this.$store.state.loader.submenu_opened;
+        },
     },
     data() {
         return {
@@ -197,48 +201,56 @@ export default {
             this.removeAuthUser()
             this.$store.dispatch('unsetSnackbar');
             this.$store.dispatch('setLoader');
+            this.$store.commit('TOGGLE_SUBMENU', false);
             sessionStorage.clear();
             this.$router.push({ name: "Login"});
         },
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "All Active Documents"});
             }
         },
         getAgingReport() {
             if(this.$route.name !== 'Document Aging Report') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Document Aging Report"});
             }
         },
         getLogs() {
             if(this.$route.name !== 'Log Report') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Log Report"});
             }
         },
         getMasterListReport() {
             if(this.$route.name !== 'Document Master List') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Document Master List"});
             }
         },
         getOfficeListReport() {
             if(this.$route.name !== 'Office List') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Office List"});
             }
         },
         getAccountSettings() {
             if(this.$route.name !== 'Account Settings') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "Account Settings",  params: { user: this.user }});
             }
         },
         getUserManagement() {
             if(this.$route.name !== 'User Management') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "User Management",  params: { user: this.user }});
             }
         },
