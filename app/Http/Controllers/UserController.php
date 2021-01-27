@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AccountEvent;
 use App\Events\AccountFullnameUpdateEvent;
 use App\Events\AccountPasswordUpdateEvent;
 use App\Events\AccountUsernameUpdateEvent;
@@ -168,10 +169,10 @@ class UserController extends Controller
             "first_name":"' . $request->first_name . '",
             "middle_name":"' . $request->middle_name . '",
             "last_name":"' . $request->last_name . '",
-            "suffix":"' . $request->suffix . '"}';
+            "suffix":"' . $request->name_suffix . '"}';
 
         $user_id = Auth::user()->id;
-        event(new AccountFullnameUpdateEvent($user_id,json_decode($old_values[0]), json_decode($request_object)));
+        event(new AccountEvent($user_id,json_decode($request_object), $old_values[0], 'fullname'));
 
         return $response;
     }
@@ -188,7 +189,7 @@ class UserController extends Controller
             "username":"' . $request->new_username . '"}';
 
         $user_id = Auth::user()->id;
-        event(new AccountUsernameUpdateEvent($user_id,$old_values, json_decode($request_object)));
+        event(new AccountEvent($user_id,json_decode($request_object),$old_values, 'username'));
 
         if($user->wasChanged()) {
             return response()->json([
@@ -215,7 +216,7 @@ class UserController extends Controller
             $user->save();
 
             $user_id = Auth::user()->id;
-            event(new AccountPasswordUpdateEvent($user_id, 'Password Updated'));
+            event(new AccountEvent($user_id, 'Password Updated',null, 'password'));
 
             return response()->json([
                 'message' => 'Password was changed successfully',
