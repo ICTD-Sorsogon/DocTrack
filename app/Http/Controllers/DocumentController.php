@@ -2,14 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\DocumentAcknowledgeEvent;
-use App\Events\DocumentCreateEvent;
-use App\Events\DocumentForwardEvent;
-use App\Events\DocumentHoldRejectEvent;
-use App\Events\DocumentReceiveEvent;
-use App\Events\DocumentTerminateEvent;
-use App\Events\DocumentUpdateEvent;
-use App\Events\NewDocumentHasAddedEvent;
+use App\Events\DocumentEvent;
 use App\Http\Requests\DocumentPostRequest;
 use Auth;
 use DB;
@@ -53,11 +46,6 @@ class DocumentController extends Controller
 
     public function receiveDocument(Request $request)
     {
-        $remarks = $request->documentRemarks;
-        $approved_by = $request->approved_by;
-        $subject = $request->subject;
-        $through = $request->through;
-
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -72,7 +60,7 @@ class DocumentController extends Controller
             $tracking_record->document->update(['status' => 'received']);
 
             $user_id = Auth::user()->id;
-            event(new DocumentReceiveEvent($user_id,$subject,$remarks, $approved_by, $through));
+            event(new DocumentEvent($user_id,$request,null,null, 'receive'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -87,13 +75,6 @@ class DocumentController extends Controller
 
     public function forwardDocument(Request $request)
     {
-        $remarks = $request->documentRemarks;
-        $forwarded_by = $request->forwarded_by;
-        $forwarded_to = $request->forwarded_to;
-        $approved_by = $request->approved_by;
-        $subject = $request->subject;
-        $through = $request->through;
-
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -110,7 +91,7 @@ class DocumentController extends Controller
             $tracking_record->document->update(['status' => 'forwarded']);
 
             $user_id = Auth::user()->id;
-            event(new DocumentForwardEvent($user_id,$subject,$remarks, $approved_by, $through, $forwarded_by, $forwarded_to));
+            event(new DocumentEvent($user_id,$request,null,null, 'forward'));
 
 
         } catch (ValidationException $error) {
@@ -144,7 +125,7 @@ class DocumentController extends Controller
             $tracking_record->document->delete();
 
             $user_id = Auth::user()->id;
-            event(new DocumentTerminateEvent($user_id,$subject,$remarks, $approved_by));
+            event(new DocumentEvent($user_id,$subject,$remarks, $approved_by, 'terminate'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -175,7 +156,7 @@ class DocumentController extends Controller
             $tracking_record->document->update(['priority_level' => $request->priority_level]);
 
             $user_id = Auth::user()->id;
-            event(new DocumentAcknowledgeEvent($user_id,$subject,$remarks));
+            event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -205,7 +186,7 @@ class DocumentController extends Controller
             $tracking_record->document->update(['status' => $request->hold_reject]);
 
             $user_id = Auth::user()->id;
-            event(new DocumentHoldRejectEvent($user_id, $status, $subject));
+            event(new DocumentEvent($user_id, $status, $subject,null, 'holdreject'));
 
 
         } catch (ValidationException $error) {
@@ -235,10 +216,9 @@ class DocumentController extends Controller
                 "tracking_code":"' . $request->tracking_code . '"}';
     
             $user_id = Auth::user()->id;
-            event(new DocumentCreateEvent($user_id, json_decode($request_obj)));
+            event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
 
         } else{
-
         $old_values = Document::select('attachment_page_count','destination_office_id','document_type_id','id','originating_office','page_count','remarks','sender_name','subject','tracking_code')->where('id', $request->id)->get();
             $request_obj = '{
                 "attachment_page_count":"' . $request->attachment_page_count . '",
@@ -252,8 +232,8 @@ class DocumentController extends Controller
                 "subject":"' . $request->subject . '",
                 "tracking_code":"' . $request->tracking_code . '"}';
 
-        $user_id = Auth::user()->id;
-        event(new DocumentUpdateEvent($user_id, json_decode($old_values[0]), json_decode($request_obj)));
+            $user_id = Auth::user()->id;
+            event(new DocumentEvent($user_id,json_decode($request_obj), json_decode($old_values[0]),null, 'update'));
 
         }
 
@@ -264,7 +244,6 @@ class DocumentController extends Controller
 
         if(!$document->id){
             $user_id = Auth::user()->id;
-            event(new NewDocumentHasAddedEvent($user_id, $request));
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $response->id;
             $tracking_record->action = 'created';
