@@ -8,6 +8,8 @@
 		:items-per-page="itemsPerPage"
 		item-key="id"
 		:loading="datatable_loader"
+        :sort-by="['priority_level']"
+        :sort-desc="[true]"
 		loading-text="Loading... Please wait"
 		class="elevation-1"
 		:search="search"
@@ -23,8 +25,13 @@
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip @click=" {selectDoc(item.id); printDialog = true}" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click=" {selectDoc(item.id); printDialog = true}" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
+					</v-chip>
+		</template>
+        <template v-slot:[`item.priority_level`] = "{ item }">
+					<v-chip class="uniform" dark :color="getPriorityLevelColor(item, item.priority_level)" >
+						{{ item.prio_text }}
 					</v-chip>
 		</template>
 		<template v-slot:[`item.view_more`]="{ item }">
@@ -41,7 +48,7 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item.originating_office)">
+					<v-col v-if="isEditable(item)">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -54,7 +61,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col>
+					<v-col v-if="!isEditable(item)">
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
@@ -63,7 +70,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col>
+					<v-col v-if="isAdmin">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
@@ -82,7 +89,7 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col>
+                    <v-col v-if="isAdmin">
 						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
@@ -104,12 +111,7 @@
 			</td>
 		</template>
 	</v-data-table>
-	<!-- <div class="text-center pt-2">
-		<v-pagination
-			v-model="page"
-			:length="pageCount"
-		></v-pagination>
-	</div> -->
+
 	<table-modal
 		@closeDialog="closeDialog"
         :dialog="dialog"
@@ -124,7 +126,7 @@
 
 <script>
 import TableModal from './TableModal';
-import { colors } from '../../../constants';
+import { colors, priority_level } from '../../../constants';
 import {mapGetters} from 'vuex'
 import PrintBarCode from './PrintBarCode'
 
@@ -147,6 +149,7 @@ export default {
                 { text: 'Originating Office', value: 'originating_office', sortable: false },
                 { text: 'Destination Office', value: 'destination.name', sortable: false },
                 { text: 'Sender', value: 'sender_name', sortable: false },
+                { text: 'Priority Level', value: 'priority_level', sortable: false },
                 { text: 'Date Filed', value: 'date_filed', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
                 { text: 'Actions', value: 'data-table-expand', sortable: false },
@@ -161,9 +164,19 @@ export default {
 		},
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
-				doc.is_external = doc.is_external ? 'External' : 'Internal'
+                doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
-				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                doc.prio_text = '';
+                if (doc.priority_level == 1) {
+                    doc.prio_text = 'Low'
+                }
+                else if(doc.priority_level == 2) {
+                    doc.prio_text = 'Medium'
+
+                }
+                else
+                    doc.prio_text = 'High'
 				return doc
 			})
 		},
@@ -195,17 +208,27 @@ export default {
             }
         },
 		isEditable(docOrigin) {
-			return this.auth_user.office_id == docOrigin || this.isAdmin
+			return this.auth_user.office_id == docOrigin.origin_office?.id || this.isAdmin
 		},
 		getTrackingCodeColor(document, document_type_id) {
             // document.color = colors[document_type_id];
             return colors[document_type_id];
         },
+        getPriorityLevelColor(document, type){
+            return priority_level[type];
+        }
 	}
 
 }
 </script>
 
 <style>
-
+.uniform {
+    width: 80px;
+    justify-content: center;
+}
+.trackin {
+    width: 220px;
+    justify-content: center;
+}
 </style>

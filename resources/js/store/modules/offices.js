@@ -29,6 +29,39 @@ const actions = {
             commit('SNACKBAR_STATUS', res)
         });
     },
+    async importNewOffice({ commit }, office_data) {
+        await axios.post('/api/import_new_office', office_data)
+        .then(response => {
+            let res = {
+                status: 'success',
+                message: `File was successfully uploaded!`
+            }
+            commit('SNACKBAR_STATUS', res)
+        })
+        .catch(error => {
+            let res = {
+                status: 'failed',
+                message: 'The server replied with an error! Please Contact your administrator.'
+            }
+            commit('SNACKBAR_STATUS', res)
+        });
+
+        /*await axios.post('/api/add_new_office', form)
+        .then(response => {
+            let res = {
+                status: 'success',
+                message: `${form.name} was successfully added!`
+            }
+            commit('SNACKBAR_STATUS', res)
+        })
+        .catch(error => {
+            let res = {
+                status: 'failed',
+                message: 'The server replied with an error! Please Contact your administrator.'
+            }
+            commit('SNACKBAR_STATUS', res)
+        });*/
+    },
     async updateExistingOffice({ commit }, form) {
         await axios.post('/api/update_existing_office', form)
         .then(response => {
