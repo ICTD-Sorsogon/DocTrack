@@ -8,6 +8,7 @@ use App\Events\AccountPasswordUpdateEvent;
 use App\Events\AccountUsernameUpdateEvent;
 use App\Events\UserCreateEvent;
 use App\Events\UserDeleteEvent;
+use App\Events\UserEvent;
 use App\Events\UserUpdateEvent;
 use Auth;
 use DB;
@@ -77,7 +78,7 @@ class UserController extends Controller
         $collection = collect($request->except('password'));
 
         $user_id = Auth::user()->id;
-        event(new UserCreateEvent($user_id, json_encode($collection)));
+        event(new UserEvent($user_id, json_encode($collection), null, 'create'));
 
         return [$user];
     }
@@ -127,7 +128,7 @@ class UserController extends Controller
             "username":"' . $request->username . '"}';
 
         $user_id = Auth::user()->id;
-        event(new UserUpdateEvent($user_id,json_decode($old_values[0]), json_decode($request_object)));
+        event(new UserEvent($user_id,json_decode($request_object),json_decode($old_values[0]), 'update'));
 
         DB::commit();
         return [$user];
@@ -148,7 +149,7 @@ class UserController extends Controller
         }
 
         $user_id = Auth::user()->id;
-        event(new UserDeleteEvent($user_id,$user));
+        event(new UserEvent($user_id,$user, null, 'delete'));
         DB::commit();
         return [$user];
     }
