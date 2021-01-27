@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Events\OfficeCreateEvent;
 use App\Events\OfficeDeleteEvent;
+use App\Events\OfficeImportEvent;
 use App\Events\OfficeUpdateEvent;
+use App\Listeners\OfficeImportListener;
 use Auth;
 use Carbon\Carbon;
 use DB;
@@ -70,9 +72,14 @@ class OfficeController extends Controller
             }
         }*/
 
+        
         DB::beginTransaction();
         try {
             foreach($request['office_data'] as $office_data){
+
+                $user_id = Auth::user()->id;
+                event(new OfficeImportEvent($user_id, $office_data['tab']));
+
                 foreach($office_data['content'] as $offices){
                     $office = new Office;
                     $office->name = $offices["Office_Name"];
@@ -81,6 +88,7 @@ class OfficeController extends Controller
                     $office->contact_number = $offices["Contact_Number"];
                     $office->contact_email = $offices["Email_Address"];
                     $office->save();
+                    
                 }
             }
         } catch (ValidationException $error) {
