@@ -185,7 +185,6 @@ export default {
             return this.$store.getters.auth_user_full_name;
         },
         submenuToggle() {
-            console.log(this.$store.state.loader.submenu_opened);
             return this.$store.state.loader.submenu_opened;
         },
     },

@@ -132,6 +132,7 @@ class OfficeController extends Controller
     {
         $offices = Office::with('users.tracking_records')->get();
         foreach ($offices as $office) {
+            $office['transaction_count'] = collect($this->bulkUserTrackingList($office))->collapse()->count();
             $office['documents'] = collect($this->bulkUserTrackingList($office))->collapse()->groupBy('document_id');
             unset($office->users);
         }
