@@ -4,7 +4,7 @@
         <v-container>
           <v-row class="d-flex justify-space-between">
             <v-card-title primary-title> Print Bar Code </v-card-title>
-			<v-btn x-large color="gray" @click="$emit('closePrintDialog')" icon>
+			<v-btn x-large color="gray" @click="$emit('closeDialog')" icon>
 				<v-icon>mdi-close</v-icon>
 			</v-btn>
           </v-row>
@@ -48,19 +48,16 @@ export default {
 		}
 	},
 	watch: {
-		code(newState, oldSate) {
-			if(newState.tracking_code) {
-				jsbarcode(this.$refs.barCode, newState.tracking_code);
+		printDialog(newState, oldSate) {
+			if(newState) {
+				new Draggable( this.$refs.dummy,  { setCursor: true, limit: this.xy })
+				jsbarcode(this.$refs.barCode, this.code);
 			}
 		}
 	},
 	methods: {
-		getRefs(e,a,b,c){ 
-			e.isMoving = false
-			console.log(e.css.x = 0)
-		},
 		print(){
-			this.$refs.barCode.setAttribute('style', `width: 3in !important; height: 1in !important; inset: ${this.inset}; position: absolute`)	
+			this.$refs.barCode.setAttribute('style', `width: 1.5in !important; height: .5in !important; inset: ${this.inset}; position: absolute`)	
 			this.$htmlToPaper('printPage');
 		},
 		xy( x, y, x0, y0 ) {
@@ -76,9 +73,6 @@ export default {
 			this.inset = `${top} ${right} ${bottom} ${left}`
 			return { x: x, y: y };
 		}
-	},
-	mounted() {
-		new Draggable( this.$refs.dummy,  { setCursor: true, limit: this.xy })
 	},
 }
 </script>
