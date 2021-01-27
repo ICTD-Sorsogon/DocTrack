@@ -17,12 +17,12 @@
                 </v-row>
                 <v-card-text>
                     <v-form ref="form" lazy-validation>
-                        <v-row v-if="dialog_for == 'exportOfficeList'">
+                        <v-row v-if="dialog_type == 'export'">
                             <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
                                 <v-btn @click="dowload" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
                             </v-col>
                         </v-row>
-                        <v-row v-if="dialog_for == 'importOfficeList'">
+                        <v-row v-if="dialog_type == 'import'">
                             <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
                                 <v-file-input
                                     label="Browse Excel File"
@@ -40,7 +40,7 @@
                                 />
                             </v-col>
                             <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
-                                <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'importOfficeList'" @click="uploadToDatabase"> UPLOAD </v-btn>
+                                <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_type == 'import'" @click="uploadToDatabase"> UPLOAD </v-btn>
                             </v-col>
                             <v-col v-show="is_preview && excel_data.length > 0 && excel_table_headers.length > 0">
                                 <v-card>
@@ -96,7 +96,7 @@
     import * as Excel from 'exceljs';
 
     export default {
-        props: ['excel_dialog', 'dialog_title', 'dialog_for'],
+        props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
         data() {
             return {
                 valid: false,

@@ -45,6 +45,12 @@
                         <v-list-item-title>Reports</v-list-item-title>
                     </v-list-item-content>
                 </template>
+                <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getArchiveListReport" v-ripple="{ class: 'primary--text' }">
+                    <v-list-item-icon>
+                        <v-icon>mdi-archive-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Archive</v-list-item-title>
+                </v-list-item>
                 <v-list-item link @click.prevent="getAgingReport" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-clock-outline</v-icon>
@@ -57,13 +63,13 @@
                     </v-list-item-icon>
                     <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
-                <v-list-item link @click.prevent="getOfficeListReport" v-ripple="{ class: 'primary--text' }">
+                <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getOfficeListReport" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
                     <v-icon>mdi-office-building</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Offices</v-list-item-title>
                 </v-list-item>
-                <v-list-item link @click.prevent="getLogs" v-ripple="{ class: 'primary--text' }">
+                <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getLogs" v-ripple="{ class: 'primary--text' }">
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
@@ -201,6 +207,12 @@ export default {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
                 this.$router.push({ name: "All Active Documents"});
+            }
+        },
+        getArchiveListReport() {
+            if(this.$route.name !== 'Archive List') {
+                this.$store.dispatch('setLoader');
+                this.$router.push({ name: "Archive List"});
             }
         },
         getAgingReport() {

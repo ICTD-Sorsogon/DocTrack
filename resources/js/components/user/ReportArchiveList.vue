@@ -3,9 +3,15 @@
         <v-card>
             <v-card-title primary-title>
                 <v-toolbar flat>
-                    <v-toolbar-title>Office List Report</v-toolbar-title>
+                    <v-toolbar-title>Archive List Report</v-toolbar-title>
                     <v-divider class="mx-4" inset vertical/>
                     <v-spacer/>
+
+                    <v-switch
+                        v-model="switch1"
+                        :label="`${(switch1)?'Group by Office':'View All'}`"
+                    ></v-switch>
+
                     <v-btn color="primary" dark class="mb-2 ma-1" @click.stop="openDialog('new_office')">
                         <v-icon>mdi-plus</v-icon> ADD
                     </v-btn>
@@ -34,12 +40,71 @@
                 :items-per-page="10"
                 :search="search"
                 class="elevation-1"
+                show-expand
+                :expanded.sync="expanded"
             >
                 <template v-slot:top>
                     <v-text-field v-model="search" label="Search" class="mx-4"/>
+
+                    <v-select
+                        v-model="sortBy"
+                        flat
+                        solo-inverted
+                        hide-details
+                        :items="keys"
+                        prepend-inner-icon="mdi-magnify"
+                        label="Select office"
+                    />
+                    <v-select
+                        v-model="sortBy"
+                        flat
+                        solo-inverted
+                        hide-details
+                        :items="keys"
+                        prepend-inner-icon="mdi-magnify"
+                        label="Sort by"
+                    />
+
                 </template>
 
-                <template v-slot:item.actions="{ item }">
+                <!--<template v-slot:top>
+                    <v-toolbar flat>
+                    <v-toolbar-title>Expandable Table</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-switch
+                        v-model="singleExpand"
+                        label="Single expand"
+                        class="mt-2"
+                    ></v-switch>
+                    </v-toolbar>
+                </template>-->
+                <template v-slot:expanded-item="{ headers, item }">
+                    <td :colspan="headers.length">
+                    <!--More info about {{ item }}-->
+
+                    <template>
+                        <v-data-table
+                            :headers="headers"
+                            :items="offices"
+                            :items-per-page="5"
+                            class="elevation-1"
+                        ></v-data-table>
+                    </template>
+
+
+                    <!--<template>
+                        <v-data-table
+                        :headers="headers"
+                        :items="desserts"
+                        :items-per-page="5"
+                        class="elevation-1"
+                        ></v-data-table>
+                    </template>-->
+                    </td>
+                </template>
+                <!--rr-->
+
+               <!-- <template v-slot:item.actions="{ item }">
                     <v-row>
                         <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pr-0" style="top:50%; text-align:right;">
                             <v-icon small @click="editOffice(item)" style="margin-right:4px;">mdi-pencil </v-icon>
@@ -48,6 +113,88 @@
                             <v-icon small @click="deleteConfirmationDialog(item)" style="margin-left:4px;"> mdi-delete </v-icon>
                         </v-col>
                     </v-row>
+                </template>-->
+
+                <template v-slot:header>
+                    <v-toolbar
+                    dark
+                    color="blue darken-3"
+                    class="mb-1"
+                    >
+                    <template v-if="$vuetify.breakpoint.mdAndUp">
+                        <v-spacer></v-spacer>
+                        <v-select
+                        v-model="sortBy"
+                        flat
+                        solo-inverted
+                        hide-details
+                        :items="keys"
+                        prepend-inner-icon=""
+                        label="Select office"
+                        ></v-select>
+                        <v-spacer></v-spacer>
+                        <v-select
+                            v-model="sortBy"
+                            flat
+                            solo-inverted
+                            hide-details
+                            :items="keys1"
+                            prepend-inner-icon=""
+                            label="Filter by"
+                        ></v-select>
+                        <v-spacer></v-spacer>
+                         <v-select
+                            v-model="sortBy"
+                            flat
+                            solo-inverted
+                            hide-details
+                            :items="keys2"
+                            prepend-inner-icon=""
+                            label="Source"
+                        ></v-select>
+                        <v-spacer></v-spacer>
+                        <v-select
+                            v-model="sortBy"
+                            flat
+                            solo-inverted
+                            hide-details
+                            :items="keys3"
+                            prepend-inner-icon=""
+                            label="Type"
+                        ></v-select>
+                        <!--<v-btn-toggle
+                        v-model="sortDesc"
+                        mandatory
+                        >
+                        <v-btn
+                            large
+                            depressed
+                            color="blue"
+                            :value="false"
+                        >
+                            <v-icon>mdi-arrow-up</v-icon>
+                        </v-btn>
+                        <v-btn
+                            large
+                            depressed
+                            color="blue"
+                            :value="true"
+                        >
+                            <v-icon>mdi-arrow-down</v-icon>
+                        </v-btn>
+                        </v-btn-toggle>-->
+                    </template>
+                    <v-spacer></v-spacer>
+                    <v-text-field
+                        v-model="search"
+                        clearable
+                        flat
+                        solo-inverted
+                        hide-details
+                        prepend-inner-icon="mdi-magnify"
+                        label="Search"
+                    ></v-text-field>
+                    </v-toolbar>
                 </template>
 
             </v-data-table>
@@ -99,7 +246,6 @@
             v-if="dialog_title && excel_dialog == true"
             :excel_dialog="excel_dialog"
             :dialog_title="dialog_title"
-            :dialog_type="dialog_type"
             :dialog_for="dialog_for"
             @close-dialog="closeDialog('excel')"
         />
@@ -118,31 +264,67 @@
         data() {
             return {
                 headers: [
-                    { text: 'Office', value: 'name' },
-                    { text: 'Office Code', value: 'office_code' },
-                    { text: 'Address', value: 'address' },
-                    { text: 'Contact Number', value: 'contact_number' },
-                    { text: 'Email Address', value: 'contact_email' },
-                    { text: 'Action', value: 'actions', align: 'center', },
+                    { text: 'Office Name', value: 'builded_office_name' },
+                    { text: '', value: 'data-table-expand' },
+                   // { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
                 form_dialog: false,
                 excel_dialog: false,
                 dialog_for: 'new_office',
-                dialog_type: '',
                 dialog_title: '',
                 office_info: '',
                 delete_dialog: false,
                 delete_info: {
                     id: '',
                     name: ''
-                }
+                },
+                switch1: true,
+                expanded: [],
+                keys: [
+                    'Office 1',
+                    'Office 2',
+                    'Office 3',
+                    'Office 4',
+                    'Office 5',
+                    'Office 6',
+                    'Office 7',
+                    'Office 8',
+                    'All'
+                ],
+                keys1: [
+                    'Tracking ID',
+                    'Subject',
+                    'Originating Office',
+                    'Destination Office',
+                    'Sender',
+                    'All'
+                ],
+                keys2: [
+                    'External',
+                    'Internal'
+                ],
+                keys3: [
+                    'Executive Order',
+                    'Provincial Ordinance',
+                    'Letter',
+                    'Purchase Order',
+                    'Salary',
+                    'Budget',
+                    'Reports',
+                    'Draft',
+                    'Others'
+                ]
             }
         },
         computed: {
             ...mapGetters(['datatable_loader']),
             offices() {
-                return this.$store.state.offices.offices;
+                const offices = this.$store.state.offices.offices;
+                offices.forEach(office => {
+                    office.builded_office_name = office.office_code + ' - ' + office.name
+                });
+                return offices;
             },
             request(){
                 return this.$store.state.snackbars.request;
@@ -201,13 +383,11 @@
                     case 'import_office':
                         this.dialog_for = 'importOfficeList';
                         this.dialog_title = 'Import Office List Via Excel File';
-                        this.dialog_type = 'import';
                         this.excel_dialog = true
                         break;
                     case 'export_office':
                         this.dialog_for = 'exportOfficeList';
                         this.dialog_title = 'Export Office List Via Excel File';
-                        this.dialog_type = 'export';
                         this.excel_dialog = true
                         break;
                 }

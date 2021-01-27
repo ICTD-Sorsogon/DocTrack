@@ -8,6 +8,7 @@ import NewDocument from './components/user/components/NewDocument';
 import EditDocument from './components/user/components/EditDocument';
 import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
+import ReportArchiveList from './components/user/ReportArchiveList';
 import ReportAging from './components/user/ReportAging';
 import ReportLog from './components/user/ReportLog';
 import ReportMasterList from './components/user/ReportMasterList';
@@ -90,6 +91,11 @@ export default {
                     path: 'terminal_document',
                     component: DocumentAction,
                     name: 'Terminal Document'
+                },
+                {
+                    path: 'reports/archive_list',
+                    component: ReportArchiveList,
+                    name: 'Archive List'
                 },
                 {
                     path: 'reports/aging',
