@@ -33,7 +33,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('office_list', 'OfficeController@getOfficeList');
         Route::get('tracking_list', 'OfficeController@getTrackingList');
         Route::get('get_non_page_active_documents', 'DocumentController@getNonPaginatedActiveDocuments');
-        Route::post('add_new_document', 'DocumentController@addNewDocument');
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
         Route::post('receive_document_confirm/{id}', 'DocumentController@receiveDocument');
