@@ -163,6 +163,23 @@
                         ></v-select>
                         </ValidationProvider>
                     </v-col>
+                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge'">
+                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                        <v-select
+                            v-model="form.priority_level"
+                            :items="priority_level"
+                            item-text="show"
+                            item-value="value"
+                            label="Priority Level"
+                            prepend-inner-icon="mdi-priority-high"
+                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
+                            required
+                            outlined
+                            :error-messages="errors"
+                            :success="valid"
+                        ></v-select>
+                        </ValidationProvider>
+                    </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-textarea
@@ -297,6 +314,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
+
 export default {
     components: {
         ValidationProvider,
@@ -341,6 +359,11 @@ export default {
                 { show: 'Hold', value: 'on hold' },
                 { show: 'Reject', value: 'rejected' }
             ],
+            priority_level: [
+                { show: 'High', value: '3' },
+                { show: 'Medium', value: '2' },
+                { show: 'Low', value: '1' }
+            ],
             temp: {
                 sample_data: 'sample'
             },
@@ -348,6 +371,7 @@ export default {
                 document_id: '',
                 action: '',
                 touched_by: '',
+                priority_level: '',
                 last_touched: '',
                 through: '',
                 approved_by: '',
@@ -361,6 +385,7 @@ export default {
                 document_id: '',
                 action: '',
                 touched_by: '',
+                priority_level: '',
                 last_touched: '',
                 through: '',
                 approved_by: '',

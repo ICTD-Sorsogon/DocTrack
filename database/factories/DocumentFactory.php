@@ -30,6 +30,7 @@ class DocumentFactory extends Factory
         $source = rand(0, 1);
         $status = ['created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
 
+
         return [
             'subject' => strtoupper($this->faker->realText(20)),
             'is_external' => $source,
@@ -37,6 +38,7 @@ class DocumentFactory extends Factory
             'originating_office' => $source ? rand(3, 12) : $this->faker->name,
             'destination_office_id' => rand(1, 26),
             'sender_name' => $source == 0 ? rand(3, 12) : $this->faker->name,
+            'priority_level' => rand(1,3),
             'page_count' => rand(1, 50),
             'is_terminal' => 0,
             'status' => $status[rand(0,7)],

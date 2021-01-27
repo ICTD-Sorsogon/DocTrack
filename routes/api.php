@@ -44,6 +44,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('add_new_office', 'OfficeController@addNewOffice');
         Route::post('update_existing_office', 'OfficeController@updateExistingOffice');
         Route::post('delete_office/{id}', 'OfficeController@deleteOffice');
+        Route::post('import_new_office', 'OfficeController@importNewOffice');
 
     });
 
