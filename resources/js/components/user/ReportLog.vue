@@ -4,7 +4,8 @@
             <v-card-title primary-title>
                 Logs 
                 <v-row align="center" justify="end" class="pr-4">
-                    <v-btn color="primary" @click="exportExcel"
+
+                    <v-btn color="primary" @click="excel_dialog = true; dialog_title ='Logs'" 
                     >
                     <v-icon
                       small
@@ -105,6 +106,14 @@
 
 
     </v-card>
+      <excel-dialog
+          v-if="dialog_title && excel_dialog == true"
+          :excel_dialog="excel_dialog"
+          :dialog_title="dialog_title"
+          dialog_type='export'
+          :dialog_for="dialog_for"
+          @close-dialog="closeDialog('excel')"
+      />
   </v-container>
     
 
@@ -112,10 +121,17 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import ExcelDialog from './components/ExcelDialog'
 import XLSX from 'xlsx';
 export default {
-    data() {
+  components:{
+    ExcelDialog,
+  },
+  data() {
         return {
+            excel_dialog: false,
+            dialog_for: 'exportLogs',
+            dialog_title: null,
             dialog: false,
             dialogDelete: false,
 
