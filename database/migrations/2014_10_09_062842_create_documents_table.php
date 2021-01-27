@@ -22,6 +22,7 @@ class CreateDocumentsTable extends Migration
             $table->string('originating_office')->nullable()->contrained('offices');
             $table->foreignId('destination_office_id')->nullable()->constrained('offices');
             $table->enum('status', ['created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged']);
+            $table->unsignedTinyInteger('priority_level')->nullable();
             $table->string('sender_name')->nullable();
             $table->unsignedInteger('page_count');
             $table->unsignedTinyInteger('is_terminal')->default(0);
