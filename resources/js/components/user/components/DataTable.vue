@@ -26,7 +26,7 @@
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip class='trackin' @click=" {selectDoc(item.id); printDialog = true}" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click="$emit('print', item.tracking_code)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
 		</template>
@@ -119,9 +119,6 @@
         v-if="selected_document"
         :selected_document="selected_document"
     ></table-modal>
-	<print-bar-code :code="selected_document" @closePrintDialog="closePrintDialog" :printDialog="printDialog">
-
-	</print-bar-code>
 </v-card-text>
 </template>
 
@@ -129,14 +126,12 @@
 import TableModal from './TableModal';
 import { colors, priority_level } from '../../../constants';
 import {mapGetters} from 'vuex'
-import PrintBarCode from './PrintBarCode'
 
 export default {
-	components: {TableModal, PrintBarCode},
+	components: {TableModal},
 	props: ['documents', 'datatable_loader'],
 	data() {
 		return {
-			printDialog: false,
 			activeDoc: null,
 			search: '',
             page: 1,
@@ -188,9 +183,6 @@ export default {
 		}
 	},
 	methods: {
-		closePrintDialog(){
-			this.printDialog = false
-		},
 		closeDialog(){
 			this.dialog = false
 		},
