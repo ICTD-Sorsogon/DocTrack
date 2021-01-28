@@ -199,4 +199,12 @@ class DocumentController extends Controller
          * PLEASE USE LARAVEL EVENTS LIKE HERE https://laravel.com/docs/8.x/events
          */
     }
+
+    public function trackingReports() {
+        $documents = Document::withTrashed()
+            ->with('tracking_records', 'tracking_records.user', 'tracking_records.user.office')
+            ->get();
+        $office = collect($documents)->groupBy('tracking_records.user.office');
+        return $documents;
+    }
 }
