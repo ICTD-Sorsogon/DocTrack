@@ -22,6 +22,7 @@
 				v-model="search"
 				label="Search"
 				class="mx-4"
+                prepend-inner-icon="mdi-magnify"
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
@@ -134,7 +135,7 @@ export default {
 			activeDoc: null,
 			search: '',
             page: 1,
-            itemsPerPage: 25,
+            itemsPerPage: 10,
             expanded: [],
             headers: [
                 { text: 'Tracking ID', value: 'tracking_code', sortable: false },
@@ -145,7 +146,6 @@ export default {
                 { text: 'Destination Office', value: 'destination.name', sortable: false },
                 { text: 'Sender', value: 'sender_name', sortable: false },
                 { text: 'Priority Level', value: 'priority_level', sortable: false },
-                { text: 'Date Filed', value: 'date_filed', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
                 { text: 'Actions', value: 'data-table-expand', sortable: false },
             ],
@@ -170,8 +170,10 @@ export default {
                     doc.prio_text = 'Medium'
 
                 }
-                else
+                else if (doc.priority_level == 3)
                     doc.prio_text = 'High'
+                else
+                    doc.prio_text = 'None'
 				return doc
 			})
 		},

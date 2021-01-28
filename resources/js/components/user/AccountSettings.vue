@@ -18,6 +18,19 @@
             >
                 <v-expansion-panel>
                     <v-expansion-panel-header disable-icon-rotate>
+                        Change Profile Picture
+                        <template v-slot:actions>
+                            <v-icon>
+                                mdi-camera-account
+                            </v-icon>
+                        </template>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                        <change-profile-picture-form/>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel>
+                    <v-expansion-panel-header disable-icon-rotate>
                         Edit Account details
                         <template v-slot:actions>
                             <v-icon>
@@ -62,6 +75,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import ChangeProfilePictureForm from './components/ChangeProfilePictureForm';
 import ChangeUsernameForm from './components/ChangeUsernameForm';
 import ChangeAccountDetailsForm from './components/ChangeAccountDetailsForm';
 import ChangePasswordForm from './components/ChangePasswordForm';
@@ -69,7 +83,8 @@ export default {
     components: {
         ChangeUsernameForm,
         ChangeAccountDetailsForm,
-        ChangePasswordForm
+        ChangePasswordForm,
+        ChangeProfilePictureForm
     },
     computed: mapGetters(['auth_user']),
     data () {

@@ -2,7 +2,7 @@
 <v-container>
   <v-card flat>
           <v-card-title primary-title>
-              Logs 
+              Logs
               <v-row align="center" justify="end" class="pr-4">
                   <v-btn color="primary" @click="exportExcel"
                   >
@@ -19,7 +19,7 @@
 
           <v-text-field
             v-model="search"
-            append-icon="mdi-magnify"
+            prepend-inner-icon="mdi-magnify"
             label="Search"
             single-line
             hide-details
@@ -33,7 +33,7 @@
       class="elevation-1"
     >
       <template v-slot:top>
-      
+
           <v-dialog
             :headers="headers2"
             v-model="dialog"
@@ -44,7 +44,7 @@
                 <span class="headline">{{ formTitle }}</span>
 
                 <v-spacer></v-spacer>
-                  <v-icon 
+                  <v-icon
                       @click="close"
                         large
                         class="ml-4"
@@ -83,14 +83,14 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                
+
               </v-card-actions>
             </v-card>
           </v-dialog>
-          
+
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon 
+        <v-icon
           medium
           class="ml-3"
           color="blue"
@@ -106,7 +106,7 @@
 
   </v-card>
 </v-container>
-    
+
 
 </template>
 
@@ -187,7 +187,7 @@ export default {
         var log_old_key = [];
 
         this.final_data = [];
-    
+
         log_new_key = Object.keys(JSON.parse(log_data.new_values));
         log_view_new = Object.values(JSON.parse(log_data.new_values));
 
@@ -231,7 +231,7 @@ export default {
         return this.editedItem;
       },
         ...mapGetters(['logs']),
-  
+
         formTitle () {
           return this.editedIndex !== -1 ? 'Logs Value' : 'Logs Value'
         },
