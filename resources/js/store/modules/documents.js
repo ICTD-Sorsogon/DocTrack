@@ -155,7 +155,6 @@ const actions = {
     async documentReports({ commit }) {
         const response = await axios.get('/api/tracking_reports')
         .then(response => {
-            console.log(response.data);
             commit('GET_TRACKING_REPORTS', response.data);
         });
 
