@@ -112,7 +112,7 @@
           :dialog_title="dialog_title"
           dialog_type='export'
           :dialog_for="dialog_for"
-          @close-dialog="closeDialog('excel')"
+          @close-dialog="closeDialog()"
       />
   </v-container>
 
@@ -239,6 +239,10 @@ export default {
           this.editedIndex = -1
         })
       },
+
+      closeDialog(){
+          this.excel_dialog = false;
+      }
 
     },
 
