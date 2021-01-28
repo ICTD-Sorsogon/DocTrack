@@ -135,7 +135,7 @@ export default {
 			activeDoc: null,
 			search: '',
             page: 1,
-            itemsPerPage: 25,
+            itemsPerPage: 10,
             expanded: [],
             headers: [
                 { text: 'Tracking ID', value: 'tracking_code', sortable: false },
@@ -170,8 +170,10 @@ export default {
                     doc.prio_text = 'Medium'
 
                 }
-                else
+                else if (doc.priority_level == 3)
                     doc.prio_text = 'High'
+                else
+                    doc.prio_text = 'None'
 				return doc
 			})
 		},
