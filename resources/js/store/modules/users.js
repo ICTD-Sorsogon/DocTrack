@@ -141,7 +141,7 @@ const actions = {
         .then(response => {
             const data = {
                 status: 'SUCCESS',
-                message: `${response.data[0]} \nwas successfully uploaded!`,
+                message: `Avatar successfully uploaded!`,
             }
             commit('SNACKBAR_STATUS', data)
         })

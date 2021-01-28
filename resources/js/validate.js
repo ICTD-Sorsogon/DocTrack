@@ -1,5 +1,10 @@
 import { extend } from 'vee-validate';
-import { required, email, max, min, confirmed, alpha_spaces, numeric } from 'vee-validate/dist/rules';
+import { required, email, max, min, confirmed, alpha_spaces, numeric, size } from 'vee-validate/dist/rules';
+
+extend ('size', {
+    ...size,
+    message: 'Avatar size should be less than 1 MB!'
+  });
 
 extend ('required', {
   ...required,
