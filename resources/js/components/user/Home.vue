@@ -128,6 +128,18 @@
             <v-icon>mdi-menu</v-icon>
         </v-app-bar-nav-icon>
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+
+        <v-avatar v-if="image_source === '/storage/null'" color="indigo">
+            <img src="/images/defaultpic.jpg" alt="default_picture">
+        </v-avatar>
+
+        <v-avatar v-else>
+            <img
+                :src="image_source"
+                alt="profile_picture"
+            >
+        </v-avatar>
         <v-progress-linear
             :active="page_loader"
             color="#A83F39"
@@ -178,13 +190,16 @@ export default {
                     (this.auth_user.suffix.trim()).slice(1);
             }
             return `${f_name} ${m_name} ${l_name} ${s_name}`;
+        },
+        image_source(){
+            return '/storage/' + this.auth_user.avatar || ''
         }
+
     },
     data() {
         return {
             drawer: null,
             group: null,
-            image_source: 'https://randomuser.me/api/portraits/'
         }
     },
     methods: {
@@ -249,7 +264,11 @@ export default {
         this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
-    }
+    },
+    mounted() {
+        console.log(this.auth_user.avatar);
+
+    },
 }
 </script>
 
