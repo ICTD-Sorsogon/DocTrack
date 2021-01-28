@@ -54,7 +54,13 @@
                         <v-list-item-title>Reports</v-list-item-title>
                     </v-list-item-content>
                 </template>
-                <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getArchiveListReport" v-ripple="{ class: 'primary--text' }">
+                <v-list-item
+                    v-if="auth_user.role_id === 1"
+                    :input-value="$route.name === 'Archive List' ? true:false"
+                    link
+                    @click.prevent="getArchiveListReport"
+                    v-ripple="{ class: 'primary--text' }"
+                >
                     <v-list-item-icon>
                         <v-icon>mdi-archive-outline</v-icon>
                     </v-list-item-icon>
@@ -238,6 +244,7 @@ export default {
         getArchiveListReport() {
             if(this.$route.name !== 'Archive List') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Archive List"});
             }
         },

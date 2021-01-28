@@ -98,7 +98,7 @@ export default {
                 },
                 // FIXME: Fix bug for submenu when using reports/'pathname'
                 {
-                    path: 'reports/archive_list',
+                    path: 'archive_list',
                     component: ReportArchiveList,
                     name: 'Archive List'
                 },
