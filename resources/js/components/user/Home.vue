@@ -264,11 +264,7 @@ export default {
         this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
-    },
-    mounted() {
-        console.log(this.auth_user.avatar);
-
-    },
+    }
 }
 </script>
 
