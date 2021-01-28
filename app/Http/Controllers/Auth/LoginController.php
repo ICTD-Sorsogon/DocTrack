@@ -50,18 +50,18 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $this->validateLogin($request);
-        
+
         if (method_exists($this, 'hasTooManyLoginAttempts') &&
         $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            
+
             return $this->sendLockoutResponse($request);
         }
-        
+
         if ($this->attemptLogin($request)) {
 
-            $user_id = Auth::user()->id;
-            event(new LoginEvent($user_id,$request,null, 'login'));
+            // $user_id = Auth::user()->id;
+            // event(new LoginEvent($user_id,$request,null, 'login'));
 
             return $this->sendLoginResponse($request);
         }
@@ -73,9 +73,9 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $user_id = Auth::user()->id;
-        $username = Auth::user()->username;
-        event(new LoginEvent($user_id,$username,null, 'logout'));
+        // $user_id = Auth::user()->id;
+        // $username = Auth::user()->username;
+        // event(new LoginEvent($user_id,$username,null, 'logout'));
 
         $this->guard()->logout();
 
