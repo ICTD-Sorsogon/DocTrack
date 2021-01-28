@@ -17,7 +17,6 @@ import Login from './components/Login';
 import HomeContainer from './components/HomeContainer';
 import NotFound from './components/NotFound';
 
-// TODO: Fix navigation guards
 export default {
     base: '/',
     mode: 'history',
@@ -42,6 +41,7 @@ export default {
         {
             path: '/',
             component: HomeContainer,
+            requiresAuth: true,
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
                     next()
@@ -65,6 +65,10 @@ export default {
                     component: NewDocument,
                     name: 'New Document'
                 },
+                /**
+                 * FIXME: Bug when logging out from these paths, will not redirect to login page instead will redirect
+                 * to root path of authenticated user (all_active_document)
+                 **/
                 {
                     path: 'edit_document/:type/:id?',
                     component: EditDocument,
@@ -91,23 +95,24 @@ export default {
                     component: DocumentAction,
                     name: 'Terminal Document'
                 },
+                // FIXME: Fix bug for submenu when using reports/'pathname'
                 {
-                    path: 'reports/aging',
+                    path: 'aging',
                     component: ReportAging,
                     name: 'Document Aging Report'
                 },
                 {
-                    path: 'reports/logs',
+                    path: 'logs',
                     component: ReportLog,
                     name: 'Log Report'
                 },
                 {
-                    path: 'reports/master_list',
+                    path: 'master_list',
                     component: ReportMasterList,
                     name: 'Document Master List'
                 },
                 {
-                    path: 'reports/office_list',
+                    path: 'office_list',
                     component: ReportOfficeList,
                     name: 'Office List'
                 },

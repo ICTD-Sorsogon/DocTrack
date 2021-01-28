@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Http\Requests\ChangePasswordPutRequest;
 use App\Http\Requests\ChangeUsernamePutRequest;
 use App\Http\Requests\ChangeFullnamePutRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use stdClass;
 
@@ -154,6 +155,18 @@ class UserController extends Controller
         return [$user];
     }
 
+    public function uploadSelfie(Request $request)
+    {
+        if($request->hasFile('file')) {
+            $filename = $request->file->getClientOriginalName();
+            if(auth()->user()->avatar){
+                Storage::delete('/public/' . auth()->user()->avatar);
+            }
+            $path = $request->file->storeAs('images', $filename, 'public');
+            Auth::user()->update(['avatar' => $path]);
+        }
+    }
+
     public function updateFullname(ChangeFullnamePutRequest $request)
     {
         $old_values = User::select('first_name','middle_name','last_name','suffix')->where('id', $request->id)->get();
@@ -181,7 +194,7 @@ class UserController extends Controller
     public function updateUsername(ChangeUsernamePutRequest $request)
     {
         $old_values = Auth::user()->username;
-        
+
         $user = User::findOrFail(Auth::user()->id);
         $user->username = $request->new_username;
         $user->save();

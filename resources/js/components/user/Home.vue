@@ -1,15 +1,18 @@
 <template>
 <div v-if="auth_user.first_name">
-    <v-navigation-drawer app dark v-model="drawer" id="sidebar" >
+    <v-navigation-drawer app dark v-model="drawer" id="sidebar" class="pt-2">
+        <template v-slot:prepend>
         <v-img
             contain
             src="/images/provincial_logo.png"
-            height="150px"
-        >
-        </v-img>
-        <v-list-item link>
-            <v-list-item-content>
-                <v-tooltip bottom>
+            height="200px"
+        />
+        <v-list class="pb-0">
+            <v-list-item class="namespace">
+                <v-list-item-content
+                    align="center"
+                >
+                    <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
                             <v-list-item-title
                                 v-bind="attrs"
@@ -20,105 +23,122 @@
                         </template>
                         {{userFullName}}
                     </v-tooltip>
-                <v-list-item-subtitle> {{auth_user.username}} </v-list-item-subtitle>
-            </v-list-item-content>
-        </v-list-item>
-        <v-divider></v-divider>
+                    <v-list-item-subtitle> {{auth_user.username}} </v-list-item-subtitle>
+                </v-list-item-content>
+            </v-list-item>
+        </v-list>
+        </template>
+        <v-divider/>
         <v-list>
-            <v-list-item link @click.prevent="getAllDocuments">
+            <v-list-item
+                :input-value="$route.name === 'All Active Documents' ? true:false"
+                link
+                @click.prevent="getAllDocuments"
+            >
                 <v-list-item-icon>
                     <v-icon>mdi-file-document-multiple-outline</v-icon>
                 </v-list-item-icon>
-
                 <v-list-item-content>
                     <v-list-item-title>Document</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-
             <v-list-group
                 prepend-icon="mdi-timeline-check-outline"
                 no-action
                 color="white"
+                :value="submenuToggle"
+                mandatory
             >
                 <template v-slot:activator>
-                    <v-list-item-content id="sample">
+                    <v-list-item-content>
                         <v-list-item-title>Reports</v-list-item-title>
                     </v-list-item-content>
                 </template>
-                <v-list-item link @click.prevent="getAgingReport" v-ripple="{ class: 'primary--text' }">
+                <v-list-item
+                    :input-value="$route.name === 'Document Aging Report' ? true:false"
+                    link
+                    @click.prevent="getAgingReport"
+                    v-ripple="{ class: 'white--text' }"
+                >
                     <v-list-item-icon>
-                    <v-icon>mdi-timeline-clock-outline</v-icon>
+                        <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Tracking</v-list-item-title>
                 </v-list-item>
-                <v-list-item link @click.prevent="getMasterListReport" v-ripple="{ class: 'primary--text' }">
+                <v-list-item
+                    :input-value="$route.name === 'Document Master List' ? true:false"
+                    link @click.prevent="getMasterListReport"
+                    v-ripple="{ class: 'white--text' }"
+                >
                     <v-list-item-icon>
-                    <v-icon>mdi-timeline-text</v-icon>
+                        <v-icon>mdi-timeline-text</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
-                <v-list-item link @click.prevent="getOfficeListReport" v-ripple="{ class: 'primary--text' }">
+                <v-list-item
+                    :input-value="$route.name === 'Office List' ? true:false"
+                    link
+                    @click.prevent="getOfficeListReport"
+                    v-ripple="{ class: 'white--text' }"
+                >
                     <v-list-item-icon>
                     <v-icon>mdi-office-building</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Offices</v-list-item-title>
                 </v-list-item>
-                <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getLogs" v-ripple="{ class: 'primary--text' }">
+                <v-list-item
+                    v-if="auth_user.role_id === 1"
+                    :input-value="$route.name === 'Log Report' ? true:false"
+                    link
+                    @click.prevent="getLogs"
+                    v-ripple="{ class: 'white--text' }"
+                >
                     <v-list-item-icon>
                     <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Logs</v-list-item-title>
                 </v-list-item>
             </v-list-group>
-
-            <v-list-item link @click.prevent="getAccountSettings">
+            <v-list-item
+                :input-value="$route.name === 'Account Settings' ? true:false"
+                link @click.prevent="getAccountSettings">
                 <v-list-item-icon>
                     <v-icon>mdi-account-cog-outline</v-icon>
                 </v-list-item-icon>
-
                 <v-list-item-content>
                     <v-list-item-title>Account Settings</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-
-            <v-list-item v-if="auth_user.role_id === 1" link @click.prevent="getUserManagement">
+            <v-list-item
+                :input-value="$route.name === 'User Management' ? true:false"
+                v-if="auth_user.role_id === 1"
+                link
+                @click.prevent="getUserManagement"
+            >
                 <v-list-item-icon>
                     <v-icon>mdi-account-supervisor-circle</v-icon>
                 </v-list-item-icon>
-
                 <v-list-item-content>
                     <v-list-item-title>User Management</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-
-            <v-list-item link @click.prevent="logout">
-                <v-list-item-icon>
-                    <v-icon>mdi-logout-variant</v-icon>
-                </v-list-item-icon>
-
-                <v-list-item-content>
-                    <v-list-item-title>Logout</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
         </v-list>
-
         <template v-slot:append>
             <div class="pa-2">
                 <v-btn
                     block
-                    @click.stop="drawer = !drawer"
+                    @click.prevent="logout"
                     dark
                     outlined
                 >
                     <v-icon left>
-                        mdi-close-circle-outline
+                        mdi-logout-variant
                     </v-icon>
-                    Hide
+                    Logout
                 </v-btn>
             </div>
         </template>
     </v-navigation-drawer>
-
     <v-app-bar
         app
         color="#0675BB"
@@ -128,6 +148,18 @@
             <v-icon>mdi-menu</v-icon>
         </v-app-bar-nav-icon>
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+
+        <v-avatar v-if="image_source === '/storage/null'" color="indigo">
+            <img src="/images/defaultpic.jpg" alt="default_picture">
+        </v-avatar>
+
+        <v-avatar v-else>
+            <img
+                :src="image_source"
+                alt="profile_picture"
+            >
+        </v-avatar>
         <v-progress-linear
             :active="page_loader"
             color="#A83F39"
@@ -165,96 +197,93 @@ export default {
         userFullName(){
             return this.$store.getters.auth_user_full_name;
         },
-        authUserFullName() {
-            var f_name = '', m_name = '',l_name = '',s_name = '';
-            f_name = (this.auth_user.first_name.trim()).charAt(0).toUpperCase() +
-                (this.auth_user.first_name.trim()).slice(1);
-            m_name = (this.auth_user.middle_name.trim()).charAt(0).toUpperCase() +
-                (this.auth_user.middle_name.trim()).slice(1);
-            l_name = (this.auth_user.last_name.trim()).charAt(0).toUpperCase() +
-                (this.auth_user.last_name.trim()).slice(1);
-            if(this.auth_user.suffix != null && typeof suffix !== 'undefined') {
-                s_name = (this.auth_user.suffix.trim()).charAt(0).toUpperCase() +
-                    (this.auth_user.suffix.trim()).slice(1);
-            }
-            return `${f_name} ${m_name} ${l_name} ${s_name}`;
+        submenuToggle() {
+            return this.$store.state.loader.submenu_opened;
+        },
+        image_source(){
+            return '/storage/' + this.auth_user.avatar || ''
         }
+
     },
     data() {
         return {
             drawer: null,
             group: null,
-            image_source: 'https://randomuser.me/api/portraits/'
         }
     },
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
         logout(){
-            this.removeAuthUser();
+            this.removeAuthUser()
             this.$store.dispatch('unsetSnackbar');
             this.$store.dispatch('setLoader');
+            this.$store.commit('TOGGLE_SUBMENU', false);
             sessionStorage.clear();
             this.$router.push({ name: "Login"});
         },
-
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "All Active Documents"});
             }
         },
         getAgingReport() {
             if(this.$route.name !== 'Document Aging Report') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Document Aging Report"});
             }
         },
         getLogs() {
             if(this.$route.name !== 'Log Report') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Log Report"});
             }
         },
         getMasterListReport() {
             if(this.$route.name !== 'Document Master List') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Document Master List"});
             }
         },
         getOfficeListReport() {
             if(this.$route.name !== 'Office List') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Office List"});
             }
         },
         getAccountSettings() {
             if(this.$route.name !== 'Account Settings') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "Account Settings",  params: { user: this.user }});
             }
         },
         getUserManagement() {
             if(this.$route.name !== 'User Management') {
                 this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "User Management",  params: { user: this.user }});
             }
         },
-        getRandomInt(min, max) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            return Math.floor(Math.random() * (max - min) + min);
-        }
     },
     beforeCreate() {
         this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
-    }
+    },
 }
 </script>
 
 <style>
 #sidebar {
     background-image: linear-gradient(180deg, #0675BB, #F72e2E);
+}
+.namespace {
+    background:rgba(0, 0, 0, 0.09);
 }
 </style>

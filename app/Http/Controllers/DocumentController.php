@@ -89,6 +89,8 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'forwarded']);
+            $tracking_record->document->update(['destination_office' => $request->forwarded_to]);
+
 
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id,$request,null,null, 'forward'));
@@ -257,5 +259,13 @@ class DocumentController extends Controller
 
         return true;
       
+    }
+
+    public function trackingReports() {
+        $documents = Document::withTrashed()
+            ->with('tracking_records', 'tracking_records.user', 'tracking_records.user.office')
+            ->get();
+        $office = collect($documents)->groupBy('tracking_records.user.office');
+        return $documents;
     }
 }

@@ -33,7 +33,7 @@
             class="elevation-1"
         >
             <template v-slot:top>
-                <v-text-field v-model="search" label="Search" class="mx-4"/>
+                <v-text-field prepend-inner-icon="mdi-magnify" v-model="search" label="Search" class="mx-4"/>
             </template>
 
             <template v-slot:item.actions="{ item }">

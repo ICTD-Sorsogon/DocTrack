@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('add_new_user', 'UserController@addNewUser');
         Route::post('update_existing_user', 'UserController@updateExistingUser');
         Route::post('delete_existing_user/{id}', 'UserController@deleteExistingUser');
+        Route::post('upload_profile_picture', 'UserController@uploadSelfie');
         Route::put('update_fullname', 'UserController@updateFullname');
         Route::put('update_username', 'UserController@updateUsername');
         Route::put('update_password', 'UserController@updatePassword');
@@ -45,6 +46,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('update_existing_office', 'OfficeController@updateExistingOffice');
         Route::post('delete_office/{id}', 'OfficeController@deleteOffice');
         Route::post('import_new_office', 'OfficeController@importNewOffice');
+
+        Route::get('tracking_reports', 'DocumentController@trackingReports');
 
     });
 
