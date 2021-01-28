@@ -151,6 +151,24 @@
           <v-row>
             <v-col>
               <v-list flat subheader>
+                <v-subheader>Status</v-subheader>
+                <v-list-item>
+                  <v-list-item-action>
+                    <v-icon>mdi-square-medium</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title>{{
+                      selected_document.status.replace(/\w/, val=>val.toUpperCase())
+                    }}</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </v-col>
+          </v-row>
+          <v-divider inset />
+          <v-row>
+            <v-col>
+              <v-list flat subheader>
                 <v-subheader>Date Filed</v-subheader>
                 <v-list-item>
                   <v-list-item-action>
@@ -290,7 +308,7 @@
         return selected_document.origin_office?.name ?? selected_document.originating_office
       },
       sender_name({selected_document}) {
-        return selected_document.sender?.name ?? selected_document.sender_name 
+        return selected_document.sender?.name ?? selected_document.sender_name
       },
     },
     methods: {

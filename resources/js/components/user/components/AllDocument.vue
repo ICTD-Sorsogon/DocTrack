@@ -22,40 +22,42 @@
     </v-tabs>
     <data-table
       @editDocument="editDocument"
+      @printDialog="openDialog"
       v-if="auth_user.role_id === 1"
       :documents="documents"
       :datatable_loader="datatable_loader"
       ></data-table>
     <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
-        <v-tab-item
+        <v-tab-item 
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
         <data-table
          @editDocument="editDocument"
+         @print="openDialog"
          :documents="userDocuments"
          :datatable_loader="datatable_loader"
          ></data-table>
         </v-tab-item>
     </v-tabs-items>
+    <print-bar-code :code="tracking_code" @closeDialog="printDialog = false" :printDialog="printDialog">
+    </print-bar-code>
 </v-card>
 </template>
 
 <script>
-/**
- * TODO:
- * Build documents before inserting to table
- * FIXME: Search only displays rows from the current page
-**/
+import PrintBarCode from './PrintBarCode'
 
 import DataTable from './DataTable';
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-    components: {DataTable},
+    components: {DataTable, PrintBarCode},
     data() {
         return {
-            tab: 0,
+          printDialog: false,
+          tab: 0,
+          tracking_code: null,
         }
     },
     computed: {
@@ -66,6 +68,10 @@ export default {
         },
     },
     methods: {
+        openDialog (code = false){
+         this.tracking_code = code 
+         this.printDialog = code && true
+        },
         checkIfID(string) {
             return /^-?\d+$/.test(string);
         },

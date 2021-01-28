@@ -147,6 +147,18 @@
             <v-icon>mdi-menu</v-icon>
         </v-app-bar-nav-icon>
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
+        <v-spacer></v-spacer>
+
+        <v-avatar v-if="image_source === '/storage/null'" color="indigo">
+            <img src="/images/defaultpic.jpg" alt="default_picture">
+        </v-avatar>
+
+        <v-avatar v-else>
+            <img
+                :src="image_source"
+                alt="profile_picture"
+            >
+        </v-avatar>
         <v-progress-linear
             :active="page_loader"
             color="#A83F39"
@@ -187,6 +199,10 @@ export default {
         submenuToggle() {
             return this.$store.state.loader.submenu_opened;
         },
+        image_source(){
+            return '/storage/' + this.auth_user.avatar || ''
+        }
+
     },
     data() {
         return {

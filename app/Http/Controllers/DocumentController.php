@@ -86,6 +86,8 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'forwarded']);
+            $tracking_record->document->update(['destination_office' => $request->forwarded_to]);
+
 
         } catch (ValidationException $error) {
             DB::rollback();

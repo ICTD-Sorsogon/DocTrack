@@ -127,6 +127,39 @@ const actions = {
         commit('GET_LOGS', response.data);
     },
 
+    async uploadProfilePicture({ commit }, image) {
+        let data = new FormData();
+        data.append('name', 'my-picture');
+        data.append('file', image);
+
+        let config = {
+          header : {
+            'Content-Type' : 'image/png'
+          }
+        }
+        await axios.post(`/api/upload_profile_picture`, data, config)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `Avatar successfully uploaded!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+        })
+        .catch(error => {
+            console.log(error);
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
+
+    async getLogs({ commit }) {
+        const response = await axios.get('/api/logs');
+        commit('GET_LOGS', response.data);
+    },
+
     async updateFullname({ commit }, form) {
         const response = await axios.put('api/update_fullname', form)
         .then(response => {
