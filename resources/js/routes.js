@@ -65,6 +65,10 @@ export default {
                     component: NewDocument,
                     name: 'New Document'
                 },
+                /**
+                 * FIXME: Bug when logging out from these paths, will not redirect to login page instead will redirect
+                 * to root path of authenticated user (all_active_document)
+                 **/
                 {
                     path: 'edit_document/:type/:id?',
                     component: EditDocument,

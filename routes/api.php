@@ -46,6 +46,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('delete_office/{id}', 'OfficeController@deleteOffice');
         Route::post('import_new_office', 'OfficeController@importNewOffice');
 
+        Route::get('tracking_reports', 'DocumentController@trackingReports');
+
     });
 
     Route::get('/authenticated', function () {

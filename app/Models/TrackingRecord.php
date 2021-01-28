@@ -18,14 +18,14 @@ class TrackingRecord extends Model
         'forwarded_by', 'forwarded_to', 'remarks'
     ];
 
-    public function getCreatedAtAttribute($value) 
+    public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->diffForHumans();
     }
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo('App\Models\User', 'touched_by');
     }
 
     public function office()
