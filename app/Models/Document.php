@@ -49,7 +49,7 @@ class Document extends Model
 
     public function tracking_records()
     {
-        return $this->hasMany('App\Models\TrackingRecord');
+        return $this->hasMany('App\Models\TrackingRecord', 'touched_by');
     }
 
     public function document_type()

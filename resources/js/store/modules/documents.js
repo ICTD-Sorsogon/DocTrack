@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const state = {
     types: '',
     allDocuments: [],
@@ -8,7 +10,7 @@ const state = {
     document_type_loading: false,
     selected_document: {},
     id: '',
-
+    tracking_reports: [],
 
 }
 
@@ -156,6 +158,13 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
+    async documentReports({ commit }) {
+        const response = await axios.get('/api/tracking_reports')
+        .then(response => {
+            commit('GET_TRACKING_REPORTS', response.data);
+        });
+
+    },
     async setDocument({ commit }, document) {
         commit('SET_SELECTED_DOCUMENT', document);
     },
@@ -203,6 +212,9 @@ const mutations = {
     },
     UNSET_SELECTED_DOCUMENT(state) {
         state.selected_document = {};
+    },
+    GET_TRACKING_REPORTS(state, reports) {
+        state.tracking_reports = reports;
     }
 }
 
