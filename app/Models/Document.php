@@ -82,7 +82,7 @@ class Document extends Model
     public static function allDocumentsArchive(User $user)
     {
         $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
-                    ->withTrashed();
+                    ->onlyTrashed();
 
         if($user->isUser()){
             $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
