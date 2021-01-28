@@ -23,7 +23,7 @@ class OfficeController extends Controller
 
     public function getOfficeList(): Collection
     {
-        return Office::with('documents')->get();
+        return Office::get();
     }
 
     public function addNewOffice(Request $request): Array

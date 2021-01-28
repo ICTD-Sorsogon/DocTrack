@@ -2,6 +2,7 @@ const state = {
     types: '',
     allDocuments: [],
     documents: [],
+    documentsArchive: [],
     document_types: [],
     document_loading: false,
     document_type_loading: false,
@@ -15,6 +16,7 @@ const getters = {
     find_document: ({documents}) => (id) => documents.find(doc => doc.id == id),
     get_alldocument: state => state.allDocuments,
     documents: state => state.documents,
+    documentsArchive: state => state.documentsArchive,
     document_types: state => state.document_types,
     selected_document: state => state.selected_document,
 }
@@ -33,6 +35,10 @@ const actions = {
     async getActiveDocuments({ commit }, page_number) {
         const response = await axios.get(`/api/get_active_documents`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
+    },
+    async getArchiveDocuments({ commit }, page_number) {
+        const response = await axios.get(`/api/get_archive_documents`);
+        commit('GET_ALL_ARCHIVE_DOCUMENTS', response.data);
     },
     async getNonPaginatedActiveDocuments({ commit }) {
         const response = await axios.get(`/api/get_non_page_active_documents`);
@@ -179,6 +185,9 @@ const mutations = {
     },
     GET_ALL_ACTIVE_DOCUMENTS(state, response) {
         state.documents = response;
+    },
+    GET_ALL_ARCHIVE_DOCUMENTS(state, response) {
+        state.documentsArchive = response;
     },
     SET_CURRENT_PAGE(state, data) {
         state.documents.current_page = data;

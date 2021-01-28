@@ -30,6 +30,11 @@ class DocumentController extends Controller
         return $documents->allDocuments(Auth::user());
     }
 
+    public function getAllArchiveDocuments(Document $documents)
+    {
+        return $documents->allDocumentsArchive(Auth::user());
+    }
+
     public function getNonPaginatedActiveDocuments()
     {
         $documents = Document::where('current_office_id', Auth::user()->office_id)

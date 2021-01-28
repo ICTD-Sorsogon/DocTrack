@@ -78,4 +78,16 @@ class Document extends Model
 
         return $document->orderBy('created_at', 'DESC')->get();
     }
+
+    public static function allDocumentsArchive(User $user)
+    {
+        $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
+                    ->withTrashed();
+
+        if($user->isUser()){
+            $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+        }
+
+        return $document->orderBy('created_at', 'DESC')->get();
+    }
 }
