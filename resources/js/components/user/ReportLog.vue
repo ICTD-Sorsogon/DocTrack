@@ -112,7 +112,7 @@
           :dialog_title="dialog_title"
           dialog_type='export'
           :dialog_for="dialog_for"
-          @close-dialog="closeDialog('excel')"
+          @close-dialog="closeDialog()"
       />
   </v-container>
 
@@ -164,6 +164,9 @@ export default {
         }
     },
     methods:{
+      closeDialog(){
+        this.excel_dialog = false;
+      },
       exportExcel(){
         var currentDate = new Date();
         var day = currentDate.getDate()
