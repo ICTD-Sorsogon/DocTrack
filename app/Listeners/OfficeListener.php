@@ -36,8 +36,8 @@ class OfficeListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
-                $log->action = 'Office Created';
-                $log->remarks = 'New Office has been Created with Office Name of : '.$office_name.' and Office Code of: '.$office_code;
+                $log->action = 'Office create';
+                $log->remarks = 'New office has been successfully created with office name of : '.$office_name.' and office code of: '.$office_code;
                 return $log->save();
             break;
 
@@ -51,8 +51,8 @@ class OfficeListener
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
                 $log->original_values = $old_values;
-                $log->action = 'Office Updated';
-                $log->remarks = 'Office has been Updated with new Office Name of : '.$name.' and Office Code of: '.$code;
+                $log->action = 'Office update';
+                $log->remarks = 'Office has been successfully updated with new office name of : '.$name.' and office code of: '.$code;
                 return $log->save();
             break;
 
@@ -62,8 +62,8 @@ class OfficeListener
 
                 $log = new Log;
                 $log->user_id = $event->user_id;
-                $log->action = 'Office Deleted';
-                $log->remarks = 'Office has been Deleted with Office Name of : '.$office_name.' and Office Code of: '.$office_code;
+                $log->action = 'Office delete';
+                $log->remarks = 'Office has been successfully deleted with office name of : '.$office_name.' and office code of: '.$office_code;
                 return $log->save();
             break;
 
@@ -72,8 +72,8 @@ class OfficeListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Office Imported';
-                $log->remarks = 'Office Imported with Sheet name of : '.$tab;
+                $log->action = 'Office imported';
+                $log->remarks = 'Office has been successfully imported with sheet name of : '.$tab;
                 return $log->save();
             break;
         }

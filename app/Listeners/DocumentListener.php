@@ -35,8 +35,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
-                $log->action = 'Document Created';
-                $log->remarks = 'New Document has been Created with Subject of : '.$subject;
+                $log->action = 'Document create';
+                $log->remarks = 'New document has been successfully created with subject of : '.$subject;
                 return $log->save();
             break;
 
@@ -50,8 +50,8 @@ class DocumentListener
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
                 $log->original_values = $old_values;
-                $log->action = 'Document Updated';
-                $log->remarks = 'Document has been Update from : '.$old_subject.' to '.$subject;
+                $log->action = 'Document update';
+                $log->remarks = 'Document has been successfully updated from : '.$old_subject.' to '.$subject;
                 return $log->save();
 
             break;
@@ -62,8 +62,8 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Document Acknowledge';
-                $log->remarks = 'Document '.$subject.' has been Acknowledge. Remarks:'.$remarks;
+                $log->action = 'Document acknowledge';
+                $log->remarks = 'Document '.$subject.' has been successfully acknowledge with remarks:'.$remarks;
                 return $log->save();
             break;
 
@@ -73,7 +73,7 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Document Hold or Reject';
+                $log->action = 'Document hold or reject';
                 $log->remarks = 'Document '.$subject.' is '.$status;
                 return $log->save();
             break;
@@ -85,8 +85,8 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Document Terminate';
-                $log->remarks = 'Document '.$subject.' has been Terminate. Approved by: '.$approved_by.'and Remarks: '.$remarks;
+                $log->action = 'Document terminate';
+                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: '.$approved_by.'with remarks: '.$remarks;
                 return $log->save();
             break;
 
@@ -98,8 +98,8 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Document Forwarded';
-                $log->remarks = 'Document '.$subject.' has been Forwarded through '.$through.'. Approved by: '.$approved_by.' and Remarks: '.$remarks;
+                $log->action = 'Document forward';
+                $log->remarks = 'Document '.$subject.' has been successfully forwarded through '.$through.'. and approved by: '.$approved_by.' with remarks: '.$remarks;
                 return $log->save();
             break;
 
@@ -111,8 +111,8 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Document Received';
-                $log->remarks = 'Document '.$subject.' has been Received through '.$through.'. Approved by: '.$approved_by.' and Remarks: '.$remarks;
+                $log->action = 'Document receive';
+                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.'. and approved by: '.$approved_by.' and remarks: '.$remarks;
                 return $log->save();
             break;
         }
