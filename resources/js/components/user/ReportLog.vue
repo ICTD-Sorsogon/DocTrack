@@ -223,6 +223,9 @@ export default {
         }
     },
     methods:{
+      closeDialog(){
+        this.excel_dialog = false;
+      },
       exportExcel(){
         var currentDate = new Date();
         var day = currentDate.getDate()

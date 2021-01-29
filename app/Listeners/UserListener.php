@@ -38,8 +38,8 @@ class UserListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->new_values = $event->request_obj;
-                $log->action = 'User Created';
-                $log->remarks = 'New Account has been Created for '.$last_name.', '.$first_name.', '.$middle_name.'  with Username of '.$username.' and Role ID of '.$role_id;
+                $log->action = 'User create';
+                $log->remarks = 'New account has been successfully created for '.$last_name.', '.$first_name.', '.$middle_name.'  with username of '.$username.' and role id of '.$role_id;
 
                 return $log->save();
             break;
@@ -56,8 +56,8 @@ class UserListener
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
                 $log->original_values = $old_values;
-                $log->action = 'User Updated';
-                $log->remarks = 'Account has been Updated for '.$last_name.', '.$first_name.', '.$middle_name.'  with Username of '.$username;
+                $log->action = 'User update';
+                $log->remarks = 'Account has been successfully updated for '.$last_name.', '.$first_name.', '.$middle_name.'  with username of '.$username;
                 return $log->save();
             break;
 
@@ -66,8 +66,8 @@ class UserListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'User Deleted';
-                $log->remarks = 'User has been Deleted with Username of : '.$username;
+                $log->action = 'User delete';
+                $log->remarks = 'User has been successfully deleted with username of : '.$username;
                 return $log->save();
             break;
         }

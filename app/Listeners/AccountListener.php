@@ -40,16 +40,16 @@ class AccountListener
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
                 $log->original_values = $old_values;
-                $log->action = 'Account Fullname Updated';
-                $log->remarks = 'Account Fullname has been Updated to : '.$last_name.', '.$first_name.', '.$middle_name.' '.$suffix;
+                $log->action = 'Account fullname update';
+                $log->remarks = 'Account fullname has been successfully updated to : '.$last_name.', '.$first_name.', '.$middle_name.' '.$suffix;
                 return $log->save();
             break;
 
             case 'password':
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Account Password Updated';
-                $log->remarks = 'Account Password has been Updated';
+                $log->action = 'Account password update';
+                $log->remarks = 'Account password has been successfully updated';
                 return $log->save();
             break;
 
@@ -60,8 +60,8 @@ class AccountListener
 
                 $log = new Log();
                 $log->user_id = $event->user_id;
-                $log->action = 'Account Username Updated';
-                $log->remarks = 'Account Username has been Updated from : '.$old_values.' to '.$username;
+                $log->action = 'Account username update';
+                $log->remarks = 'Account username has been successfully updated from : '.$old_values.' to '.$username;
                 return $log->save();
             break;
         }
