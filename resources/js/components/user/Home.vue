@@ -213,6 +213,10 @@ export default {
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
         logout(){
+            var redirects = this.$route.path.substring(1).split('/').length;
+            if(redirects > 1){
+                this.$router.push({ name: "All Active Documents"});
+            }
             this.removeAuthUser()
             this.$store.dispatch('unsetSnackbar');
             this.$store.dispatch('setLoader');
