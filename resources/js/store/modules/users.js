@@ -234,7 +234,6 @@ const mutations = {
     UNSET_AUTH_USER: (state) => {
         state.user = {};
         state.user_full_name = '';
-
     },
     FETCH_ALL_USERS: (state, users) => {
         state.all_users = users;

@@ -18,7 +18,6 @@ import HomeContainer from './components/HomeContainer';
 import NotFound from './components/NotFound';
 
 export default {
-    base: '/',
     mode: 'history',
     routes: [
         {
@@ -26,14 +25,17 @@ export default {
             component: NotFound,
             name: 'Not Found'
         },
+        // FIXME: fix route guards
         {
-            path: '/',
+            path: '/login',
             component: Login,
             name: 'Login',
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
-                    next({name: 'All Active Documents' })
-                }).then(()=>{}).catch((error) => {
+                    console.log('login unauth:', response);
+                    next()
+                }).catch((error) => {
+                    console.log('Login catch: ',error);
                     return next()
                 });
             },
@@ -42,10 +44,13 @@ export default {
             path: '/',
             component: HomeContainer,
             requiresAuth: true,
+            redirect: '/all_active_document',
             beforeEnter: (to, from, next) => {
                 axios.get('api/authenticated').then((response) => {
+                    console.log('goods: ',response);
                     next()
                 }).catch((error) => {
+                    console.log('catch: ',error);
                     return next({name: 'Login' })
                 });
             },

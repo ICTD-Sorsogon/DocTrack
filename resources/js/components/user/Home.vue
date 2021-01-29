@@ -136,6 +136,7 @@
                     </v-icon>
                     Logout
                 </v-btn>
+                <!-- <logout-dialog @trigger-logout="logout"></logout-dialog> -->
             </div>
         </template>
     </v-navigation-drawer>
@@ -183,7 +184,9 @@
 <script>
 // TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
+import LogoutDialog from './components/LogoutDialog'
 export default {
+    components: { LogoutDialog },
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
@@ -218,10 +221,10 @@ export default {
             if(redirects > 1){
                 this.$router.push({ name: "All Active Documents" });
             }
-            this.removeAuthUser()
             this.$store.dispatch('unsetSnackbar');
             this.$store.dispatch('setLoader');
             this.$store.commit('TOGGLE_SUBMENU', false);
+            this.removeAuthUser()
             sessionStorage.clear();
             this.$router.push({ name: "Login"});
         },
