@@ -39,7 +39,7 @@
                     outlined
                     color="primary"
                     link
-                    @click.prevent="goBack"
+                    :href="baseURL"
                 >
                     <v-icon
                         left
@@ -77,12 +77,10 @@ export default {
             case 'lg': return 455
             case 'xl': return 720
             }
+        },
+        baseURL() {
+            return window.location.origin;
         }
     },
-    methods: {
-        goBack(){
-            this.$router.back();
-        },
-    }
 }
 </script>
