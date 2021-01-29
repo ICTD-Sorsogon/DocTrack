@@ -89,9 +89,69 @@
               </v-card>
             </v-dialog>
 
+          <v-dialog
+              :headers="headers2"
+              v-model="emptyLogDialog"
+              max-width="60vw"
+            >
+              <v-card
+              >
+                <v-card-title>
+                  <span class="headline">{{ formTitle }}</span>
+
+                  <v-spacer></v-spacer>
+                    <v-icon
+                        @click="close"
+                          large
+                          class="ml-4"
+                        >
+                      mdi-close
+                    </v-icon>
+                </v-card-title>
+
+              <v-simple-table>
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">
+                          Label
+                        </th>
+                        <th class="text-left">
+                          New
+                        </th>
+                        <th class="text-left">
+                          Old
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><h4>No Data Found</h4></td>
+                      </tr>
+                    </tbody>
+                  </template>
+              </v-simple-table>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+
         </template>
         <template v-slot:item.actions="{ item }">
           <v-icon
+            v-if="!item.original_values && !item.new_values"
+            medium
+            class="ml-3"
+            color="blue"
+            @click="emptyLogDialog = true"
+          >
+            mdi-more
+          </v-icon>
+          <v-icon
+            v-else
             medium
             class="ml-3"
             color="blue"
@@ -102,8 +162,6 @@
         </template>
       </v-data-table>
     </template>
-
-
 
     </v-card>
       <excel-dialog
@@ -129,6 +187,7 @@ export default {
   },
   data() {
         return {
+            emptyLogDialog: false,
             excel_dialog: false,
             dialog_for: 'exportLogs',
             dialog_title: null,
@@ -234,6 +293,7 @@ export default {
       },
       close () {
         this.dialog = false
+        this.emptyLogDialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
