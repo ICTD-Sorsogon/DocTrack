@@ -168,12 +168,47 @@
 
                     <v-row>
                         <v-col class="d-flex" cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                            <v-text-field v-model="search" label="Search Value" class="mx-4"/>
+                            <v-text-field v-model="search" @input="textboxChange" label="Search Value" class="mx-4"/>
                         </v-col>
                     </v-row>
                 </template>
 
-                <template v-slot:[`item.view_more`]="{ item }">
+                <template v-slot:[`item.tracking_code`] = "{ item }">
+					<v-chip class='trackin' label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+						{{ item.tracking_code }}
+					</v-chip>
+	        	</template>
+
+                <!--<template v-slot:[`item.restore`]="{ item }">
+                    <td>
+                        <v-btn
+                            color="primary"
+                            icon
+                            @click.prevent="{selectDoc(item.id); viewDialog = true}"
+                            title="dd"
+                        >
+                            <v-icon>mdi-backup-restore</v-icon>
+                        </v-btn>
+                    </td>
+                </template>-->
+
+                <template v-slot:[`item.actions`]="{ item }">
+                    <v-row>
+                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
+                            <v-btn fab icon raised x-small color = 'primary' title="Restore to Active" style="margin-right:4px;"
+                                @click.prevent="{selectDoc(item.id); viewDialog = true}"
+                            ><v-icon>mdi-backup-restore</v-icon></v-btn>
+                        </v-col>
+                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pl-0" style="top:50%; text-align:left; ">
+                            <v-btn fab icon raised x-small color = 'primary' title="View More"
+                                @click.prevent="{selectDoc(item.id); viewDialog = true}"
+                            ><v-icon>mdi-more</v-icon></v-btn>
+                        </v-col>
+                    </v-row>
+                </template>
+
+
+                <!--<template v-slot:[`item.view_more`]="{ item }">
                     <td>
                         <v-btn
                             color="primary"
@@ -183,10 +218,16 @@
                             <v-icon>mdi-more</v-icon>
                         </v-btn>
                     </td>
-                </template>
+                </template>-->
 
 
             </v-data-table>
+            <table-modal
+                @closeDialog="closeDialog('dialog')"
+                :dialog="viewDialog"
+                v-if="selected_document"
+                :selected_document="selected_document"
+            />
         </v-card>
 
         <v-row justify="center">
@@ -265,10 +306,12 @@
 <script>
     import OfficeTableModal from './components/OfficeTableModal';
     import ExcelDialog from './components/ExcelDialog';
+    import TableModal from './components/TableModal';
+    import { colors } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
 
     export default {
-        components: { OfficeTableModal, ExcelDialog },
+        components: { OfficeTableModal, ExcelDialog, TableModal },
         data() {
             return {
                 activeDoc: null,
@@ -286,7 +329,9 @@
                     { text: 'Originating Office', value: 'originating_office' },
                     { text: 'Destination Office', value: 'destination.name' },
                     { text: 'Sender', value: 'sender_name' },
-                    { text: 'View More', value: 'view_more' },
+                   // { text: 'Restore', value: 'restore' },
+                   // { text: 'View More', value: 'view_more' },
+                    { text: 'Action', value: 'actions', align: 'center', },
                    // { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
@@ -372,8 +417,17 @@
                     return doc
                 })
             },
+            selected_document() {
+                return this.extendedData.find(data=>data.id == this.activeDoc)
+            },
         },
         methods: {
+            textboxChange(value){
+                console.log(`${this.search_option} : ` + value)
+            },
+            getTrackingCodeColor(document, document_type_id) {
+                return colors[document_type_id];
+            },
             searchOption(key){
                 switch (key) {
                     case 'normal':
@@ -464,6 +518,9 @@
                         break;
                     case 'excel':
                         this.excel_dialog = false;
+                        break;
+                    case 'dialog':
+                        this.viewDialog = false
                         break;
                 }
             }
