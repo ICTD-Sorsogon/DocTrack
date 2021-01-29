@@ -56,8 +56,6 @@
                 :items-per-page="10"
                 :search="search"
                 class="elevation-1"
-                show-expand
-                :expanded.sync="expanded"
             >
                 <template v-slot:top>
                    <!-- <v-text-field v-model="search" label="Search" class="mx-4"/>-->
@@ -173,118 +171,20 @@
                             <v-text-field v-model="search" label="Search Value" class="mx-4"/>
                         </v-col>
                     </v-row>
-
-
                 </template>
 
-                <!--<template v-slot:top>
-                    <v-toolbar flat>
-                    <v-toolbar-title>Expandable Table</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-switch
-                        v-model="singleExpand"
-                        label="Single expand"
-                        class="mt-2"
-                    ></v-switch>
-                    </v-toolbar>
-                </template>-->
-                <template v-slot:expanded-item="{ headers, item }">
-                    <td :colspan="headers.length">
-                    <!--More info about {{ item }}-->
-
-                    <template>
-                        <v-data-table
-                            :headers="headers"
-                            :items="offices"
-                            :items-per-page="5"
-                            class="elevation-1"
-                        ></v-data-table>
-                    </template>
-
-
-                    <!--<template>
-                        <v-data-table
-                        :headers="headers"
-                        :items="desserts"
-                        :items-per-page="5"
-                        class="elevation-1"
-                        ></v-data-table>
-                    </template>-->
+                <template v-slot:[`item.view_more`]="{ item }">
+                    <td>
+                        <v-btn
+                            color="primary"
+                            icon
+                            @click.prevent="{selectDoc(item.id); viewDialog = true}"
+                        >
+                            <v-icon>mdi-more</v-icon>
+                        </v-btn>
                     </td>
                 </template>
-                <!--rr-->
 
-               <!-- <template v-slot:item.actions="{ item }">
-                    <v-row>
-                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pr-0" style="top:50%; text-align:right;">
-                            <v-icon small @click="editOffice(item)" style="margin-right:4px;">mdi-pencil </v-icon>
-                        </v-col>
-                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pl-0" style="top:50%; text-align:left;">
-                            <v-icon small @click="deleteConfirmationDialog(item)" style="margin-left:4px;"> mdi-delete </v-icon>
-                        </v-col>
-                    </v-row>
-                </template>-->
-
-                <!--<template v-slot:header>
-                    <v-toolbar
-                    dark
-                    color="blue darken-3"
-                    class="mb-1"
-                    >
-                    <template v-if="$vuetify.breakpoint.mdAndUp">
-                        <v-spacer></v-spacer>
-                        <v-select
-                        v-model="sortBy"
-                        flat
-                        solo-inverted
-                        hide-details
-                        :items="keys"
-                        prepend-inner-icon=""
-                        label="Select office"
-                        ></v-select>
-                        <v-spacer></v-spacer>
-                        <v-select
-                            v-model="sortBy"
-                            flat
-                            solo-inverted
-                            hide-details
-                            :items="keys1"
-                            prepend-inner-icon=""
-                            label="Filter by"
-                        ></v-select>
-                        <v-spacer></v-spacer>
-                         <v-select
-                            v-model="sortBy"
-                            flat
-                            solo-inverted
-                            hide-details
-                            :items="keys2"
-                            prepend-inner-icon=""
-                            label="Source"
-                        ></v-select>
-                        <v-spacer></v-spacer>
-                        <v-select
-                            v-model="sortBy"
-                            flat
-                            solo-inverted
-                            hide-details
-                            :items="keys3"
-                            prepend-inner-icon=""
-                            label="Type"
-                        ></v-select>
-                    </template>
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                        v-model="search"
-                        clearable
-                        flat
-                        solo-inverted
-                        hide-details
-                        prepend-inner-icon="mdi-magnify"
-                        label="Search"
-                    ></v-text-field>
-                    </v-toolbar>
-                </template>-->
 
             </v-data-table>
         </v-card>
@@ -371,6 +271,8 @@
         components: { OfficeTableModal, ExcelDialog },
         data() {
             return {
+                activeDoc: null,
+                viewDialog: false,
                /* headers: [
                     { text: 'Office Name', value: 'builded_office_name' },
                     { text: '', value: 'data-table-expand' },
@@ -384,7 +286,7 @@
                     { text: 'Originating Office', value: 'originating_office' },
                     { text: 'Destination Office', value: 'destination.name' },
                     { text: 'Sender', value: 'sender_name' },
-                    { text: '', value: 'data-table-expand' },
+                    { text: 'View More', value: 'view_more' },
                    // { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
@@ -552,6 +454,9 @@
                         break;
                 }
             },
+            selectDoc(id){
+                this.activeDoc = id
+            },
             closeDialog(key){
                 switch (key) {
                     case 'form':
@@ -566,6 +471,7 @@
         mounted() {
             this.$store.dispatch('getArchiveDocuments');
             this.$store.dispatch('unsetLoader');
+
         }
     }
 </script>
