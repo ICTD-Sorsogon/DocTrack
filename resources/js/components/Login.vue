@@ -66,26 +66,26 @@
                                                             prepend-inner-icon="mdi-account-box"
                                                             name="username"
                                                             v-model="form.username"
+                                                            :error-messages="errors"
                                                             label="Username"
                                                             id="username"
                                                             type="text"
                                                             outlined
                                                             required
                                                         />
-                                                        <span>{{ errors[0] }}</span>
                                                     </ValidationProvider>
                                                     <ValidationProvider rules="required" v-slot="{ errors }">
                                                         <v-text-field
                                                             prepend-inner-icon="mdi-form-textbox-password"
                                                             name="password"
                                                             v-model="form.password"
+                                                            :error-messages="errors"
                                                             label="Password"
                                                             id="password"
                                                             type="password"
                                                             required
                                                             outlined
                                                         />
-                                                        <span>{{ errors[0] }}</span>
                                                     </ValidationProvider>
                                                 </v-card-text>
                                                 <v-card-actions>
