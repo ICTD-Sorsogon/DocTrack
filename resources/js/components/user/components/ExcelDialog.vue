@@ -182,6 +182,7 @@
                                 tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
                                 content: []
                             });
+                            // Preview
                             sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
                                 var rowIndex = rowNumber - 1;
                                 if (rowIndex > 0) {
@@ -196,6 +197,7 @@
                                             ((dataCol[5] == undefined)? null : dataCol[5])
                                     });
                                 }
+                            // Duplicate Validation
                                 row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
                                     var colIndex = colNumber - 1;
                                     if (rowIndex > 0 && colIndex < 3) {
@@ -260,6 +262,57 @@
                         });
                     }
                 });
+            },
+            exportLogs(){
+                const header_color = this.marian_blue;
+                const data = this.$store.state.users.logs;
+                let workbook = new Excel.Workbook()
+                let worksheet = workbook.addWorksheet('Logs')
+                worksheet.columns = [
+                    { header: 'User ID', key: 'user_id', width: 55 },
+                    { header: 'Action', key: 'action', width: 13 },
+                    { header: 'Remarks', key: 'remarks', width: 60 },
+                    { header: 'Original Values', key: 'original_values', width: 18 },
+                    { header: 'New Values', key: 'new_values', width: 35 }
+                ]
+                data.forEach((e, index) => {
+                    worksheet.addRow({
+                        user_id: e.user_id,
+                        action: e.action,
+                        remarks: e.remarks,
+                        original_values: e.original_values,
+                        new_values: e.new_values
+                    })
+                })
+                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                    const headerColumns = ['A','B', 'C', 'D', 'E']
+                    headerColumns.forEach((v) => {
+                        if(rowNumber == 1){
+                            worksheet.getCell(`${v}${rowNumber}`).style = {
+                                fill: {
+                                    type: 'pattern',
+                                    pattern:'solid',
+                                    fgColor:{ argb: header_color }
+                                },
+                                font: {
+                                    color: {argb: "ffffff"},
+                                    bold: true
+                                }
+                            }
+                        }else{
+                            worksheet.getCell(`${v}${rowNumber}`).style = {
+                                border: {
+                                    top: { style: 'thin' },
+                                    left: { style: 'thin' },
+                                    bottom: { style: 'thin' },
+                                    right: { style: 'thin' }
+                                }
+                            }
+                        }
+                    })
+                })
+                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
                 const header_color = this.marian_blue;

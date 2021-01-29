@@ -101,6 +101,7 @@
             :dialog_title="dialog_title"
             :dialog_type="dialog_type"
             :dialog_for="dialog_for"
+            :dialog_type ="dialog_type"
             @close-dialog="closeDialog('excel')"
         />
 

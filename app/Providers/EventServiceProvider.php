@@ -38,57 +38,19 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $listen = [
-        NewDocumentHasAddedEvent::class => [
-            InsertDocumentListener::class,
-        ],
-        DocumentUpdateEvent::class => [
-            DocumentUpdateListener::class,
-        ],
-        DocumentDeleteEvent::class => [
-            DocumentDeleteListener::class,
-        ],
+    // protected $listen = [
 
-        //Office
-            OfficeCreateEvent::class => [
-            OfficeCreateListener::class,
-        ],
-            OfficeUpdateEvent::class => [
-            OfficeUpdateListener::class,
-        ],
-            OfficeDeleteEvent::class => [
-            OfficeDeleteListener::class,
-        ],
-
-        //User 
-            UserCreateEvent::class => [
-            UserCreateListener::class,
-        ],
-            UserUpdateEvent::class => [
-            UserUpdateListener::class,
-        ],
-            UserDeleteEvent::class => [
-            UserDeleteListener::class,
-        ],
-
-        // Account
-            AccountFullnameUpdateEvent::class => [
-            AccountFullnameListener::class,
-        ],
-            AccountUsernameUpdateEvent::class => [
-            AccountUsernameListener::class,
-        ],
-            AccountPasswordUpdateEvent::class => [
-            AccountPasswordListener::class,
-        ]
-
-    ];
+    // ];
 
     /**
      * Register any events for your application.
      *
      * @return void
      */
+    public function shouldDiscoverEvents()
+    {
+        return true;
+    }
     public function boot()
     {
         //

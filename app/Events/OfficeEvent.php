@@ -10,18 +10,25 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DocumentDeleteEvent
+class OfficeEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $user_id;
+    public $request_obj;
+    public $type;
+    public $old_values;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user_id, $request_obj, $old_values, $type)
     {
-        //
+        $this->user_id = $user_id;
+        $this->request_obj = $request_obj;
+        $this->old_values = $old_values;
+        $this->type = $type;
     }
 
     /**
