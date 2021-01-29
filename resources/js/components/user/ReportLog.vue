@@ -1,121 +1,137 @@
 <template>
-<v-container>
-  <v-card flat>
-          <v-card-title primary-title>
-              Logs
-              <v-row align="center" justify="end" class="pr-4">
-                  <v-btn color="primary" @click="exportExcel"
-                  >
-                  <v-icon
-                    small
-                    class="mr-2"
-                  >
-                    mdi-export
-                  </v-icon>
-                  Export</v-btn
-                  >
-              </v-row>
-          </v-card-title>
+  <v-container>
+    <v-card flat>
+            <v-card-title primary-title>
+                Logs
+                <v-row align="center" justify="end" class="pr-4">
 
-          <v-text-field
-            v-model="search"
-            prepend-inner-icon="mdi-magnify"
-            label="Search"
-            single-line
-            hide-details
-          ></v-text-field>
-
-  <template>
-    <v-data-table
-      :headers="headers"
-      :items="logs"
-      :search="search"
-      class="elevation-1"
-    >
-      <template v-slot:top>
-
-          <v-dialog
-            :headers="headers2"
-            v-model="dialog"
-            max-width="80vw"
-          >
-            <v-card>
-              <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
-
-                <v-spacer></v-spacer>
-                  <v-icon
-                      @click="close"
-                        large
-                        class="ml-4"
-                      >
-                    mdi-close
-                  </v-icon>
-              </v-card-title>
-
-            <v-simple-table>
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">
-                        Label
-                      </th>
-                      <th class="text-left">
-                        New
-                      </th>
-                      <th class="text-left">
-                        Old
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(item, index) in final_data"
-                      :key="index"
+                    <v-btn color="primary" @click="excel_dialog = true; dialog_title ='Logs'"
                     >
-                      <td>{{ item['key'] }}</td>
-                      <td>{{ item['new'] }}</td>
-                      <td>{{ item['old'] }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-            </v-simple-table>
+                    <v-icon
+                      small
+                      class="mr-2"
+                    >
+                      mdi-export
+                    </v-icon>
+                    Export</v-btn
+                    >
+                </v-row>
+            </v-card-title>
 
-              <v-card-actions>
-                <v-spacer></v-spacer>
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+            ></v-text-field>
 
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+    <template>
+      <v-data-table
+        :headers="headers"
+        :items="logs"
+        :search="search"
+        class="elevation-1"
+      >
+        <template v-slot:top>
 
-      </template>
-      <template v-slot:item.actions="{ item }">
-        <v-icon
-          medium
-          class="ml-3"
-          color="blue"
-          @click="editItem(item)"
-        >
-          mdi-more
-        </v-icon>
-      </template>
-    </v-data-table>
-  </template>
+            <v-dialog
+              :headers="headers2"
+              v-model="dialog"
+              max-width="80vw"
+            >
+              <v-card>
+                <v-card-title>
+                  <span class="headline">{{ formTitle }}</span>
+
+                  <v-spacer></v-spacer>
+                    <v-icon
+                        @click="close"
+                          large
+                          class="ml-4"
+                        >
+                      mdi-close
+                    </v-icon>
+                </v-card-title>
+
+              <v-simple-table>
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">
+                          Label
+                        </th>
+                        <th class="text-left">
+                          New
+                        </th>
+                        <th class="text-left">
+                          Old
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(item, index) in final_data"
+                        :key="index"
+                      >
+                        <td>{{ item['key'] }}</td>
+                        <td>{{ item['new'] }}</td>
+                        <td>{{ item['old'] }}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+              </v-simple-table>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+
+        </template>
+        <template v-slot:item.actions="{ item }">
+          <v-icon
+            medium
+            class="ml-3"
+            color="blue"
+            @click="editItem(item)"
+          >
+            mdi-more
+          </v-icon>
+        </template>
+      </v-data-table>
+    </template>
 
 
 
-  </v-card>
-</v-container>
+    </v-card>
+      <excel-dialog
+          v-if="dialog_title && excel_dialog == true"
+          :excel_dialog="excel_dialog"
+          :dialog_title="dialog_title"
+          dialog_type='export'
+          :dialog_for="dialog_for"
+          @close-dialog="closeDialog()"
+      />
+  </v-container>
 
 
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import ExcelDialog from './components/ExcelDialog'
 import XLSX from 'xlsx';
 export default {
-    data() {
+  components:{
+    ExcelDialog,
+  },
+  data() {
         return {
+            excel_dialog: false,
+            dialog_for: 'exportLogs',
+            dialog_title: null,
             dialog: false,
             dialogDelete: false,
 
@@ -148,6 +164,9 @@ export default {
         }
     },
     methods:{
+      closeDialog(){
+        this.excel_dialog = false;
+      },
       exportExcel(){
         var currentDate = new Date();
         var day = currentDate.getDate()
