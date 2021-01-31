@@ -22,7 +22,7 @@
     </v-tabs>
     <data-table
       @editDocument="editDocument"
-      @printDialog="openDialog"
+      @print="openDialog"
       v-if="auth_user.role_id === 1"
       :documents="documents"
       :datatable_loader="datatable_loader"
