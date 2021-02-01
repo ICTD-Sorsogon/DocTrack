@@ -40,7 +40,7 @@
          ></data-table>
         </v-tab-item>
     </v-tabs-items>
-    <print-bar-code :code="tracking_code" @closeDialog="printDialog = false" :printDialog="printDialog">
+    <print-bar-code :item="item" @closeDialog="printDialog = false" :printDialog="printDialog">
     </print-bar-code>
 </v-card>
 </template>
@@ -57,7 +57,7 @@ export default {
         return {
           printDialog: false,
           tab: 0,
-          tracking_code: null,
+          item: null,
         }
     },
     computed: {
@@ -68,9 +68,9 @@ export default {
         },
     },
     methods: {
-        openDialog (code = false){
-         this.tracking_code = code 
-         this.printDialog = code && true
+        openDialog (item = false){
+         this.item = item 
+         this.printDialog = item && true
         },
         checkIfID(string) {
             return /^-?\d+$/.test(string);

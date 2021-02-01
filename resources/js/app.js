@@ -38,6 +38,9 @@ const options = {
       'titlebar=yes',
       'scrollbars=yes'
     ],
+    styles: [
+        'css/app.css'
+      ]
   }
 
 Vue.use(VueHtmlToPaper, options);
