@@ -26,7 +26,7 @@
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip class='trackin' @click="$emit('print', item.tracking_code)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click="$emit('print', item)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
 		</template>
