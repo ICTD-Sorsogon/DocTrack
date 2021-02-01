@@ -206,33 +206,28 @@ class DocumentController extends Controller
     {
         if(!$document->id){
             $request_obj = '{
+                "subject":"' . $request->subject . '",
+                "sender_name":"' . $request->sender_name . '",
+                "remarks":"' . $request->remarks . '",
                 "attachment_page_count":"' . $request->attachment_page_count . '",
                 "destination_office_id":"' . $request->destination_office_id . '",
                 "document_type_id":"' . $request->document_type_id . '",
-                "id":"' . $request->id . '",
-                "originating_office":"' . $request->originating_office . '",
-                "page_count":"' . $request->page_count . '",
-                "remarks":"' . $request->remarks . '",
-                "sender_name":"' . $request->sender_name . '",
-                "subject":"' . $request->subject . '",
-                "tracking_code":"' . $request->tracking_code . '"}';
-    
+                "page_count":"' . $request->page_count . '"}';
+
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
 
         } else{
-        $old_values = Document::select('attachment_page_count','destination_office_id','document_type_id','id','originating_office','page_count','remarks','sender_name','subject','tracking_code')->where('id', $request->id)->get();
+            $old_values = Document::select('subject','sender_name','remarks','attachment_page_count','destination_office_id','document_type_id','page_count')->where('id', $request->id)->get();
             $request_obj = '{
+                "subject":"' . $request->subject . '",
+                "sender_name":"' . $request->sender_name . '",
+                "remarks":"' . $request->remarks . '",
                 "attachment_page_count":"' . $request->attachment_page_count . '",
                 "destination_office_id":"' . $request->destination_office_id . '",
                 "document_type_id":"' . $request->document_type_id . '",
-                "id":"' . $request->id . '",
-                "originating_office":"' . $request->originating_office . '",
-                "page_count":"' . $request->page_count . '",
-                "remarks":"' . $request->remarks . '",
-                "sender_name":"' . $request->sender_name . '",
-                "subject":"' . $request->subject . '",
-                "tracking_code":"' . $request->tracking_code . '"}';
+                "page_count":"' . $request->page_count . '"}';
+
 
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id,json_decode($request_obj), json_decode($old_values[0]),null, 'update'));
@@ -258,7 +253,7 @@ class DocumentController extends Controller
         }
 
         return true;
-      
+
     }
 
     public function trackingReports() {

@@ -77,7 +77,7 @@ class DocumentListener
                 $log->remarks = 'Document '.$subject.' is '.$status;
                 return $log->save();
             break;
-            
+
             case 'terminate':
                 $remarks = $event->old_values;
                 $subject = $event->request_obj;
