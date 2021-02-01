@@ -38,7 +38,8 @@ const actions = {
         const response = await axios.get(`/api/get_active_documents`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
     },
-    async getArchiveDocuments({ commit }, page_number) {
+    async getArchiveDocuments({ commit }, filter) {
+        console.log('DOCUMENT MODULE:' + filter);
         const response = await axios.get(`/api/get_archive_documents`);
         commit('GET_ALL_ARCHIVE_DOCUMENTS', response.data);
     },

@@ -222,7 +222,8 @@
 
 
 
-                    <div v-if="search_option == 'advance'" class="elevation-3 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;">
+                    <!--<div v-if="search_option == 'advance'" class="elevation-3 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;">-->
+                    <v-card v-if="search_option == 'advance'" class="elevation-2 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;border:1px solid #B8B8B8;">
                         <v-row>
                             <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
                                 <v-text-field v-model="search" @input="textboxChange" label="Traking ID" class="mx-4"/>
@@ -335,8 +336,23 @@
                                     </v-date-picker>
                                 </v-dialog>
                             </v-col>-->
+
                         </v-row>
-                    </div>
+                         <v-btn
+                            v-show="true"
+                            color="red"
+                            fab
+                            dark
+                            small
+                            absolute
+                            top
+                            right
+                            @click="search_option = 'normal'"
+                        >
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                    </v-card>
+                    <!--</div>-->
 
                     <v-row v-if="search_option == 'normal'">
                         <v-col class="d-flex" cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
@@ -564,7 +580,7 @@
                 search_option: 'normal',
                 table: [],
                 display:[],
-                selected: [new Date().getFullYear().toString()],
+                //selected: [new Date().getFullYear().toString()],
                 recordFilter: ["By Date Range", "By Year"],
                 selectRecord: "By Date Range",
                 isByYear: false
@@ -587,20 +603,37 @@
             request(){
                 return this.$store.state.snackbars.request;
             },
-            extendedData() {
-                return JSON.parse(JSON.stringify( this.documentsArchive)).map(doc=>{
-                    doc.is_external = doc.is_external ? 'External' : 'Internal'
-                    doc.sender_name = doc.sender?.name ?? doc.sender_name
-                    doc.originating_office = doc.origin_office?.name ?? doc.originating_office
-                    doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
+            extendedData: {
+                get: function () {
+                    return JSON.parse(JSON.stringify( this.documentsArchive)).map(doc=>{
+                        doc.is_external = doc.is_external ? 'External' : 'Internal'
+                        doc.sender_name = doc.sender?.name ?? doc.sender_name
+                        doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                        doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
 
-                    const year = new Date(doc.created_at).getFullYear().toString()
-                    if(!this.display.includes(year)){
-                        this.display.push(year);
-                    }
+                        const year = new Date(doc.created_at).getFullYear().toString()
+                        if(!this.display.includes(year)){
+                            this.display.push(year);
+                        }
 
-                    return doc
-                })
+                        return doc
+                    })
+                },
+                set: function (data) {
+                    return JSON.parse(JSON.stringify( this.data)).map(doc=>{
+                        doc.is_external = doc.is_external ? 'External' : 'Internal'
+                        doc.sender_name = doc.sender?.name ?? doc.sender_name
+                        doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                        doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
+
+                        const year = new Date(doc.created_at).getFullYear().toString()
+                        if(!this.display.includes(year)){
+                            this.display.push(year);
+                        }
+
+                        return doc
+                    })
+                }
             },
             selected_document() {
                 return this.extendedData.find(data=>data.id == this.activeDoc)
@@ -613,23 +646,16 @@
                 if (this.allData) return 'mdi-minus-box'
                 return 'mdi-checkbox-blank-outline'
             },
+            selected: {
+                get: function () {
+                    return [new Date().getFullYear().toString()]
+                },
+                set: function (year) {
+                    return [year]
+                }
+            }
         },
         methods: {
-            /*sample(){
-                var required = ['a', 'b', 'c'];
-                var data = 'b';
-                var a = '';
-                var b = '';
-                var c = '';
-                if(required.includes(data)){
-                    data = data
-                }
-                console.log();
-                //if(data == 'a'){
-                //}else if(data == 'b'){
-                //}else if(data == 'c'){
-                //}
-            },*/
             recordFilterBy(){
                 if(this.selectRecord == 'By Date Range'){
                     this.isByYear = false
@@ -649,7 +675,7 @@
                     if (this.allData) {
                        this.selected = []
                     } else {
-                        this.selected = this.display.slice()
+                        this.selected = [...this.selected, this.display.slice()]
                     }
                 })
             },
@@ -757,7 +783,7 @@
             }
         },
         mounted() {
-            this.$store.dispatch('getArchiveDocuments');
+            this.$store.dispatch('getArchiveDocuments', this.selected);
             this.$store.dispatch('unsetLoader');
 
         }
