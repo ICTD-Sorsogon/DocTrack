@@ -69,8 +69,11 @@ export default {
     },
     methods: {
         openDialog (item = false){
-         this.item = item 
-         this.printDialog = item && true
+         if(this.auth_user.role_id != 1 && !this.tab){
+           return
+         }
+          this.item = item 
+          this.printDialog = item && true
         },
         checkIfID(string) {
             return /^-?\d+$/.test(string);
