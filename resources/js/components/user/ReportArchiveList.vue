@@ -60,29 +60,201 @@
                 <template v-slot:top>
                    <!-- <v-text-field v-model="search" label="Search" class="mx-4"/>-->
 
+                   <v-row>
+                       <!--<v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9">
+                           <v-select
+                                v-model="selected"
+                                :items="display"
+                                small-chips
+                                label="Select Year"
+                                multiple
+                                outlined
+                                dense
+                                class="mx-4"
+                                deletable-chips
+                                @change="loadData"
+                            >
+                                <template v-slot:prepend-item>
+                                    <v-list-item ripple @click="select(); loadData('All')">
+                                        <v-list-item-action>
+                                            <v-icon :color="selected.length > 0 ? 'indigo darken-4' : ''">
+                                                {{ icon }}
+                                            </v-icon>
+                                        </v-list-item-action>
+                                        <v-list-item-content>
+                                            <v-list-item-title>Select All</v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    <v-divider class="mt-2"></v-divider>
+                                </template>
+                            </v-select>
+                       </v-col>-->
+                       <v-col class="d-flex" cols="12" xs="3" sm="3" md="3" lg="3" xl="3">
+                           <v-select
+                                v-model="selectRecord"
+                                :items="recordFilter"
+                                label="Select Record"
+                                dense
+                                outlined
+                                class="mx-4"
+                                filled
+                                @change="recordFilterBy"
+                            ></v-select>
+                            <v-divider class=" mt-0" inset vertical dense/>
+                       </v-col>
+                       <v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9" v-if="isByYear">
+                           <v-select
+                                v-model="selected"
+                                :items="display"
+                                small-chips
+                                label="Select Year"
+                                multiple
+                                outlined
+                                dense
+                                class="mx-4"
+                                deletable-chips
+                                @change="loadData"
+                            >
+                                <template v-slot:prepend-item>
+                                    <v-list-item ripple @click="select(); loadData('All')">
+                                        <v-list-item-action>
+                                            <v-icon :color="selected.length > 0 ? 'indigo darken-4' : ''">
+                                                {{ icon }}
+                                            </v-icon>
+                                        </v-list-item-action>
+                                        <v-list-item-content>
+                                            <v-list-item-title>Select All</v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    <v-divider class="mt-2"></v-divider>
+                                </template>
+                            </v-select>
+                       </v-col>
+                       <v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9" v-if="!isByYear">
+                           <v-dialog
+                                ref="dialog"
+                                v-model="modal"
+                                :return-value.sync="date"
+                                persistent
+                                width="290px"
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field
+                                        v-model="date"
+                                        label="FROM"
+                                        prepend-icon=""
+                                        readonly
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        class="mx-4"
+                                        outlined
+                                        dense
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                    v-model="date"
+                                    scrollable
+                                    :max="new Date(date1).toISOString().substr(0, 10)"
+                                >
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="modal = false"
+                                    >
+                                        Cancel
+                                    </v-btn>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="$refs.dialog.save(date)"
+                                    >
+                                        OK
+                                    </v-btn>
+                                </v-date-picker>
+                            </v-dialog>
+                            <v-dialog
+                                ref="dialog1"
+                                v-model="modal1"
+                                :return-value.sync="date1"
+                                persistent
+                                width="290px"
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field
+                                        v-model="date1"
+                                        label="TO"
+                                        prepend-icon=""
+                                        readonly
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        class="mx-4"
+                                        outlined
+                                        dense
+                                    ></v-text-field>
+                                </template>
+                                <v-date-picker
+                                    v-model="date1"
+                                    scrollable
+                                    :min="new Date(date).toISOString().substr(0, 10)"
+                                >
+                                    <v-spacer></v-spacer>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="modal1 = false"
+                                    >
+                                        Cancel
+                                    </v-btn>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="$refs.dialog1.save(date1)"
+                                    >
+                                        OK
+                                    </v-btn>
+                                </v-date-picker>
+                            </v-dialog>
+                       </v-col>
+                   </v-row>
 
 
 
 
-                    <div v-if="search_option == 'advance'" class="elevation-1 pt-5 pb-0" style="background-color:#E6F5FD;">
-                        <v-row >
+
+                    <div v-if="search_option == 'advance'" class="elevation-3 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;">
+                        <v-row>
+                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
+                                <v-text-field v-model="search" @input="textboxChange" label="Traking ID" class="mx-4"/>
+                            </v-col>
+                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
+                                <v-text-field v-model="search" @input="textboxChange" label="Subject" class="mx-4"/>
+                            </v-col>
+
+                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
+                                <v-select class="mx-4" :items="keys2" label="Document Source" dense></v-select>
+                            </v-col>
+                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
+                                <v-select class="mx-4" :items="keys3" label="Document Type" dense></v-select>
+                            </v-col>
+
                             <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
                                 <v-select class="mx-4" :items="keys" label="Originating Office" dense></v-select>
                             </v-col>
                             <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
                                 <v-select class="mx-4" :items="keys" label="Destination Office" dense></v-select>
                             </v-col>
-                            <v-col class="d-flex" cols="12" xs="4" sm="4" md="4" lg="4" xl="4">
-                                <v-select class="mx-4" :items="keys1" label="Document Column" dense></v-select>
+
+                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
+                                <v-text-field v-model="search" @input="textboxChange" label="Sender Name" class="mx-4"/>
                             </v-col>
-                            <v-col class="d-flex" cols="12" xs="4" sm="4" md="4" lg="4" xl="4">
-                                <v-select class="mx-4" :items="keys2" label="Document Source" dense></v-select>
-                            </v-col>
-                            <v-col class="d-flex" cols="12" xs="4" sm="4" md="4" lg="4" xl="4">
-                                <v-select class="mx-4" :items="keys3" label="Document Type" dense></v-select>
+                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
+                                <v-text-field v-model="search" @input="textboxChange" label="Date Created" class="mx-4"/>
                             </v-col>
 
-                            <v-col class="ml-5">
+
+
+                            <!--<v-col class="ml-5">
                                 <v-dialog
                                     ref="dialog"
                                     v-model="modal"
@@ -162,11 +334,11 @@
                                         </v-btn>
                                     </v-date-picker>
                                 </v-dialog>
-                            </v-col>
+                            </v-col>-->
                         </v-row>
                     </div>
 
-                    <v-row>
+                    <v-row v-if="search_option == 'normal'">
                         <v-col class="d-flex" cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
                             <v-text-field v-model="search" @input="textboxChange" label="Search Value" class="mx-4"/>
                         </v-col>
@@ -329,6 +501,7 @@
                     { text: 'Originating Office', value: 'originating_office' },
                     { text: 'Destination Office', value: 'destination.name' },
                     { text: 'Sender', value: 'sender_name' },
+                    { text: 'Date Created', value: 'created_at' },
                    // { text: 'Restore', value: 'restore' },
                    // { text: 'View More', value: 'view_more' },
                     { text: 'Action', value: 'actions', align: 'center', },
@@ -389,7 +562,12 @@
                 formTitle: 'advance serch',
                 userAE: false,
                 search_option: 'normal',
-                table: []
+                table: [],
+                display:[],
+                selected: [new Date().getFullYear().toString()],
+                recordFilter: ["By Date Range", "By Year"],
+                selectRecord: "By Date Range",
+                isByYear: false
             }
         },
         watch: {
@@ -400,7 +578,7 @@
         computed: {
             ...mapGetters(['documentsArchive', 'datatable_loader', 'auth_user']),
             offices() {
-                const offices = this.$store.state.offices.offices;
+                const offices = JSON.parse(JSON.stringify(this.$store.state.offices.offices));
                 offices.forEach(office => {
                     office.builded_office_name = office.office_code + ' - ' + office.name
                 });
@@ -414,14 +592,67 @@
                     doc.is_external = doc.is_external ? 'External' : 'Internal'
                     doc.sender_name = doc.sender?.name ?? doc.sender_name
                     doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                    doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
+
+                    const year = new Date(doc.created_at).getFullYear().toString()
+                    if(!this.display.includes(year)){
+                        this.display.push(year);
+                    }
+
                     return doc
                 })
             },
             selected_document() {
                 return this.extendedData.find(data=>data.id == this.activeDoc)
             },
+            allData () {
+                return this.selected.length === this.display.length
+            },
+            icon () {
+                if (this.allData) return 'mdi-close-box'
+                if (this.allData) return 'mdi-minus-box'
+                return 'mdi-checkbox-blank-outline'
+            },
         },
         methods: {
+            /*sample(){
+                var required = ['a', 'b', 'c'];
+                var data = 'b';
+                var a = '';
+                var b = '';
+                var c = '';
+                if(required.includes(data)){
+                    data = data
+                }
+                console.log();
+                //if(data == 'a'){
+                //}else if(data == 'b'){
+                //}else if(data == 'c'){
+                //}
+            },*/
+            recordFilterBy(){
+                if(this.selectRecord == 'By Date Range'){
+                    this.isByYear = false
+                }else if(this.selectRecord == 'By Year'){
+                    this.isByYear = true
+                }
+            },
+            loadData(data){
+                if(data == 'All'){
+                    console.log('All data here', this.display);
+                }else{
+                    console.log(data);
+                }
+            },
+            select () {
+                this.$nextTick(() => {
+                    if (this.allData) {
+                       this.selected = []
+                    } else {
+                        this.selected = this.display.slice()
+                    }
+                })
+            },
             textboxChange(value){
                 console.log(`${this.search_option} : ` + value)
             },
