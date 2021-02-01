@@ -87,6 +87,7 @@
                     <v-list-item-title>Offices</v-list-item-title>
                 </v-list-item>
                 <v-list-item
+                    v-if="auth_user.role_id === 1"
                     :input-value="$route.name === 'Log Report' ? true:false"
                     link
                     @click.prevent="getLogs"

@@ -17,12 +17,12 @@
                 </v-row>
                 <v-card-text>
                     <v-form ref="form" lazy-validation>
-                        <v-row v-if="dialog_for == 'exportOfficeList'">
+                        <v-row v-if="dialog_type == 'export'">
                             <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
                                 <v-btn @click="dowload" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
                             </v-col>
                         </v-row>
-                        <v-row v-if="dialog_for == 'importOfficeList'">
+                        <v-row v-if="dialog_type == 'import'">
                             <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
                                 <v-file-input
                                     label="Browse Excel File"
@@ -40,7 +40,7 @@
                                 />
                             </v-col>
                             <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
-                                <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_for == 'importOfficeList'" @click="uploadToDatabase"> UPLOAD </v-btn>
+                                <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_type == 'import'" @click="uploadToDatabase"> UPLOAD </v-btn>
                             </v-col>
                             <v-col v-show="is_preview && excel_data.length > 0 && excel_table_headers.length > 0">
                                 <v-card>
@@ -96,7 +96,7 @@
     import * as Excel from 'exceljs';
 
     export default {
-        props: ['excel_dialog', 'dialog_title', 'dialog_for'],
+        props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
         data() {
             return {
                 valid: false,
@@ -182,6 +182,7 @@
                                 tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
                                 content: []
                             });
+                            // Preview
                             sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
                                 var rowIndex = rowNumber - 1;
                                 if (rowIndex > 0) {
@@ -196,6 +197,7 @@
                                             ((dataCol[5] == undefined)? null : dataCol[5])
                                     });
                                 }
+                            // Duplicate Validation
                                 row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
                                     var colIndex = colNumber - 1;
                                     if (rowIndex > 0 && colIndex < 3) {
@@ -260,6 +262,57 @@
                         });
                     }
                 });
+            },
+            exportLogs(){
+                const header_color = this.marian_blue;
+                const data = this.$store.state.users.logs;
+                let workbook = new Excel.Workbook()
+                let worksheet = workbook.addWorksheet('Logs')
+                worksheet.columns = [
+                    { header: 'User ID', key: 'user_id', width: 55 },
+                    { header: 'Action', key: 'action', width: 13 },
+                    { header: 'Remarks', key: 'remarks', width: 60 },
+                    { header: 'Original Values', key: 'original_values', width: 18 },
+                    { header: 'New Values', key: 'new_values', width: 35 }
+                ]
+                data.forEach((e, index) => {
+                    worksheet.addRow({
+                        user_id: e.user_id,
+                        action: e.action,
+                        remarks: e.remarks,
+                        original_values: e.original_values,
+                        new_values: e.new_values
+                    })
+                })
+                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                    const headerColumns = ['A','B', 'C', 'D', 'E']
+                    headerColumns.forEach((v) => {
+                        if(rowNumber == 1){
+                            worksheet.getCell(`${v}${rowNumber}`).style = {
+                                fill: {
+                                    type: 'pattern',
+                                    pattern:'solid',
+                                    fgColor:{ argb: header_color }
+                                },
+                                font: {
+                                    color: {argb: "ffffff"},
+                                    bold: true
+                                }
+                            }
+                        }else{
+                            worksheet.getCell(`${v}${rowNumber}`).style = {
+                                border: {
+                                    top: { style: 'thin' },
+                                    left: { style: 'thin' },
+                                    bottom: { style: 'thin' },
+                                    right: { style: 'thin' }
+                                }
+                            }
+                        }
+                    })
+                })
+                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
                 const header_color = this.marian_blue;

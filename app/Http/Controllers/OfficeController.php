@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\OfficeCreateEvent;
-use App\Events\OfficeDeleteEvent;
-use App\Events\OfficeUpdateEvent;
+use App\Events\OfficeEvent;
 use Auth;
-use Carbon\Carbon;
 use DB;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Office;
@@ -55,7 +51,7 @@ class OfficeController extends Controller
             "contact_email":"' . $request->contact_email . '"}';
 
         $user_id = Auth::user()->id;
-        event(new OfficeCreateEvent($user_id, json_decode($request_obj)));
+        event(new OfficeEvent($user_id, json_decode($request_obj),null, 'create'));
 
         return [$office];
     }
@@ -70,9 +66,14 @@ class OfficeController extends Controller
             }
         }*/
 
+        
         DB::beginTransaction();
         try {
             foreach($request['office_data'] as $office_data){
+
+                $user_id = Auth::user()->id;
+                event(new OfficeEvent($user_id, $office_data['tab'], null, 'import'));
+
                 foreach($office_data['content'] as $offices){
                     $office = new Office;
                     $office->name = $offices["Office_Name"];
@@ -81,6 +82,7 @@ class OfficeController extends Controller
                     $office->contact_number = $offices["Contact_Number"];
                     $office->contact_email = $offices["Email_Address"];
                     $office->save();
+                    
                 }
             }
         } catch (ValidationException $error) {
@@ -125,7 +127,7 @@ class OfficeController extends Controller
             "contact_email":"' . $request->contact_email . '"}';
 
         $user_id = Auth::user()->id;
-        event(new OfficeUpdateEvent($user_id, json_decode($old_values[0]), json_decode($request_obj)));
+        event(new OfficeEvent($user_id, json_decode($old_values[0]), json_decode($request_obj), 'update'));
 
         return [$office];
     }
@@ -148,7 +150,7 @@ class OfficeController extends Controller
 
         $user_id = Auth::user()->id;
 
-        event(new OfficeDeleteEvent($user_id,$office));
+        event(new OfficeEvent($user_id,$office,null,'delete'));
 
         return [$office];
     }
