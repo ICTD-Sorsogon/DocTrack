@@ -214,12 +214,23 @@ export default {
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
         logout(){
-            this.removeAuthUser()
-            this.$store.dispatch('unsetSnackbar');
-            this.$store.dispatch('setLoader');
-            this.$store.commit('TOGGLE_SUBMENU', false);
-            sessionStorage.clear();
-            this.$router.push({ name: "Login"});
+            var path = this.$router.currentRoute.path.split('/');
+            if (path.length >= 3) {
+                this.$router.push({ name: "All Active Documents"});
+                this.removeAuthUser()
+                this.$store.dispatch('unsetSnackbar');
+                this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
+                sessionStorage.clear();
+                this.$router.push({ name: "Login"});
+            } else {
+                this.removeAuthUser()
+                this.$store.dispatch('unsetSnackbar');
+                this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
+                sessionStorage.clear();
+                this.$router.push({ name: "Login"});
+            }
         },
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
