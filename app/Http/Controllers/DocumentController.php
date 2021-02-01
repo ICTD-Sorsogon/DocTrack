@@ -221,7 +221,9 @@ class DocumentController extends Controller
             event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
 
         } else{
-        $old_values = Document::select('attachment_page_count','destination_office_id','document_type_id','id','originating_office','page_count','remarks','sender_name','subject','tracking_code')->where('id', $request->id)->get();
+        $old_values = Document::select('attachment_page_count','destination_office_id',
+        'document_type_id','id','originating_office','page_count','remarks','sender_name',
+        'subject','tracking_code')->where('id', $request->id)->get();
             $request_obj = '{
                 "attachment_page_count":"' . $request->attachment_page_count . '",
                 "destination_office_id":"' . $request->destination_office_id . '",
