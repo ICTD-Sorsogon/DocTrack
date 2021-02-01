@@ -24,9 +24,4 @@ class LoginController extends Controller
             'password' => ['The provided credentials are incorrect']
         ]);
     }
-
-    public function logout()
-    {
-        Auth::guard('web')->logout();
-    }
 }

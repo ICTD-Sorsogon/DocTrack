@@ -58,7 +58,6 @@ export default {
             let documents = JSON.parse(JSON.stringify(
                 this.$store.state.documents.tracking_reports
             ));
-
             documents.forEach(document => {
                 var temp = 0;
                 document.diff = [];

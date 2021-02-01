@@ -7,7 +7,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 export default {
     modules: {
-        strict: true,
+        strict: process.env.NODE_ENV !== 'production',
         snackbars,
         users,
         documents,
