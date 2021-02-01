@@ -38,7 +38,7 @@
                             </v-icon>
                         </template>
                     </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    <v-expansion-panel-content class='formpanel'>
                         <change-account-details-form/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -51,7 +51,7 @@
                             </v-icon>
                         </template>
                     </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    <v-expansion-panel-content class='formpanel'>
                         <change-username-form/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -64,7 +64,7 @@
                             </v-icon>
                         </template>
                     </v-expansion-panel-header>
-                    <v-expansion-panel-content>
+                    <v-expansion-panel-content class='formpanel'>
                         <change-password-form/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -103,3 +103,8 @@ export default {
     }
 }
 </script>
+<style scoped>
+.formpanel{
+    padding-top: 20px;
+}
+</style>
