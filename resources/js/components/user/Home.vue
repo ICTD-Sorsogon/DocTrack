@@ -125,7 +125,7 @@
         </v-list>
         <template v-slot:append>
             <div class="pa-2">
-                <v-btn
+                <!-- <v-btn
                     block
                     @click.prevent="logout"
                     dark
@@ -135,7 +135,8 @@
                         mdi-logout-variant
                     </v-icon>
                     Logout
-                </v-btn>
+                </v-btn> -->
+                <logout-dialog @trigger-logout="logout"></logout-dialog>
             </div>
         </template>
     </v-navigation-drawer>
@@ -183,7 +184,9 @@
 <script>
 // TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
+import LogoutDialog from './components/LogoutDialog';
 export default {
+    components: { LogoutDialog },
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
