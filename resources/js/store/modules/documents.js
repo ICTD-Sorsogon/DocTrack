@@ -49,7 +49,7 @@ const actions = {
         .then(response => {
             let res = {
                 status: 'success',
-                message: `Document ${form.tracking_code} created!`
+                message: `Document ${form.subject} created!`
             }
             commit('SNACKBAR_STATUS', res)
             dispatch('getActiveDocuments')

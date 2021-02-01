@@ -155,7 +155,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['priority_level' => $request->priority_level]);
+            $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
@@ -216,7 +216,7 @@ class DocumentController extends Controller
                 "sender_name":"' . $request->sender_name . '",
                 "subject":"' . $request->subject . '",
                 "tracking_code":"' . $request->tracking_code . '"}';
-    
+
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
 
@@ -258,7 +258,7 @@ class DocumentController extends Controller
         }
 
         return true;
-      
+
     }
 
     public function trackingReports() {
