@@ -41,6 +41,7 @@ const actions = {
     async getArchiveDocuments({ commit }, filter) {
         console.log('DOCUMENT MODULE:' + filter);
         const response = await axios.get(`/api/get_archive_documents`);
+        console.log(response)
         commit('GET_ALL_ARCHIVE_DOCUMENTS', response.data);
     },
     async getNonPaginatedActiveDocuments({ commit }) {
@@ -197,7 +198,31 @@ const mutations = {
         state.documents = response;
     },
     GET_ALL_ARCHIVE_DOCUMENTS(state, response) {
-        state.documentsArchive = response;
+
+        //state.documentsArchive = [];
+        //state.documentsArchive.data.splice(0, state.documentsArchive.data.length, ...response);
+
+        state.documentsArchive = []
+        state.documentsArchive.push({
+            filter: 'By Date Range',
+            filter_selected: [
+                new Date().toISOString().substr(0, 10),
+                new Date().toISOString().substr(0, 10)
+            ],
+            data: [...response]
+        });
+       /*state.documentsArchive.data = response;
+       state.documentsArchive.filter = 'By Date Range';
+       state.documentsArchive.filter_selected = {
+           date1: new Date().toISOString().substr(0, 10),
+           date2: new Date().toISOString().substr(0, 10)
+       };*/
+       //debugger
+
+       //console.log(...state.documentsArchive)
+
+       //console.log(state.documentsArchive);
+      // console.log(state.documentsArchive.data);
     },
     SET_CURRENT_PAGE(state, data) {
         state.documents.current_page = data;

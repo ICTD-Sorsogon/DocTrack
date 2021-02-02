@@ -155,6 +155,7 @@
                                     v-model="date"
                                     scrollable
                                     :max="new Date(date1).toISOString().substr(0, 10)"
+                                    :min="Math.min(...display).toString()"
                                 >
                                     <v-spacer></v-spacer>
                                     <v-btn
@@ -196,6 +197,7 @@
                                 <v-date-picker
                                     v-model="date1"
                                     scrollable
+                                    :max="Math.max(...display).toString() + '-12-31'"
                                     :min="new Date(date).toISOString().substr(0, 10)"
                                 >
                                     <v-spacer></v-spacer>
@@ -580,7 +582,7 @@
                 search_option: 'normal',
                 table: [],
                 display:[],
-                //selected: [new Date().getFullYear().toString()],
+                selected: [new Date().getFullYear().toString()],
                 recordFilter: ["By Date Range", "By Year"],
                 selectRecord: "By Date Range",
                 isByYear: false
@@ -605,7 +607,9 @@
             },
             extendedData: {
                 get: function () {
-                    return JSON.parse(JSON.stringify( this.documentsArchive)).map(doc=>{
+                    //console.log('ll:' + this.documentsArchive)
+                    console.log('getter');
+                    return JSON.parse(JSON.stringify( this.documentsArchive[0].data)).map(doc=>{
                         doc.is_external = doc.is_external ? 'External' : 'Internal'
                         doc.sender_name = doc.sender?.name ?? doc.sender_name
                         doc.originating_office = doc.origin_office?.name ?? doc.originating_office
@@ -620,6 +624,7 @@
                     })
                 },
                 set: function (data) {
+                    console.log('setter')
                     return JSON.parse(JSON.stringify( this.data)).map(doc=>{
                         doc.is_external = doc.is_external ? 'External' : 'Internal'
                         doc.sender_name = doc.sender?.name ?? doc.sender_name
@@ -639,6 +644,7 @@
                 return this.extendedData.find(data=>data.id == this.activeDoc)
             },
             allData () {
+                //console.log('compare:' + this.selected.length === this.display.length);
                 return this.selected.length === this.display.length
             },
             icon () {
@@ -646,17 +652,29 @@
                 if (this.allData) return 'mdi-minus-box'
                 return 'mdi-checkbox-blank-outline'
             },
-            selected: {
+            /*selected: {
                 get: function () {
                     return [new Date().getFullYear().toString()]
                 },
                 set: function (year) {
-                    return [year]
+                    console.log('hh:');
+                    console.log(year)
+                    console.log('end')
+                    return year
                 }
-            }
+            }*/
         },
         methods: {
             recordFilterBy(){
+               // console.log(this.selectRecord, ...this.selected)
+
+                console.log(
+                    this.selected.includes(new Date(this.date).getFullYear().toString()) &&
+                    this.selected.includes(new Date(this.date1).getFullYear().toString())
+                )
+                console.log(new Date(this.date).getFullYear().toString(), new Date(this.date1).getFullYear().toString());
+
+
                 if(this.selectRecord == 'By Date Range'){
                     this.isByYear = false
                 }else if(this.selectRecord == 'By Year'){
@@ -673,9 +691,9 @@
             select () {
                 this.$nextTick(() => {
                     if (this.allData) {
-                       this.selected = []
+                        this.selected = []
                     } else {
-                        this.selected = [...this.selected, this.display.slice()]
+                        this.selected = this.display.slice()
                     }
                 })
             },
@@ -783,8 +801,18 @@
             }
         },
         mounted() {
+            //console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
             this.$store.dispatch('getArchiveDocuments', this.selected);
+           /* setTimeout(function() {
+                console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
+               // debugger
+            }.bind(this), 5000);
+            debugger
+*/
+            //console.log(this.documentsArchive.data);
             this.$store.dispatch('unsetLoader');
+
+            //console.log(new Date('2020', '12', 0).getDate().toString())
 
         }
     }
