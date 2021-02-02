@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             DocumentTypesSeeder::class,
             PersonnelSeeder::class,
             DocumentsTableSeeder::class,
+            NotificationSeeder::class,
         ]);
     }
 }

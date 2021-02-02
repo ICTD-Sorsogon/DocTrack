@@ -204,7 +204,7 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
-        if(!$document->id){
+        if (!$document->id) {
             $request_obj = '{
                 "subject":"' . $request->subject . '",
                 "sender_name":"' . $request->sender_name . '",
@@ -215,10 +215,10 @@ class DocumentController extends Controller
                 "page_count":"' . $request->page_count . '"}';
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
-
-        } else{
-            $old_values = Document::select('subject','sender_name','remarks','attachment_page_count','destination_office_id','document_type_id','page_count')->where('id', $request->id)->get();
+            event(new DocumentEvent($request->destination_office_id, $user_id, json_decode($request_obj), null, null, 'create'));
+        } else {
+            $old_values = Document::select('subject', 'sender_name', 'remarks', 'attachment_page_count', 
+            'destination_office_id', 'document_type_id', 'page_count')->where('id', $request->id)->get();
             $request_obj = '{
                 "subject":"' . $request->subject . '",
                 "sender_name":"' . $request->sender_name . '",
@@ -230,14 +230,15 @@ class DocumentController extends Controller
 
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,json_decode($request_obj), json_decode($old_values[0]),null, 'update'));
-
+            event(new DocumentEvent($request->destination_office_id, $user_id
+            ,json_decode($request_obj), json_decode($old_values[0]) , null, 'update'));
         }
 
         return $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
         );
+
 
         if(!$document->id){
             $user_id = Auth::user()->id;

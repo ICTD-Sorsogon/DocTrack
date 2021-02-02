@@ -372,6 +372,11 @@ import ExcelDialog from './components/ExcelDialog'
             this.initialize();
         },
         mounted() {
+           Echo.channel('office')
+           .listen('Hello', (e) => {
+                console.log(e)
+                console.log('Helloooo')
+            })
             this.$store.dispatch('unsetLoader');
             this.$store.dispatch('getLogs');
         }

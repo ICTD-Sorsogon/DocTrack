@@ -28,7 +28,7 @@
       :datatable_loader="datatable_loader"
       ></data-table>
     <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
-        <v-tab-item 
+        <v-tab-item
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
@@ -69,7 +69,7 @@ export default {
     },
     methods: {
         openDialog (code = false){
-         this.tracking_code = code 
+         this.tracking_code = code
          this.printDialog = code && true
         },
         checkIfID(string) {
@@ -100,6 +100,12 @@ export default {
         },
     },
   mounted() {
+    Echo.channel('documents'+this.auth_user.office_id)
+    .listen('DocumentEvent', (e) => {
+        this.$store.dispatch("setSnackbar", {type:'success', message:'Test Snackbar'});
+        console.log(e)
+        console.log('Helloooo')
+    })
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("unsetDataTableLoader");
   },

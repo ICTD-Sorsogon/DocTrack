@@ -27,7 +27,7 @@ class DocumentListener
      */
     public function handle(DocumentEvent $event)
     {
-        switch($event->type){
+        switch ($event->type) {
             case 'create':
                 $subject = $event->request_obj->subject;
                 $data = json_encode($event->request_obj);
@@ -86,7 +86,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->action = 'Document terminate';
-                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: '.$approved_by.'with remarks: '.$remarks;
+                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
+                    '.$approved_by.'with remarks: '.$remarks;
                 return $log->save();
             break;
 
@@ -99,7 +100,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->action = 'Document forward';
-                $log->remarks = 'Document '.$subject.' has been successfully forwarded through '.$through.'. and approved by: '.$approved_by.' with remarks: '.$remarks;
+                $log->remarks = 'Document '.$subject.' has been successfully forwarded through '.$through.'. 
+                    and approved by: '.$approved_by.' with remarks: '.$remarks;
                 return $log->save();
             break;
 
@@ -112,7 +114,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->action = 'Document receive';
-                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.'. and approved by: '.$approved_by.' and remarks: '.$remarks;
+                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.'. 
+                    and approved by: '.$approved_by.' and remarks: '.$remarks;
                 return $log->save();
             break;
         }

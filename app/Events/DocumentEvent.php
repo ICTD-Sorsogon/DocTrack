@@ -2,6 +2,8 @@
 
 namespace App\Events;
 
+use App\Models\Document;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DocumentEvent
+class DocumentEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,20 +21,22 @@ class DocumentEvent
     public $type;
     public $old_values;
     public $approved_by;
+    public $user;
+    public $office_id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user_id, $request_obj, $old_values,$approved_by, $type)
+    public function __construct($office_id, $user_id, $request_obj, $old_values, $approved_by, $type)
     {
         $this->user_id = $user_id;
+        $this->office_id = $office_id;
         $this->request_obj = $request_obj;
         $this->old_values = $old_values;
         $this->type = $type;
         $this->approved_by = $approved_by;
     }
-
     /**
      * Get the channels the event should broadcast on.
      *
@@ -40,6 +44,6 @@ class DocumentEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return new Channel('documents'.$this->office_id);
     }
 }
