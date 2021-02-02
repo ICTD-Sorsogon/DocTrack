@@ -166,7 +166,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge'">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
-                            v-model="form.priority_level"
+                            v-model="form.priority_levels"
                             :items="priority_level"
                             item-text="show"
                             item-value="value"
@@ -371,7 +371,7 @@ export default {
                 document_id: '',
                 action: '',
                 touched_by: '',
-                priority_level: '',
+                priority_levels: '',
                 last_touched: '',
                 through: '',
                 approved_by: '',
@@ -385,7 +385,7 @@ export default {
                 document_id: '',
                 action: '',
                 touched_by: '',
-                priority_level: '',
+                priority_levels: '',
                 last_touched: '',
                 through: '',
                 approved_by: '',
