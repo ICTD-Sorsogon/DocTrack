@@ -29,7 +29,7 @@ class DocumentsTableSeeder extends Seeder
 
                     $persistDocument = Document::factory()->create(
                         array_merge($document->toArray(), [
-                        'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
+                        'originating_office' =>  $document->is_external ? $faker->company : $user->office->id,
                         'tracking_code' => $this->buildTrackingNumber(
                             $document->is_external,
                             $user->office->office_code,
@@ -51,7 +51,7 @@ class DocumentsTableSeeder extends Seeder
                 $document = Document::factory()->make();
                 $persistDocument = Document::factory()->create(
                     array_merge($document->toArray(), [
-                        'originating_office' =>  $document->originating_office ? $faker->company : $user->office->id,
+                        'originating_office' =>  $document->is_external ? $faker->company : $user->office->id,
                         'tracking_code' => $this->buildTrackingNumber(
                             $document->is_external,
                             $user->office->office_code,
