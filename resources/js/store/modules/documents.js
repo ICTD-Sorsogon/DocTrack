@@ -39,10 +39,21 @@ const actions = {
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
     },
     async getArchiveDocuments({ commit }, filter) {
-        console.log('DOCUMENT MODULE:' + filter);
         const response = await axios.get(`/api/get_archive_documents`);
-        console.log(response)
-        commit('GET_ALL_ARCHIVE_DOCUMENTS', response.data);
+        //console.log(response)
+        const filterSelectedAndResponse = {
+            filterBy: filter.filterBy,
+            filterSelected: filter.filterSelected,
+            data: response.data
+        }
+
+        console.log('---document dispatch payload')
+        console.log(filterSelectedAndResponse);
+        console.log('---')
+
+        commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+
+        //commit('GET_ALL_ARCHIVE_DOCUMENTS', response.data);
     },
     async getNonPaginatedActiveDocuments({ commit }) {
         const response = await axios.get(`/api/get_non_page_active_documents`);
@@ -202,7 +213,32 @@ const mutations = {
         //state.documentsArchive = [];
         //state.documentsArchive.data.splice(0, state.documentsArchive.data.length, ...response);
 
+        /*status:             response.stateStatus = 'add || update'
+        filter_selected:    response.isDataChange = "[array]"
+
+        filter:             response.filterBy = "By Date Range || By Year"
+        filter_selected:    response.filterSelectedYear = "[array]"
+        filter_selected:    response.filterSelectedDateRange = "[array]"
+        data:               [...response.data] = '[array]'*/
+
+
         state.documentsArchive = []
+        state.documentsArchive.push({
+            filter: response.filterBy,
+            filter_selected: response.filterSelected,
+            data: [...response.data]
+        });
+
+        //state.documentsArchive[0].filter = "By Date Range1"
+        //console.log('=' + state.documentsArchive[0].filter)
+
+        console.log({
+            filter: response.filterBy,
+            filter_selected: response.filterSelected,
+            data: [...response.data]
+        })
+
+        /*state.documentsArchive = []
         state.documentsArchive.push({
             filter: 'By Date Range',
             filter_selected: [
@@ -210,7 +246,8 @@ const mutations = {
                 new Date().toISOString().substr(0, 10)
             ],
             data: [...response]
-        });
+        });*/
+
        /*state.documentsArchive.data = response;
        state.documentsArchive.filter = 'By Date Range';
        state.documentsArchive.filter_selected = {

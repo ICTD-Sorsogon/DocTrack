@@ -98,7 +98,7 @@
                                 outlined
                                 class="mx-4"
                                 filled
-                                @change="recordFilterBy"
+                                @change="filterChange(false, false)"
                             ></v-select>
                             <v-divider class=" mt-0" inset vertical dense/>
                        </v-col>
@@ -113,10 +113,10 @@
                                 dense
                                 class="mx-4"
                                 deletable-chips
-                                @change="loadData"
+                                @change="filterChange(true, false)"
                             >
                                 <template v-slot:prepend-item>
-                                    <v-list-item ripple @click="select(); loadData('All')">
+                                    <v-list-item ripple @click="select()">
                                         <v-list-item-action>
                                             <v-icon :color="filterYearSelected.length > 0 ? 'indigo darken-4' : ''">
                                                 {{ icon }}
@@ -168,7 +168,7 @@
                                     <v-btn
                                         text
                                         color="primary"
-                                        @click="$refs.dialog.save(filterDateFrom)"
+                                        @click="$refs.dialog.save(filterDateFrom); filterChange(false, true)"
                                     >
                                         OK
                                     </v-btn>
@@ -211,7 +211,7 @@
                                     <v-btn
                                         text
                                         color="primary"
-                                        @click="$refs.dialog1.save(filterDateTo)"
+                                        @click="$refs.dialog1.save(filterDateTo); filterChange(false, true)"
                                     >
                                         OK
                                     </v-btn>
@@ -594,16 +594,13 @@
             },
         },
         computed: {
-            ...mapGetters(['documentsArchive', 'datatable_loader', 'auth_user']),
+            ...mapGetters(['documentsArchive', 'datatable_loader', 'auth_user', 'request']),
             offices() {
                 const offices = JSON.parse(JSON.stringify(this.$store.state.offices.offices));
                 offices.forEach(office => {
                     office.builded_office_name = office.office_code + ' - ' + office.name
                 });
                 return offices;
-            },
-            request(){
-                return this.$store.state.snackbars.request;
             },
             extendedData: {
                 get: function () {
@@ -625,7 +622,7 @@
                 },
                 set: function (data) {
                     console.log('setter')
-                    return JSON.parse(JSON.stringify( this.data)).map(doc=>{
+                    return JSON.parse(JSON.stringify(data)).map(doc=>{
                         doc.is_external = doc.is_external ? 'External' : 'Internal'
                         doc.sender_name = doc.sender?.name ?? doc.sender_name
                         doc.originating_office = doc.origin_office?.name ?? doc.originating_office
@@ -665,7 +662,7 @@
             }*/
         },
         methods: {
-            recordFilterBy(){
+            filterChange(isYearChange, isDateRangeChane){
                // console.log(this.filterOptionSelected, ...this.filterYearSelected)
 
                /* console.log(
@@ -673,33 +670,81 @@
                     this.filterYearSelected.includes(new Date(this.filterDateTo).getFullYear().toString())
                 )
                 console.log(new Date(this.date).getFullYear().toString(), new Date(this.filterDateTo).getFullYear().toString());*/
+                const filterSelected = {
+                    filterBy: this.filterOptionSelected,
+                    filterSelected: []
+                }
+
+                const dateFromYear = new Date(this.filterDateFrom).getFullYear().toString();
+                const dateToYear = new Date(this.filterDateTo).getFullYear().toString();
+
+                const isInState = this.filterYearSelected.includes(dateFromYear) && this.filterYearSelected.includes(dateToYear);
+
+
 
 
                 if(this.filterOptionSelected == 'By Date Range'){
+
                     this.isByYear = false
-                    if(!this.filterYearSelected.includes(new Date(this.filterDateFrom).getFullYear().toString()) &&
-                       this.filterYearSelected.includes(new Date(this.filterDateTo).getFullYear().toString())
-                    ){
-                        this.$store.dispatch('getArchiveDocuments', [this.filterDateFrom, this.filterDateTo]);
+                    if (isDateRangeChane) {
+                        console.log('date change')
+                        filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
+                        filterSelected.data = this.extendedData
+                        this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
+                    } else {
+                        if(isInState){
+                            console.log('get data from state : state match');
+                            filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
+                            filterSelected.data = this.extendedData
+                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
+                        }else{
+                            filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
+                            console.log('fetch data from db : state did not match');
+                            this.$store.dispatch('getArchiveDocuments', filterSelected);
+                        }
                     }
                 }else if(this.filterOptionSelected == 'By Year'){
                     this.isByYear = true
                     //this.$store.dispatch('getArchiveDocuments', this.filterYearSelected);
+                    if (isYearChange) {
+                        if(this.filterYearSelected.length > 0){
+                        console.log('change year', this.filterYearSelected);
+                        }
+                        filterSelected.filterSelected = this.filterYearSelected
+                        filterSelected.data = this.extendedData
+                        this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
+                    } else {
+                        if(isInState){
+                            console.log('2get data from state : state match');
+                            filterSelected.filterSelected = this.filterYearSelected
+                            filterSelected.data = this.extendedData
+                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
+                        }else{
+                            filterSelected.filterSelected = this.filterYearSelected
+                            console.log('2fetch data from db : state did not match');
+                            this.$store.dispatch('getArchiveDocuments', filterSelected);
+                        }
+                    }
                 }
+
             },
-            loadData(data){
+            /*loadData(data){
                 if(data == 'All'){
                     console.log('All data here', this.distinctYearFromDB);
+                    this.filterChange('byYear')
                 }else{
                     console.log(data);
+                    this.filterChange('byYear')
                 }
-            },
+            },*/
             select () {
                 this.$nextTick(() => {
                     if (this.allData) {
                         this.filterYearSelected = []
+                        this.filterChange(true, false)
                     } else {
                         this.filterYearSelected = this.distinctYearFromDB.slice()
+                        this.filterChange(true, false)
                     }
                 })
             },
@@ -808,7 +853,38 @@
         },
         mounted() {
             //console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
-            this.$store.dispatch('getArchiveDocuments', this.filterYearSelected);
+            if (this.$store.state.documents.documentsArchive[0].data == undefined) {
+                const currentDate = {
+                    filterBy: "By Date Range",
+                    filterSelected: [
+                        new Date().toISOString().substr(0, 10),
+                        new Date().toISOString().substr(0, 10)
+                    ]
+                }
+                console.log('no data found in state');
+                this.$store.dispatch('getArchiveDocuments', currentDate);
+                console.log(': reloaded as of now');
+            }else{
+                console.log('has data in state');
+                console.log(this.$store.state.documents.documentsArchive[0]);
+
+                const filterBy = this.$store.state.documents.documentsArchive[0].filter
+                const filterSelected = this.$store.state.documents.documentsArchive[0].filter_selected
+                const data = this.$store.state.documents.documentsArchive[0].data
+
+                this.filterOptionSelected = filterBy
+                console.log('--',this.filterOptionSelected);
+                if (filterBy == 'By Date Range') {
+                    this.filterDateFrom = filterSelected[0]
+                    this.filterDateTo = filterSelected[1]
+                    this.isByYear = false
+                    console.log('dd', filterSelected[0]);
+                } else {
+                    this.filterYearSelected = filterSelected
+                    this.isByYear = true
+                }
+                this.extendedData = data
+            }
            /* setTimeout(function() {
                 console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
                // debugger
