@@ -36,7 +36,7 @@ class DocumentFactory extends Factory
             'is_external' => $source,
             'document_type_id' => rand(1, 7),
             'originating_office' => $source ? rand(3, 12) : $this->faker->name,
-            'destination_office_id' => rand(1, 26),
+            'destination_office_id' => '['. rand(1, 26) .']',
             'sender_name' => $source == 0 ? rand(3, 12) : $this->faker->name,
             'priority_level' => rand(1,3),
             'page_count' => rand(1, 50),
