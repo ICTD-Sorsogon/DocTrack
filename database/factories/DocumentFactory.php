@@ -28,7 +28,7 @@ class DocumentFactory extends Factory
         $dateFilled = Carbon::createFromTimeStamp($this->faker->dateTimeBetween('-360 days', 'now')->getTimestamp());
         $attachmentPageCount = rand(1, 50);
         $source = rand(0, 1);
-        $status = ['created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
+        $status = ['created', 'received', 'forwarded', 'on hold', 'rejected', 'terminated', 'acknowledged'];
 
 
         return [
@@ -41,7 +41,7 @@ class DocumentFactory extends Factory
             'priority_level' => rand(1,3),
             'page_count' => rand(1, 50),
             'is_terminal' => 0,
-            'status' => $status[rand(0,7)],
+            'status' => $status[rand(0,6)],
             'remarks' => $this->faker->realText(100),
             'attachment_page_count' => $attachmentPageCount,
         ];

@@ -168,11 +168,9 @@
         </v-avatar>
 
         <v-avatar v-else>
-            <img
-                :src="image_source"
-                alt="profile_picture"
-            >
+            <img :src="image_source" alt="profile_picture">
         </v-avatar>
+
         <v-progress-linear
             :active="page_loader"
             color="#A83F39"

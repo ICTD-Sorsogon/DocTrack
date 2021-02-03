@@ -94,7 +94,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'forwarded']);
-            $tracking_record->document->update(['destination_office' => $request->forwarded_to]);
+            $tracking_record->document->update(['destination_office_id' => $request->forwarded_to]);
 
 
             $user_id = Auth::user()->id;
@@ -160,7 +160,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['priority_level' => $request->priority_level]);
+            $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
@@ -221,12 +221,16 @@ class DocumentController extends Controller
                 "sender_name":"' . $request->sender_name . '",
                 "subject":"' . $request->subject . '",
                 "tracking_code":"' . $request->tracking_code . '"}';
-    
+
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
 
         } else{
-        $old_values = Document::select('attachment_page_count','destination_office_id','document_type_id','id','originating_office','page_count','remarks','sender_name','subject','tracking_code')->where('id', $request->id)->get();
+        $old_values = Document::select(
+            'attachment_page_count','destination_office_id',
+            'document_type_id','id','originating_office','page_count','remarks','sender_name',
+            'subject','tracking_code'
+        )->where('id', $request->id)->get();
             $request_obj = '{
                 "attachment_page_count":"' . $request->attachment_page_count . '",
                 "destination_office_id":"' . $request->destination_office_id . '",
@@ -263,7 +267,7 @@ class DocumentController extends Controller
         }
 
         return true;
-      
+
     }
 
     public function trackingReports() {
