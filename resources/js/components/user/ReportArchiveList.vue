@@ -39,10 +39,10 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item :key="1" @click.stop="search_option = 'normal'">
+                            <v-list-item :key="1" @click.stop="searchOption = 'normal'">
                                 <v-icon class="ma-1">mdi-magnify</v-icon> NORMAL SEARCH
                             </v-list-item>
-                            <v-list-item :key="2" @click.stop="search_option = 'advance'">
+                            <v-list-item :key="2" @click.stop="searchOption = 'advance'">
                                 <v-icon  class="ma-1">mdi-magnify</v-icon> ADVANCED SEARCH
                             </v-list-item>
                         </v-list>
@@ -63,8 +63,8 @@
                    <v-row>
                        <!--<v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9">
                            <v-select
-                                v-model="selected"
-                                :items="display"
+                                v-model="filterYearSelected"
+                                :items="distinctYearFromDB"
                                 small-chips
                                 label="Select Year"
                                 multiple
@@ -77,7 +77,7 @@
                                 <template v-slot:prepend-item>
                                     <v-list-item ripple @click="select(); loadData('All')">
                                         <v-list-item-action>
-                                            <v-icon :color="selected.length > 0 ? 'indigo darken-4' : ''">
+                                            <v-icon :color="filterYearSelected.length > 0 ? 'indigo darken-4' : ''">
                                                 {{ icon }}
                                             </v-icon>
                                         </v-list-item-action>
@@ -91,8 +91,8 @@
                        </v-col>-->
                        <v-col class="d-flex" cols="12" xs="3" sm="3" md="3" lg="3" xl="3">
                            <v-select
-                                v-model="selectRecord"
-                                :items="recordFilter"
+                                v-model="filterOptionSelected"
+                                :items="filterOptionList"
                                 label="Select Record"
                                 dense
                                 outlined
@@ -104,8 +104,8 @@
                        </v-col>
                        <v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9" v-if="isByYear">
                            <v-select
-                                v-model="selected"
-                                :items="display"
+                                v-model="filterYearSelected"
+                                :items="distinctYearFromDB"
                                 small-chips
                                 label="Select Year"
                                 multiple
@@ -118,7 +118,7 @@
                                 <template v-slot:prepend-item>
                                     <v-list-item ripple @click="select(); loadData('All')">
                                         <v-list-item-action>
-                                            <v-icon :color="selected.length > 0 ? 'indigo darken-4' : ''">
+                                            <v-icon :color="filterYearSelected.length > 0 ? 'indigo darken-4' : ''">
                                                 {{ icon }}
                                             </v-icon>
                                         </v-list-item-action>
@@ -133,14 +133,14 @@
                        <v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9" v-if="!isByYear">
                            <v-dialog
                                 ref="dialog"
-                                v-model="modal"
-                                :return-value.sync="date"
+                                v-model="filterDateDialogFrom"
+                                :return-value.sync="filterDateFrom"
                                 persistent
                                 width="290px"
                             >
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field
-                                        v-model="date"
+                                        v-model="filterDateFrom"
                                         label="FROM"
                                         prepend-icon=""
                                         readonly
@@ -152,23 +152,23 @@
                                     ></v-text-field>
                                 </template>
                                 <v-date-picker
-                                    v-model="date"
+                                    v-model="filterDateFrom"
                                     scrollable
-                                    :max="new Date(date1).toISOString().substr(0, 10)"
-                                    :min="Math.min(...display).toString()"
+                                    :max="new Date(filterDateTo).toISOString().substr(0, 10)"
+                                    :min="Math.min(...distinctYearFromDB).toString()"
                                 >
                                     <v-spacer></v-spacer>
                                     <v-btn
                                         text
                                         color="primary"
-                                        @click="modal = false"
+                                        @click="filterDateDialogFrom = false"
                                     >
                                         Cancel
                                     </v-btn>
                                     <v-btn
                                         text
                                         color="primary"
-                                        @click="$refs.dialog.save(date)"
+                                        @click="$refs.dialog.save(filterDateFrom)"
                                     >
                                         OK
                                     </v-btn>
@@ -176,14 +176,14 @@
                             </v-dialog>
                             <v-dialog
                                 ref="dialog1"
-                                v-model="modal1"
-                                :return-value.sync="date1"
+                                v-model="filterDateDialogTo"
+                                :return-value.sync="filterDateTo"
                                 persistent
                                 width="290px"
                             >
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field
-                                        v-model="date1"
+                                        v-model="filterDateTo"
                                         label="TO"
                                         prepend-icon=""
                                         readonly
@@ -195,23 +195,23 @@
                                     ></v-text-field>
                                 </template>
                                 <v-date-picker
-                                    v-model="date1"
+                                    v-model="filterDateTo"
                                     scrollable
-                                    :max="Math.max(...display).toString() + '-12-31'"
-                                    :min="new Date(date).toISOString().substr(0, 10)"
+                                    :max="Math.max(...distinctYearFromDB).toString() + '-12-31'"
+                                    :min="new Date(filterDateFrom).toISOString().substr(0, 10)"
                                 >
                                     <v-spacer></v-spacer>
                                     <v-btn
                                         text
                                         color="primary"
-                                        @click="modal1 = false"
+                                        @click="filterDateDialogTo = false"
                                     >
                                         Cancel
                                     </v-btn>
                                     <v-btn
                                         text
                                         color="primary"
-                                        @click="$refs.dialog1.save(date1)"
+                                        @click="$refs.dialog1.save(filterDateTo)"
                                     >
                                         OK
                                     </v-btn>
@@ -224,8 +224,8 @@
 
 
 
-                    <!--<div v-if="search_option == 'advance'" class="elevation-3 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;">-->
-                    <v-card v-if="search_option == 'advance'" class="elevation-2 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;border:1px solid #B8B8B8;">
+                    <!--<div v-if="searchOption == 'advance'" class="elevation-3 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;">-->
+                    <v-card v-if="searchOption == 'advance'" class="elevation-2 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;border:1px solid #B8B8B8;">
                         <v-row>
                             <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
                                 <v-text-field v-model="search" @input="textboxChange" label="Traking ID" class="mx-4"/>
@@ -301,14 +301,14 @@
                             <v-col class="mr-5">
                                 <v-dialog
                                     ref="dialog1"
-                                    v-model="modal1"
-                                    :return-value.sync="date1"
+                                    v-model="filterDateDialogTo"
+                                    :return-value.sync="filterDateTo"
                                     persistent
                                     width="290px"
                                 >
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-text-field
-                                            v-model="date1"
+                                            v-model="filterDateTo"
                                             label="TO"
                                             prepend-icon=""
                                             readonly
@@ -317,21 +317,21 @@
                                         ></v-text-field>
                                     </template>
                                     <v-date-picker
-                                        v-model="date1"
+                                        v-model="filterDateTo"
                                         scrollable
                                     >
                                         <v-spacer></v-spacer>
                                         <v-btn
                                             text
                                             color="primary"
-                                            @click="modal1 = false"
+                                            @click="filterDateDialogTo = false"
                                         >
                                             Cancel
                                         </v-btn>
                                         <v-btn
                                             text
                                             color="primary"
-                                            @click="$refs.dialog1.save(date1)"
+                                            @click="$refs.dialog1.save(filterDateTo)"
                                         >
                                             OK
                                         </v-btn>
@@ -349,14 +349,14 @@
                             absolute
                             top
                             right
-                            @click="search_option = 'normal'"
+                            @click="searchOption = 'normal'"
                         >
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
                     </v-card>
                     <!--</div>-->
 
-                    <v-row v-if="search_option == 'normal'">
+                    <v-row v-if="searchOption == 'normal'">
                         <v-col class="d-flex" cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
                             <v-text-field v-model="search" @input="textboxChange" label="Search Value" class="mx-4"/>
                         </v-col>
@@ -572,19 +572,19 @@
                     'Draft',
                     'Others'
                 ],
-                modal: false,
-                date: new Date().toISOString().substr(0, 10),
-                modal1: false,
-                date1: new Date().toISOString().substr(0, 10),
+                filterDateDialogFrom: false,
+                filterDateFrom: new Date().toISOString().substr(0, 10),
+                filterDateDialogTo: false,
+                filterDateTo: new Date().toISOString().substr(0, 10),
                 items: ['Foo', 'Bar', 'Fizz', 'Buzz'],
                 formTitle: 'advance serch',
                 userAE: false,
-                search_option: 'normal',
+                searchOption: 'normal',
                 table: [],
-                display:[],
-                selected: [new Date().getFullYear().toString()],
-                recordFilter: ["By Date Range", "By Year"],
-                selectRecord: "By Date Range",
+                distinctYearFromDB:[],
+                filterYearSelected: [new Date().getFullYear().toString()],
+                filterOptionList: ["By Date Range", "By Year"],
+                filterOptionSelected: "By Date Range",
                 isByYear: false
             }
         },
@@ -616,8 +616,8 @@
                         doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
 
                         const year = new Date(doc.created_at).getFullYear().toString()
-                        if(!this.display.includes(year)){
-                            this.display.push(year);
+                        if(!this.distinctYearFromDB.includes(year)){
+                            this.distinctYearFromDB.push(year);
                         }
 
                         return doc
@@ -632,8 +632,8 @@
                         doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
 
                         const year = new Date(doc.created_at).getFullYear().toString()
-                        if(!this.display.includes(year)){
-                            this.display.push(year);
+                        if(!this.distinctYearFromDB.includes(year)){
+                            this.distinctYearFromDB.push(year);
                         }
 
                         return doc
@@ -644,15 +644,15 @@
                 return this.extendedData.find(data=>data.id == this.activeDoc)
             },
             allData () {
-                //console.log('compare:' + this.selected.length === this.display.length);
-                return this.selected.length === this.display.length
+                //console.log('compare:' + this.filterYearSelected.length === this.distinctYearFromDB.length);
+                return this.filterYearSelected.length === this.distinctYearFromDB.length
             },
             icon () {
                 if (this.allData) return 'mdi-close-box'
                 if (this.allData) return 'mdi-minus-box'
                 return 'mdi-checkbox-blank-outline'
             },
-            /*selected: {
+            /*filterYearSelected: {
                 get: function () {
                     return [new Date().getFullYear().toString()]
                 },
@@ -666,24 +666,30 @@
         },
         methods: {
             recordFilterBy(){
-               // console.log(this.selectRecord, ...this.selected)
+               // console.log(this.filterOptionSelected, ...this.filterYearSelected)
 
-                console.log(
-                    this.selected.includes(new Date(this.date).getFullYear().toString()) &&
-                    this.selected.includes(new Date(this.date1).getFullYear().toString())
+               /* console.log(
+                    this.filterYearSelected.includes(new Date(this.date).getFullYear().toString()) &&
+                    this.filterYearSelected.includes(new Date(this.filterDateTo).getFullYear().toString())
                 )
-                console.log(new Date(this.date).getFullYear().toString(), new Date(this.date1).getFullYear().toString());
+                console.log(new Date(this.date).getFullYear().toString(), new Date(this.filterDateTo).getFullYear().toString());*/
 
 
-                if(this.selectRecord == 'By Date Range'){
+                if(this.filterOptionSelected == 'By Date Range'){
                     this.isByYear = false
-                }else if(this.selectRecord == 'By Year'){
+                    if(!this.filterYearSelected.includes(new Date(this.filterDateFrom).getFullYear().toString()) &&
+                       this.filterYearSelected.includes(new Date(this.filterDateTo).getFullYear().toString())
+                    ){
+                        this.$store.dispatch('getArchiveDocuments', [this.filterDateFrom, this.filterDateTo]);
+                    }
+                }else if(this.filterOptionSelected == 'By Year'){
                     this.isByYear = true
+                    //this.$store.dispatch('getArchiveDocuments', this.filterYearSelected);
                 }
             },
             loadData(data){
                 if(data == 'All'){
-                    console.log('All data here', this.display);
+                    console.log('All data here', this.distinctYearFromDB);
                 }else{
                     console.log(data);
                 }
@@ -691,28 +697,28 @@
             select () {
                 this.$nextTick(() => {
                     if (this.allData) {
-                        this.selected = []
+                        this.filterYearSelected = []
                     } else {
-                        this.selected = this.display.slice()
+                        this.filterYearSelected = this.distinctYearFromDB.slice()
                     }
                 })
             },
             textboxChange(value){
-                console.log(`${this.search_option} : ` + value)
+                console.log(`${this.searchOption} : ` + value)
             },
             getTrackingCodeColor(document, document_type_id) {
                 return colors[document_type_id];
             },
-            searchOption(key){
+            /*searchOption(key){
                 switch (key) {
                     case 'normal':
-                            this.search_option = 'normal'
+                            this.searchOption = 'normal'
                         break;
                     case 'advance':
-                            this.search_option = 'advance'
+                            this.searchOption = 'advance'
                         break;
                 }
-            },
+            },*/
             jj($event){
                 if(this.birthday.length > 2){
                     this.birthday.pop();
@@ -802,7 +808,7 @@
         },
         mounted() {
             //console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
-            this.$store.dispatch('getArchiveDocuments', this.selected);
+            this.$store.dispatch('getArchiveDocuments', this.filterYearSelected);
            /* setTimeout(function() {
                 console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
                // debugger
