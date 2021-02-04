@@ -27,7 +27,7 @@ class DocumentFactory extends Factory
     {
         $dateFilled = Carbon::createFromTimeStamp($this->faker->dateTimeBetween('-360 days', 'now')->getTimestamp());
         $source = rand(0, 1);
-        $status = ['created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
+        $status = ['created', 'received', 'forwarded', 'on hold', 'rejected', 'terminated', 'acknowledged'];
 
 
         return [

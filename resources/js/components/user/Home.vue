@@ -125,7 +125,7 @@
         </v-list>
         <template v-slot:append>
             <div class="pa-2">
-                <v-btn
+                <!-- <v-btn
                     block
                     @click.prevent="logout"
                     dark
@@ -135,7 +135,8 @@
                         mdi-logout-variant
                     </v-icon>
                     Logout
-                </v-btn>
+                </v-btn> -->
+                <logout-dialog @trigger-logout="logout"></logout-dialog>
             </div>
         </template>
     </v-navigation-drawer>
@@ -155,11 +156,9 @@
         </v-avatar>
 
         <v-avatar v-else>
-            <img
-                :src="image_source"
-                alt="profile_picture"
-            >
+            <img :src="image_source" alt="profile_picture">
         </v-avatar>
+
         <v-progress-linear
             :active="page_loader"
             color="#A83F39"
@@ -183,7 +182,9 @@
 <script>
 // TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
+import LogoutDialog from './components/LogoutDialog';
 export default {
+    components: { LogoutDialog },
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
@@ -214,12 +215,23 @@ export default {
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
         logout(){
-            this.removeAuthUser()
-            this.$store.dispatch('unsetSnackbar');
-            this.$store.dispatch('setLoader');
-            this.$store.commit('TOGGLE_SUBMENU', false);
-            sessionStorage.clear();
-            this.$router.push({ name: "Login"});
+            var path = this.$router.currentRoute.path.split('/');
+            if (path.length >= 3) {
+                this.$router.push({ name: "All Active Documents"});
+                this.removeAuthUser()
+                this.$store.dispatch('unsetSnackbar');
+                this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
+                sessionStorage.clear();
+                this.$router.push({ name: "Login"});
+            } else {
+                this.removeAuthUser()
+                this.$store.dispatch('unsetSnackbar');
+                this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', false);
+                sessionStorage.clear();
+                this.$router.push({ name: "Login"});
+            }
         },
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {

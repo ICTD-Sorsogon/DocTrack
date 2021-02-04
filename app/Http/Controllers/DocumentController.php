@@ -89,7 +89,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'forwarded']);
-            $tracking_record->document->update(['destination_office' => $request->forwarded_to]);
+            $tracking_record->document->update(['destination_office_id' => $request->forwarded_to]);
 
 
             $user_id = Auth::user()->id;
@@ -155,7 +155,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['priority_level' => $request->priority_level]);
+            $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));

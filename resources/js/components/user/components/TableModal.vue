@@ -313,7 +313,7 @@
     },
     methods: {
       dotColor(action){
-        let colors = {terminate: 'grey', rejected:'pink', create: 'cyan', processing: 'deep-purple', recieve: 'teal'}
+        let colors = {terminated: 'grey', rejected:'pink', created: 'cyan', acknowledged: 'deep-purple', recieved: 'teal'}
         return colors[action] ?? 'amber'
       }
     },
