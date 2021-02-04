@@ -25,7 +25,7 @@ class CreateDocumentsTable extends Migration
             $table->unsignedTinyInteger('priority_level')->nullable();
             $table->string('sender_name')->nullable();
             $table->unsignedInteger('page_count');
-            $table->unsignedTinyInteger('is_terminal')->default(0);
+            $table->boolean('acknowledged')->default(0);
             $table->string('remarks')->nullable();
             $table->unsignedInteger('attachment_page_count')->default(0);
             $table->timestamps();

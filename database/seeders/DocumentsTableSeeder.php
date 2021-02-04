@@ -25,18 +25,21 @@ class DocumentsTableSeeder extends Seeder
         foreach ($users as $user) {
             if ($user->id%2 == 0) {
                 for ($i = 0; $i < 10; $i++) {
-                    $document = Document::factory()->make();
+                    $persistDocument = Document::withoutEvents(function() use ($faker, $user){ 
+                        $source = rand(0,1);
+                        return  Document::factory()->create(
+                        [
+                            'is_external' => $source,
+                            'originating_office' =>  $source ? $faker->company : $user->office->id,
+                            'sender_name' => $source ?  $faker->name : rand(3, 12),
+                            'tracking_code' => $this->buildTrackingNumber(
+                                $source,
+                                $user->office->office_code,
+                                rand(1,50)
+                            )
+                        ]);
+                });
 
-                    $persistDocument = Document::factory()->create(
-                        array_merge($document->toArray(), [
-                        'originating_office' =>  $document->is_external ? $faker->company : $user->office->id,
-                        'tracking_code' => $this->buildTrackingNumber(
-                            $document->is_external,
-                            $user->office->office_code,
-                            $document->attachment_page_count,
-                            $document->date_filed
-                        )])
-                    );
                     TrackingRecord::factory()->create([
                             'document_id' => $persistDocument->id,
                             'touched_by' => $user->id
@@ -48,18 +51,20 @@ class DocumentsTableSeeder extends Seeder
                 }
             }
             for ($i = 0; $i < 10; $i++) {
-                $document = Document::factory()->make();
-                $persistDocument = Document::factory()->create(
-                    array_merge($document->toArray(), [
-                        'originating_office' =>  $document->is_external ? $faker->company : $user->office->id,
-                        'tracking_code' => $this->buildTrackingNumber(
-                            $document->is_external,
-                            $user->office->office_code,
-                            $document->attachment_page_count,
-                            $document->date_filed
-                        )
-                    ])
-                );
+                $persistDocument = Document::withoutEvents(function() use ($faker, $user){ 
+                    $source = rand(0,1);
+                    return  Document::factory()->create(
+                        [
+                            'is_external' => $source,
+                            'originating_office' =>  $source ? $faker->company : $user->office->id,
+                            'sender_name' => $source ?  $faker->name : rand(3, 12),
+                            'tracking_code' => $this->buildTrackingNumber(
+                                $source,
+                                $user->office->office_code,
+                                rand(1,50)
+                            )
+                        ]);
+            });
 
                 TrackingRecord::factory()->create(
                     [
@@ -75,7 +80,7 @@ class DocumentsTableSeeder extends Seeder
         }
     }
 
-    private function buildTrackingNumber($source, $office_code, $attachment, $date)
+    private function buildTrackingNumber($source, $office_code, $attachment)
     {
         $origin = $source ? 'E' : 'I';
         $tracking = $origin.
