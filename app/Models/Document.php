@@ -31,6 +31,11 @@ class Document extends Model
         return Office::whereIn('id', $value)->get();
     }
 
+    public function setDestinationOfficeIdAttribute($value)
+    {
+        $this->attributes['destination_office_id'] = json_encode($value);
+    }
+
     public static function boot()
     {
         parent::boot();
