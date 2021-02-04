@@ -25,6 +25,7 @@ class Document extends Model
         'saved' => DocumentEvent::class,
         'deleting' => DocumentEvent::class,
     ];
+
     public function getDestinationOfficeIdAttribute($value)
     {
         $value = auth()->user()->can('update', $this) ? json_decode($value) : [auth()->user()->office->id];
@@ -85,11 +86,10 @@ class Document extends Model
 
     public static function allDocuments(User $user)
     {
-        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records'])
-                    ->where('is_terminal', false);
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
 
         if($user->isUser()){
-            $document->whereRaw("(json_contains(`destination_office_id`, {$user->office_id}) OR originating_office = {$user->office_id} )");
+            $document->whereRaw("((json_contains(`destination_office_id`, {$user->office_id}) AND acknowledged = 1) OR originating_office = {$user->office_id} )");
         }
 
         return $document->orderBy('created_at', 'DESC')->get();

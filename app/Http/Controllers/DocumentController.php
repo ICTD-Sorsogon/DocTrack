@@ -204,60 +204,12 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
-        // if(!$document->id){
-        //     $request_obj = '{
-        //         "attachment_page_count":"' . $request->attachment_page_count . '",
-        //         "destination_office_id":"' . $request->destination_office_id . '",
-        //         "document_type_id":"' . $request->document_type_id . '",
-        //         "id":"' . $request->id . '",
-        //         "originating_office":"' . $request->originating_office . '",
-        //         "page_count":"' . $request->page_count . '",
-        //         "remarks":"' . $request->remarks . '",
-        //         "sender_name":"' . $request->sender_name . '",
-        //         "subject":"' . $request->subject . '",
-        //         "tracking_code":"' . $request->tracking_code . '"}';
-    
-        //     $user_id = Auth::user()->id;
-        //     event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
 
-        // } else{
-        // $old_values = Document::select('attachment_page_count','destination_office_id','document_type_id','id','originating_office','page_count','remarks','sender_name','subject','tracking_code')->where('id', $request->id)->get();
-        //     $request_obj = '{
-        //         "attachment_page_count":"' . $request->attachment_page_count . '",
-        //         "destination_office_id":"' . $request->destination_office_id . '",
-        //         "document_type_id":"' . $request->document_type_id . '",
-        //         "id":"' . $request->id . '",
-        //         "originating_office":"' . $request->originating_office . '",
-        //         "page_count":"' . $request->page_count . '",
-        //         "remarks":"' . $request->remarks . '",
-        //         "sender_name":"' . $request->sender_name . '",
-        //         "subject":"' . $request->subject . '",
-        //         "tracking_code":"' . $request->tracking_code . '"}';
-
-        //     $user_id = Auth::user()->id;
-        //     event(new DocumentEvent($user_id,json_decode($request_obj), json_decode($old_values[0]),null, 'update'));
-
-        // }
-        $response = $document->updateOrCreate(
+        return $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
         );
 
-        if(!$document->id){
-            $user_id = Auth::user()->id;
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $response->id;
-            $tracking_record->action = 'created';
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $response->remarks;
-            $tracking_record->save();
-            $tracking_record->document->update(['status' => 'created']);
-
-        }
-
-        return true;
-      
     }
 
     public function trackingReports() {
