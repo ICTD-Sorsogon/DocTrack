@@ -50,6 +50,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('tracking_reports', 'DocumentController@trackingReports');
 
+        Route::get('notifs', 'NotificationController@index');
+        Route::put('notifs/{notifs}', 'NotificationController@update');
+
     });
 
     Route::get('/authenticated', function () {

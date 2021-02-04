@@ -23,12 +23,13 @@ class DocumentEvent implements ShouldBroadcast
     public $approved_by;
     public $user;
     public $office_id;
+    public $document_id;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($office_id, $user_id, $request_obj, $old_values, $approved_by, $type)
+    public function __construct($document_id, $office_id, $user_id, $request_obj, $old_values, $approved_by, $type)
     {
         $this->user_id = $user_id;
         $this->office_id = $office_id;
@@ -36,6 +37,7 @@ class DocumentEvent implements ShouldBroadcast
         $this->old_values = $old_values;
         $this->type = $type;
         $this->approved_by = $approved_by;
+        $this->document_id = $document_id;
     }
     /**
      * Get the channels the event should broadcast on.

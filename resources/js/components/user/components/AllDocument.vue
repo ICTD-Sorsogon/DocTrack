@@ -100,12 +100,6 @@ export default {
         },
     },
   mounted() {
-    Echo.channel('documents'+this.auth_user.office_id)
-    .listen('DocumentEvent', (e) => {
-        this.$store.dispatch("setSnackbar", {type:'success', message:'Test Snackbar'});
-        console.log(e)
-        console.log('Helloooo')
-    })
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("unsetDataTableLoader");
   },

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
+use App\Models\Office;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -14,7 +16,8 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        //
+        return NotificationResource::collection(Notification::latest()->get());
+
     }
 
     /**
@@ -44,9 +47,9 @@ class NotificationController extends Controller
      * @param  \App\Models\Notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function show(Notification $notification)
+    public function show(Office $office, Notification $notification)
     {
-        //
+        return new NotificationResource($notification);
     }
 
     /**
@@ -67,9 +70,10 @@ class NotificationController extends Controller
      * @param  \App\Models\Notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Notification $notification)
+    public function update(Request $request, Notification $notifs)
     {
-        //
+        $notifs->update($request->all());
+        return response('Update');
     }
 
     /**

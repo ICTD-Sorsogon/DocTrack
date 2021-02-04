@@ -150,6 +150,10 @@
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
         <v-spacer></v-spacer>
 
+        <!-- NOTIFICATION!! -->
+        <notification-item style="margin-top:580px; margin-left:200px" v-if="notif"></notification-item>
+        <notification  v-on:showNotif="showNotif" style="margin-right:15px"></notification>
+
         <v-avatar v-if="image_source === '/storage/null'" color="indigo">
             <img src="/images/defaultpic.jpg" alt="default_picture">
         </v-avatar>
@@ -181,9 +185,15 @@
 </template>
 
 <script>
+import Notification from './Notification'
+import NotificationItem from './NotificationItem'
 // TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
 export default {
+    components:{
+        Notification,
+        NotificationItem
+    },
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
@@ -209,10 +219,17 @@ export default {
         return {
             drawer: null,
             group: null,
+            messages: 5,
+            show: false,
+            notif: false,
         }
     },
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
+
+        showNotif(){
+          this.notif = !this.notif
+        },
         logout(){
             this.removeAuthUser()
             this.$store.dispatch('unsetSnackbar');

@@ -204,6 +204,14 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
+
+        $document_object = $document->updateOrCreate(
+            ['id' => $document->id],
+            $request->validated()
+        );
+
+        $document_id = $document_object->id;
+
         if (!$document->id) {
             $request_obj = '{
                 "subject":"' . $request->subject . '",
@@ -215,7 +223,7 @@ class DocumentController extends Controller
                 "page_count":"' . $request->page_count . '"}';
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($request->destination_office_id, $user_id, json_decode($request_obj), null, null, 'create'));
+            event(new DocumentEvent($document_id, $request->destination_office_id, $user_id, json_decode($request_obj), null, null, 'create'));
         } else {
             $old_values = Document::select('subject', 'sender_name', 'remarks', 'attachment_page_count', 
             'destination_office_id', 'document_type_id', 'page_count')->where('id', $request->id)->get();
@@ -230,28 +238,24 @@ class DocumentController extends Controller
 
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($request->destination_office_id, $user_id
+            event(new DocumentEvent($document->id, $request->destination_office_id, $user_id
             ,json_decode($request_obj), json_decode($old_values[0]) , null, 'update'));
         }
 
-        return $document->updateOrCreate(
-            ['id' => $document->id],
-            $request->validated()
-        );
 
 
-        if(!$document->id){
-            $user_id = Auth::user()->id;
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $response->id;
-            $tracking_record->action = 'created';
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $response->remarks;
-            $tracking_record->save();
-            $tracking_record->document->update(['status' => 'created']);
+        // if (!$document->id) {
+        //     $user_id = Auth::user()->id;
+        //     $tracking_record = new TrackingRecord();
+        //     $tracking_record->document_id = $response->id;
+        //     $tracking_record->action = 'created';
+        //     $tracking_record->touched_by = Auth::user()->id;
+        //     $tracking_record->last_touched = Carbon::now();
+        //     $tracking_record->remarks = $response->remarks;
+        //     $tracking_record->save();
+        //     $tracking_record->document->update(['status' => 'created']);
 
-        }
+        // }
 
         return true;
 

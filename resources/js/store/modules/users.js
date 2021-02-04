@@ -18,6 +18,8 @@ const state = {
     all_users_loading: true,
     user_full_name: '',
     logs: [],
+    notifs: [],
+    count_notifs: [],
 }
 
 const getters = {
@@ -26,6 +28,7 @@ const getters = {
     all_users: state => state.all_users,
     all_users_complete: state => state.all_users_complete,
     logs: state => state.logs,
+    notifs: state => state.notifs,
     is_admin: state => state.user.role_id == 1,
 }
 
@@ -155,11 +158,6 @@ const actions = {
         });
     },
 
-    async getLogs({ commit }) {
-        const response = await axios.get('/api/logs');
-        commit('GET_LOGS', response.data);
-    },
-
     async updateFullname({ commit }, form) {
         const response = await axios.put('api/update_fullname', form)
         .then(response => {
@@ -222,7 +220,63 @@ const actions = {
             };
             commit('SNACKBAR_STATUS', snackbar_error);
         });
-    }
+    },
+
+    async getNotifs({ commit }) {
+        await axios.get('/api/notifs')
+        .then(response =>{
+            commit('GET_NOTIFS', response.data.data);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
+    async getNotifs({ commit, state }) {
+        await axios.get('/api/notifs')
+        .then(response =>{
+            let data = []
+            response.data.data.forEach(notification => {
+                if(notification.office_id == state.user.office_id && notification.user_id == state.user.id){
+                    data.push(notification)
+                }
+            });
+            commit('GET_NOTIFS', data);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
+    async seenNotif({ commit }, notif) {
+        await axios.put(`api/notifs/${notif.id}`, notif)
+        .then(response => {
+                commit('SEEN_NOTIF', notif.id);
+            })
+            .catch(error => {
+                var snackbar_error ={
+                    message: error.response.data.errors,
+                    status: 'error',
+                    title: error.response.data.message,
+                    type: 'error'
+                };
+                commit('SNACKBAR_STATUS', snackbar_error);
+            });
+    },
+
+
 }
 
 const mutations = {
@@ -259,6 +313,15 @@ const mutations = {
     },
     GET_LOGS(state, response) {
         state.logs = response;
+    },
+    GET_NOTIFS(state, response) {
+        state.notifs = response;
+    },
+
+    SEEN_NOTIF(state, id) {
+        state.notifs.forEach(notif => {
+            notif.id ==  id ? notif.status = 1 : 0
+        });
     }
 }
 

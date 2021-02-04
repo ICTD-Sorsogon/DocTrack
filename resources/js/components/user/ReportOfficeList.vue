@@ -224,12 +224,12 @@
             }
         },
         mounted() {
-            Echo.channel('offices')
-            .listen('OfficeEvent', (e) =>{
-                console.log(e)
-                console.log('working echo')
+            // Echo.channel('offices')
+            // .listen('OfficeEvent', (e) =>{
+            //     console.log(e)
+            //     console.log('working echo')
 
-            })
+            // })
 
             this.$store.dispatch('unsetLoader');
         }
