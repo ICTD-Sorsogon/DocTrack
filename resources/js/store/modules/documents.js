@@ -38,20 +38,97 @@ const actions = {
         const response = await axios.get(`/api/get_active_documents`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
     },
-    async getArchiveDocuments({ commit }, filter) {
-        const response = await axios.get(`/api/get_archive_documents`);
-        //console.log(response)
+    getArchiveDocuments({ commit }, filter) {
+
+        /*mutateStateStatus:             response.mutateStateStatus = 'createstate || updatestate'
+        getDataFrom:                   response.getDataFrom = "backup || db || none"
+
+        filterBy:                      response.filterBy = "By Date Range || By Year"
+        filterSelectedYear:            response.filterSelectedYear = "[array]"
+        filterSelectedDateRange:       response.filterSelectedDateRange = "[array]"
+        data:                          [...response.data] = '[array]'
+        backup:                        {
+                                            filterBy: '',
+                                            filterSelected: [],
+                                            data: []
+                                       }*/
+
+        /*const filterSelectedAndResponse = {
+            //mutateStateStatus: filter.mutateStateStatus,
+            //getDataFrom: filter.getDataFrom,
+            filterBy: filter.filterBy,
+            filterSelectedYear: filter.filterSelectedYear,
+            filterSelectedDateRange: filter.filterSelectedDateRange,
+            data: [...filter.data],
+            backup: {
+                filterBy: filter.backup.filterBy,
+                filterSelected: response.backup.filterSelected,
+                data: [...response.backup.data]
+            }
+        }*/
+        console.log('filter here');
+        console.log(filter);
+
         const filterSelectedAndResponse = {
+            backup: {}
+        };
+
+        switch (filter.getDataFrom) {
+            case 'backup':
+                console.log('end');
+                    filterSelectedAndResponse.mutateStateStatus = filter.mutateStateStatus
+                    filterSelectedAndResponse.getDataFrom = filter.getDataFrom
+
+                    filterSelectedAndResponse.filterBy = filter.filterBy
+                    filterSelectedAndResponse.filterSelectedYear = filter.filterSelectedYear
+                    filterSelectedAndResponse.filterSelectedDateRange = filter.filterSelectedDateRange
+                    filterSelectedAndResponse.filterSelectedYear = filter.filterSelectedYear
+                    filterSelectedAndResponse.data = [...filter.data]
+
+                    filterSelectedAndResponse.backup.filterSelected = filter.backup.filterSelectedDateRange
+                    filterSelectedAndResponse.backup.filterBy = filter.backup.filterSelectedYear
+                    filterSelectedAndResponse.backup.data = [...filter.backup.data]
+                    commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+                break;
+            case 'db':
+                    axios.get(`/api/get_archive_documents`).then(response => {
+                        filterSelectedAndResponse.mutateStateStatus = filter.mutateStateStatus
+                        filterSelectedAndResponse.getDataFrom = filter.getDataFrom
+
+                        filterSelectedAndResponse.filterBy = filter.filterBy
+                        filterSelectedAndResponse.data = response.data
+                        filterSelectedAndResponse.backup.filterBy = filter.backup.filterBy
+                        filterSelectedAndResponse.backup.data = response.data
+                        if (filter.filterBy == 'By Date Range') {
+                            console.log('range');
+                            console.log( filter.backup.filterBy)
+                            filterSelectedAndResponse.filterSelectedDateRange = filter.filterSelectedDateRange
+                            filterSelectedAndResponse.backup.filterSelected = filter.backup.filterSelected
+                        } else {
+                            filterSelectedAndResponse.filterSelectedYear = filter.filterSelectedYear
+                            filterSelectedAndResponse.backup.filterSelected = filter.backup.filterSelected
+                        }
+                        console.log(filterSelectedAndResponse);
+                        commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+                    })
+                break;
+        }
+
+        //commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+
+
+        //console.log(response)
+        /*const filterSelectedAndResponse = {
             filterBy: filter.filterBy,
             filterSelected: filter.filterSelected,
             data: response.data
-        }
+        }*/
 
         console.log('---document dispatch payload')
         console.log(filterSelectedAndResponse);
         console.log('---')
 
-        commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+
 
         //commit('GET_ALL_ARCHIVE_DOCUMENTS', response.data);
     },
@@ -210,33 +287,96 @@ const mutations = {
     },
     GET_ALL_ARCHIVE_DOCUMENTS(state, response) {
 
+       // state.documentsArchive = []
+
+
         //state.documentsArchive = [];
         //state.documentsArchive.data.splice(0, state.documentsArchive.data.length, ...response);
 
-        /*status:             response.stateStatus = 'add || update'
-        filter_selected:    response.isDataChange = "[array]"
 
-        filter:             response.filterBy = "By Date Range || By Year"
-        filter_selected:    response.filterSelectedYear = "[array]"
-        filter_selected:    response.filterSelectedDateRange = "[array]"
-        data:               [...response.data] = '[array]'*/
+        /*mutateStateStatus:             response.mutateStateStatus = 'createstate || updatestate'
+        getDataFrom:                   response.getDataFrom = "backup || db || none"
+
+        filterBy:                      response.filterBy = "By Date Range || By Year"
+        filterSelectedYear:            response.filterSelectedYear = "[array]"
+        filterSelectedDateRange:       response.filterSelectedDateRange = "[array]"
+        data:                          [...response.data] = '[array]'
+        backup:                        {
+                                            filterBy: '',
+                                            filterSelected: [],
+                                            data: []
+                                       }*/
+
+        if (response.mutateStateStatus == 'createstate') {
+            state.documentsArchive = []
+            state.documentsArchive.push({
+                //mutateStateStatus: response.mutateStateStatus,
+                //getDataFrom: response.getDataFrom,
+                filterBy: 'By Date Range',
+                filterSelectedYear: [new Date().getFullYear().toString()],
+                filterSelectedDateRange: [
+                    new Date().toISOString().substr(0, 10),
+                    new Date().toISOString().substr(0, 10)
+                ],
+                data: [...response.data],
+                backup: {
+                    filterBy: 'By Date Range',
+                    filterSelected: [
+                        new Date().toISOString().substr(0, 10),
+                        new Date().toISOString().substr(0, 10)
+                    ],
+                    data: [...response.backup.data]
+                }
+            })
+        } else {
+            if (response.getDataFrom == 'backup') {
+                console.log('dd')
+                //state.documentsArchive = []
+                state.documentsArchive[0].filterBy = response.filterBy
+                if (response.filterBy == "By Date Range") {
+                    state.documentsArchive[0].filterSelectedDateRange = response.filterSelectedDateRange
+                } else {
+                    state.documentsArchive[0].filterSelectedYear = response.filterSelectedYear
+                }
+
+            } else {
+                // console.log('end mutate:', state.documentsArchive[0].backup.filterBy)
+                //state.documentsArchive.mutateStateStatus = response.mutateStateStatus
+                //state.documentsArchive.getDataFrom = response.getDataFrom
+                state.documentsArchive[0].filterBy = response.filterBy
+
+                if (response.filterBy == 'By Date Range') {
+                    state.documentsArchive[0].filterSelectedYear = state.documentsArchive[0].filterSelectedYear
+                    state.documentsArchive[0].filterSelectedDateRange = response.filterSelectedDateRange
+                } else {
+                    state.documentsArchive[0].filterSelectedDateRange = state.documentsArchive[0].filterSelectedDateRange
+                    state.documentsArchive[0].filterSelectedYear = response.filterSelectedYear
+                }
+
+                state.documentsArchive[0].data = [...response.data]
+
+                state.documentsArchive[0].backup.filterBy = response.backup.filterBy
+                state.documentsArchive[0].backup.filterSelected = response.backup.filterSelected
+                state.documentsArchive[0].backup.data = [...response.backup.data]
+            }
 
 
-        state.documentsArchive = []
+        }
+
+
+
+
+        /*state.documentsArchive = []
         state.documentsArchive.push({
             filter: response.filterBy,
             filter_selected: response.filterSelected,
             data: [...response.data]
-        });
+        });*/
 
         //state.documentsArchive[0].filter = "By Date Range1"
         //console.log('=' + state.documentsArchive[0].filter)
 
-        console.log({
-            filter: response.filterBy,
-            filter_selected: response.filterSelected,
-            data: [...response.data]
-        })
+
 
         /*state.documentsArchive = []
         state.documentsArchive.push({

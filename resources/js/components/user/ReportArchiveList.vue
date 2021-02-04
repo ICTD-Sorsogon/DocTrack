@@ -675,6 +675,20 @@
                     filterSelected: []
                 }
 
+                /*const filterSelected_33 = {
+                    mutateStateStatus: '',
+                    getDataFrom: '',
+                    filterBy: this.filterOptionSelected,
+                    filterSelectedYear: this.filterYearSelected,
+                    filterSelectedDateRange: [this.filterDateFrom, this.filterDateTo],
+                    data: [],
+                    backup: {
+                        filterBy: this.filterOptionSelected,
+                        filterSelected: [],
+                        data: []
+                    }
+                }*/
+
                 const dateFromYear = new Date(this.filterDateFrom).getFullYear().toString();
                 const dateToYear = new Date(this.filterDateTo).getFullYear().toString();
 
@@ -686,47 +700,96 @@
                 if(this.filterOptionSelected == 'By Date Range'){
 
                     this.isByYear = false
-                    if (isDateRangeChane) {
-                        console.log('date change')
-                        filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
-                        filterSelected.data = this.extendedData
-                        this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
+                    if (isDateRangeChane || !isInState) {
+                        /*console.log('date change')
+                        //filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
+                        //filterSelected.data = this.extendedData
+
+                        filterSelected.mutateStateStatus = 'updatestate'
+                        filterSelected.getDataFrom = 'db'
+                        filterSelected.filterBy = this.filterOptionSelected
+                        filterSelected.filterSelectedDateRange = [this.filterDateFrom, this.filterDateTo]
+
+                        this.$store.dispatch('getArchiveDocuments', filterSelected)*/
+
+                        this.filterChangeFetch(false, true)
+
+                        //this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
                     } else {
                         if(isInState){
-                            console.log('get data from state : state match');
+                            console.log(Math.floor(Math.random() * Math.floor(10)) + ': ins state')
+                            /*console.log('get data from state : state match');
                             filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
-                            filterSelected.data = this.extendedData
-                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
-                        }else{
+                            filterSelected.data = this.extendedData*/
+                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', {
+                                filterBy: this.filterOptionSelected,
+                                getDataFrom: 'backup',
+                                filterSelectedDateRange: [this.filterDateFrom, this.filterDateTo]
+                            });
+                        }/*else{
                             filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
                             console.log('fetch data from db : state did not match');
                             this.$store.dispatch('getArchiveDocuments', filterSelected);
-                        }
+
+                            this.filterChangeFetch(false, true)
+
+                        }*/
                     }
                 }else if(this.filterOptionSelected == 'By Year'){
                     this.isByYear = true
                     //this.$store.dispatch('getArchiveDocuments', this.filterYearSelected);
-                    if (isYearChange) {
-                        if(this.filterYearSelected.length > 0){
-                        console.log('change year', this.filterYearSelected);
-                        }
+                    if (isYearChange || !isInState) {
+                        /*console.log('change year', this.filterYearSelected);
                         filterSelected.filterSelected = this.filterYearSelected
                         filterSelected.data = this.extendedData
-                        this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
+                        this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);*/
+
+                        this.filterChangeFetch(true, false)
+
                     } else {
                         if(isInState){
-                            console.log('2get data from state : state match');
+                            console.log(Math.floor(Math.random() * Math.floor(10)) + ':in state')
+
+                            //this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', { filterBy: this.filterOptionSelected, getDataFrom: 'backup' });
+                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', {
+                                filterBy: this.filterOptionSelected,
+                                getDataFrom: 'backup',
+                                filterSelectedYear: this.filterYearSelected
+                            });
+                            /*console.log('2get data from state : state match');
                             filterSelected.filterSelected = this.filterYearSelected
                             filterSelected.data = this.extendedData
-                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
-                        }else{
+                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);*/
+                        }/*else{
                             filterSelected.filterSelected = this.filterYearSelected
                             console.log('2fetch data from db : state did not match');
                             this.$store.dispatch('getArchiveDocuments', filterSelected);
-                        }
+
+                            this.filterChangeFetch(true, false)
+
+                        }*/
                     }
                 }
 
+            },
+            filterChangeFetch(isYearChange, isDateRangeChane){
+                console.log('fetch data');
+                const filterSelected = {
+                    mutateStateStatus: 'updatestate',
+                    getDataFrom: 'db',
+                    filterBy: this.filterOptionSelected,
+                    backup: {
+                        filterBy: this.filterOptionSelected
+                    }
+                }
+                if (isDateRangeChane) {
+                    filterSelected.filterSelectedDateRange = [this.filterDateFrom, this.filterDateTo]
+                    filterSelected.backup.filterSelected = [this.filterDateFrom, this.filterDateTo]
+                } else if (isYearChange) {
+                    filterSelected.filterSelectedYear = this.filterYearSelected
+                    filterSelected.backup.filterSelected = this.filterYearSelected
+                }
+                this.$store.dispatch('getArchiveDocuments', filterSelected)
             },
             /*loadData(data){
                 if(data == 'All'){
@@ -853,13 +916,34 @@
         },
         mounted() {
             //console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
-            if (this.$store.state.documents.documentsArchive[0].data == undefined) {
+
+            //console.log(this.$store.state.documents.documentsArchive[0].data, 'dds')
+
+            /*if (this.$store.state.documents.documentsArchive[0].data == undefined) {*/
+            console.log('mounted');
+            console.log(new Date().getFullYear().toString())
+            if(this.$store.state.documents.documentsArchive[0] == undefined){
+                //mutateStateStatus: response.mutateStateStatus,
+                //getDataFrom: response.getDataFrom,
+
                 const currentDate = {
+                    mutateStateStatus: 'createstate',
+                    getDataFrom: 'db',
                     filterBy: "By Date Range",
-                    filterSelected: [
+                    filterSelectedYear: [new Date().getFullYear().toString()],
+                    filterSelectedDateRange: [
                         new Date().toISOString().substr(0, 10),
                         new Date().toISOString().substr(0, 10)
-                    ]
+                    ],
+                    data: [],
+                    backup: {
+                        filterBy: "By Date Range",
+                        filterSelected: [
+                            new Date().toISOString().substr(0, 10),
+                            new Date().toISOString().substr(0, 10)
+                        ],
+                        data: []
+                    }
                 }
                 console.log('no data found in state');
                 this.$store.dispatch('getArchiveDocuments', currentDate);
@@ -868,23 +952,25 @@
                 console.log('has data in state');
                 console.log(this.$store.state.documents.documentsArchive[0]);
 
-                const filterBy = this.$store.state.documents.documentsArchive[0].filter
-                const filterSelected = this.$store.state.documents.documentsArchive[0].filter_selected
+                const filterBy = this.$store.state.documents.documentsArchive[0].filterBy
+                const filterSelectedYear = this.$store.state.documents.documentsArchive[0].filterSelectedYear
+                const filterSelectedDateRange = this.$store.state.documents.documentsArchive[0].filterSelectedDateRange
                 const data = this.$store.state.documents.documentsArchive[0].data
 
                 this.filterOptionSelected = filterBy
                 console.log('--',this.filterOptionSelected);
                 if (filterBy == 'By Date Range') {
-                    this.filterDateFrom = filterSelected[0]
-                    this.filterDateTo = filterSelected[1]
+                    this.filterDateFrom = filterSelectedDateRange[0]
+                    this.filterDateTo = filterSelectedDateRange[1]
                     this.isByYear = false
-                    console.log('dd', filterSelected[0]);
+                    console.log('dd', filterSelectedDateRange[0]);
                 } else {
-                    this.filterYearSelected = filterSelected
+                    this.filterYearSelected = filterSelectedYear
                     this.isByYear = true
                 }
                 this.extendedData = data
             }
+            /*}*/
            /* setTimeout(function() {
                 console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
                // debugger
@@ -893,6 +979,8 @@
 */
             //console.log(this.documentsArchive.data);
             this.$store.dispatch('unsetLoader');
+
+           // this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', { filterBy: this.filterOptionSelected, getDataFrom: 'backup' });
 
             //console.log(new Date('2020', '12', 0).getDate().toString())
 
