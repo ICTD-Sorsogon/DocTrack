@@ -7,7 +7,7 @@ describe('Document Flow', () => {
 		cy.get('.v-card__title > .row > .v-btn').click() // create document
 		cy.contains('Document Title/Subject').siblings('input').type('New Documents')
 		cy.contains('Document Type').parent().click()
-		cy.contains('Salary').parent().click()
+        cy.contains('Salary').parent().click()
 		cy.contains('Destination Office').parent().click()
 		cy.contains('Office of the Vice Governor').parent().click()
 		cy.contains('Sender Name').parent().type('Cypress test')
@@ -55,13 +55,13 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('td > .row > :nth-child(1) > .v-btn').click()
+        cy.get('td > .row > :nth-child(1) > .v-btn').click() //forward document
         cy.contains('Forwarded by').parent().type('Docking Office').type('{enter}')
         cy.contains('Forwarded to').parent().type('Office of the Governor').type('{enter}')
         cy.contains('Through').parent().click()
         cy.contains('Docket Office').parent().click()
         cy.contains('Approved by').parent().type('Atty Paul Jazmin')
-        cy.contains('Remarks').parent().type('Care of Paul Jazmin!')
+        cy.contains('Remarks').parent().type('Care of Atty Paul Jazmin!')
         cy.get('.my-2 > .v-btn > .v-btn__content').click()
         cy.get('.v-card__actions > :nth-child(3)').click()
         cy.get('.v-snack__action > .v-btn').click()
@@ -88,7 +88,7 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('.row > :nth-child(2) > .v-btn').click()
+        cy.get('.row > :nth-child(2) > .v-btn').click() // terminal document
         cy.contains('Approved by').parent().type('Atty Paul Jazmin')
         cy.contains('Remarks').parent().type('Olanaps!')
         cy.get('.my-2 > .v-btn > .v-btn__content').click()
