@@ -25,6 +25,7 @@ class NotificationFactory extends Factory
             'user_id' => rand(0, 10),
             'document_id' => rand(0, 10),
             'office_id' => rand(0, 10),
+            'sender_name' => $this->faker->name,
             'message' => $this->faker->name,
             'status' => rand(0, 1),
         ];

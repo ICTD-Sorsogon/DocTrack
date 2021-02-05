@@ -62,9 +62,8 @@ import NotificationItem from './NotificationItem'
     mounted(){
         Echo.channel('documents'+this.auth_user.office_id)
         .listen('DocumentEvent', (e) => {
-            console.log(e);
             this.$store.dispatch('getNotifs');
-            this.$store.dispatch("setSnackbar", {type:'success', message:'Test Snackbar'});
+            // this.$store.dispatch("setSnackbar", {type:'success', message:'Test Snackbar'});
         })
 
         this.$store.dispatch('getNotifs');

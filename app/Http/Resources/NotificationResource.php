@@ -20,6 +20,7 @@ class NotificationResource extends JsonResource
             'office_id' => $this->office_id,
             'message' => $this->message,
             'status' => $this->status,
+            'sender_name' => $this->sender_name,
             'created_at' => $this->created_at->diffForHumans(),
         ];
     }

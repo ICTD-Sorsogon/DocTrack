@@ -32,9 +32,10 @@ class DocumentNotificationListener
         switch ($event->type) {
             case 'create':
                 $sender_id = $event->request_obj->sender_name;
-                // $notify_user = User::whereIn('office_id', [$event->office_id])->get();
-                // dd($sender_id);
+                // $notify_user = User::whereIn('id', [$sender_id])->get();
+                $name = User::all()->find($sender_id);
                 $document = Document::all()->find($event->document_id);
+                $name = User::all()->find($sender_id);
 
                 $notify_user = User::whereIn('office_id', [$event->office_id])->get();
                 // $test = '' ;
@@ -43,6 +44,8 @@ class DocumentNotificationListener
                     $notification->document_id = $event->document_id;
                     $notification->user_id = $value->id;
                     $notification->office_id = $event->office_id;
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
                     $notification->status = 0;
                     $notification->message = 'Document '.$document->subject.' has been created.';
                     $notification->save();

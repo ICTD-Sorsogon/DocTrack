@@ -25,7 +25,7 @@
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                    <v-list-item-title style="color:black;" v-html="item.name"></v-list-item-title>
+                    <v-list-item-title style="color:black;" v-html="item.sender_name"></v-list-item-title>
                     <v-list-item-subtitle style="color:black" v-html="item.message"></v-list-item-subtitle>
                     <h6 style="font-weight:50; color: gray" v-html="item.created_at"></h6>
                 </v-list-item-content>
@@ -59,7 +59,7 @@ export default {
             newNotif.forEach(notif => {
                 allUsers.forEach(user => {
                     if(notif.user_id == user.id){
-                        notif.name  = (user.first_name + ' ' + user.middle_name + ' ' + user.last_name + ' ' + (user.suffix ?? '')).trim()
+                        // notif.name  = (user.first_name + ' ' + user.middle_name + ' ' + user.last_name + ' ' + (user.suffix ?? '')).trim()
                         notif.avatar  =  user.avatar
                     }
                 });
