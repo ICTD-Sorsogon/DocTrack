@@ -915,6 +915,10 @@
             }
         },
         mounted() {
+            //console.log('dd')
+            //console.log(this.$store.state.documents.documentsArchive = [])
+            //console.log('dd')
+
             //console.log('from', this.$store.state.documents.documentsArchive.data, 'end')
 
             //console.log(this.$store.state.documents.documentsArchive[0].data, 'dds')
@@ -980,7 +984,7 @@
             //console.log(this.documentsArchive.data);
             this.$store.dispatch('unsetLoader');
 
-           // this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', { filterBy: this.filterOptionSelected, getDataFrom: 'backup' });
+            //this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', { filterBy: this.filterOptionSelected, getDataFrom: 'backup' });
 
             //console.log(new Date('2020', '12', 0).getDate().toString())
 

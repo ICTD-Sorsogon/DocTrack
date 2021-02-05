@@ -30,14 +30,12 @@ class DocumentController extends Controller
         return $documents->allDocuments(Auth::user());
     }
 
-    public function getAllArchiveDocuments(Request $documents)
+    public function getAllArchiveDocuments(Document $documents, Request $request)
     {
-
         //dd('dd muna', $documents);
-
-
-        $documents = new Document;
-        return $documents->allDocumentsArchive(Auth::user());
+        //$documents = new Document;
+        //dd($request->all());
+        return $documents->allDocumentsArchive(Auth::user(), $request);
     }
 
     public function getNonPaginatedActiveDocuments()

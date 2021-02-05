@@ -95,13 +95,28 @@ class Document extends Model
         return $document->orderBy('created_at', 'DESC')->get();
     }
 
-    public static function allDocumentsArchive(User $user)
+    public static function allDocumentsArchive(User $user, $request)
     {
+        $isByYear = ($request->filterBy == 'Year')?true:false;
+        $isNotEmpty = (count($request->selected) > 0)?true:false;
+        $selected = $request->selected;
+
+        //dd($request->selected);
         $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
                     ->onlyTrashed();
 
         if($user->isUser()){
             $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+        }
+
+        //$document->whereBetween('created_at', [$from, $to])
+
+        if ($isNotEmpty) {
+            $document->when(!$isByYear, function ($query) use ($selected) {
+                        return $query->whereBetween('created_at', $selected);
+                    })->when($isByYear, function ($query) use ($selected) {
+                        return $query->whereIn(Document::raw('YEAR(`created_at`)'), $selected);
+                    });
         }
 
         return $document->orderBy('created_at', 'DESC')->get();

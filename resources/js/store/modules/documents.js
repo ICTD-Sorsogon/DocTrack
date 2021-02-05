@@ -92,9 +92,11 @@ const actions = {
                 break;
             case 'db':
                 //console.log((filter.filterBy == 'By Date Range')? { selected: filter.filterSelectedDateRange } : { selected: filter.filterSelectedYear })
-                    axios.post(`/api/get_archive_documents`,
-                        ((filter.filterBy == 'By Date Range')? {selected: filter.filterSelectedDateRange} : {selected: filter.filterSelectedYear})
-                    ).then(response => {
+                    axios.post(`/api/get_archive_documents`, (
+                        (filter.filterBy == 'By Date Range')?
+                            {selected: filter.filterSelectedDateRange, filterBy: 'Date'} :
+                            {selected: filter.filterSelectedYear, filterBy: 'Year'}
+                    )).then(response => {
                         filterSelectedAndResponse.mutateStateStatus = filter.mutateStateStatus
                         filterSelectedAndResponse.getDataFrom = filter.getDataFrom
 
@@ -112,7 +114,7 @@ const actions = {
                             filterSelectedAndResponse.backup.filterSelected = filter.backup.filterSelected
                         }
                         console.log(filterSelectedAndResponse);
-                        //commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+                        commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
                     })
                 break;
         }
@@ -290,7 +292,9 @@ const mutations = {
     },
     GET_ALL_ARCHIVE_DOCUMENTS(state, response) {
 
-       // state.documentsArchive = []
+        console.log('MUTATE SUCCESS')
+
+        //state.documentsArchive = []
 
 
         //state.documentsArchive = [];
@@ -309,6 +313,7 @@ const mutations = {
                                             filterSelected: [],
                                             data: []
                                        }*/
+
 
         if (response.mutateStateStatus == 'createstate') {
             state.documentsArchive = []
@@ -346,6 +351,8 @@ const mutations = {
                 // console.log('end mutate:', state.documentsArchive[0].backup.filterBy)
                 //state.documentsArchive.mutateStateStatus = response.mutateStateStatus
                 //state.documentsArchive.getDataFrom = response.getDataFrom
+
+
                 state.documentsArchive[0].filterBy = response.filterBy
 
                 if (response.filterBy == 'By Date Range') {
