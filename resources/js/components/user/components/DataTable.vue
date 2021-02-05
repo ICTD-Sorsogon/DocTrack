@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="!isEditable(item)">
+					<v-col v-if="!isEditable(item) && item.status != 'received'">
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>
@@ -81,7 +81,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="isAdmin">
+					<v-col v-if="isAdmin || item.status == 'received'">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
