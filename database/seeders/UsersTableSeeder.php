@@ -18,7 +18,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         User::factory()->create(['username' => 'GO', 'role_id' => 2, 'office_id' => '1']);
-        User::factory()->create(['username' => 'VCO', 'role_id' => 2, 'office_id' => '2']);
+        User::factory()->create(['username' => 'VGO', 'role_id' => 2, 'office_id' => '2']);
         User::factory()->create(['username' => 'MSP', 'role_id' => 2, 'office_id' => '3']);
         User::factory()->create(['username' => 'SSP', 'role_id' => 2, 'office_id' => '4']);
         User::factory()->create(['username' => 'admin', 'role_id' => 1, 'office_id' => '37']);

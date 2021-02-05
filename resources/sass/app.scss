@@ -13,3 +13,7 @@ img#dummy {
 	width: 80px !important; 
 	height: 50px !important;
 }
+
+.bordered table th + th { border-left:1px solid #ddd; }
+.bordered table td + td { border-left:1px solid #ddd; }
+.bordered table {border: 1px solid #ddd}

@@ -2,11 +2,9 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      {{$route.params.type}} Document
+      {{$route.params.type.replace(/\w/, val=>val.toUpperCase()) }} Document
       <v-row align="center" justify="end" class="pr-4">
-        <v-btn color="primary" @click.prevent="navigateAllDocuments"
-          >Back</v-btn
-        >
+        <v-btn color="primary" @click.prevent="navigateAllDocuments" >Back</v-btn>
       </v-row>
     </v-card-title>
 
@@ -68,7 +66,7 @@
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
-                                v-model="origin_office"
+                                v-model="form.destination_office_id"
                                 :items="offices"
                                 item-text="name"
                                 clearable
@@ -78,9 +76,21 @@
                                 label="Destination Office"
                                 prepend-inner-icon="mdi-account-arrow-right-outline"
                                 :error-messages="errors"
-
+                                chips
+                                multiple
                                 required
-                            ></v-combobox>
+                            >
+                            <template v-slot:selection="{ attrs, item, parent, selected }">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-chip color="primary" v-bind="attrs" v-on="on"  >
+                                        {{ item.office_code || item }}
+                                    </v-chip>
+                                </template>
+                                <span >{{item.name || item}}</span>
+                            </v-tooltip>
+                            </template>
+                        </v-combobox>
                         </ValidationProvider>
                     </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
@@ -201,16 +211,11 @@ export default {
                this.form.sender_name = val
             }
         },
-        origin_office: {
-            get() {
-                return this.form.destination.name ?? this.form.destination_office_id
-            },
-            set(val) {
-                this.form.destination_office_id = val
-            }
-        },
         selected_document() {
             return this.find_document(this.$route.params.id)
+        },
+        destination() {
+            return this.form.destination_office_id
         }
     },
     data() {
@@ -225,7 +230,7 @@ export default {
                 subject: '',
                 document_type_id: '',
                 sender: {},
-                destination_office_id: NaN,
+                destination_office_id: [],
                 destination:{},
                 sender_name: NaN,
                 page_count: '',
@@ -245,7 +250,7 @@ export default {
         },
         sanitizeInputs() {
             let dataPayload = JSON.parse(JSON.stringify(this.form))
-            dataPayload.destination_office_id = dataPayload.destination_office_id.id ?? dataPayload.destination_office_id
+            dataPayload.destination_office_id = dataPayload.destination_office_id.reduce((ids,item) => {item.id && ids.push(item.id); return ids}, [])
             dataPayload.sender_name = dataPayload.sender_name.id ?? dataPayload.sender_name
             return dataPayload
         },
@@ -286,6 +291,13 @@ export default {
         fillForm(){
             this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
         },
+    },
+    watch: {
+        destination(value) {
+            if(typeof value[value.length - 1] != 'object' && value.length > 1){
+               this.$nextTick(() => this.destination.pop())
+            }
+        }
     },
     mounted() {
         this.fillForm();

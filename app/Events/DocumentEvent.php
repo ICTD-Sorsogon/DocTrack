@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Document;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,23 +15,17 @@ class DocumentEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user_id;
-    public $request_obj;
-    public $type;
-    public $old_values;
-    public $approved_by;
+    public $user;
+    public $document;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user_id, $request_obj, $old_values,$approved_by, $type)
+    public function __construct($document)
     {
-        $this->user_id = $user_id;
-        $this->request_obj = $request_obj;
-        $this->old_values = $old_values;
-        $this->type = $type;
-        $this->approved_by = $approved_by;
+        $this->document = $document instanceof Document ? $document : Document::find($document);
+        $this->user = Auth()->user();
     }
 
     /**

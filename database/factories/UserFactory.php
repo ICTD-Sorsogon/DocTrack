@@ -36,6 +36,7 @@ class UserFactory extends Factory
             'office_id' => rand(1, 3),
             'is_active' => true,
             'created_at' => $this->faker->dateTimeBetween($startDate = '-1 years', $endDate = 'now', $timezone = null),
+            'avatar' => 'images/defaultpic.jpg'
         ];
     }
 }
