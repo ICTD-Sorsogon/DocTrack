@@ -59,7 +59,7 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item)">
+					<v-col v-if="isEditable(item) && item.acknowledged">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
