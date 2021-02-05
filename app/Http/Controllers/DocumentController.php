@@ -30,8 +30,13 @@ class DocumentController extends Controller
         return $documents->allDocuments(Auth::user());
     }
 
-    public function getAllArchiveDocuments(Document $documents)
+    public function getAllArchiveDocuments(Request $documents)
     {
+
+        //dd('dd muna', $documents);
+
+
+        $documents = new Document;
         return $documents->allDocumentsArchive(Auth::user());
     }
 

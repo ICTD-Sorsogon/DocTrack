@@ -91,7 +91,10 @@ const actions = {
                     commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
                 break;
             case 'db':
-                    axios.get(`/api/get_archive_documents`).then(response => {
+                //console.log((filter.filterBy == 'By Date Range')? { selected: filter.filterSelectedDateRange } : { selected: filter.filterSelectedYear })
+                    axios.post(`/api/get_archive_documents`,
+                        ((filter.filterBy == 'By Date Range')? {selected: filter.filterSelectedDateRange} : {selected: filter.filterSelectedYear})
+                    ).then(response => {
                         filterSelectedAndResponse.mutateStateStatus = filter.mutateStateStatus
                         filterSelectedAndResponse.getDataFrom = filter.getDataFrom
 
@@ -109,7 +112,7 @@ const actions = {
                             filterSelectedAndResponse.backup.filterSelected = filter.backup.filterSelected
                         }
                         console.log(filterSelectedAndResponse);
-                        commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
+                        //commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
                     })
                 break;
         }
