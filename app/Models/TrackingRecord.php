@@ -12,10 +12,10 @@ class TrackingRecord extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = [
+    protected $fillable = [
         'document_id', 'actions', 'status',
         'approved_by', 'touched_by', 'last_touched',
-        'forwarded_by', 'forwarded_to', 'remarks'
+        'forwarded_by', 'forwarded_to', 'remarks','destination'
     ];
 
     public function getCreatedAtAttribute($value)

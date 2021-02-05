@@ -16,6 +16,7 @@ class CreateTrackingRecordsTable extends Migration
         Schema::create('tracking_records', function (Blueprint $table) {
             $table->id();
             $table->foreignId('document_id')->constrained('documents');
+            $table->foreignId('destination')->nullable()->constrained('offices');
             $table->enum('action', ['created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated' , 'acknowledged']);
             $table->enum('through', ['docket office', 'personal', 'email', 'others'])->nullable();
             $table->string('approved_by')->nullable();
@@ -23,7 +24,7 @@ class CreateTrackingRecordsTable extends Migration
             $table->dateTime('last_touched');
             $table->foreignId('forwarded_by')->nullable()->constrained('offices');
             $table->foreignId('forwarded_to')->nullable()->constrained('offices');
-            $table->string('remarks')->nullable();
+            $table->text('remarks')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

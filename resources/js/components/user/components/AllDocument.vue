@@ -22,13 +22,13 @@
     </v-tabs>
     <data-table
       @editDocument="editDocument"
-      @printDialog="openDialog"
+      @print="openDialog"
       v-if="auth_user.role_id === 1"
       :documents="documents"
       :datatable_loader="datatable_loader"
       ></data-table>
     <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
-        <v-tab-item 
+        <v-tab-item
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
@@ -40,7 +40,7 @@
          ></data-table>
         </v-tab-item>
     </v-tabs-items>
-    <print-bar-code :code="tracking_code" @closeDialog="printDialog = false" :printDialog="printDialog">
+    <print-bar-code :item="item" @closeDialog="printDialog = false" :printDialog="printDialog">
     </print-bar-code>
 </v-card>
 </template>
@@ -57,20 +57,23 @@ export default {
         return {
           printDialog: false,
           tab: 0,
-          tracking_code: null,
+          item: null,
         }
     },
     computed: {
         ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
         userDocuments() {
             let type = this.tab ? 'originating_office' : 'destination_office_id'
-            return JSON.parse(JSON.stringify(this.documents)).filter( doc => doc[type] == this.auth_user.office_id )
+            return JSON.parse(JSON.stringify(this.documents)).filter( doc => this.tab ? doc[type] == this.auth_user.office_id : doc['originating_office'] != this.auth_user.office_id  )
         },
     },
     methods: {
-        openDialog (code = false){
-         this.tracking_code = code 
-         this.printDialog = code && true
+        openDialog (item = false){
+         if(this.auth_user.role_id != 1 && !this.tab){
+           return
+         }
+          this.item = item
+          this.printDialog = item && true
         },
         checkIfID(string) {
             return /^-?\d+$/.test(string);
@@ -89,13 +92,13 @@ export default {
         getNewDocumentRecordForm() {
             if (this.$route.name !== "Edit Document") {
             this.$store.dispatch("setLoader");
-            this.$router.push({ name: "Edit Document", params:{type: 'Create'} });
+            this.$router.push({ name: "Edit Document", params:{type: 'create'} });
             }
         },
         editDocument(id) {
             if (this.$route.name !== "Edit Document") {
                 this.$store.dispatch("setLoader");
-                this.$router.push({ name:"Edit Document", params: {id: id, type: 'Edit'}});
+                this.$router.push({ name:"Edit Document", params: {id: id, type: 'edit'}});
             }
         },
     },
