@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Models\Document;
-use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -16,28 +15,17 @@ class DocumentEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $user_id;
-    public $request_obj;
-    public $type;
-    public $old_values;
-    public $approved_by;
     public $user;
-    public $office_id;
-    public $document_id;
+    public $document;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($document_id, $office_id, $user_id, $request_obj, $old_values, $approved_by, $type)
+    public function __construct($document)
     {
-        $this->user_id = $user_id;
-        $this->office_id = $office_id;
-        $this->request_obj = $request_obj;
-        $this->old_values = $old_values;
-        $this->type = $type;
-        $this->approved_by = $approved_by;
-        $this->document_id = $document_id;
+        $this->document = $document instanceof Document ? $document : Document::find($document);
+        $this->user = Auth()->user();
     }
     /**
      * Get the channels the event should broadcast on.

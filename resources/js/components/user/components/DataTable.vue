@@ -26,7 +26,7 @@
 			/>
 		</template>
 		<template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip class='trackin' @click="$emit('print', item.tracking_code)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click="$emit('print', item)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
 		</template>
@@ -46,10 +46,20 @@
 				</v-btn>
 			</td>
 		</template>
+		<template v-slot:[`item.destination_office_id`]="{ item }">
+				<v-tooltip :key="destination.office_code" v-for="destination in item.destination_office_id" top>
+					<template v-slot:activator="{ on, attrs }">
+						<v-chip color="primary" v-bind="attrs" v-on="on" :x-small="item.destination_office_id.length > 1" >
+							{{destination.office_code}}
+						</v-chip>
+					</template>
+					<span>{{destination.name}}</span>
+				</v-tooltip>
+		</template>
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item)">
+					<v-col v-if="isEditable(item) && item.acknowledged">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -143,7 +153,7 @@ export default {
                 { text: 'Source', value: 'is_external', sortable: false },
                 { text: 'Type', value: 'document_type.name', sortable: false },
                 { text: 'Originating Office', value: 'originating_office', sortable: false },
-                { text: 'Destination Office', value: 'destination.name', sortable: false },
+                { text: 'Destination Office', value: 'destination_office_id', sortable: false },
                 { text: 'Sender', value: 'sender_name', sortable: false },
                 { text: 'Priority Level', value: 'priority_level', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
@@ -161,7 +171,7 @@ export default {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
                 doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
-                doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'Low'
