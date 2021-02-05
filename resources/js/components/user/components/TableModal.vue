@@ -121,9 +121,16 @@
                     <v-icon>mdi-square-medium</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
-                    <v-list-item-title>{{
-                      selected_document.destination.name
-                    }}</v-list-item-title>
+                    <v-list-item-title>
+                    <v-tooltip :key="destination.office_code" v-for="destination in selected_document.destination_office_id" top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-chip v-bind="attrs" v-on="on" >
+                          {{destination.office_code}}
+                        </v-chip>
+                      </template>
+                      <span>{{destination.name}}</span>
+                    </v-tooltip>
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
               </v-list>

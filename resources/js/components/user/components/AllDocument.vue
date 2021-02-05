@@ -28,7 +28,7 @@
       :datatable_loader="datatable_loader"
       ></data-table>
     <v-tabs-items v-if="auth_user.role_id != 1"  v-model="tab">
-        <v-tab-item 
+        <v-tab-item
             v-for="item in ['Incoming','Outgoing']"
             :key="item"
             >
@@ -72,7 +72,7 @@ export default {
          if(this.auth_user.role_id != 1 && !this.tab){
            return
          }
-          this.item = item 
+          this.item = item
           this.printDialog = item && true
         },
         checkIfID(string) {
@@ -92,13 +92,13 @@ export default {
         getNewDocumentRecordForm() {
             if (this.$route.name !== "Edit Document") {
             this.$store.dispatch("setLoader");
-            this.$router.push({ name: "Edit Document", params:{type: 'Create'} });
+            this.$router.push({ name: "Edit Document", params:{type: 'create'} });
             }
         },
         editDocument(id) {
             if (this.$route.name !== "Edit Document") {
                 this.$store.dispatch("setLoader");
-                this.$router.push({ name:"Edit Document", params: {id: id, type: 'Edit'}});
+                this.$router.push({ name:"Edit Document", params: {id: id, type: 'edit'}});
             }
         },
     },

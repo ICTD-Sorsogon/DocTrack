@@ -8,7 +8,6 @@ use App\Models\TrackingRecord;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use stdClass;
 
 class DocumentListener
 {
@@ -99,7 +98,7 @@ class DocumentListener
                 $log->remarks = 'Document '.$subject.' is '.$status;
                 return $log->save();
             break;
-            
+
             case 'terminate':
                 $remarks = $event->old_values;
                 $subject = $event->request_obj;

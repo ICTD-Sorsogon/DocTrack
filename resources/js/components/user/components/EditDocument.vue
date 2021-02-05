@@ -2,7 +2,7 @@
 <v-card flat>
 
     <v-card-title primary-title>
-      {{$route.params.type}} Document
+      {{$route.params.type.replace(/\w/, val=>val.toUpperCase()) }} Document
       <v-row align="center" justify="end" class="pr-4">
         <v-btn color="primary" @click.prevent="navigateAllDocuments" >Back</v-btn>
       </v-row>
@@ -294,7 +294,7 @@ export default {
     },
     watch: {
         destination(value) {
-            if(typeof value[value.length - 1] != 'object'){
+            if(typeof value[value.length - 1] != 'object' && value.length > 1){
                this.$nextTick(() => this.destination.pop())
             }
         }

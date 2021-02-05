@@ -163,13 +163,11 @@
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
         <v-spacer></v-spacer>
 
-        <v-avatar v-if="image_source === '/storage/null'" color="indigo">
-            <img src="/images/defaultpic.jpg" alt="default_picture">
-        </v-avatar>
-
-        <v-avatar v-else>
-            <img :src="image_source" alt="profile_picture">
-        </v-avatar>
+        <router-link to="/account_settings">
+            <v-avatar>
+                <img :src="image_source" alt="profile_picture">
+            </v-avatar>
+        </router-link>
 
         <v-progress-linear
             :active="page_loader"

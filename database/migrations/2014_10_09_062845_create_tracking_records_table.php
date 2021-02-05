@@ -24,7 +24,7 @@ class CreateTrackingRecordsTable extends Migration
             $table->dateTime('last_touched');
             $table->foreignId('forwarded_by')->nullable()->constrained('offices');
             $table->foreignId('forwarded_to')->nullable()->constrained('offices');
-            $table->string('remarks')->nullable();
+            $table->text('remarks')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

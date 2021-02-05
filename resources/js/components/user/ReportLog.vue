@@ -1,121 +1,125 @@
 <template>
-  <v-container>
-    <v-card flat>
+    <v-container>
+        <v-card flat>
             <v-card-title primary-title>
                 Logs
                 <v-row align="center" justify="end" class="pr-4">
-
-                    <v-btn color="primary" @click="excel_dialog = true; dialog_title ='Logs'"
-                    >
-                    <v-icon
-                      small
-                      class="mr-2"
-                    >
-                      mdi-export
-                    </v-icon>
-                    Export</v-btn
-                    >
+                    <v-btn color="primary" @click="excel_dialog = true; dialog_title ='Logs'">
+                        <v-icon small class="mr-2">
+                            mdi-export
+                        </v-icon>
+                            Export
+                    </v-btn >
                 </v-row>
             </v-card-title>
 
             <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Search"
+                single-line
+                hide-details
             ></v-text-field>
 
-    <template>
-      <v-data-table
-        :headers="headers"
-        :items="logs"
-        :search="search"
-        class="elevation-1"
-      >
-        <template v-slot:top>
+            <template>
+                <v-data-table
+                    :headers="headers"
+                    :items="logs"
+                    :search="search"
+                    class="elevation-1"
+                >
+                    <template v-slot:top>
+                        <v-dialog :headers="headers2" v-model="dialog" max-width="80vw">
+                            <v-card v-if="final_data.length">
+                                <v-card-title>
+                                    <span class="headline">{{ formTitle }}</span>
+                                    <v-spacer></v-spacer>
+                                    <v-icon @click="close" large class="ml-4">
+                                        mdi-close
+                                    </v-icon>
+                                </v-card-title>
 
-            <v-dialog
-              :headers="headers2"
-              v-model="dialog"
-              max-width="80vw"
-            >
-              <v-card>
-                <v-card-title>
-                  <span class="headline">{{ formTitle }}</span>
+                                <v-simple-table >
+                                    <template v-slot:default>
+                                        <thead>
+                                            <tr>
+                                                <th class="text-left">
+                                                    Label
+                                                </th>
+                                                <th class="text-left">
+                                                    New
+                                                </th>
+                                                <th class="text-left">
+                                                    Old
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr
+                                                v-for="(item, index) in final_data"
+                                                :key="index"
+                                            >
+                                                <td>{{ item['key'] }}</td>
+                                                <td>{{ item['new'] }}</td>
+                                                <td>{{ item['old'] }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </template>
+                                </v-simple-table>
 
-                  <v-spacer></v-spacer>
-                    <v-icon
-                        @click="close"
-                          large
-                          class="ml-4"
+                                <v-card-actions>
+                                    <v-spacer></v-spacer>
+                                </v-card-actions>
+                            </v-card>
+
+                            <v-card v-else height="20vh">
+                                <v-card-title>
+                                    <span class="headline">{{ formTitle }}</span>
+
+                                    <v-spacer></v-spacer>
+                                    <v-icon @click="close" large class="ml-4">
+                                        mdi-close
+                                    </v-icon>
+                                </v-card-title>
+                                <h3 align="center">No Data Found</h3>
+                            </v-card>
+
+                        </v-dialog>
+
+                    </template>
+                    <template v-slot:item.actions="{ item }">
+                        <v-icon
+                        v-if="!item.original_values && !item.new_values"
+                        medium
+                        class="ml-3"
+                        color="blue"
+                        @click="noData()"
                         >
-                      mdi-close
-                    </v-icon>
-                </v-card-title>
+                        mdi-more
+                        </v-icon>
+                        <v-icon
+                        v-else
+                        medium
+                        class="ml-3"
+                        color="blue"
+                        @click="editItem(item)"
+                        >
+                        mdi-more
+                        </v-icon>
+                    </template>
+                </v-data-table>
+            </template>
 
-              <v-simple-table>
-                  <template v-slot:default>
-                    <thead>
-                      <tr>
-                        <th class="text-left">
-                          Label
-                        </th>
-                        <th class="text-left">
-                          New
-                        </th>
-                        <th class="text-left">
-                          Old
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr
-                        v-for="(item, index) in final_data"
-                        :key="index"
-                      >
-                        <td>{{ item['key'] }}</td>
-                        <td>{{ item['new'] }}</td>
-                        <td>{{ item['old'] }}</td>
-                      </tr>
-                    </tbody>
-                  </template>
-              </v-simple-table>
-
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-
-        </template>
-        <template v-slot:item.actions="{ item }">
-          <v-icon
-            medium
-            class="ml-3"
-            color="blue"
-            @click="editItem(item)"
-          >
-            mdi-more
-          </v-icon>
-        </template>
-      </v-data-table>
-    </template>
-
-
-
-    </v-card>
-      <excel-dialog
-          v-if="dialog_title && excel_dialog == true"
-          :excel_dialog="excel_dialog"
-          :dialog_title="dialog_title"
-          dialog_type='export'
-          :dialog_for="dialog_for"
-          @close-dialog="closeDialog()"
-      />
-  </v-container>
-
+        </v-card>
+        <excel-dialog
+            v-if="dialog_title && excel_dialog == true"
+            :excel_dialog="excel_dialog"
+            :dialog_title="dialog_title"
+            dialog_type='export'
+            :dialog_for="dialog_for"
+            @close-dialog="closeDialog()"
+        />
+    </v-container>
 
 </template>
 
@@ -124,10 +128,10 @@ import { mapGetters, mapActions } from "vuex";
 import ExcelDialog from './components/ExcelDialog'
 import XLSX from 'xlsx';
 export default {
-  components:{
-    ExcelDialog,
-  },
-  data() {
+    components:{
+        ExcelDialog,
+    },
+    data() {
         return {
             excel_dialog: false,
             dialog_for: 'exportLogs',
@@ -138,16 +142,16 @@ export default {
             search: '',
             editedIndex: -1,
             editedItem: {
-              new_values: '',
-              action: 0,
-              table_name: 0,
-              remarks: '',
+                new_values: '',
+                action: 0,
+                table_name: 0,
+                remarks: '',
             },
             final_data: [],
             defaultItem: {
-              action: 0,
-              table_name: 0,
-              remarks: 0,
+                action: 0,
+                table_name: 0,
+                remarks: 0,
             },
             headers: [
                 { text: 'Username', value: 'user.username' },
@@ -164,113 +168,117 @@ export default {
         }
     },
     methods:{
-      closeDialog(){
-        this.excel_dialog = false;
-      },
-      exportExcel(){
-        var currentDate = new Date();
-        var day = currentDate.getDate()
-        var month = currentDate.getMonth() + 1
-        var year = currentDate.getFullYear()
-        let date_format = month+"/"+day+"/"+year;
-        this.export_excel = [];
-        this.logs.forEach((log)=>{
-          console.log(log);
-          this.export_excel.push({
-            Username: log.user.username,
-            Action: log.action,
-            Remarks: log.remarks,
-            New_Values: log.new_values,
-            Old_Values: log.original_values,
-          })
-        })
-        var sheet_name = "Logs";
-        var logs_rec = XLSX.utils.json_to_sheet(this.export_excel);
-        var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, logs_rec, sheet_name);
-        XLSX.writeFile(wb, date_format+' - Record_List.xlsx');
-      },
+        noData(){
+            this.final_data = []
+            this.dialog = true
+        },
+        closeDialog(){
+            this.excel_dialog = false;
+        },
+        exportExcel(){
+            var currentDate = new Date();
+            var day = currentDate.getDate()
+            var month = currentDate.getMonth() + 1
+            var year = currentDate.getFullYear()
+            let date_format = month+"/"+day+"/"+year;
+            this.export_excel = [];
+            this.logs.forEach((log)=>{
+            console.log(log);
+            this.export_excel.push({
+                Username: log.user.username,
+                Action: log.action,
+                Remarks: log.remarks,
+                New_Values: log.new_values,
+                Old_Values: log.original_values,
+            })
+            })
+            var sheet_name = "Logs";
+            var logs_rec = XLSX.utils.json_to_sheet(this.export_excel);
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, logs_rec, sheet_name);
+            XLSX.writeFile(wb, date_format+' - Record_List.xlsx');
+        },
 
-      initialize () {this.logs},
-      editItem (item) {
-        this.editedIndex = this.logs.indexOf(item)
-        this.editedItem = Object.assign(item)
-        this.dialog = true
+        initialize () {this.logs},
+        editItem (item) {
+            this.editedIndex = this.logs.indexOf(item)
+            this.editedItem = Object.assign(item)
+            this.dialog = true
 
-        let log_data = this.editedItem;
+            let log_data = this.editedItem;
 
-        var log_new_key = [];
-        var log_view_new = [];
+            var log_new_key = [];
+            var log_view_new = [];
 
-        var log_view_old = [];
-        var log_old_key = [];
+            var log_view_old = [];
+            var log_old_key = [];
 
-        this.final_data = [];
+            this.final_data = [];
 
-        log_new_key = Object.keys(JSON.parse(log_data.new_values));
-        log_view_new = Object.values(JSON.parse(log_data.new_values));
+            log_new_key = Object.keys(JSON.parse(log_data.new_values));
+            log_view_new = Object.values(JSON.parse(log_data.new_values));
 
-        if(log_data.original_values != null){
+            if(log_data.original_values != null){
 
-          log_old_key = Object.keys(JSON.parse(log_data.original_values));
-          log_view_old = Object.values(JSON.parse(log_data.original_values));
-            for (var i = 0 ; i < log_old_key.length; i++){
-              this.final_data.push({
+            log_old_key = Object.keys(JSON.parse(log_data.original_values));
+            log_view_old = Object.values(JSON.parse(log_data.original_values));
+                for (var i = 0 ; i < log_old_key.length; i++){
+                this.final_data.push({
+                    'key': log_new_key[i],
+                    'new': log_view_new[i],
+                    'old': log_view_old[i]
+                })
+                }
+
+            }else{
+            for (var i = 0 ; i < log_new_key.length; i++){
+                this.final_data.push({
                 'key': log_new_key[i],
-                'new': log_view_new[i],
-                'old': log_view_old[i]
-              })
+                'new': log_view_new[i]
+                })
             }
 
+            }
 
-        }else{
-          for (var i = 0 ; i < log_new_key.length; i++){
-            this.final_data.push({
-              'key': log_new_key[i],
-              'new': log_view_new[i]
+        },
+        close () {
+            this.dialog = false
+            this.emptyLogDialog = false
+            this.$nextTick(() => {
+            this.editedItem = Object.assign({}, this.defaultItem)
+            this.editedIndex = -1
             })
-          }
+        },
 
-
+        closeDialog(){
+            this.excel_dialog = false;
         }
-
-      },
-      close () {
-        this.dialog = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
-      },
 
     },
 
-      computed: {
-      test(){
-        return this.editedItem;
-      },
+    computed: {
         ...mapGetters(['logs']),
-
         formTitle () {
-          return this.editedIndex !== -1 ? 'Logs Value' : 'Logs Value'
+            return this.editedIndex !== -1 ? 'Logs Value' : 'Logs Value'
         },
-      },
+    },
+
     watch: {
-      dialog (val) {
-        val || this.close()
-      },
-      dialogDelete (val) {
-        val || this.closeDelete()
-      },
+        dialog (val) {
+            val || this.close()
+        },
+        dialogDelete (val) {
+            val || this.closeDelete()
+        },
     },
 
     created () {
-      this.initialize();
+        this.initialize();
     },
-    mounted() {
 
-      this.$store.dispatch('unsetLoader');
-      this.$store.dispatch('getLogs');
+    mounted() {
+        this.$store.dispatch('unsetLoader');
+        this.$store.dispatch('getLogs');
     }
 
 }
