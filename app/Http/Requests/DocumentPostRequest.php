@@ -13,7 +13,7 @@ class DocumentPostRequest extends FormRequest
      */
     public function authorize()
     {
-        return  !$this->document ?? auth()->user()->can('update', $this->document);
+        return !$this->document || auth()->user()->can('update', $this->document);
     }
 
     /**
@@ -27,7 +27,8 @@ class DocumentPostRequest extends FormRequest
             'subject' => 'required|string',
             'is_external' => 'required|boolean',
             'document_type_id' => 'required|digits_between: 1, 999',
-            'destination_office_id' => 'required|digits_between:1,999',
+            'destination_office_id' => 'required|array',
+            'destination_office_id.*' => 'required|digits_between:1,999',
             'sender_name' => 'required',
             'page_count' => 'required|digits_between:1, 99999',
             'remarks' => 'required|string',

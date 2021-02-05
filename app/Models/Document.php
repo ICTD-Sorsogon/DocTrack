@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\DocumentEvent;
 use App\Models\Traits\TrackingNumberBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,22 @@ class Document extends Model
         'page_count', 'date_filed', 'is_terminal', 'is_external',
         'remarks', 'attachment_page_count', 'status', 'priority_level'
     ];
+
+    protected $dispatchesEvents = [
+        'saved' => DocumentEvent::class,
+        'deleting' => DocumentEvent::class,
+    ];
+
+    public function getDestinationOfficeIdAttribute($value)
+    {
+        $value = auth()->user()->can('update', $this) ? json_decode($value) : [auth()->user()->office->id];
+        return Office::whereIn('id', $value)->get();
+    }
+
+    public function setDestinationOfficeIdAttribute($value)
+    {
+        $this->attributes['destination_office_id'] = json_encode($value);
+    }
 
     public static function boot()
     {
@@ -44,12 +61,12 @@ class Document extends Model
 
     public function destination()
     {
-        return $this->belongsTo('App\Models\Office', 'destination_office_id');
+       return $this->belongsTo('App\Models\Office');
     }
 
     public function tracking_records()
     {
-        return $this->hasMany('App\Models\TrackingRecord', 'touched_by');
+        return $this->hasMany('App\Models\TrackingRecord', 'document_id');
     }
 
     public function document_type()
@@ -69,11 +86,10 @@ class Document extends Model
 
     public static function allDocuments(User $user)
     {
-        $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
-                    ->where('is_terminal', false);
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
 
         if($user->isUser()){
-            $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+            $document->whereRaw("((json_contains(`destination_office_id`, {$user->office_id}) AND acknowledged = 1) OR originating_office = {$user->office_id} )");
         }
 
         return $document->orderBy('created_at', 'DESC')->get();
