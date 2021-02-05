@@ -44,7 +44,9 @@
 			<strong>Originating Office:</strong> {{item.originating_office}}
 		</div>
 		<div class="">
-			<strong>Destination Office:</strong> {{item.destination.name}} 
+			<strong>Destination Office:</strong> <v-chip x-small v-for="office in item.destination_office_id" :key="office.office_code" >
+				{{office.office_code}} 
+			</v-chip>
 		</div>
 		<div class="">
 			<strong>Date Filed:</strong> {{dateFiled}} 
@@ -104,8 +106,11 @@ export default {
 		return {
 			barCodeData: null,
 			tab: 0,
+			x: null,
+			y: null,
 			offsetX: '',
 			offsetY: '',
+			dragObject: {},
 			inset: 'auto  auto auto auto',
 		}
 	},
@@ -116,31 +121,31 @@ export default {
 		maxWidth(){
 			return this.tab ? '70%' : '30%'
 		},
-		x(){
-			return this.$refs.dummy.parentElement.clientWidth
-		},
-		y(){
-			return this.$refs.dummy.parentElement.clientHeight
-		}
+
 	},
 	watch: {
 		printDialog(newState, oldSate) {
 			if(newState) {
-				new Draggable( this.$refs.dummy,  { setCursor: true, limit: this.xy })
+				this.dragObject = new Draggable( this.$refs.dummy,  { setCursor: true, limit: this.xy })
 				jsbarcode(this.$refs.barCode, this.item.tracking_code);
 				this.barCodeData = this.$refs.barCode.src
 			}
 		}
 	},
 	methods: {
-		print(){
-			let page = this.tab ? 'routeSlip' : 'printPage'
-			if(!this.tab){
-				this.$refs.barCode.setAttribute('style', `width: 1.5in !important; height: .5in !important; inset: ${this.inset}; position: absolute`)	
-			}
-			this.$htmlToPaper(page);
-		},
-		xy( x, y, x0, y0 ) {
+	getWindowSize(event) {
+		this.x = this.$refs.dummy.parentElement.clientWidth
+		this.y = this.$refs.dummy.parentElement.clientHeight
+	},
+	print(){
+		let page = this.tab ? 'routeSlip' : 'printPage'
+		if(!this.tab){
+			this.$refs.barCode.setAttribute('style', `width: 1.5in !important; height: .5in !important; inset: ${this.inset}; position: absolute`)
+		}
+		this.$htmlToPaper(page);
+	},
+	xy( x, y, x0, y0 ) {
+			this.getWindowSize()
 			x = x > (this.x - 80)  ? this.x - 80 : x < 0 ? 0 : x
 			y = y > (this.y - 50) ? this.y - 50 : y < 0 ? 0 : y
 			let offsetX = String((x/(this.x - 80)) * 65)
@@ -154,6 +159,18 @@ export default {
 			return { x: x, y: y };
 		}
 	},
+	mounted() {
+    this.$nextTick(function() {
+		window.addEventListener('resize', this.getWindowSize)
+
+		//Init
+		this.getWindowSize()
+	})
+
+	},
+	beforeDestroy() {
+		window.removeEventListener('resize', this.getWindowSize);
+  }
 }
 </script>
 
