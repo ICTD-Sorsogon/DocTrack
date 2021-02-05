@@ -294,7 +294,7 @@ export default {
     },
     watch: {
         destination(value) {
-            if(typeof value[value.length - 1] != 'object'){
+            if(typeof value[value.length - 1] != 'object' && value.length > 1){
                this.$nextTick(() => this.destination.pop())
             }
         }
