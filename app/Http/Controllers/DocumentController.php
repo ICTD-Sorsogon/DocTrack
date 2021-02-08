@@ -50,6 +50,7 @@ class DocumentController extends Controller
         try {
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $request->id;
+            $tracking_record->destination = $request->destination_office_id;
             $tracking_record->action = 'received';
             $tracking_record->through = $request->through;
             $tracking_record->approved_by = $request->approved_by;
@@ -57,7 +58,6 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            $tracking_record->document->update(['status' => 'received']);
 
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id,$request,null,null, 'receive'));
@@ -89,7 +89,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'forwarded']);
-            $tracking_record->document->update(['destination_office_id' => $request->forwarded_to]);
+            $tracking_record->document->update(['acknowledged' => false]);
 
 
             $user_id = Auth::user()->id;
@@ -155,6 +155,7 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
+            $tracking_record->document->update(['acknowledged' => true]);
             $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
             $user_id = Auth::user()->id;
