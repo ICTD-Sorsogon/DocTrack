@@ -69,7 +69,7 @@ export default {
             .map(doc => {
               if(this.tab==0){
                 let id = doc.destination_office_id[0].id
-                doc.recieved = doc.tracking_records.find(record => record.destination == id )
+                doc.received = doc.tracking_records.find(record => record.destination == id && record.action == 'received' )
               }
               return doc
             })
