@@ -80,6 +80,7 @@ class DocumentsTableSeeder extends Seeder
         }
     }
 
+    
     private function buildTrackingNumber($source, $office_code, $attachment)
     {
         $origin = $source ? 'E' : 'I';
