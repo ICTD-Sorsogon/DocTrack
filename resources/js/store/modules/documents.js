@@ -10,7 +10,6 @@ const state = {
     selected_document: {},
     id: '',
     tracking_reports: [],
-
 }
 
 const getters = {
