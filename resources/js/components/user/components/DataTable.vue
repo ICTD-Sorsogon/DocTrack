@@ -81,7 +81,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="isAdmin || item.status == 'received'">
+					<v-col v-if="isAdmin || item.received">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
