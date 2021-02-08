@@ -10,6 +10,7 @@ describe('Document Flow', () => {
         cy.contains('Salary').parent().click()
 		cy.contains('Destination Office').parent().click()
 		cy.contains('Office of the Vice Governor').parent().click()
+        cy.get(':nth-child(4) > :nth-child(1) > .v-input > .v-input__control > .v-input__slot > .v-select__slot > :nth-child(4) > .v-input__icon > .v-icon ').click({force: true})
 		cy.contains('Sender Name').parent().type('Cypress test')
 		cy.contains('Page Count').parent().type(20)
 		cy.contains('Attachment').parent().type(10)
@@ -24,7 +25,7 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('.row > :nth-child(4) > .v-btn').click() // acknowledge document
+        cy.get('.row > :nth-child(3) > .v-btn').click() // acknowledge document
         cy.get(':nth-child(5) > :nth-child(1) > .v-input > .v-input__control > .v-input__slot')
         .click().type('High').type('{enter}')
         cy.contains('Remarks').parent().type('LGMT')
