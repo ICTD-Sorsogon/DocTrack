@@ -105,6 +105,7 @@ export default {
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("unsetDataTableLoader");
+    this.$store.dispatch("getAllUsers");
   },
 };
 </script>
