@@ -93,12 +93,12 @@
                            <v-select
                                 v-model="filterOptionSelected"
                                 :items="filterOptionList"
-                                label="Select Record"
+                                label="FILTER BY:"
                                 dense
                                 outlined
                                 class="mx-4"
                                 filled
-                                @change="filterChange(false, false)"
+                                @change="filterBy"
                             ></v-select>
                             <v-divider class=" mt-0" inset vertical dense/>
                        </v-col>
@@ -410,7 +410,9 @@
                     </td>
                 </template>-->
 
-
+                <v-alert slot="no-results" :value="true" type="error" icon="mdi-alert" align="left">
+                    Your search for "{{ search }}" found no results.
+                </v-alert>
             </v-data-table>
             <table-modal
                 @closeDialog="closeDialog('dialog')"
@@ -583,8 +585,8 @@
                 table: [],
                 distinctYearFromDB:[],
                 filterYearSelected: [new Date().getFullYear().toString()],
-                filterOptionList: ["By Date Range", "By Year"],
-                filterOptionSelected: "By Date Range",
+                filterOptionList: ["Date", "Year"],
+                filterOptionSelected: "Date",
                 isByYear: false
             }
         },
@@ -606,19 +608,21 @@
                 get: function () {
                     //console.log('ll:' + this.documentsArchive)
                     console.log('getter');
-                    return JSON.parse(JSON.stringify( this.documentsArchive[0].data)).map(doc=>{
-                        doc.is_external = doc.is_external ? 'External' : 'Internal'
-                        doc.sender_name = doc.sender?.name ?? doc.sender_name
-                        doc.originating_office = doc.origin_office?.name ?? doc.originating_office
-                        doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
+                    if (this.documentsArchive.length) {
+                        return JSON.parse(JSON.stringify( this.documentsArchive[0].data)).map(doc=>{
+                            doc.is_external = doc.is_external ? 'External' : 'Internal'
+                            doc.sender_name = doc.sender?.name ?? doc.sender_name
+                            doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                            doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
 
-                        const year = new Date(doc.created_at).getFullYear().toString()
-                        if(!this.distinctYearFromDB.includes(year)){
-                            this.distinctYearFromDB.push(year);
-                        }
+                            const year = new Date(doc.created_at).getFullYear().toString()
+                            if(!this.distinctYearFromDB.includes(year)){
+                                this.distinctYearFromDB.push(year);
+                            }
 
-                        return doc
-                    })
+                            return doc
+                        })
+                    }
                 },
                 set: function (data) {
                     console.log('setter')
@@ -638,7 +642,9 @@
                 }
             },
             selected_document() {
-                return this.extendedData.find(data=>data.id == this.activeDoc)
+                if (this.documentsArchive.length) {
+                    return this.extendedData.find(data=>data.id == this.activeDoc)
+                }
             },
             allData () {
                 //console.log('compare:' + this.filterYearSelected.length === this.distinctYearFromDB.length);
@@ -662,7 +668,40 @@
             }*/
         },
         methods: {
+            filterBy(){
+
+                const text = this.filterOptionSelected
+                const payload = {}
+                payload.action = "update"
+                payload.filterBy = text
+
+                if (this.filterOptionSelected == "Year") {
+                    this.isByYear = true
+
+                    payload.year = { list: this.filterYearSelected }
+                } else {
+                    this.isByYear = false
+
+                    payload.date = { list: [this.filterDateFrom, this.filterDateTo] }
+                }
+                this.$store.dispatch('getArchiveDocuments', payload)
+
+            },
+            loadData(){},
             filterChange(isYearChange, isDateRangeChane){
+                const text = this.filterOptionSelected
+                const payload = {}
+
+                payload.action = "update"
+                payload.filterBy = text
+                if (isYearChange) {
+                    payload.year = { list: this.filterYearSelected }
+                } else {
+                    payload.date = { list: [this.filterDateFrom, this.filterDateTo] }
+                }
+
+                this.$store.dispatch('getArchiveDocuments', payload)
+
                // console.log(this.filterOptionSelected, ...this.filterYearSelected)
 
                /* console.log(
@@ -670,10 +709,7 @@
                     this.filterYearSelected.includes(new Date(this.filterDateTo).getFullYear().toString())
                 )
                 console.log(new Date(this.date).getFullYear().toString(), new Date(this.filterDateTo).getFullYear().toString());*/
-                const filterSelected = {
-                    filterBy: this.filterOptionSelected,
-                    filterSelected: []
-                }
+
 
                 /*const filterSelected_33 = {
                     mutateStateStatus: '',
@@ -689,63 +725,33 @@
                     }
                 }*/
 
+                /*const filterSelected = {
+                    filterBy: this.filterOptionSelected,
+                    filterSelected: []
+                }
                 const dateFromYear = new Date(this.filterDateFrom).getFullYear().toString();
                 const dateToYear = new Date(this.filterDateTo).getFullYear().toString();
-
                 const isInState = this.filterYearSelected.includes(dateFromYear) && this.filterYearSelected.includes(dateToYear);
-
-
-
-
                 if(this.filterOptionSelected == 'By Date Range'){
 
                     this.isByYear = false
                     if (isDateRangeChane || !isInState) {
-                        /*console.log('date change')
-                        //filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
-                        //filterSelected.data = this.extendedData
-
-                        filterSelected.mutateStateStatus = 'updatestate'
-                        filterSelected.getDataFrom = 'db'
-                        filterSelected.filterBy = this.filterOptionSelected
-                        filterSelected.filterSelectedDateRange = [this.filterDateFrom, this.filterDateTo]
-
-                        this.$store.dispatch('getArchiveDocuments', filterSelected)*/
-
                         this.filterChangeFetch(false, true)
-
-                        //this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);
                     } else {
                         if(isInState){
                             console.log(Math.floor(Math.random() * Math.floor(10)) + ': ins state')
-                            /*console.log('get data from state : state match');
-                            filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
-                            filterSelected.data = this.extendedData*/
                             this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', {
                                 filterBy: this.filterOptionSelected,
                                 getDataFrom: 'backup',
                                 filterSelectedDateRange: [this.filterDateFrom, this.filterDateTo]
                             });
-                        }/*else{
-                            filterSelected.filterSelected = [this.filterDateFrom, this.filterDateTo]
-                            console.log('fetch data from db : state did not match');
-                            this.$store.dispatch('getArchiveDocuments', filterSelected);
-
-                            this.filterChangeFetch(false, true)
-
-                        }*/
+                        }
                     }
                 }else if(this.filterOptionSelected == 'By Year'){
                     this.isByYear = true
                     //this.$store.dispatch('getArchiveDocuments', this.filterYearSelected);
                     if (isYearChange || !isInState) {
-                        /*console.log('change year', this.filterYearSelected);
-                        filterSelected.filterSelected = this.filterYearSelected
-                        filterSelected.data = this.extendedData
-                        this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);*/
-
                         this.filterChangeFetch(true, false)
-
                     } else {
                         if(isInState){
                             console.log(Math.floor(Math.random() * Math.floor(10)) + ':in state')
@@ -756,20 +762,9 @@
                                 getDataFrom: 'backup',
                                 filterSelectedYear: this.filterYearSelected
                             });
-                            /*console.log('2get data from state : state match');
-                            filterSelected.filterSelected = this.filterYearSelected
-                            filterSelected.data = this.extendedData
-                            this.$store.commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelected);*/
-                        }/*else{
-                            filterSelected.filterSelected = this.filterYearSelected
-                            console.log('2fetch data from db : state did not match');
-                            this.$store.dispatch('getArchiveDocuments', filterSelected);
-
-                            this.filterChangeFetch(true, false)
-
-                        }*/
+                        }
                     }
-                }
+                }*/
 
             },
             filterChangeFetch(isYearChange, isDateRangeChane){

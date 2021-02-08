@@ -40,6 +40,20 @@ const actions = {
     },
     getArchiveDocuments({ commit }, filter) {
 
+
+
+        axios.post(`/api/get_archive_documents`, (
+            (filter.filterBy == 'Year')? {selected: filter.year.list, filterBy: 'Year'} : {selected: filter.date.list, filterBy: 'Date'}
+        )).then(response => {
+
+            const data = response.data
+            //console.log({...filter, data})
+            //commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data});
+
+            console.log(response)
+
+        })
+
         /*mutateStateStatus:             response.mutateStateStatus = 'createstate || updatestate'
         getDataFrom:                   response.getDataFrom = "backup || db || none"
 
@@ -66,7 +80,7 @@ const actions = {
                 data: [...response.backup.data]
             }
         }*/
-        console.log('filter here');
+        /*console.log('filter here');
         console.log(filter);
 
         const filterSelectedAndResponse = {
@@ -122,16 +136,11 @@ const actions = {
         //commit('GET_ALL_ARCHIVE_DOCUMENTS', filterSelectedAndResponse);
 
 
-        //console.log(response)
-        /*const filterSelectedAndResponse = {
-            filterBy: filter.filterBy,
-            filterSelected: filter.filterSelected,
-            data: response.data
-        }*/
+
 
         console.log('---document dispatch payload')
         console.log(filterSelectedAndResponse);
-        console.log('---')
+        console.log('---')*/
 
 
 
@@ -294,6 +303,59 @@ const mutations = {
 
         console.log('MUTATE SUCCESS')
 
+        /*{
+            year: [],
+            selected: {
+                date: {
+                    text: ''
+                    list: []
+                    data: []
+                },
+                year: {
+                    text: ''
+                    list: [],
+                    data: []
+                }
+            }
+        }*/
+
+        //console.log(response)
+
+
+        /*if (response.action == "new") {
+            state.documentsArchive = []
+            state.documentsArchive.push({
+                year: [new Date().getFullYear().toString()],
+                selected: {
+                    date: {
+                        text: 'Date',
+                        list: [
+                            new Date().toISOString().substr(0, 10),
+                            new Date().toISOString().substr(0, 10)
+                        ],
+                        data: [response.data]
+                    },
+                    year: {
+                        text: 'Year',
+                        list: [new Date().getFullYear().toString()],
+                        data: []
+                    }
+                }
+            })
+        } else {
+            if (response.filterBy == 'Year') {
+                state.documentsArchive[0].selected.year.text = response.filterBy
+                state.documentsArchive[0].selected.year.list = response.year.list
+                state.documentsArchive[0].selected.year.data = response.data
+            } else {
+                state.documentsArchive[0].selected.date.text = response.filterBy
+                state.documentsArchive[0].selected.date.list = response.date.list
+                state.documentsArchive[0].selected.date.data = response.data
+            }
+        }*/
+
+        //console.log(state.documentsArchive)
+
         //state.documentsArchive = []
 
 
@@ -313,9 +375,24 @@ const mutations = {
                                             filterSelected: [],
                                             data: []
                                        }*/
+        /*{
+            year: [],
+            selected: {
+                date: {
+                    text: ''
+                    list: []
+                    data: []
+                },
+                year: {
+                    text: ''
+                    list: [],
+                    data: []
+                }
+            }
+        }*/
 
 
-        if (response.mutateStateStatus == 'createstate') {
+        /*if (response.mutateStateStatus == 'createstate') {
             state.documentsArchive = []
             state.documentsArchive.push({
                 //mutateStateStatus: response.mutateStateStatus,
@@ -371,7 +448,7 @@ const mutations = {
             }
 
 
-        }
+        }*/
 
 
 

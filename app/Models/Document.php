@@ -101,15 +101,21 @@ class Document extends Model
         $isNotEmpty = (count($request->selected) > 0)?true:false;
         $selected = $request->selected;
 
-        //dd($request->selected);
-        $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')
-                    ->onlyTrashed();
+        //$document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')->onlyTrashed();
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records'])->onlyTrashed();
 
-        if($user->isUser()){
-            $document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+        if ($user->isUser()) {
+            //$document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+           // $document->whereRaw("((json_contains(`destination_office_id`, {$user->office_id}) AND acknowledged = 1) OR originating_office = {$user->office_id} )");
+
+            //$document->whereJsonContains('destination_office_id', $user->office_id)->where('acknowledged', 1)->orWhere('originating_office', $user->office_id);
+            //$year = $document->select(Document::raw('YEAR(created_at) as year'))->whereNotNull('created_at')->distinct();
+        } else {
+            //$year = $document->select(Document::raw('YEAR(created_at) as year'))->whereNotNull('created_at')->distinct();
         }
 
-        //$document->whereBetween('created_at', [$from, $to])
+        //$year = $year->get()->pluck('year');
+        $year = [2019, 2020];
 
         if ($isNotEmpty) {
             $document->when(!$isByYear, function ($query) use ($selected) {
@@ -119,6 +125,18 @@ class Document extends Model
                     });
         }
 
-        return $document->orderBy('created_at', 'DESC')->get();
+       // return $document->orderBy('created_at', 'DESC')->get();
+
+       $docu = $document->orderBy('created_at', 'DESC')->get();
+       //$ff->header(year = [2018, 2020];
+       //return $ff;
+
+        return response()->json(
+           [
+               'data' => $docu,
+               'year' => $year
+            ]
+        );
+
     }
 }
