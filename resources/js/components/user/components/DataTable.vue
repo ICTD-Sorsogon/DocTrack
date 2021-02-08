@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="!isEditable(item) && item.status != 'received'">
+					<v-col v-if="!isEditable(item) && !item.recieved ">
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>

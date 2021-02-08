@@ -18,7 +18,7 @@ class Document extends Model
         'tracking_code', 'subject', 'document_type_id',
         'destination_office_id', 'current_office', 'sender_name',
         'page_count', 'date_filed', 'is_terminal', 'is_external',
-        'remarks', 'attachment_page_count', 'status', 'priority_level'
+        'remarks', 'attachment_page_count', 'status', 'priority_level','acknowledged'
     ];
 
     protected $dispatchesEvents = [

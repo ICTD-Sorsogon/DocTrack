@@ -64,7 +64,15 @@ export default {
         ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
         userDocuments() {
             let type = this.tab ? 'originating_office' : 'destination_office_id'
-            return JSON.parse(JSON.stringify(this.documents)).filter( doc => this.tab ? doc[type] == this.auth_user.office_id : doc['originating_office'] != this.auth_user.office_id  )
+            return JSON.parse(JSON.stringify(this.documents))
+            .filter( doc => this.tab ? doc[type] == this.auth_user.office_id : doc['originating_office'] != this.auth_user.office_id )
+            .map(doc => {
+              if(this.tab==0){
+                let id = doc.destination_office_id[0].id
+                doc.recieved = doc.tracking_records.find(record => record.destination == id )
+              }
+              return doc
+            })
         },
     },
     methods: {
@@ -105,6 +113,7 @@ export default {
   mounted() {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("unsetDataTableLoader");
+    this.$store.dispatch("getAllUsers");
   },
 };
 </script>
