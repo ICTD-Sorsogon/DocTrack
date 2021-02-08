@@ -17,6 +17,7 @@ class DocumentEvent implements ShouldBroadcast
 
     public $user;
     public $document;
+    public $broadcastMe = [];
     /**
      * Create a new event instance.
      *
@@ -26,8 +27,12 @@ class DocumentEvent implements ShouldBroadcast
     {
         $this->document = $document instanceof Document ? $document : Document::find($document);
         $this->user = Auth()->user();
+
+        extract(get_object_vars($document));
+        foreach($document->destination_office_id as $office){
+            array_push($this->broadcastMe, new Channel('documents'.$office->id));
+        }
         
-        extract(get_object_vars($this->document));
     }
     /**
      * Get the channels the event should broadcast on.
@@ -36,6 +41,8 @@ class DocumentEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('documents'.$this->document->office_id);
+
+        // return [ new Channel('documents'.$this->document->office_id) ];
+        return $this->broadcastMe;
     }
 }
