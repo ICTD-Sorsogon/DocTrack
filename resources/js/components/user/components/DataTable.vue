@@ -59,7 +59,7 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item) && item.acknowledged">
+					<v-col v-if="isEditable(item) && !item.acknowledged">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="!isEditable(item) && item.status != 'received'">
+					<v-col v-if="!isEditable(item) && !item.received ">
 						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
 						>
 							<v-icon left>

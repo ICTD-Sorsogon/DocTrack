@@ -30,6 +30,7 @@ const getters = {
     logs: state => state.logs,
     notifs: state => state.notifs,
     is_admin: state => state.user.role_id == 1,
+    find_user: ({all_users}) => (id) => all_users.find(user => user.id == id),
 }
 
 const actions = {
