@@ -66,6 +66,7 @@ class UserController extends Controller
             $user->is_active = $request->is_active;
             $user->username = $request->username;
             $user->password = Hash::make($request->password);
+            $user->avatar = 'images/defaultpic.jpg';
             $user->save();
         } catch (ValidationException $error) {
             DB::rollback();

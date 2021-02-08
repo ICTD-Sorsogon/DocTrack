@@ -162,6 +162,11 @@
         <v-avatar v-else>
             <img :src="image_source" alt="profile_picture">
         </v-avatar>
+        <router-link to="/account_settings">
+            <v-avatar>
+                <img :src="image_source" alt="profile_picture">
+            </v-avatar>
+        </router-link>
 
         <v-progress-linear
             :active="page_loader"

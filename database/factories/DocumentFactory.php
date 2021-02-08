@@ -40,7 +40,7 @@ class DocumentFactory extends Factory
             'priority_level' => rand(1,3),
             'page_count' => rand(1, 50),
             'acknowledged' => rand(0,1),
-            'status' => $status[rand(0,7)],
+            'status' => $status[rand(0,6)],
             'remarks' => $this->faker->realText(100),
             'attachment_page_count' => rand(1, 50),
         ];
