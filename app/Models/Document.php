@@ -90,6 +90,7 @@ class Document extends Model
 
         if($user->isUser()){
             $document->whereRaw("((json_contains(`destination_office_id`, {$user->office_id}) AND acknowledged = 1) OR originating_office = {$user->office_id} )");
+            // $document->whereJsonContains('destination_office_id', $user->office_id)->where('acknowledged', 1)->orWhere('originating_office', $user->office_id);
         }
 
         return $document->orderBy('created_at', 'DESC')->get();

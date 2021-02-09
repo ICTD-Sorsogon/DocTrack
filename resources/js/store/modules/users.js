@@ -223,22 +223,6 @@ const actions = {
         });
     },
 
-    async getNotifs({ commit }) {
-        await axios.get('/api/notifs')
-        .then(response =>{
-            commit('GET_NOTIFS', response.data.data);
-        })
-        .catch(error => {
-            var snackbar_error ={
-                message: error.response.data.errors,
-                status: 'error',
-                title: error.response.data.message,
-                type: 'error'
-            };
-            commit('SNACKBAR_STATUS', snackbar_error);
-        });
-    },
-
     async getNotifs({ commit, state }) {
         await axios.get('/api/notifs')
         .then(response =>{
