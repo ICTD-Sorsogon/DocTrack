@@ -56,22 +56,21 @@ export default {
         // in b/w transaction by checking previous last_touched
         all_documents(){
             let documents = JSON.parse(JSON.stringify(
-                this.$store.state.documents.tracking_reports
+                this.$store.state.documents.documents
             ));
 
-            documents.forEach(document => {
-                var temp = 0;
-                document.diff = [];
-                document.senderDelayed = 0;
-                document.receiverDelayed = 0;
-                document.docketDelayed = 0;
-                document.tracking_records.forEach(tracking => {
-                    document.diff.push({action:tracking.action,last_touched:tracking.last_touched,office:tracking.user.office.name});
-                });
-                // console.log(document)
-            });
-            console.log(documents);
-            // return documents;
+            // documents.forEach(document => {
+            //     var temp = 0;
+            //     document.diff = [];
+            //     document.senderDelayed = 0;
+            //     document.receiverDelayed = 0;
+            //     document.docketDelayed = 0;
+            //     document.tracking_records.forEach(tracking => {
+            //         document.diff.push({action:tracking.action,last_touched:tracking.last_touched,office:tracking.user.office.name});
+            //     });
+            // });
+            console.log(documents)
+            return documents;
         },
         // all_documents(){
         //     let offices = JSON.parse(JSON.stringify(

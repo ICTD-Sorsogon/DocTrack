@@ -1,6 +1,5 @@
 import axios from "axios";
 
-var test='';
 const state = {
     types: '',
     allDocuments: [],
