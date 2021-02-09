@@ -50,7 +50,7 @@ class DocumentController extends Controller
         try {
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $request->id;
-            $tracking_record->destination = $request->destination_office_id;
+            $tracking_record->destination = $request->destination;
             $tracking_record->action = 'received';
             $tracking_record->through = $request->through;
             $tracking_record->approved_by = $request->approved_by;
@@ -88,8 +88,13 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            $tracking_record->document->update(['status' => 'forwarded']);
-            $tracking_record->document->update(['acknowledged' => false]);
+           
+            $destination = json_decode($tracking_record->document->destination_office_id);
+
+            array_push($destination,$request->forwarded_to);
+            $tracking_record->document->update(['status' => 'forwarded', 
+                'destination_office_id' => $destination, 
+                'acknowledged' => false]);
 
 
             $user_id = Auth::user()->id;

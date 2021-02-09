@@ -26,9 +26,13 @@ class Document extends Model
         'deleting' => DocumentEvent::class,
     ];
 
-    public function getDestinationOfficeIdAttribute($value)
+    protected $hidden = ['destination_office_id'];
+
+    protected $appends = ['destination'];
+
+    public function getDestinationAttribute()
     {
-        $value = auth()->user()->can('update', $this) ? json_decode($value) : [auth()->user()->office->id];
+        $value = auth()->user()->can('update', $this) ? json_decode($this->attributes['destination_office_id']) : [auth()->user()->office->id];
         return Office::whereIn('id', $value)->get();
     }
 

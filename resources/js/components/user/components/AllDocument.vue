@@ -68,7 +68,7 @@ export default {
             .filter( doc => this.tab ? doc[type] == this.auth_user.office_id : doc['originating_office'] != this.auth_user.office_id )
             .map(doc => {
               if(this.tab==0){
-                let id = doc.destination_office_id[0].id
+                let id = doc.destination[0].id
                 doc.received = doc.tracking_records.find(record => record.destination == id && record.action == 'received' )
               }
               return doc

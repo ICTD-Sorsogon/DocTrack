@@ -266,13 +266,13 @@
       >
         <v-timeline-item
           small
-          v-for=" {id, created_at, action, remarks, touched_by} in tracking_records"
+          v-for=" {id, date_filed, action, remarks, touched_by} in tracking_records"
           :color="dotColor(action)"
           :key="id"
         >
           <v-row class="pt-1">
             <v-col cols="3">
-              <strong>{{ created_at }}</strong>
+              <strong>{{ date_filed }}</strong>
             </v-col>
             <v-col>
               <strong>{{ action.toUpperCase() }}</strong>

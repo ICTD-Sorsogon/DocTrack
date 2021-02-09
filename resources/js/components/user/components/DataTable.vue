@@ -46,10 +46,10 @@
 				</v-btn>
 			</td>
 		</template>
-		<template v-slot:[`item.destination_office_id`]="{ item }">
-				<v-tooltip :key="destination.office_code" v-for="destination in item.destination_office_id" top>
+		<template v-slot:[`item.destination`]="{ item }">
+				<v-tooltip :key="destination.office_code" v-for="destination in item.destination" top>
 					<template v-slot:activator="{ on, attrs }">
-						<v-chip color="primary" v-bind="attrs" v-on="on" :x-small="item.destination_office_id.length > 1" >
+						<v-chip color="primary" v-bind="attrs" v-on="on" :x-small="item.destination.length > 1" >
 							{{destination.office_code}}
 						</v-chip>
 					</template>
@@ -81,7 +81,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="isAdmin || item.status == 'received'">
+					<v-col v-if="isAdmin || item.received">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
 						>
@@ -153,7 +153,7 @@ export default {
                 { text: 'Source', value: 'is_external', sortable: false },
                 { text: 'Type', value: 'document_type.name', sortable: false },
                 { text: 'Originating Office', value: 'originating_office', sortable: false },
-                { text: 'Destination Office', value: 'destination_office_id', sortable: false },
+                { text: 'Destination Office', value: 'destination', sortable: false },
                 { text: 'Sender', value: 'sender_name', sortable: false },
                 { text: 'Priority Level', value: 'priority_level', sortable: false },
                 { text: 'View More', value: 'view_more', sortable: false },
