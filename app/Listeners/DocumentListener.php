@@ -31,16 +31,19 @@ class DocumentListener
     public function handle(DocumentEvent $event)
     { 
         extract(get_object_vars($event));
-        foreach($document->destination_office_id as $office){
-            TrackingRecord::create([
-                'action' => 'created',
-                'destination' => $office->id,
-                'document_id' => $document->id,
-                'touched_by' => auth()->user()->id,
-                'remarks' => $document->remarks,
-                'last_touched' => Carbon::now()
-            ]);
-        };
+
+        if($document->wasRecentlyCreated){
+            foreach($document->destination as $office){
+                TrackingRecord::create([
+                    'action' => 'created',
+                    'destination' => $office->id,
+                    'document_id' => $document->id,
+                    'touched_by' => auth()->user()->id,
+                    'remarks' => $document->remarks,
+                    'last_touched' => Carbon::now()
+                ]);
+            };
+        }
         // return false;
         // $type = ['edited', 'created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
         // $message = 'Document has been successfully';
