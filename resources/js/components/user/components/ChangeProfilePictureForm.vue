@@ -1,12 +1,12 @@
 <template>
     <div>
         <v-col align="center" justify="end">
-            <v-img max-height="150" max-width="250" :src="url"></v-img>
+            <v-img max-height="350" max-width="450" :src="url"></v-img>
         </v-col>
 
         <ValidationObserver ref="observer" v-slot="{ valid }">
             <v-col cols="12" xl="12" lg="12" md="12" align="center">
-            <ValidationProvider rules="required|size:1000" v-slot="{ errors, valid }">
+            <ValidationProvider rules="required|size:3000" v-slot="{ errors, valid }">
                 <v-file-input
                     show-size
                     :clearable="false"

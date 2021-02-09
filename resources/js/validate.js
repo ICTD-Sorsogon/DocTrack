@@ -3,7 +3,7 @@ import { required, email, max, min, confirmed, alpha_spaces, numeric, size } fro
 
 extend ('size', {
     ...size,
-    message: 'Avatar size should be less than 1 MB!'
+    message: 'Avatar size should be less than 3 MB!'
   });
 
 extend ('required', {
