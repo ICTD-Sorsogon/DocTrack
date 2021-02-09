@@ -35,6 +35,7 @@ class DocumentController extends Controller
         //dd('dd muna', $documents);
         //$documents = new Document;
         //dd($request->all());
+        //dd($request);
         return $documents->allDocumentsArchive(Auth::user(), $request);
     }
 

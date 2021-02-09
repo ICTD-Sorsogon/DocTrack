@@ -42,15 +42,20 @@ const actions = {
 
 
 
+
         axios.post(`/api/get_archive_documents`, (
             (filter.filterBy == 'Year')? {selected: filter.year.list, filterBy: 'Year'} : {selected: filter.date.list, filterBy: 'Date'}
         )).then(response => {
 
-            const data = response.data
-            //console.log({...filter, data})
-            //commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data});
+            const data = response.data.data
+            filter.yearFromDb = response.data.year
 
-            console.log(response)
+
+            //console.log({...filter, data})
+            //console.log(response)
+            commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data});
+
+            //console.log(response)
 
         })
 
@@ -321,19 +326,18 @@ const mutations = {
 
         //console.log(response)
 
+        const yearList = response.yearFromDb.map(String)
 
-        /*if (response.action == "new") {
+        if (response.action == "new") {
             state.documentsArchive = []
             state.documentsArchive.push({
-                year: [new Date().getFullYear().toString()],
+                year: yearList,
                 selected: {
+                    filter: 'Date',
                     date: {
                         text: 'Date',
-                        list: [
-                            new Date().toISOString().substr(0, 10),
-                            new Date().toISOString().substr(0, 10)
-                        ],
-                        data: [response.data]
+                        list: [ new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10) ],
+                        data: response.data
                     },
                     year: {
                         text: 'Year',
@@ -343,16 +347,20 @@ const mutations = {
                 }
             })
         } else {
+            state.documentsArchive[0].year = []
+            state.documentsArchive[0].year = yearList
             if (response.filterBy == 'Year') {
+                state.documentsArchive[0].selected.filter = response.filterBy
                 state.documentsArchive[0].selected.year.text = response.filterBy
                 state.documentsArchive[0].selected.year.list = response.year.list
                 state.documentsArchive[0].selected.year.data = response.data
             } else {
+                state.documentsArchive[0].selected.filter = response.filterBy
                 state.documentsArchive[0].selected.date.text = response.filterBy
                 state.documentsArchive[0].selected.date.list = response.date.list
                 state.documentsArchive[0].selected.date.data = response.data
             }
-        }*/
+        }
 
         //console.log(state.documentsArchive)
 
