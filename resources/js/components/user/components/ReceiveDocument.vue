@@ -411,7 +411,7 @@ export default {
             this.documentDialog = false
         },
         sanitize() {
-            this.form.destination_office_id = this.form.destination_office_id[0].id
+            this.form.destination = this.form.destination[0].id
         },
         receiveDocumentConfirm() {
             this.btnloading = true;
