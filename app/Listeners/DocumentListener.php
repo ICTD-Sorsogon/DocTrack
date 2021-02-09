@@ -86,21 +86,22 @@ class DocumentListener
 
         // }
 
-
             $destinationOffce = '';
-            foreach ($document->destination_office_id as $myoffice) {
-                $destinationOffce .= $myoffice->name . ', ';
+            $document_length = count(json_decode($document->destination_office_id));
+
+            for($index = 0; $index < $document_length; $index++){
+                $destinationOffce .= json_decode($document->destination)[$index]->name . ', ';
             }
 
-            $data_object = (object) array(
-                'subject' => $document->subject,
-                'sender_name' => $document->sender_name,
-                'remarks' => $document->remarks,
-                'attachment_page_count' => $document->attachment_page_count,
-                'destination_office_id' => $destinationOffce,
-                'document_type_id' => $document->document_type_id,
-                'page_count' => $document->page_count,
-            );
+                $data_object = (object) array(
+                    'subject' => $document->subject,
+                    'sender_name' => $document->sender_name,
+                    'remarks' => $document->remarks,
+                    'attachment_page_count' => $document->attachment_page_count,
+                    'destination_office_id' => $destinationOffce,
+                    'document_type_id' => $document->document_type_id,
+                    'page_count' => $document->page_count,
+                );
 
 
                 $subject = $document->subject;
