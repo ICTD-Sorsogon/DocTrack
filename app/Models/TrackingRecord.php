@@ -22,9 +22,9 @@ class TrackingRecord extends Model
         'date_filed'
     ];
 
-    public function getDateFiledAttribute($value)
+    public function getDateFiledAttribute()
     {
-        return Carbon::parse($value)->diffForHumans();
+        return Carbon::parse($this->attributes['created_at'])->diffForHumans();
     }
 
     public function user()
