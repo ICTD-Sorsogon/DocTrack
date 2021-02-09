@@ -41,13 +41,13 @@ export default {
                     align: 'start',
                     value: 'name',
                 }
-                // ,
-                // { text: 'All Transaction', value: 'transaction_count' },
-                // { text: 'Delayed Document', value: 'delayed' },
+                ,
+                { text: 'All Transaction', value: 'transaction_count' },
+                { text: 'Delayed Document',  },
                 // { text: 'Fastest Transaction', value: 'fastestTransaction' },
                 // { text: 'Slowest Transaction', value: 'longestDelay' },
-                // { text: 'Average Transaction Speed', value: 'speed' },
-                // { text: 'Efficiency Rating', value: 'efficiency' },
+                { text: 'Average Transaction Speed', value: 'speed' },
+                { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
     },
@@ -55,22 +55,30 @@ export default {
         //TOFIX elapse time for fastest and longest transaction should check
         // in b/w transaction by checking previous last_touched
         all_documents(){
-            let documents = JSON.parse(JSON.stringify(
-                this.$store.state.documents.documents
+            let data = JSON.parse(JSON.stringify(
+                this.$store.state.documents.allDocuments
             ));
 
-            // documents.forEach(document => {
-            //     var temp = 0;
-            //     document.diff = [];
-            //     document.senderDelayed = 0;
-            //     document.receiverDelayed = 0;
-            //     document.docketDelayed = 0;
-            //     document.tracking_records.forEach(tracking => {
-            //         document.diff.push({action:tracking.action,last_touched:tracking.last_touched,office:tracking.user.office.name});
-            //     });
-            // });
-            console.log(documents)
-            return documents;
+            data.forEach(document => {
+                var temp = 0;
+                document.diff = [];
+                document.senderDelayed = 0;
+                document.receiverDelayed = 0;
+                document.docketDelayed = 0;
+                // document.documents.forEach(el => {
+                //     console.log(el);
+                // });
+                // for (var i = 1; i < document.documents.length; i++) {
+                //     console.log(document.documents[i])
+                // }
+                // console.log(document.documents[211])
+                // console.log(document.documents)
+                document.documents.forEach(tracking => {
+                    document.diff.push({action:tracking.action,last_touched:tracking.last_touched,office:tracking.user.office.name});
+                });
+            });
+            console.log(data);
+            return data;
         },
         // all_documents(){
         //     let offices = JSON.parse(JSON.stringify(
