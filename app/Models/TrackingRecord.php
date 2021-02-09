@@ -18,7 +18,11 @@ class TrackingRecord extends Model
         'forwarded_by', 'forwarded_to', 'remarks','destination'
     ];
 
-    public function getCreatedAtAttribute($value)
+    protected $appends = [
+        'date_filed'
+    ];
+
+    public function getDateFiledAttribute($value)
     {
         return Carbon::parse($value)->diffForHumans();
     }
