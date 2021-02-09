@@ -25,7 +25,7 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('.row > :nth-child(3) > .v-btn').click() // acknowledge document
+        cy.get('.row > :nth-child(4) > .v-btn').click() // acknowledge document
         cy.get(':nth-child(5) > :nth-child(1) > .v-input > .v-input__control > .v-input__slot')
         .click().type('High').type('{enter}')
         cy.contains('Remarks').parent().type('LGMT')
