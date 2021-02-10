@@ -28,8 +28,8 @@ class DocumentListener
      * @return void
      */
     public function handle(DocumentEvent $event)
-    { 
-        
+    {
+
         extract(get_object_vars($event));
         if($document->wasRecentlyCreated){
             foreach($document->destination as $office){
@@ -49,8 +49,8 @@ class DocumentListener
 
 
 
-        
-        switch($event->type){
+
+        /*switch($event->type){
             case 'create':
                 $subject = $event->request_obj->subject;
                 $data = json_encode($event->request_obj);
@@ -138,6 +138,6 @@ class DocumentListener
                 $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.'. and approved by: '.$approved_by.' and remarks: '.$remarks;
                 return $log->save();
             break;
-        }
+        }*/
     }
 }

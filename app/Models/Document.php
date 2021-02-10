@@ -101,9 +101,7 @@ class Document extends Model
 
     public static function allDocumentsArchive(User $user, $request)
     {
-
         $isByYear = ($request->filterBy == 'Year')?true:false;
-        //$isNotEmpty = (count($request->selected) > 0)?true:false;
         $selected = $request->selected;
 
         $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')->onlyTrashed();
@@ -111,49 +109,22 @@ class Document extends Model
 
         if ($user->isUser()) {
             //$document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
-           // $document->whereRaw("((json_contains(`destination_office_id`, {$user->office_id}) AND acknowledged = 1) OR originating_office = {$user->office_id} )");
-
             //$document->whereJsonContains('destination_office_id', $user->office_id)->where('acknowledged', 1)->orWhere('originating_office', $user->office_id);
-            //$year = $document->select(Document::raw('YEAR(created_at) as year'))->whereNotNull('created_at')->distinct();
-        } /*else {
-            //$year = $document->select(Document::raw('YEAR(created_at) as year'))->whereNotNull('created_at')->distinct();
-        }*/
+        }
 
+        $document->when(!$isByYear, function ($query) use ($selected) {
+                    return $query->whereBetween('created_at', [$selected[0].' 00:00:00', $selected[1].' 23:59:59']);
+                })->when($isByYear, function ($query) use ($selected) {
+                    return $query->whereIn(Document::raw('YEAR(`created_at`)'), $selected);
+                });
 
-        //if ($isNotEmpty) {
-            $document->when(!$isByYear, function ($query) use ($selected) {
-                        //return $query->whereBetween('created_at', $selected);
-                        return $query->whereBetween('created_at', [$selected[0].' 00:00:00', $selected[1].' 23:59:59']);
-                    })->when($isByYear, function ($query) use ($selected) {
-                        return $query->whereIn(Document::raw('YEAR(`created_at`)'), $selected);
-                    });
-       // }
-        //dd($document->get());
-       // return $document->orderBy('created_at', 'DESC')->get();
-
-       $docu = $document->orderBy('created_at', 'DESC')->get();
-       //$ff->header(year = [2018, 2020];
-       //return $ff;
-
+        $docu = $document->orderBy('created_at', 'DESC')->get();
         $year = static::select(Document::raw('YEAR(created_at) as year'))
             ->onlyTrashed()
             ->distinct()
             ->get()
             ->pluck('year');
 
-       return response()->json(
-           [
-               'data' => $docu,
-               'year' => $year
-            ]
-        );
-        //dd($request);
-        /* dd(response()->json(
-            [
-                'data' => $docu,
-                'year' => $year
-             ]
-            ));*/
-
+        return response()->json(['data' => $docu, 'year' => $year]);
     }
 }

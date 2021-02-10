@@ -32,10 +32,6 @@ class DocumentController extends Controller
 
     public function getAllArchiveDocuments(Document $documents, Request $request)
     {
-        //dd('dd muna', $documents);
-        //$documents = new Document;
-        //dd($request->all());
-        //dd($request);
         return $documents->allDocumentsArchive(Auth::user(), $request);
     }
 
@@ -68,8 +64,8 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
 
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$request,null,null, 'receive'));
+            //$user_id = Auth::user()->id;
+            //event(new DocumentEvent($user_id,$request,null,null, 'receive'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -97,17 +93,17 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-           
+
             $destination = json_decode($tracking_record->document->destination_office_id);
 
             array_push($destination,$request->forwarded_to);
-            $tracking_record->document->update(['status' => 'forwarded', 
-                'destination_office_id' => $destination, 
+            $tracking_record->document->update(['status' => 'forwarded',
+                'destination_office_id' => $destination,
                 'acknowledged' => false]);
 
 
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$request,null,null, 'forward'));
+            //$user_id = Auth::user()->id;
+            //event(new DocumentEvent($user_id,$request,null,null, 'forward'));
 
 
         } catch (ValidationException $error) {
@@ -140,8 +136,8 @@ class DocumentController extends Controller
             $tracking_record->document->update(['status' => 'terminated']);
             $tracking_record->document->delete();
 
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$subject,$remarks, $approved_by, 'terminate'));
+            //$user_id = Auth::user()->id;
+            //event(new DocumentEvent($user_id,$subject,$remarks, $approved_by, 'terminate'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -172,8 +168,8 @@ class DocumentController extends Controller
             $tracking_record->document->update(['acknowledged' => true]);
             $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
+            //$user_id = Auth::user()->id;
+            //event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -202,8 +198,8 @@ class DocumentController extends Controller
             $tracking_record->save();
             $tracking_record->document->update(['status' => $request->hold_reject]);
 
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id, $status, $subject,null, 'holdreject'));
+            //$user_id = Auth::user()->id;
+            //event(new DocumentEvent($user_id, $status, $subject,null, 'holdreject'));
 
 
         } catch (ValidationException $error) {
