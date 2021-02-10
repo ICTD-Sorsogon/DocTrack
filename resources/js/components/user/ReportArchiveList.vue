@@ -748,8 +748,16 @@
                     this.filter.date = { list: [this.filterDateFrom, this.filterDateTo] }
 
                     this.$store.dispatch('getArchiveDocuments', this.filter).then( () => {
-                        this.distributeState()
                         console.log('no data found');
+                        console.log(this.documentsArchive)
+                        /*setTimeout(function() {
+                            console.log('no data found1');
+                            console.log(this.documentsArchive)
+                            this.distributeState()
+                        }.bind(this), 5000);*/
+
+                        this.distributeState()
+
                         /*const selected = this.documentsArchive[0]
                         this.distinctYearFromDB = selected.year
                         if (selected.selected.filter == 'Year') {
@@ -764,8 +772,9 @@
                     })
 
                 } else {
-                    this.distributeState()
                     console.log('has data')
+                    this.distributeState()
+
 
                     /*const selected = this.documentsArchive[0]
                     this.distinctYearFromDB = selected.year

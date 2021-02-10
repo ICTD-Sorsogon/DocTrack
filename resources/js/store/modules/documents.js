@@ -38,26 +38,22 @@ const actions = {
         const response = await axios.get(`/api/get_active_documents`);
         commit('GET_ALL_ACTIVE_DOCUMENTS', response.data);
     },
-    getArchiveDocuments({ commit }, filter) {
+    async getArchiveDocuments({ commit }, filter) {
 
 
 
 
-        axios.post(`/api/get_archive_documents`, (
+        const response = await axios.post(`/api/get_archive_documents`, (
             (filter.filterBy == 'Year')? {selected: filter.year.list, filterBy: 'Year'} : {selected: filter.date.list, filterBy: 'Date'}
-        )).then(response => {
+        ))
 
-            const data = response.data.data
-            filter.yearFromDb = response.data.year
+        const data = response.data.data
+        filter.yearFromDb = response.data.year
 
 
             //console.log({...filter, data})
             //console.log(response)
-            commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data});
-
-            //console.log(response)
-
-        })
+        await commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data});
 
         /*mutateStateStatus:             response.mutateStateStatus = 'createstate || updatestate'
         getDataFrom:                   response.getDataFrom = "backup || db || none"
@@ -341,7 +337,8 @@ const mutations = {
                     },
                     year: {
                         text: 'Year',
-                        list: [new Date().getFullYear().toString()],
+                        list: [],
+                        //list: [new Date().getFullYear().toString()],
                         data: []
                     }
                 }

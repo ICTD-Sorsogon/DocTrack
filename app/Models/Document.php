@@ -99,7 +99,7 @@ class Document extends Model
     {
 
         $isByYear = ($request->filterBy == 'Year')?true:false;
-        $isNotEmpty = (count($request->selected) > 0)?true:false;
+        //$isNotEmpty = (count($request->selected) > 0)?true:false;
         $selected = $request->selected;
 
         $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')->onlyTrashed();
@@ -116,14 +116,14 @@ class Document extends Model
         }*/
 
 
-        if ($isNotEmpty) {
+        //if ($isNotEmpty) {
             $document->when(!$isByYear, function ($query) use ($selected) {
                         //return $query->whereBetween('created_at', $selected);
                         return $query->whereBetween('created_at', [$selected[0].' 00:00:00', $selected[1].' 23:59:59']);
                     })->when($isByYear, function ($query) use ($selected) {
                         return $query->whereIn(Document::raw('YEAR(`created_at`)'), $selected);
                     });
-        }
+       // }
         //dd($document->get());
        // return $document->orderBy('created_at', 'DESC')->get();
 
