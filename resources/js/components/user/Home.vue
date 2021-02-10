@@ -156,7 +156,11 @@
         <notification  v-on:showNotif="showNotif" style="margin-right:15px"></notification>
 
         <router-link to="/account_settings">
-            <v-avatar>
+            <v-avatar v-if="image_source === '/storage/null'" color="indigo">
+                <img src="/images/defaultpic.jpg" alt="default_picture">
+            </v-avatar>
+
+            <v-avatar v-else>
                 <img :src="image_source" alt="profile_picture">
             </v-avatar>
         </router-link>
