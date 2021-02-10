@@ -13,14 +13,18 @@ class TrackingRecord extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'document_id', 'actions', 'status',
+        'document_id', 'action', 'status',
         'approved_by', 'touched_by', 'last_touched',
         'forwarded_by', 'forwarded_to', 'remarks','destination'
     ];
 
-    public function getCreatedAtAttribute($value)
+    protected $appends = [
+        'date_filed'
+    ];
+
+    public function getDateFiledAttribute()
     {
-        return Carbon::parse($value)->diffForHumans();
+        return Carbon::parse($this->attributes['created_at'])->diffForHumans();
     }
 
     public function user()

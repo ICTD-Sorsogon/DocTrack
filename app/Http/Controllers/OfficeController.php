@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\OfficeEvent;
+use App\Models\Document;
 use Auth;
 use DB;
 
@@ -166,13 +167,25 @@ class OfficeController extends Controller
 
     public function getTrackingList()
     {
-        $offices = Office::with('users.tracking_records')->get();
-        foreach ($offices as $office) {
-            $office['transaction_count'] = collect($this->bulkUserTrackingList($office))->collapse()->count();
-            $office['documents'] = collect($this->bulkUserTrackingList($office))->collapse()->groupBy('document_id');
-            unset($office->users);
-        }
-        return $offices;
+        $stat = [];
+        $document =  Document::with('tracking_records')
+            ->get()
+            ->groupBy('originating_office')
+            ->filter(function($val,$key){return is_numeric($key);});
+
+        foreach (Office::all() as $office) {
+           $stat[$office->name]['count'] = @$document[$office->id]?->count() ?? 0;
+           $stat[$office->name]['document'] = $document[$office->id] ?? null;
+        } 
+
+        return $stat;
+        // $offices = Office::with('users.tracking_records')->get();
+        // foreach ($offices as $office) {
+        //     $office['transaction_count'] = collect($this->bulkUserTrackingList($office))->collapse()->count();
+        //     $office['documents'] = collect($this->bulkUserTrackingList($office))->collapse()->groupBy('document_id');
+        //     unset($office->users);
+        // }
+        // return $offices;
     }
 
 }

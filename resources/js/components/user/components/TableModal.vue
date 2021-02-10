@@ -183,7 +183,7 @@
                   </v-list-item-action>
                   <v-list-item-content>
                     <v-list-item-title>{{
-                      selected_document.created_at
+                      (new Date(selected_document.created_at)).toString()
                     }}</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
@@ -266,13 +266,13 @@
       >
         <v-timeline-item
           small
-          v-for="{id,action, created_at, remarks} in selected_document.tracking_records"
+          v-for=" {id, date_filed, action, remarks, touched_by} in tracking_records"
           :color="dotColor(action)"
           :key="id"
         >
           <v-row class="pt-1">
             <v-col cols="3">
-              <strong>{{ created_at }}</strong>
+              <strong>{{ date_filed }}</strong>
             </v-col>
             <v-col>
               <strong>{{ action.toUpperCase() }}</strong>
@@ -281,21 +281,16 @@
               </div>
             </v-col>
              <v-col>
-              <v-avatar>
-                <v-img
-                  src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairFrida&accessoriesType=Kurt&hairColor=Red&facialHairType=BeardLight&facialHairColor=BrownDark&clotheType=GraphicShirt&clotheColor=Gray01&graphicType=Skull&eyeType=Wink&eyebrowType=RaisedExcitedNatural&mouthType=Disbelief&skinColor=Brown"
-                ></v-img>
-              </v-avatar>
-              <v-avatar>
-                <v-img
-                  src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairFrizzle&accessoriesType=Prescription02&hairColor=Black&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=BlazerSweater&clotheColor=Black&eyeType=Default&eyebrowType=FlatNatural&mouthType=Default&skinColor=Tanned"
-                ></v-img>
-              </v-avatar>
-              <v-avatar>
-                <v-img
-                  src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairMiaWallace&accessoriesType=Sunglasses&hairColor=BlondeGolden&facialHairType=Blank&clotheType=BlazerSweater&eyeType=Surprised&eyebrowType=RaisedExcited&mouthType=Smile&skinColor=Pale"
-                ></v-img>
-              </v-avatar>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-avatar v-bind="attrs" v-on="on" >
+                          <v-img
+                            :src="touched_by.avatar"
+                          ></v-img>
+                        </v-avatar>
+                      </template>
+                      <span>{{touched_by.office.name}}</span>
+                    </v-tooltip>
             </v-col>
           </v-row>
         </v-timeline-item>
@@ -308,15 +303,20 @@
 </template>
 
 <script>
+    import { mapGetters, mapActions } from "vuex";
     export default {
     props: ['selected_document', 'dialog'],
     computed: {
+      ...mapGetters(['find_user']),
       originating_office_name({selected_document}) {
         return selected_document.origin_office?.name ?? selected_document.originating_office
       },
       sender_name({selected_document}) {
         return selected_document.sender?.name ?? selected_document.sender_name
       },
+      tracking_records({selected_document}) {
+        return selected_document.tracking_records.map(record=>{record.touched_by = this.find_user(record.touched_by); return record});
+      }
     },
     methods: {
       dotColor(action){

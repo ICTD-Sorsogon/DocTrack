@@ -410,8 +410,12 @@ export default {
         closeDocumentDialog () {
             this.documentDialog = false
         },
+        sanitize() {
+            this.form.destination = this.form.destination[0].id
+        },
         receiveDocumentConfirm() {
             this.btnloading = true;
+            this.sanitize();
                 this.$store.dispatch("receiveDocumentConfirm", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {
                         this.$store.dispatch('setSnackbar', {

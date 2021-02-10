@@ -24,14 +24,16 @@ class DocumentFeatureTest extends TestCase
         Sanctum::actingAs($user);
 
         $data = \App\Models\Document::factory()->make()->only(
-            ['subject','is_external', 'document_type_id', 'destination_office_id', 'sender_name',
-             'page_count', 'is_terminal', 'remarks', 'attachment_page_count']
+            ['subject','is_external', 'document_type_id', 'sender_name',
+             'page_count', 'remarks', 'attachment_page_count']
         );
+        $data['destination_office_id'] = [1];
         $this->assertAuthenticated();
         $response = $this->postJson('/api/add_new_document', $data);
         $tracking_code = $response->getOriginalContent()->tracking_code;
         $response->assertSuccessful();
-        $response->assertJsonFragment(collect($data)->except(['is_external', 'is_terminal', 'originating_office','status'])->toArray());
+        $response->assertJsonFragment(collect($data)->except(['is_external', 'is_terminal', 'originating_office','status', 'destination_office_id'])->toArray());
+        unset($data['destination_office_id']);
         $this->assertDatabaseHas('documents',array_merge(compact('tracking_code'), $data));
     }
 
