@@ -28,19 +28,14 @@ class DocumentEvent implements ShouldBroadcast
         $this->document = $document instanceof Document ? $document : Document::find($document);
         $this->user = Auth()->user();
 
-        extract(get_object_vars($document));
-
-        $document_length = count(json_decode($document->destination_office_id));
-
-        for($index = 0; $index < $document_length; $index++){
-            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->destination_office_id)[$index]));
-        }
-
-        // foreach($document->destination_office_id as $office){
-
-            // array_push($this->broadcastMe, new Channel('documents'.$office));
+        // if($document->destination_office_id){
+            $document_length = count(json_decode($document->destination_office_id));
+    
+            for($index = 0; $index < $document_length; $index++){
+                array_push($this->broadcastMe, new Channel('documents'. json_decode($document->destination_office_id)[$index]));
+            }
         // }
-        
+
     }
     /**
      * Get the channels the event should broadcast on.

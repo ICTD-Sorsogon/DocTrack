@@ -131,13 +131,13 @@ class DocumentListener
 
             break;
 
-            case 'acknowledge':
-                $remarks = $event->old_values;
-                $subject = $event->request_obj;
+            case 'acknowledged':
+                $remarks = $document->remarks;
+                $subject = $document->subject;
 
                 $log = new Log();
-                $log->user_id = $event->user_id;
-                $log->action = 'Document acknowledge';
+                $log->user_id = auth()->user()->id;
+                $log->action = 'Document acknowledged';
                 $log->remarks = 'Document '.$subject.' has been successfully acknowledge with remarks:'.$remarks;
                 return $log->save();
             break;

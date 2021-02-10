@@ -147,8 +147,6 @@ class DocumentController extends Controller
 
     public function acknowledgeDocument(Request $request)
     {
-        $remarks = $request->remarks;
-        $subject = $request->subject;
 
         DB::beginTransaction();
         try {
@@ -159,12 +157,9 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['acknowledged' => true]);
-            $tracking_record->document->update(['priority_level' => $request->priority_levels]);
-
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
+            $tracking_record->document->update(['status' => 'acknowledged', 'acknowledged' => true, 'priority_level' => $request->priority_levels]);
+            // $tracking_record->document->update(['acknowledged' => true]);
+            // $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
         } catch (ValidationException $error) {
             DB::rollback();
