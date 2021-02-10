@@ -58,10 +58,7 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$request,null,null, 'receive'));
-
+            $tracking_record->document->update(['status' => 'received']);
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;

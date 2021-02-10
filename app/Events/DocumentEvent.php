@@ -28,13 +28,17 @@ class DocumentEvent implements ShouldBroadcast
         $this->document = $document instanceof Document ? $document : Document::find($document);
         $this->user = Auth()->user();
 
-        // if($document->destination_office_id){
-            $document_length = count(json_decode($document->destination_office_id));
-    
+        if($document->status == 'received'){
+            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
+        }
+
+        if($document->status == 'acknowledged'){
+            $document_length = count(json_decode($document->destination_office_id)); 
             for($index = 0; $index < $document_length; $index++){
                 array_push($this->broadcastMe, new Channel('documents'. json_decode($document->destination_office_id)[$index]));
             }
-        // }
+        }
+
 
     }
     /**

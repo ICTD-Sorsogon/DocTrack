@@ -134,7 +134,6 @@ class DocumentListener
             case 'acknowledged':
                 $remarks = $document->remarks;
                 $subject = $document->subject;
-
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document acknowledged';

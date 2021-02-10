@@ -302,10 +302,18 @@ export default {
             }
         },
     },
+    created(){
+        Echo.channel('documents'+this.auth_user.office_id)
+        .listen('DocumentEvent', (e) => {
+            console.log('get all active documents')
+            this.$store.dispatch('getActiveDocuments');
+        })
+    },
     beforeCreate() {
         this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
+
     },
 }
 </script>

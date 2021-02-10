@@ -228,6 +228,11 @@ const actions = {
         .then(response =>{
             let data = []
             response.data.data.forEach(notification => {
+                // console.log('notificaion office id',notification.office_id)
+                // console.log('state user office id',state.user.office_id)
+
+                // console.log('notification user id',notification.user_id)
+                // console.log('state.userid', state.user)
                 if(notification.office_id == state.user.office_id && notification.user_id == state.user.id){
                     data.push(notification)
                 }
