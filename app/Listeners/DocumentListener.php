@@ -52,7 +52,10 @@ class DocumentListener
         // $message = 'Document has been successfully';
 
 
-        if(!$document->wasRecentlyCreated){
+        if(!$document->wasRecentlyCreated && 
+            $document->status != 'acknowledged' &&
+            $document->status != 'received'
+            ){
             $new = $document;
             $old = $document->getOriginal();
             $new_destinationOffices = $this->destinationOffice($new, 'new');
@@ -173,17 +176,18 @@ class DocumentListener
                 return $log->save();
             break;
 
-            case 'receive':
-                $remarks = json_encode($event->request_obj->documentRemarks);
-                $subject = json_encode($event->request_obj->subject);
-                $approved_by = json_encode($event->request_obj->approved_by);
-                $through = json_encode($event->request_obj->through);
+            case 'received':
+                $tracking_records = $document->tracking_records;
+                $through = $tracking_records[2]->through;
+                $approved_by = $tracking_records[2]->approved_by;
+                $remarks = $document->remarks;
+                $subject = $document->subject;
 
                 $log = new Log();
-                $log->user_id = $event->user_id;
+                $log->user_id = auth()->user()->id;
                 $log->action = 'Document receive';
-                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.'. 
-                    and approved by: '.$approved_by.' and remarks: '.$remarks;
+                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.
+                ' and approved by: '.$approved_by.' and remarks: '.$remarks;
                 return $log->save();
             break;
         }
