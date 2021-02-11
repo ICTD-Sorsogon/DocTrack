@@ -257,7 +257,8 @@ import ExcelDialog from './components/ExcelDialog'
                         // Loop all Users and Change Sender name to Users Name
                         getAll.forEach(user => {
                             if(user.id == log.new_values.sender_name) {
-                                log.new_values.sender_name = user.last_name + ',' + user.first_name + ' ' +  user.middle_name + ' ' + user.suffix;
+                                log.new_values.sender_name = user.last_name + ',' + user.first_name + ' ' +
+                                  user.middle_name + ' ' + (user.suffix != null ? user.suffix : '');
                             }
 
                         });
@@ -265,7 +266,8 @@ import ExcelDialog from './components/ExcelDialog'
                         if(log.original_values){
                             getAll.forEach(user => {
                                 if(user.id == log.original_values.sender_name) {
-                                    log.original_values.sender_name = user.last_name + ',' + user.first_name + ' ' +  user.middle_name + ' ' + user.suffix;
+                                    log.original_values.sender_name = user.last_name + ',' + user.first_name + ' ' +
+                                      user.middle_name + ' ' + (user.suffix != null ? user.suffix : '');
                                 }
                             });
                         }

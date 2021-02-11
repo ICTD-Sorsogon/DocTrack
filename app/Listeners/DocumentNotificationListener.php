@@ -35,20 +35,21 @@ class DocumentNotificationListener
         
         switch ($document->status) {
             case 'created':
-                $sender_id = $document->sender_name;
-                $name = User::all()->find($sender_id);
-                $docket_office = User::where('office_id', 37)->get();
-                $document = Document::all()->find($document->id);
-                    $notification = new Notification();
-                    $notification->document_id = $document->id;
-                    $notification->user_id = $docket_office[0]->id;
-                    $notification->office_id = $docket_office[0]->office_id;
-                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
-                    $notification->status = 0;
-                    $notification->message = 'Document '.$document->subject.' has been created.';
-                    $notification->save();
-                
+                if($document->wasRecentlyCreated){
+                    $sender_id = $document->sender_name;
+                    $name = User::all()->find($sender_id);
+                    $docket_office = User::where('office_id', 37)->get();
+                    $document = Document::all()->find($document->id);
+                        $notification = new Notification();
+                        $notification->document_id = $document->id;
+                        $notification->user_id = $docket_office[0]->id;
+                        $notification->office_id = $docket_office[0]->office_id;
+                        $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                        . $name->last_name . ' ' . $name->suffix;
+                        $notification->status = 0;
+                        $notification->message = 'Document '.$document->subject.' has been created.';
+                        $notification->save();
+                }
                 // foreach ($notify_user as $key => $value) {
                 //     $notification = new Notification();
                 //     $notification->document_id = $document->id;

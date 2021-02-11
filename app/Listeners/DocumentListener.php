@@ -4,10 +4,12 @@ namespace App\Listeners;
 
 use App\Events\DocumentEvent;
 use App\Models\Log;
+use App\Models\Office;
 use App\Models\TrackingRecord;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use PHP_CodeSniffer\Standards\Squiz\Sniffs\Scope\MethodScopeSniff;
 use Symfony\Component\VarDumper\VarDumper;
 
 class DocumentListener
@@ -44,91 +46,83 @@ class DocumentListener
                 ]);
             };
         }
+
         // return false;
         // $type = ['edited', 'created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
         // $message = 'Document has been successfully';
 
 
+        if(!$document->wasRecentlyCreated){
+            $new = $document;
+            $old = $document->getOriginal();
+            $new_destinationOffices = $this->destinationOffice($new, 'new');
+            $old_destinationOffices = $this->destinationOffice($old, 'old');
+
+            $new_object = (object) array(
+                'subject' => $new->subject,
+                'sender_name' => $new->sender_name,
+                'remarks' => $new->remarks,
+                'attachment_page_count' => $new->attachment_page_count,
+                'destination_office_id' => $new_destinationOffices,
+                'document_type_id' => $new->document_type_id,
+                'page_count' => $new->page_count,
+            );
+
+            $old_object = (object) array(
+                'subject' => $old['subject'],
+                'sender_name' => $old['sender_name'],
+                'remarks' => $old['remarks'],
+                'attachment_page_count' => $old['attachment_page_count'],
+                'destination_office_id' => $old_destinationOffices,
+                'document_type_id' => $old['document_type_id'],
+                'page_count' => $old['page_count'],
+            );
+
+            $new_data = json_encode($new_object);
+            $old_data = json_encode($old_object);
+
+            $log = new Log();
+            $log->user_id = auth()->user()->id;
+            $log->new_values = $new_data;
+            $log->original_values = $old_data;
+            $log->action = 'Document update';
+            $log->remarks = 'Document has been successfully updated from : '.$old['subject'].' to '.$new->subject;
+            return $log->save();
+        }
+
+
+
         switch($document->status){
             case 'created':
-
-        // if (!$document->id) {
-        //     $request_obj = '{
-        //         "subject":"' . $request->subject . '",
-        //         "sender_name":"' . $request->sender_name . '",
-        //         "remarks":"' . $request->remarks . '",
-        //         "attachment_page_count":"' . $request->attachment_page_count . '",
-        //         "destination_office_id":"' . $request->destination_office_id . '",
-        //         "document_type_id":"' . $request->document_type_id . '",
-        //         "page_count":"' . $request->page_count . '"}';
-
-        //     $user_id = Auth::user()->id;
-        //     event(new DocumentEvent($user_id, json_decode($request_obj), null,null, 'create'));
-
-        // } else {
-        //     $old_values = Document::select(
-        //     'attachment_page_count','destination_office_id',
-        //     'document_type_id','id','originating_office','page_count','remarks','sender_name',
-        //     'subject','tracking_code'
-        //     )->where('id', $request->id)->get();
-        //     $request_obj = '{
-        //         "subject":"' . $request->subject . '",
-        //         "sender_name":"' . $request->sender_name . '",
-        //         "remarks":"' . $request->remarks . '",
-        //         "attachment_page_count":"' . $request->attachment_page_count . '",
-        //         "destination_office_id":"' . $request->destination_office_id . '",
-        //         "document_type_id":"' . $request->document_type_id . '",
-        //         "page_count":"' . $request->page_count . '"}';
-
-
-        //     $user_id = Auth::user()->id;
-        //     event(new DocumentEvent($user_id ,json_decode($request_obj), json_decode($old_values[0]), null, 'update'));
-
-        // }
-
-            $destinationOffce = '';
-            $document_length = count(json_decode($document->destination_office_id));
-
-            for($index = 0; $index < $document_length; $index++){
-                $destinationOffce .= json_decode($document->destination)[$index]->name . ', ';
-            }
-
-                $data_object = (object) array(
-                    'subject' => $document->subject,
-                    'sender_name' => $document->sender_name,
-                    'remarks' => $document->remarks,
-                    'attachment_page_count' => $document->attachment_page_count,
-                    'destination_office_id' => $destinationOffce,
-                    'document_type_id' => $document->document_type_id,
-                    'page_count' => $document->page_count,
-                );
-
-
-                $subject = $document->subject;
-                $data = json_encode($data_object);
-
-                $log = new Log();
-                $log->user_id = auth()->user()->id;
-                $log->new_values = $data;
-                $log->action = 'Document create';
-                $log->remarks = 'New document has been successfully created with subject of : '.$subject;
-                return $log->save();
-            break;
-
-            case 'update':
-                $subject = $event->request_obj->subject;
-                $old_values = json_encode($event->old_values);
-                $old_subject = $event->old_values->subject;
-                $data = json_encode($event->request_obj);
-
-                $log = new Log();
-                $log->user_id = $event->user_id;
-                $log->new_values = $data;
-                $log->original_values = $old_values;
-                $log->action = 'Document update';
-                $log->remarks = 'Document has been successfully updated from : '.$old_subject.' to '.$subject;
-                return $log->save();
-
+                if($document->wasRecentlyCreated){
+                    $destinationOffce = '';
+                    $document_length = count(json_decode($document->destination_office_id));
+        
+                    for($index = 0; $index < $document_length; $index++){
+                        $destinationOffce .= json_decode($document->destination)[$index]->name . ', ';
+                    }
+        
+                        $data_object = (object) array(
+                            'subject' => $document->subject,
+                            'sender_name' => $document->sender_name,
+                            'remarks' => $document->remarks,
+                            'attachment_page_count' => $document->attachment_page_count,
+                            'destination_office_id' => $destinationOffce,
+                            'document_type_id' => $document->document_type_id,
+                            'page_count' => $document->page_count,
+                        );
+        
+        
+                        $subject = $document->subject;
+                        $data = json_encode($data_object);
+        
+                        $log = new Log();
+                        $log->user_id = auth()->user()->id;
+                        $log->new_values = $data;
+                        $log->action = 'Document create';
+                        $log->remarks = 'New document has been successfully created with subject of : '.$subject;
+                        return $log->save();
+                }
             break;
 
             case 'acknowledged':
@@ -193,5 +187,26 @@ class DocumentListener
                 return $log->save();
             break;
         }
+    }
+
+    public function destinationOffice($document, $type) {
+        $destinationOffce = '';
+
+        if($type == 'old'){
+            $document_length = count(json_decode($document['destination_office_id']));
+            for($index = 0; $index < $document_length; $index++){
+                $office_id = json_decode($document['destination_office_id'])[$index];
+                $office = Office::find($office_id);
+                $destinationOffce .= $office->name . ', ';
+            }
+        }
+        if($type == 'new'){
+            $document_length = count(json_decode($document->destination_office_id));
+            for($index = 0; $index < $document_length; $index++){
+                $destinationOffce .= json_decode($document->destination)[$index]->name . ', ';
+            }
+        }
+
+        return $destinationOffce;
     }
 }
