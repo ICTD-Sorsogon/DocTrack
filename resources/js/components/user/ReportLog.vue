@@ -59,7 +59,7 @@
                                                 v-for="(item, index) in final_data"
                                                 :key="index"
                                             >
-                                                <td>{{ item['key'] }}</td>
+                                                <td style="text-transform:capitalize"> {{ item['key'] }}</td>
                                                 <td>{{ item['new'] }}</td>
                                                 <td>{{ item['old'] }}</td>
                                             </tr>
