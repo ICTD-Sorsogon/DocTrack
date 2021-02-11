@@ -85,13 +85,11 @@ export default {
         closeDialog(){
             this.dialog = false
         },
-
         highlight(isHighlighted){
             if(isHighlighted){
                 return 'highlight'
             }
         },
-
         seen(index, item){
             if(item.status == 0){
                 this.$store.dispatch('seenNotif', {id: item.id, status: 1});

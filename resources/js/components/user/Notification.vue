@@ -1,31 +1,17 @@
 <template>
-<div>
+  <div>
+        <v-badge
+          :content="notifs"
+          :value="notifs"
+          color="green"
+          overlap
+        >
+          <v-icon large @click="showNotif" style="cursor:pointer;">
+              mdi-bell
+          </v-icon>
+        </v-badge>
 
-    <!-- <v-row style="margin-right: 20px"> -->
-      <!-- <notification-drawer></notification-drawer> -->
-    <!-- </v-row> -->
-    <!-- <v-row style="margin-top:500px; margin-right:10px" v-if="notif"> -->
-      <!-- <notification-item v-if="notif"></notification-item> -->
-    <!-- </v-row> -->
-      <v-badge
-        :content="notifs"
-        :value="notifs"
-        color="green"
-        overlap
-      >
-        <!-- <v-icon large @click="showNotif" style="cursor:pointer;">
-            mdi-bell
-        </v-icon> -->
-
-        <v-icon large @click="showNotif" style="cursor:pointer;">
-            mdi-bell
-        </v-icon>
-      </v-badge>
-
-</div>
-
-
-
+  </div>
 </template>
 
 <script>

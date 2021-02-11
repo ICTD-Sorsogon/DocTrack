@@ -152,8 +152,9 @@
         <v-spacer></v-spacer>
 
         <!-- NOTIFICATION!! -->
+        <div v-if="notif" class="outside" v-on:click="away()"></div>
         <notification-item style="margin-top:580px; margin-left:200px" v-if="notif"></notification-item>
-        <notification  v-on:showNotif="showNotif" style="margin-right:15px"></notification>
+        <notification v-on:showNotif="showNotif" style="margin-right:15px"></notification>
 
         <router-link to="/account_settings">
             <v-avatar v-if="image_source === '/storage/null'" color="indigo">
@@ -223,7 +224,6 @@ export default {
             drawer: null,
             group: null,
             messages: 5,
-            show: false,
             notif: false,
         }
     },
@@ -231,8 +231,13 @@ export default {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
 
         showNotif(){
-          this.notif = !this.notif
+            this.notif = !this.notif
         },
+
+        away() {
+            this.notif = !this.notif;
+        },
+
         logout(){
             var path = this.$router.currentRoute.path.split('/');
             if (path.length >= 3) {
@@ -323,5 +328,12 @@ export default {
 }
 .namespace {
     background:rgba(0, 0, 0, 0.09);
+}
+.outside {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
 }
 </style>
