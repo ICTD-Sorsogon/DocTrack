@@ -193,7 +193,7 @@ import ExcelDialog from './components/ExcelDialog'
                 log_new_key = Object.keys(item.new_values);
                 log_view_new = Object.values(item.new_values);
 
-                if(item.original_values != null){
+                if(item.original_values != null && item.new_values.destination_office != undefined){
                     log_old_key = Object.keys(item.original_values);
                     log_view_old = Object.values(item.original_values);
                     for (var i = 0 ; i < log_old_key.length; i++){
@@ -203,7 +203,7 @@ import ExcelDialog from './components/ExcelDialog'
                             'old': log_view_old[i]
                         })
                     }
-                }else{
+                }else if(item.new_values != null && item.new_values.destination_office != undefined){
                     for (var i = 0 ; i < log_new_key.length; i++){
                         this.final_data.push({
                             'key': log_new_key[i].split('_').join(' '),
