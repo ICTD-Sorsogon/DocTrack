@@ -6,7 +6,7 @@
 		:items="extendedData"
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
-		item-key="id"
+		item-key="keys"
 		:loading="datatable_loader"
         :sort-by="['priority_level']"
         :sort-desc="[true]"
@@ -169,8 +169,10 @@ export default {
 		},
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+				doc.keys = doc.id + ' ' + (doc.recipient_id ?? '')
                 doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
+				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
                 if (doc.priority_level == 1) {
