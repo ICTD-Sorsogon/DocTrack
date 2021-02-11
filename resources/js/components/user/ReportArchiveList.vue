@@ -50,7 +50,7 @@
             >
                 <template v-slot:top>
                     <v-row>
-                        <v-col class="d-flex" v-bind="breakpoint(3)">
+                        <v-col class="d-flex" v-bind="bp(3)">
                             <v-select
                                 v-model="filterOptionSelected"
                                 :items="filterOptionList"
@@ -63,7 +63,7 @@
                             ></v-select>
                             <v-divider class=" mt-0" inset vertical dense/>
                         </v-col>
-                        <v-col class="d-flex"  v-bind="breakpoint(9)" v-if="isByYear">
+                        <v-col class="d-flex"  v-bind="bp(9)" v-if="isByYear">
                            <v-select
                                 v-model="filterYearSelected"
                                 :items="distinctYearFromDB"
@@ -89,7 +89,7 @@
                                 </template>
                             </v-select>
                         </v-col>
-                        <v-col class="d-flex"  v-bind="breakpoint(9)" v-if="!isByYear">
+                        <v-col class="d-flex"  v-bind="bp(9)" v-if="!isByYear">
                             <v-dialog
                                 ref="dialog"
                                 v-model="filterDateDialogFrom"
@@ -161,39 +161,151 @@
 
                     <v-card v-if="searchOption == 'advance'" class="elevation-2 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;border:1px solid #B8B8B8;">
                         <v-row class="d-flex">
-                            <v-col v-bind="breakpoint(6)">
-                                <v-text-field v-model="advanceSearch.trackingId" @input="textboxChange" label="Traking ID" class="mx-4"/>
+                            <v-col v-bind="bp(6)">
+                                <v-text-field v-model="advanceSearch.trackingId" @input="textboxChange" label="Traking ID" class="mx-4" clearable/>
                             </v-col>
-                            <v-col v-bind="breakpoint(6)">
-                                <v-text-field v-model="advanceSearch.search" @input="textboxChange" label="Subject" class="mx-4"/>
+                            <v-col v-bind="bp(6)">
+                                <v-text-field v-model="advanceSearch.search" @input="textboxChange" label="Subject" class="mx-4" clearable/>
                             </v-col>
-                            <v-col v-bind="breakpoint(6)">
-                                <v-select class="mx-4" :items="keys2" v-model="advanceSearch.source" @change="textboxChange" label="Document Source" dense/>
+                            <v-col v-bind="bp(6)">
+                                <v-select class="mx-4" :items="advanceSearch.optionSource" v-model="advanceSearch.source" @change="textboxChange" label="Document Source" dense clearable hide-selected multiple deletable-chips chips>
+                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSourceChip(item)">
+                                                    {{item}}
+                                                </v-chip>
+                                            </template>
+                                            <span >{{item}}</span>
+                                        </v-tooltip>
+                                    </template>
+                                </v-select>
                             </v-col>
-                            <v-col v-bind="breakpoint(6)">
-                                <v-select class="mx-4" :items="keys3" v-model="advanceSearch.type" @change="textboxChange" label="Document Type" dense/>
+                            <v-col v-bind="bp(6)">
+                                <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="advanceSearch.type" @change="textboxChange" label="Document Type" dense clearable hide-selected multiple deletable-chips chips/>
                             </v-col>
-                            <v-col v-bind="breakpoint(6)">
-                                <v-select class="mx-4" :items="keys" v-model="advanceSearch.originating" @change="textboxChange" label="Originating Office" dense/>
+                            <v-col v-bind="bp(6)">
+                                <!--<v-select class="mx-4" :items="offices" v-model="advanceSearch.originating" @change="textboxChange" label="Originating Office" dense/>-->
+                                <v-combobox
+                                    v-model="advanceSearch.originating"
+                                    :items="offices"
+                                    item-text="name"
+                                    clearable
+                                    hide-selected
+                                    persistent-hint
+                                    label="Originating Office"
+                                    chips
+                                    required
+                                    class="mx-4"
+                                    dense
+                                    multiple
+                                >
+                                    <template v-slot:selection="{ attrs, item, parent, selected }">
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small>
+                                                    {{ item.name || item }}
+                                                </v-chip>
+                                            </template>
+                                            <span >{{item.office_code || item}}</span>
+                                        </v-tooltip>
+                                    </template>
+                                </v-combobox>
                             </v-col>
-                            <v-col v-bind="breakpoint(6)">
-                                <v-select class="mx-4" :items="keys" v-model="advanceSearch.destination" @change="textboxChange" label="Destination Office" dense/>
+                            <v-col v-bind="bp(6)">
+                                <!--<v-select class="mx-4" :items="keys" v-model="advanceSearch.destination" @change="textboxChange" label="Destination Office" dense/>-->
+                                <v-combobox
+                                    v-model="advanceSearch.destination"
+                                    :items="offices"
+                                    item-text="name"
+                                    clearable
+                                    hide-selected
+                                    persistent-hint
+                                    label="Destination Office"
+                                    chips
+                                    multiple
+                                    required
+                                    class="mx-4"
+                                    dense
+                                >
+                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeDestinationChip(item)">
+                                                {{ item.office_code || item }}
+                                            </v-chip>
+                                        </template>
+                                        <span >{{item.name || item}}</span>
+                                    </v-tooltip>
+                                    </template>
+                                </v-combobox>
                             </v-col>
 
-                            <v-col v-bind="breakpoint(6)">
-                                <v-text-field v-model="advanceSearch.sender" @input="textboxChange" label="Sender Name" class="mx-4"/>
+                            <v-col v-bind="bp(6)">
+                                <!--<v-text-field v-model="advanceSearch.sender" @input="textboxChange" label="Sender Name" class="mx-4"/>-->
+                                <v-combobox
+                                    v-model="advanceSearch.sender"
+                                    :items="all_users"
+                                    item-text="full_name"
+                                    clearable
+                                    hide-selected
+                                    persistent-hint
+                                    label="Sender Name"
+                                    required
+                                    class="mx-4"
+                                />
                             </v-col>
-                            <v-col v-bind="breakpoint(6)">
-                                <v-text-field v-model="advanceSearch.dateCreated" @input="textboxChange" label="Date Created" class="mx-4"/>
+                            <v-col v-bind="bp(6)">
+                                <!--<v-text-field v-model="advanceSearch.dateCreated" @input="textboxChange" label="Date Created" class="mx-4"/>-->
+                                <v-dialog
+                                    ref="dialog_created"
+                                    v-model="advanceSearch.optionDateCreated"
+                                    :return-value.sync="advanceSearch.dateCreated"
+                                    persistent
+                                    width="290px"
+                                >
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field
+                                            v-model="advanceSearch.dateCreated"
+                                            label="Date Created"
+                                            prepend-icon=""
+                                            readonly
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            class="mx-4"
+                                            clearable
+                                        />
+                                    </template>
+                                    <v-date-picker
+                                        v-model="advanceSearch.dateCreated"
+                                        scrollable
+                                        :max="new Date().toISOString().slice(0,10)"
+                                        :min="Math.min(...distinctYearFromDB).toString()"
+                                    >
+                                        <v-spacer/>
+                                        <v-btn text color="primary" @click="advanceSearch.optionDateCreated = false"> Cancel </v-btn>
+                                        <v-btn text color="primary" @click="$refs.dialog_created.save(advanceSearch.dateCreated); filterChange(false, true)"> OK </v-btn>
+                                    </v-date-picker>
+                                </v-dialog>
                             </v-col>
+
+                            <v-col v-bind="bp(12)" align="right">
+                                <v-btn color="#5D97C1" dark class="mb-2 ma-1 pl-13 pr-13" @click="searchOption = 'normal'">
+                                    <v-icon class="ma-1 mr-1">mdi-cancel</v-icon> CANCEL
+                                </v-btn>
+                                <v-btn color="primary" dark class="mb-2 ma-1 ml-0 mr-2 pl-13 pr-13" @click.stop="openDialog('new_office')">
+                                    <v-icon class="ma-1 mr-1">mdi-magnify</v-icon> SEARCH
+                                </v-btn>
+                            </v-col>
+
                         </v-row>
-                         <v-btn v-show="true" color="#81B7DA" class="elevation-2" fab dark small absolute top right @click="searchOption = 'normal'">
+                         <!--<v-btn v-show="true" color="#81B7DA" class="elevation-2" fab dark small absolute top right @click="searchOption = 'normal'">
                             <v-icon>mdi-close</v-icon>
-                        </v-btn>
+                        </v-btn>-->
                     </v-card>
 
                     <v-row v-if="searchOption == 'normal'" class="d-flex">
-                        <v-col v-bind="breakpoint(12)">
+                        <v-col v-bind="bp(12)">
                             <v-text-field v-model="search" label="Search Value" class="mx-4"/>
                         </v-col>
                     </v-row>
@@ -208,12 +320,12 @@
 
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-row>
-                        <v-col v-bind="breakpoint(6)" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
+                        <v-col v-bind="bp(6)" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
                             <v-btn fab icon raised x-small color = 'primary' title="Restore to Active" style="margin-right:4px;"
                                 @click.prevent="{selectDoc(item.id); viewDialog = true}"
                             ><v-icon>mdi-backup-restore</v-icon></v-btn>
                         </v-col>
-                        <v-col v-bind="breakpoint(6)" class="pl-0" style="top:50%; text-align:left; ">
+                        <v-col v-bind="bp(6)" class="pl-0" style="top:50%; text-align:left; ">
                             <v-btn fab icon raised x-small color = 'primary' title="View More"
                                 @click.prevent="{selectDoc(item.id); viewDialog = true}"
                             ><v-icon>mdi-more</v-icon></v-btn>
@@ -293,7 +405,7 @@
     import OfficeTableModal from './components/OfficeTableModal';
     import ExcelDialog from './components/ExcelDialog';
     import TableModal from './components/TableModal';
-    import { colors } from '../../constants';
+    import { colors, breakpoint } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
 
     export default {
@@ -326,40 +438,6 @@
                 },
                 switch1: true,
                 expanded: [],
-                keys: [
-                    'Office 1',
-                    'Office 2',
-                    'Office 3',
-                    'Office 4',
-                    'Office 5',
-                    'Office 6',
-                    'Office 7',
-                    'Office 8',
-                    'All'
-                ],
-                keys1: [
-                    'Tracking ID',
-                    'Subject',
-                    'Originating Office',
-                    'Destination Office',
-                    'Sender',
-                    'All'
-                ],
-                keys2: [
-                    'External',
-                    'Internal'
-                ],
-                keys3: [
-                    'Executive Order',
-                    'Provincial Ordinance',
-                    'Letter',
-                    'Purchase Order',
-                    'Salary',
-                    'Budget',
-                    'Reports',
-                    'Draft',
-                    'Others'
-                ],
                 filterDateDialogFrom: false,
                 filterDateFrom: new Date().toISOString().substr(0, 10),
                 filterDateDialogTo: false,
@@ -384,8 +462,14 @@
                     originating: '',
                     destination: '',
                     sender: '',
-                    dateCreated: ''
+                    dateCreated: null,
+                    optionSource: [
+                        'External',
+                        'Internal'
+                    ],
+                    optionDateCreated: false,
                 },
+
             }
         },
         watch: {
@@ -394,21 +478,21 @@
             }
         },
         computed: {
-            ...mapGetters(['documentsArchive', 'datatable_loader', 'auth_user', 'request']),
-            offices() {
-                const offices = JSON.parse(JSON.stringify(this.$store.state.offices.offices));
+            ...mapGetters(['document_types', 'offices', 'all_users', 'documentsArchive', 'datatable_loader', 'auth_user', 'request']),
+            /*offices() {
+                var offices = JSON.parse(JSON.stringify(this.$store.state.offices.offices));
                 offices.forEach(office => {
                     office.builded_office_name = office.office_code + ' - ' + office.name
                 });
                 return offices;
-            },
+            },*/
             extendedData: {
                 get: function () {
                     //console.log('getter');
                     if (this.documentsArchive.length) {
-                        const selected = this.documentsArchive[0].selected
-                        const dataRes = (selected.filter == 'Year')? selected.year.data : selected.date.data
-                        const data = JSON.parse(JSON.stringify(dataRes)).map(doc=>{
+                        var selected = this.documentsArchive[0].selected
+                        var dataRes = (selected.filter == 'Year')? selected.year.data : selected.date.data
+                        var data = JSON.parse(JSON.stringify(dataRes)).map(doc=>{
                             doc.is_external = doc.is_external ? 'External' : 'Internal'
                             doc.sender_name = doc.sender?.name ?? doc.sender_name
                             doc.originating_office = doc.origin_office?.name ?? doc.originating_office
@@ -437,14 +521,23 @@
             },
         },
         methods: {
-            breakpoint(col){
-                return { cols:"12", xs:col, sm:col, md:col, lg:col, xl:col }
+            removeDestinationChip(item){
+                this.advanceSearch.destination.splice(this.advanceSearch.destination.indexOf(item), 1)
+                this.advanceSearch.destination = [...this.advanceSearch.destination]
+                //console.log(objIndex)
+            },
+            removeSourceChip(item){
+                this.advanceSearch.source.splice(this.advanceSearch.source.indexOf(item), 1)
+                this.advanceSearch.source = [...this.advanceSearch.source]
+            },
+            bp(col){
+                return breakpoint(col)
             },
             filterBy(){
                 this.filter = {}
                 this.filter.action = "update"
                 this.filter.filterBy = this.filterOptionSelected
-                const selected = this.documentsArchive[0]
+                var selected = this.documentsArchive[0]
 
                 if (this.filterOptionSelected == "Year") {
                     this.isByYear = true
@@ -489,7 +582,7 @@
                 }
             },
             distributeState(){
-                const selected = this.documentsArchive[0]
+                var selected = this.documentsArchive[0]
                 this.distinctYearFromDB = selected.year
                 this.filterOptionSelected = selected.selected.filter
                 if (selected.selected.filter == 'Year') {
@@ -527,7 +620,7 @@
             },
             textboxChange(value){
 
-                /*const advanceSearch = {
+                /*var advanceSearch = {
                     trackingId: '',
                     subject: '',
                     source: '',
@@ -538,8 +631,11 @@
                     dateCreated: ''
                 }*/
 
-                console.log(value)
-                console.log(this.$refs)
+                //console.log(value)
+                //console.log(this.$refs)
+
+                console.log(this.advanceSearch)
+
                 //this.$refs.trackingId.value)
                 //trackingId
                 //console.log(`${this.searchOption} : ` + value)
@@ -628,6 +724,8 @@
         async mounted() {
             await this.mountState()
             this.$store.dispatch('unsetLoader')
+            //console.log('hhhhhhhhhh')
+            //console.log(breakpoint(2))
         }
     }
 </script>

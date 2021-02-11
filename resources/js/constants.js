@@ -47,7 +47,18 @@ export const snackbar_icon = {
 };
 
 export const priority_level = {
-    3 : '#F44336',
-    2 : '#FFA726',
+    3: '#F44336',
+    2: '#FFA726',
     1: '#03A9F4'
+};
+
+export const breakpoint = (col) => {
+    return {
+        cols: "12",
+        xs: col,
+        sm: col,
+        md: col,
+        lg: col,
+        xl: col
+    }
 };
