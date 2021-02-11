@@ -268,11 +268,25 @@ class OfficesTableSeeder extends Seeder
                 'contact_email' => 'ssc@sorsogonstatecollege.edu.ph',
             ],
             [
-                'name' => 'Docking Office',
+                'name' => 'Docket Office',
                 'address' => 'Capitol Compound, Burabod, Sorsogon City, Sorsogon',
                 'office_code' => 'DO',
                 'contact_number' => '09104111426',
                 'contact_email' => 'docking@sorsogon.gov.ph',
+            ],
+            [
+                'name' => 'External',
+                'address' => '',
+                'office_code' => 'EXT',
+                'contact_number' => '',
+                'contact_email' => '',
+            ],
+            [
+                'name' => 'Local Government Unit',
+                'address' => '',
+                'office_code' => 'LGU',
+                'contact_number' => '',
+                'contact_email' => '',
             ],
         ];
         DB::table('offices')->insert($offices);
