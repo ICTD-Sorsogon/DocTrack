@@ -28,6 +28,10 @@ class DocumentEvent implements ShouldBroadcast
         $this->document = $document instanceof Document ? $document : Document::find($document);
         $this->user = Auth()->user();
 
+        if($document->status == 'created'){
+            array_push($this->broadcastMe, new Channel('documents37'));
+        }
+
         if($document->status == 'received'){
             array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
         }

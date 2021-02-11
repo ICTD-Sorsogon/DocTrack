@@ -34,24 +34,33 @@ class DocumentNotificationListener
         $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
         
         switch ($document->status) {
-            // case 'created':
+            case 'created':
+                $sender_id = $document->sender_name;
+                $name = User::all()->find($sender_id);
+                $docket_office = User::where('office_id', 37)->get();
+                $document = Document::all()->find($document->id);
+                    $notification = new Notification();
+                    $notification->document_id = $document->id;
+                    $notification->user_id = $docket_office[0]->id;
+                    $notification->office_id = $docket_office[0]->office_id;
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->status = 0;
+                    $notification->message = 'Document '.$document->subject.' has been created.';
+                    $notification->save();
                 
-            //     $sender_id = $document->sender_name;
-            //     $name = User::all()->find($sender_id);
-            //     $document = Document::all()->find($document->id);
-                
-            //     foreach ($notify_user as $key => $value) {
-            //         $notification = new Notification();
-            //         $notification->document_id = $document->id;
-            //         $notification->user_id = $value->id;
-            //         $notification->office_id = $value->office_id;
-            //         $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-            //         . $name->last_name . ' ' . $name->suffix;
-            //         $notification->status = 0;
-            //         $notification->message = 'Document '.$document->subject.' has been created.';
-            //         $notification->save();
-            //     }
-            // break;
+                // foreach ($notify_user as $key => $value) {
+                //     $notification = new Notification();
+                //     $notification->document_id = $document->id;
+                //     $notification->user_id = $value->id;
+                //     $notification->office_id = $value->office_id;
+                //     $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                //     . $name->last_name . ' ' . $name->suffix;
+                //     $notification->status = 0;
+                //     $notification->message = 'Document '.$document->subject.' has been created.';
+                //     $notification->save();
+                // }
+            break;
                 
             case 'update':
                 $subject = $event->request_obj->subject;
