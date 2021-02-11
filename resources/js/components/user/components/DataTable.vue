@@ -9,7 +9,7 @@
 		item-key="id"
 		:loading="datatable_loader"
         :sort-by="['priority_level']"
-        :sort-desc="[true]"
+        :sort-desc="[false]"
 		loading-text="Loading... Please wait"
 		class="elevation-1"
 		:search="search"
@@ -174,14 +174,14 @@ export default {
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
                 if (doc.priority_level == 1) {
-                    doc.prio_text = 'Low'
+                    doc.prio_text = 'High'
                 }
                 else if(doc.priority_level == 2) {
                     doc.prio_text = 'Medium'
 
                 }
                 else if (doc.priority_level == 3)
-                    doc.prio_text = 'High'
+                    doc.prio_text = 'Low'
                 else
                     doc.prio_text = 'None'
 				return doc
@@ -232,7 +232,7 @@ export default {
     justify-content: center;
 }
 .trackin {
-    width: 220px;
+    width: 250px;
     justify-content: center;
 }
 </style>

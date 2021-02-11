@@ -360,9 +360,9 @@ export default {
                 { show: 'Reject', value: 'rejected' }
             ],
             priority_level: [
-                { show: 'High', value: '3' },
+                { show: 'High', value: '1' },
                 { show: 'Medium', value: '2' },
-                { show: 'Low', value: '1' }
+                { show: 'Low', value: '3' }
             ],
             temp: {
                 sample_data: 'sample'
