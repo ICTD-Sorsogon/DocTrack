@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-card>
-            <v-card-title primary-title>
+            <v-card-title primary-title class="pr-0">
                 <v-toolbar flat>
                     <v-toolbar-title>Archive List Report</v-toolbar-title>
                     <v-divider class="mx-4" inset vertical/>
@@ -31,10 +31,10 @@
                         </template>
                         <v-list>
                             <v-list-item :key="1" @click.stop="searchOption = 'normal'">
-                                <v-icon class="ma-1">mdi-magnify</v-icon> NORMAL SEARCH
+                                <v-icon class="ma-1 mr-1">mdi-magnify</v-icon> NORMAL
                             </v-list-item>
                             <v-list-item :key="2" @click.stop="searchOption = 'advance'">
-                                <v-icon  class="ma-1">mdi-magnify</v-icon> ADVANCED SEARCH
+                                <v-icon  class="ma-1 mr-1">mdi-cogs</v-icon> ADVANCED
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -43,14 +43,14 @@
             </v-card-title>
             <v-data-table
                 :headers="headers"
-                :items="extendedData"
+                :items="tableData"
                 :items-per-page="10"
                 :search="search"
                 class="elevation-1"
             >
                 <template v-slot:top>
                     <v-row>
-                        <v-col class="d-flex" cols="12" xs="3" sm="3" md="3" lg="3" xl="3">
+                        <v-col class="d-flex" v-bind="breakpoint(3)">
                             <v-select
                                 v-model="filterOptionSelected"
                                 :items="filterOptionList"
@@ -63,12 +63,12 @@
                             ></v-select>
                             <v-divider class=" mt-0" inset vertical dense/>
                         </v-col>
-                        <v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9" v-if="isByYear">
+                        <v-col class="d-flex"  v-bind="breakpoint(9)" v-if="isByYear">
                            <v-select
                                 v-model="filterYearSelected"
                                 :items="distinctYearFromDB"
                                 small-chips
-                                label="Select Year"
+                                label="SELECT YEAR"
                                 multiple
                                 outlined
                                 dense
@@ -89,7 +89,7 @@
                                 </template>
                             </v-select>
                         </v-col>
-                        <v-col class="d-flex" cols="12" xs="9" sm="9" md="9" lg="9" xl="9" v-if="!isByYear">
+                        <v-col class="d-flex"  v-bind="breakpoint(9)" v-if="!isByYear">
                             <v-dialog
                                 ref="dialog"
                                 v-model="filterDateDialogFrom"
@@ -160,43 +160,41 @@
                     </v-row>
 
                     <v-card v-if="searchOption == 'advance'" class="elevation-2 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;border:1px solid #B8B8B8;">
-                        <v-row>
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-text-field v-model="search" @input="textboxChange" label="Traking ID" class="mx-4"/>
+                        <v-row class="d-flex">
+                            <v-col v-bind="breakpoint(6)">
+                                <v-text-field v-model="advanceSearch.trackingId" @input="textboxChange" label="Traking ID" class="mx-4"/>
                             </v-col>
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-text-field v-model="search" @input="textboxChange" label="Subject" class="mx-4"/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-text-field v-model="advanceSearch.search" @input="textboxChange" label="Subject" class="mx-4"/>
                             </v-col>
-
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-select class="mx-4" :items="keys2" label="Document Source" dense/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-select class="mx-4" :items="keys2" v-model="advanceSearch.source" @change="textboxChange" label="Document Source" dense/>
                             </v-col>
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-select class="mx-4" :items="keys3" label="Document Type" dense/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-select class="mx-4" :items="keys3" v-model="advanceSearch.type" @change="textboxChange" label="Document Type" dense/>
                             </v-col>
-
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-select class="mx-4" :items="keys" label="Originating Office" dense/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-select class="mx-4" :items="keys" v-model="advanceSearch.originating" @change="textboxChange" label="Originating Office" dense/>
                             </v-col>
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-select class="mx-4" :items="keys" label="Destination Office" dense/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-select class="mx-4" :items="keys" v-model="advanceSearch.destination" @change="textboxChange" label="Destination Office" dense/>
                             </v-col>
 
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-text-field v-model="search" @input="textboxChange" label="Sender Name" class="mx-4"/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-text-field v-model="advanceSearch.sender" @input="textboxChange" label="Sender Name" class="mx-4"/>
                             </v-col>
-                            <v-col class="d-flex" cols="12" xs="6" sm="6" md="6" lg="6" xl="6">
-                                <v-text-field v-model="search" @input="textboxChange" label="Date Created" class="mx-4"/>
+                            <v-col v-bind="breakpoint(6)">
+                                <v-text-field v-model="advanceSearch.dateCreated" @input="textboxChange" label="Date Created" class="mx-4"/>
                             </v-col>
                         </v-row>
-                         <v-btn v-show="true" color="red" fab dark small absolute top right @click="searchOption = 'normal'">
+                         <v-btn v-show="true" color="#81B7DA" class="elevation-2" fab dark small absolute top right @click="searchOption = 'normal'">
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
                     </v-card>
 
-                    <v-row v-if="searchOption == 'normal'">
-                        <v-col class="d-flex" cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                            <v-text-field v-model="search" @input="textboxChange" label="Search Value" class="mx-4"/>
+                    <v-row v-if="searchOption == 'normal'" class="d-flex">
+                        <v-col v-bind="breakpoint(12)">
+                            <v-text-field v-model="search" label="Search Value" class="mx-4"/>
                         </v-col>
                     </v-row>
 
@@ -210,12 +208,12 @@
 
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-row>
-                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
+                        <v-col v-bind="breakpoint(6)" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
                             <v-btn fab icon raised x-small color = 'primary' title="Restore to Active" style="margin-right:4px;"
                                 @click.prevent="{selectDoc(item.id); viewDialog = true}"
                             ><v-icon>mdi-backup-restore</v-icon></v-btn>
                         </v-col>
-                        <v-col cols="12" xs="6" sm="6" md="6" lg="6" xl="6" class="pl-0" style="top:50%; text-align:left; ">
+                        <v-col v-bind="breakpoint(6)" class="pl-0" style="top:50%; text-align:left; ">
                             <v-btn fab icon raised x-small color = 'primary' title="View More"
                                 @click.prevent="{selectDoc(item.id); viewDialog = true}"
                             ><v-icon>mdi-more</v-icon></v-btn>
@@ -376,7 +374,18 @@
                 filterOptionList: ["Date", "Year"],
                 filterOptionSelected: "Date",
                 isByYear: false,
-                filter: {}
+                filter: {},
+                tableData: [],
+                advanceSearch: {
+                    trackingId: '',
+                    subject: '',
+                    source: '',
+                    type: '',
+                    originating: '',
+                    destination: '',
+                    sender: '',
+                    dateCreated: ''
+                },
             }
         },
         watch: {
@@ -399,13 +408,15 @@
                     if (this.documentsArchive.length) {
                         const selected = this.documentsArchive[0].selected
                         const dataRes = (selected.filter == 'Year')? selected.year.data : selected.date.data
-                        return JSON.parse(JSON.stringify(dataRes)).map(doc=>{
+                        const data = JSON.parse(JSON.stringify(dataRes)).map(doc=>{
                             doc.is_external = doc.is_external ? 'External' : 'Internal'
                             doc.sender_name = doc.sender?.name ?? doc.sender_name
                             doc.originating_office = doc.origin_office?.name ?? doc.originating_office
                             doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
                             return doc
                         })
+                        this.tableData = data
+                        return data
                     }
                 },
                 set: function (data) {
@@ -423,9 +434,12 @@
             icon () {
                 if (this.allData) return 'mdi-close-box'
                 return 'mdi-checkbox-blank-outline'
-            }
+            },
         },
         methods: {
+            breakpoint(col){
+                return { cols:"12", xs:col, sm:col, md:col, lg:col, xl:col }
+            },
             filterBy(){
                 this.filter = {}
                 this.filter.action = "update"
@@ -512,7 +526,23 @@
                 })
             },
             textboxChange(value){
-                console.log(`${this.searchOption} : ` + value)
+
+                /*const advanceSearch = {
+                    trackingId: '',
+                    subject: '',
+                    source: '',
+                    type: '',
+                    originating: '',
+                    destination: '',
+                    sender: '',
+                    dateCreated: ''
+                }*/
+
+                console.log(value)
+                console.log(this.$refs)
+                //this.$refs.trackingId.value)
+                //trackingId
+                //console.log(`${this.searchOption} : ` + value)
             },
             getTrackingCodeColor(document, document_type_id) {
                 return colors[document_type_id];
