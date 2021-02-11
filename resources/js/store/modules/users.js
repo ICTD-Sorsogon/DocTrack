@@ -251,21 +251,21 @@ const actions = {
     },
 
     async seenNotif({ commit }, notif) {
-        await axios.put(`api/notifs/${notif.id}`, notif)
+        await axios.put(`http://127.0.0.1:8000/api/notifs/${notif.id}`, notif)
         .then(response => {
-                commit('SEEN_NOTIF', notif.id);
-            })
-            .catch(error => {
-                var snackbar_error ={
-                    message: error.response.data.errors,
-                    status: 'error',
-                    title: error.response.data.message,
-                    type: 'error'
-                };
-                commit('SNACKBAR_STATUS', snackbar_error);
-            });
+            console.log(response)
+            commit('SEEN_NOTIF', notif.id);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
     },
-
 
 }
 
