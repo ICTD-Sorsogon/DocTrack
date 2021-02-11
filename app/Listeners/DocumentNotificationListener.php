@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\DocumentEvent;
 use App\Models\Document;
 use App\Models\Notification;
+use App\Models\Office;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -40,6 +41,8 @@ class DocumentNotificationListener
                     $name = User::all()->find($sender_id);
                     $docket_office = User::where('office_id', 37)->get();
                     $document = Document::all()->find($document->id);
+
+                    if(!$document->originating_office){
                         $notification = new Notification();
                         $notification->document_id = $document->id;
                         $notification->user_id = $docket_office[0]->id;
@@ -49,6 +52,23 @@ class DocumentNotificationListener
                         $notification->status = 0;
                         $notification->message = 'Document '.$document->subject.' has been created.';
                         $notification->save();
+                    }
+
+
+                    $docket_offices = User::where('office_id', 37)->get();
+                    foreach($docket_offices as $docket_office){
+                        $notification = new Notification();
+                        $notification->document_id = $document->id;
+                        $notification->user_id = $docket_office->id;
+                        $notification->office_id = 37;
+                        $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                        . $name->last_name . ' ' . $name->suffix;
+                        $notification->status = 0;
+                        $notification->message = 'Document '.$document->subject.' has been created.';
+                        $notification->save();
+                    }
+
+
                 }
                 // foreach ($notify_user as $key => $value) {
                 //     $notification = new Notification();
@@ -68,7 +88,7 @@ class DocumentNotificationListener
                 $old_values = json_encode($event->old_values);
                 $old_subject = $event->old_values->subject;
                 $data = json_encode($event->request_obj);
-                
+       
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
@@ -141,16 +161,32 @@ class DocumentNotificationListener
                 $document = Document::all()->find($document->id);
                 $user_office_id = User::where('office_id', $document->originating_office)->get();
                 $receiver_fullname = Auth::user()->last_name. ', ' . Auth::user()->first_name. ' ' . Auth::user()->middle_name;
+                $office_received = Office::find(Auth::user()->office_id);
+
+                if(!$document->originating_office){
+                    $notification = new Notification();
+                    $notification->document_id = $document->id;
+                    $notification->user_id = $user_office_id[0]->id;
+                    $notification->office_id = $document->originating_office;
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->status = 0;
+                    $notification->message = 'Document '.$document->subject.' has been received by '. $receiver_fullname . ' at ' . $office_received->name;
+                    $notification->save(); 
+                }
                 
-                $notification = new Notification();
-                $notification->document_id = $document->id;
-                $notification->user_id = $user_office_id[0]->id;
-                $notification->office_id = $document->originating_office;
-                $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                . $name->last_name . ' ' . $name->suffix;
-                $notification->status = 0;
-                $notification->message = 'Document '.$document->subject.' has been received by '. $receiver_fullname;
-                $notification->save();
+                $docket_offices = User::where('office_id', 37)->get();
+                foreach($docket_offices as $docket_office){
+                    $notification = new Notification();
+                    $notification->document_id = $document->id;
+                    $notification->user_id = $docket_office->id;
+                    $notification->office_id = 37;
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->status = 0;
+                    $notification->message = 'Document '.$document->subject.' has been received by '. $receiver_fullname . ' at ' . $office_received->name;
+                    $notification->save();
+                }
 
             break;
         }
