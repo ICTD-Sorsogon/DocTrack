@@ -29,7 +29,13 @@ class DocumentEvent implements ShouldBroadcast
         $this->user = Auth()->user();
 
         if($document->status == 'created'){
-            array_push($this->broadcastMe, new Channel('documents37'));
+            if($document->wasRecentlyCreated){
+                array_push($this->broadcastMe, new Channel('documents37'));
+            } else {
+                array_push($this->broadcastMe, new Channel('documents37'));
+                array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
+            }
+            
         }
 
         if($document->status == 'received'){

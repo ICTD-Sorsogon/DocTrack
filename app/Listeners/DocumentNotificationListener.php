@@ -40,11 +40,12 @@ class DocumentNotificationListener
                 $name = User::all()->find($sender_id);
                 $docket_office = User::where('office_id', 37)->get();
                 $document_data = Document::all()->find($document->id);
-                $document_old = $document_data->getOriginal();
-                $document_new = $document_data->getAttributes();
+                $document_old = $document->getOriginal();
+                $document_new = $document->getAttributes();
+                
+                $docket_offices = User::where('office_id', 37)->get();
                 if($document->wasRecentlyCreated){
 
-                    $docket_offices = User::where('office_id', 37)->get();
                     foreach($docket_offices as $docket_office){
                         $notification = new Notification();
                         $notification->document_id = $document_data->id;
@@ -64,6 +65,18 @@ class DocumentNotificationListener
                         $notification->document_id = $document_data->id;
                         $notification->user_id = $value['id'];
                         $notification->office_id = $value['office_id'];
+                        $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                        . $name->last_name . ' ' . $name->suffix;
+                        $notification->status = 0;
+                        $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
+                        $notification->save();
+                    }
+
+                    foreach($docket_offices as $docket_office){
+                        $notification = new Notification();
+                        $notification->document_id = $document_data->id;
+                        $notification->user_id = $docket_office->id;
+                        $notification->office_id = 37;
                         $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
                         . $name->last_name . ' ' . $name->suffix;
                         $notification->status = 0;
