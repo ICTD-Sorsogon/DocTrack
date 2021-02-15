@@ -34,7 +34,7 @@ describe('Document Flow', () => {
         cy.get('.v-snack__action > .v-btn').click()
         cy.get('.v-app-bar__nav-icon').click()
         cy.get('.col > .v-btn > .v-btn__content').click()
-        cy.get('.v-card__actions > :nth-child(2)').click()
+        cy.get('.v-card__actions > :nth-child(2)').click({multiple : true, force:true})
         cy.get('input[name=username]').type('VGO')
         cy.get('input[name=password]').type('secret')
         cy.get('button[type=submit]').click()
