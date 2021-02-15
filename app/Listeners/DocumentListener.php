@@ -53,7 +53,8 @@ class DocumentListener
 
         if(!$document->wasRecentlyCreated && 
             $document->status != 'acknowledged' &&
-            $document->status != 'received'
+            $document->status != 'received' &&
+            $document->status != 'forwarded'
             ){
             $new = $document;
             $old = $document->getOriginal();
@@ -161,34 +162,35 @@ class DocumentListener
                 return $log->save();
             break;
 
-            case 'forward':
-                $remarks = json_encode($event->request_obj->documentRemarks);
-                $subject = json_encode($event->request_obj->subject);
-                $approved_by = json_encode($event->request_obj->approved_by);
-                $through = json_encode($event->request_obj->through);
-
+            case 'forwarded':
+                $tracking_records = $document->tracking_records;
+                $remarks = $document->remarks;
+                $subject = $document->subject;
+                $approved_by = $tracking_records[4]->approved_by;
+                $through = $tracking_records[4]->through;
+                
                 $log = new Log();
-                $log->user_id = $event->user_id;
+                $log->user_id = auth()->user()->id;
                 $log->action = 'Document forward';
-                $log->remarks = 'Document '.$subject.' has been successfully forwarded through '.$through.'. 
-                    and approved by: '.$approved_by.' with remarks: '.$remarks;
+                $log->remarks = 'Document '.$subject.' has been successfully forwarded through '.$through.
+                ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
                 return $log->save();
             break;
 
-            // case 'received':
-            //     $tracking_records = $document->tracking_records;
-            //     $through = $tracking_records[2]->through;
-            //     $approved_by = $tracking_records[2]->approved_by;
-            //     $remarks = $document->remarks;
-            //     $subject = $document->subject;
+            case 'received':
+                $tracking_records = $document->tracking_records;
+                $through = $tracking_records[2]->through;
+                $approved_by = $tracking_records[2]->approved_by;
+                $remarks = $document->remarks;
+                $subject = $document->subject;
 
-            //     $log = new Log();
-            //     $log->user_id = auth()->user()->id;
-            //     $log->action = 'Document receive';
-            //     $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.
-            //     ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
-            //     return $log->save();
-            // break;
+                $log = new Log();
+                $log->user_id = auth()->user()->id;
+                $log->action = 'Document receive';
+                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.
+                ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
+                return $log->save();
+            break;
         }
     }
 

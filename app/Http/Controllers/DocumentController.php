@@ -85,7 +85,6 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            $tracking_record->document->update(['status' => 'forwarded']);
 
             $destination = json_decode($tracking_record->document->destination_office_id);
 
@@ -93,11 +92,6 @@ class DocumentController extends Controller
             $tracking_record->document->update(['status' => 'forwarded',
                 'destination_office_id' => $destination,
                 'acknowledged' => false]);
-
-
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$request,null,null, 'forward'));
-
 
         } catch (ValidationException $error) {
             DB::rollback();

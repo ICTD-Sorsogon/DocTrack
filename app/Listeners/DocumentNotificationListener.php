@@ -156,18 +156,40 @@ class DocumentNotificationListener
                 return $log->save();
             break;
 
-            case 'forward':
-                $remarks = json_encode($event->request_obj->documentRemarks);
-                $subject = json_encode($event->request_obj->subject);
-                $approved_by = json_encode($event->request_obj->approved_by);
-                $through = json_encode($event->request_obj->through);
+            case 'forwarded':
 
-                $log = new Log();
-                $log->user_id = $event->user_id;
-                $log->action = 'Document forward';
-                $log->remarks = 'Document '.$subject.' has been successfully forwarded through '.$through.'. 
-                    and approved by: '.$approved_by.' with remarks: '.$remarks;
-                return $log->save();
+                $sender_id = $document->sender_name;
+                $name = User::all()->find($sender_id);
+                $document_data = Document::all()->find($document->id);
+                $user_office_id = User::where('office_id', $document->originating_office)->get();
+
+                $forwarded_by = Office::find($document->tracking_records[4]->forwarded_by);
+                $forwarded_to = Office::find($document->tracking_records[4]->forwarded_to);
+                $through = $document->tracking_records[4]->through;
+
+                $notification = new Notification();
+                $notification->document_id = $document_data->id;
+                $notification->user_id = $sender_id;
+                $notification->office_id = $document->tracking_records[4]->forwarded_to;
+                $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                . $name->last_name . ' ' . $name->suffix;
+                $notification->status = 0;
+                $notification->message = 'Document '.$document_data->subject.' is forwarded to your office by '. $forwarded_by->name . ' through ' . $through;
+                $notification->save(); 
+                
+                $docket_offices = User::where('office_id', 37)->get();
+                foreach($docket_offices as $docket_office){
+                    $notification = new Notification();
+                    $notification->document_id = $document_data->id;
+                    $notification->user_id = $docket_office->id;
+                    $notification->office_id = 37;
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->status = 0;
+                    $notification->message = 'Document '.$document_data->subject.' is forwarded to '. $forwarded_to->name . ' from ' . $forwarded_by->name . ' through ' . $through;
+                    $notification->save();
+                }
+
             break;
 
             case 'received':

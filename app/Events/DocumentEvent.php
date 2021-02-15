@@ -43,6 +43,11 @@ class DocumentEvent implements ShouldBroadcast
             array_push($this->broadcastMe, new Channel('documents'. json_decode($document->sender_name)));
         }
 
+        if($document->status == 'forwarded'){
+            array_push($this->broadcastMe, new Channel('documents37'));
+            array_push($this->broadcastMe, new Channel('documents'. $document->tracking_records[4]->forwarded_to));
+        }
+
         if($document->status == 'acknowledged'){
             $document_length = count(json_decode($document->destination_office_id)); 
             for($index = 0; $index < $document_length; $index++){
