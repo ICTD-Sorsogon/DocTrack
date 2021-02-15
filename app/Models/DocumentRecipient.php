@@ -11,5 +11,8 @@ class DocumentRecipient extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $primaryKey = 'recipient_id';
+
     protected $guarded = ['id'];
+
 }

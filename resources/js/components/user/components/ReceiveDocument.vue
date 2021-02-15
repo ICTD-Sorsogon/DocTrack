@@ -541,9 +541,8 @@ export default {
         },
     },
     mounted() {
-        console.log(this.selected_document)
         this.$store.dispatch('unsetLoader');
-        this.form = this.find_document(this.$route.params.id);
+        this.form = this.$route.params.item;
     }
 
 }

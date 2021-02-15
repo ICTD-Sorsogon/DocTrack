@@ -67,8 +67,10 @@ export default {
             return JSON.parse(JSON.stringify(this.documents))
             .filter( doc => this.tab ? doc[type] == this.auth_user.office_id : doc['originating_office'] != this.auth_user.office_id )
             .map(doc => {
-                for(status of ['acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
-                  doc[status] = doc.recipient.every( recipient => recipient[status] )
+                doc.sender=false
+                if(!this.tab){
+                  doc.recipient_id = doc.recipient[0].recipient_id
+                  doc.sender=true
                 }
               return doc
             })
