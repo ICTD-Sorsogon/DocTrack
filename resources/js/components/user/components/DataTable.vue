@@ -109,6 +109,15 @@
 							Acknowledge
 						</v-btn>
 					</v-col>
+                    <v-col v-if="isGO">
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Change Date')" text color="#E65100" block
+						>
+							<v-icon left>
+								mdi-calendar-edit
+							</v-icon>
+							Change Date
+						</v-btn>
+					</v-col>
                     <v-col>
 						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Hold or Reject')" text color="#F44336" block
 						>
@@ -192,7 +201,10 @@ export default {
 		},
 		isAdmin() {
 			return this.auth_user.role_id == 1
-		}
+		},
+        isGO(){
+            return this.auth_user.role_id == 3
+        }
 	},
 	methods: {
 		closeDialog(){

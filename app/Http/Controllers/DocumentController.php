@@ -88,12 +88,12 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-           
+
             $destination = json_decode($tracking_record->document->destination_office_id);
 
             array_push($destination,$request->forwarded_to);
-            $tracking_record->document->update(['status' => 'forwarded', 
-                'destination_office_id' => $destination, 
+            $tracking_record->document->update(['status' => 'forwarded',
+                'destination_office_id' => $destination,
                 'acknowledged' => false]);
 
 
@@ -196,6 +196,28 @@ class DocumentController extends Controller
             $user_id = Auth::user()->id;
             event(new DocumentEvent($user_id, $status, $subject,null, 'holdreject'));
 
+
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$tracking_record];
+    }
+
+    public function changeDateDocument(Request $request)
+    {
+        $updatedTime = $request->date_filed. ' ' .$request->time_filed;
+        DB::beginTransaction();
+        try {
+            $tracking_record = TrackingRecord::find($request->id);
+            $tracking_record->update([
+                'created_at' => Carbon::parse($updatedTime),
+                'last_touched' => Carbon::parse($updatedTime)
+                ]);
 
         } catch (ValidationException $error) {
             DB::rollback();
