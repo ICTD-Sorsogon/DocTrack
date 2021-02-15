@@ -311,6 +311,7 @@ export default {
         Echo.channel('documents'+this.auth_user.office_id)
         .listen('DocumentEvent', (e) => {
             this.$store.dispatch('getActiveDocuments');
+            this.$store.dispatch('getNotifs');
         })
     },
     beforeCreate() {

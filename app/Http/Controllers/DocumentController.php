@@ -85,6 +85,7 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
+            $tracking_record->document->update(['status' => 'forwarded']);
            
             $destination = json_decode($tracking_record->document->destination_office_id);
 
@@ -155,8 +156,6 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged', 'acknowledged' => true, 'priority_level' => $request->priority_levels]);
-            // $tracking_record->document->update(['acknowledged' => true]);
-            // $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
         } catch (ValidationException $error) {
             DB::rollback();

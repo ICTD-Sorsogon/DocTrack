@@ -34,6 +34,7 @@ class DocumentEvent implements ShouldBroadcast
 
         if($document->status == 'received'){
             array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
+            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->sender_name)));
         }
 
         if($document->status == 'acknowledged'){
@@ -41,8 +42,8 @@ class DocumentEvent implements ShouldBroadcast
             for($index = 0; $index < $document_length; $index++){
                 array_push($this->broadcastMe, new Channel('documents'. json_decode($document->destination_office_id)[$index]));
             }
+            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->sender_name)));
         }
-
 
     }
     /**

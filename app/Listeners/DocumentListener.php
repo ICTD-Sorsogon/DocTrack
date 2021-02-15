@@ -51,7 +51,6 @@ class DocumentListener
         // $type = ['edited', 'created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
         // $message = 'Document has been successfully';
 
-
         if(!$document->wasRecentlyCreated && 
             $document->status != 'acknowledged' &&
             $document->status != 'received'
@@ -176,20 +175,20 @@ class DocumentListener
                 return $log->save();
             break;
 
-            case 'received':
-                $tracking_records = $document->tracking_records;
-                $through = $tracking_records[2]->through;
-                $approved_by = $tracking_records[2]->approved_by;
-                $remarks = $document->remarks;
-                $subject = $document->subject;
+            // case 'received':
+            //     $tracking_records = $document->tracking_records;
+            //     $through = $tracking_records[2]->through;
+            //     $approved_by = $tracking_records[2]->approved_by;
+            //     $remarks = $document->remarks;
+            //     $subject = $document->subject;
 
-                $log = new Log();
-                $log->user_id = auth()->user()->id;
-                $log->action = 'Document receive';
-                $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.
-                ' and approved by: '.$approved_by.' and remarks: '.$remarks;
-                return $log->save();
-            break;
+            //     $log = new Log();
+            //     $log->user_id = auth()->user()->id;
+            //     $log->action = 'Document receive';
+            //     $log->remarks = 'Document '.$subject.' has been successfully received through '.$through.
+            //     ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
+            //     return $log->save();
+            // break;
         }
     }
 
