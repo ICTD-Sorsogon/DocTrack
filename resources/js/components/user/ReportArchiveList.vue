@@ -160,7 +160,11 @@
                     </v-row>
 
                     <v-card v-if="searchOption == 'advance'" class="elevation-2 pt-5 pb-0 mb-5" style="background-color:#E6F5FD;border:1px solid #B8B8B8;">
-                        <v-row class="d-flex">
+                        <advance-search
+                           :minimumYear="Math.min(...distinctYearFromDB).toString()"
+                           @searchParameter="advanceSearchQuery"
+                        />
+                        <!--<v-row class="d-flex">
                             <v-col v-bind="bp(6)">
                                 <v-text-field v-model="advanceSearch.trackingId" @input="textboxChange" label="Traking ID" class="mx-4" clearable/>
                             </v-col>
@@ -182,10 +186,20 @@
                                 </v-select>
                             </v-col>
                             <v-col v-bind="bp(6)">
-                                <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="advanceSearch.type" @change="textboxChange" label="Document Type" dense clearable hide-selected multiple deletable-chips chips/>
+                                <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="advanceSearch.type" @change="textboxChange" label="Document Type" dense clearable hide-selected multiple deletable-chips chips>
+                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeTypeChip(item.name)">
+                                                    {{item.name}}
+                                                </v-chip>
+                                            </template>
+                                            <span >{{item.name}}</span>
+                                        </v-tooltip>
+                                    </template>
+                                </v-select>
                             </v-col>
                             <v-col v-bind="bp(6)">
-                                <!--<v-select class="mx-4" :items="offices" v-model="advanceSearch.originating" @change="textboxChange" label="Originating Office" dense/>-->
                                 <v-combobox
                                     v-model="advanceSearch.originating"
                                     :items="offices"
@@ -200,20 +214,19 @@
                                     dense
                                     multiple
                                 >
-                                    <template v-slot:selection="{ attrs, item, parent, selected }">
+                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                         <v-tooltip top>
                                             <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small>
-                                                    {{ item.name || item }}
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeOriginatingChip(item)">
+                                                    {{ item.office_code || item }}
                                                 </v-chip>
                                             </template>
-                                            <span >{{item.office_code || item}}</span>
+                                            <span >{{item.name || item}}</span>
                                         </v-tooltip>
                                     </template>
                                 </v-combobox>
                             </v-col>
                             <v-col v-bind="bp(6)">
-                                <!--<v-select class="mx-4" :items="keys" v-model="advanceSearch.destination" @change="textboxChange" label="Destination Office" dense/>-->
                                 <v-combobox
                                     v-model="advanceSearch.destination"
                                     :items="offices"
@@ -229,20 +242,19 @@
                                     dense
                                 >
                                     <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                    <v-tooltip top>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeDestinationChip(item)">
-                                                {{ item.office_code || item }}
-                                            </v-chip>
-                                        </template>
-                                        <span >{{item.name || item}}</span>
-                                    </v-tooltip>
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeDestinationChip(item)">
+                                                    {{ item.office_code || item }}
+                                                </v-chip>
+                                            </template>
+                                            <span >{{item.name || item}}</span>
+                                        </v-tooltip>
                                     </template>
                                 </v-combobox>
                             </v-col>
 
                             <v-col v-bind="bp(6)">
-                                <!--<v-text-field v-model="advanceSearch.sender" @input="textboxChange" label="Sender Name" class="mx-4"/>-->
                                 <v-combobox
                                     v-model="advanceSearch.sender"
                                     :items="all_users"
@@ -251,12 +263,24 @@
                                     hide-selected
                                     persistent-hint
                                     label="Sender Name"
+                                    chips
+                                    multiple
                                     required
                                     class="mx-4"
-                                />
+                                >
+                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeSenderChip(item)">
+                                                    {{ item.full_name || item }}
+                                                </v-chip>
+                                            </template>
+                                            <span >{{item.full_name || item}}</span>
+                                        </v-tooltip>
+                                    </template>
+                                </v-combobox>
                             </v-col>
                             <v-col v-bind="bp(6)">
-                                <!--<v-text-field v-model="advanceSearch.dateCreated" @input="textboxChange" label="Date Created" class="mx-4"/>-->
                                 <v-dialog
                                     ref="dialog_created"
                                     v-model="advanceSearch.optionDateCreated"
@@ -298,7 +322,7 @@
                                 </v-btn>
                             </v-col>
 
-                        </v-row>
+                        </v-row>-->
                          <!--<v-btn v-show="true" color="#81B7DA" class="elevation-2" fab dark small absolute top right @click="searchOption = 'normal'">
                             <v-icon>mdi-close</v-icon>
                         </v-btn>-->
@@ -408,8 +432,10 @@
     import { colors, breakpoint } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
 
+    import AdvanceSearch from './components/ArchiveAdvanceSearch'
+
     export default {
-        components: { OfficeTableModal, ExcelDialog, TableModal },
+        components: { OfficeTableModal, ExcelDialog, TableModal, AdvanceSearch },
         data() {
             return {
                 activeDoc: null,
@@ -454,7 +480,7 @@
                 isByYear: false,
                 filter: {},
                 tableData: [],
-                advanceSearch: {
+                /*advanceSearch: {
                     trackingId: '',
                     subject: '',
                     source: '',
@@ -468,7 +494,7 @@
                         'Internal'
                     ],
                     optionDateCreated: false,
-                },
+                },*/
 
             }
         },
@@ -521,6 +547,14 @@
             },
         },
         methods: {
+            advanceSearchQuery(param) {
+                console.log('search param:')
+                console.log(param)
+            },
+            /*removeOriginatingChip(item){
+                this.advanceSearch.originating.splice(this.advanceSearch.originating.indexOf(item), 1)
+                this.advanceSearch.originating = [...this.advanceSearch.originating]
+            },
             removeDestinationChip(item){
                 this.advanceSearch.destination.splice(this.advanceSearch.destination.indexOf(item), 1)
                 this.advanceSearch.destination = [...this.advanceSearch.destination]
@@ -530,6 +564,15 @@
                 this.advanceSearch.source.splice(this.advanceSearch.source.indexOf(item), 1)
                 this.advanceSearch.source = [...this.advanceSearch.source]
             },
+            removeTypeChip(item){
+                this.advanceSearch.type.splice(this.advanceSearch.type.indexOf(item), 1)
+                this.advanceSearch.type = [...this.advanceSearch.type]
+            },
+            removeSenderChip(item){
+                this.advanceSearch.sender.splice(this.advanceSearch.sender.indexOf(item), 1)
+                this.advanceSearch.sender = [...this.advanceSearch.sender]
+                //console.log(objIndex)
+            },*/
             bp(col){
                 return breakpoint(col)
             },
@@ -634,7 +677,7 @@
                 //console.log(value)
                 //console.log(this.$refs)
 
-                console.log(this.advanceSearch)
+                //console.log(this.advanceSearch)
 
                 //this.$refs.trackingId.value)
                 //trackingId
@@ -726,6 +769,10 @@
             this.$store.dispatch('unsetLoader')
             //console.log('hhhhhhhhhh')
             //console.log(breakpoint(2))
+
+            //console.log(this.bp(6));
+            //console.log(this.bp([2,3,4,5,6]));
+            //console.log(this.$root)
         }
     }
 </script>

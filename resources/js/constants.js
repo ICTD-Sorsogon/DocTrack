@@ -53,12 +53,23 @@ export const priority_level = {
 };
 
 export const breakpoint = (col) => {
-    return {
-        cols: "12",
-        xs: col,
-        sm: col,
-        md: col,
-        lg: col,
-        xl: col
+    if (Array.isArray(col)) {
+        return {
+            cols: "12",
+            xs: col[0] || 12,
+            sm: col[1] || 12,
+            md: col[2] || 12,
+            lg: col[3] || 12,
+            xl: col[4] || 12
+        }
+    } else {
+        return {
+            cols: "12",
+            xs: col || 12,
+            sm: col || 12,
+            md: col || 12,
+            lg: col || 12,
+            xl: col || 12
+        }
     }
 };
