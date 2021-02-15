@@ -152,6 +152,24 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
+    async changeDateDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/change_date_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was updated!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
     async documentReports({ commit }) {
         const response = await axios.get('/api/tracking_reports')
         .then(response => {
