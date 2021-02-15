@@ -9,7 +9,7 @@
 		item-key="id"
 		:loading="datatable_loader"
         :sort-by="['priority_level']"
-        :sort-desc="[true]"
+        :sort-desc="[false]"
 		loading-text="Loading... Please wait"
 		class="elevation-1"
 		:search="search"
@@ -109,6 +109,15 @@
 							Acknowledge
 						</v-btn>
 					</v-col>
+                    <v-col v-if="isGO">
+						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Change Date')" text color="#E65100" block
+						>
+							<v-icon left>
+								mdi-calendar-edit
+							</v-icon>
+							Change Date
+						</v-btn>
+					</v-col>
                     <v-col>
 						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Hold or Reject')" text color="#F44336" block
 						>
@@ -174,14 +183,14 @@ export default {
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
                 if (doc.priority_level == 1) {
-                    doc.prio_text = 'Low'
+                    doc.prio_text = 'High'
                 }
                 else if(doc.priority_level == 2) {
                     doc.prio_text = 'Medium'
 
                 }
                 else if (doc.priority_level == 3)
-                    doc.prio_text = 'High'
+                    doc.prio_text = 'Low'
                 else
                     doc.prio_text = 'None'
 				return doc
@@ -192,7 +201,10 @@ export default {
 		},
 		isAdmin() {
 			return this.auth_user.role_id == 1
-		}
+		},
+        isGO(){
+            return this.auth_user.role_id == 3
+        }
 	},
 	methods: {
 		closeDialog(){
@@ -232,7 +244,7 @@ export default {
     justify-content: center;
 }
 .trackin {
-    width: 220px;
+    width: 250px;
     justify-content: center;
 }
 </style>

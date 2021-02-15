@@ -215,7 +215,7 @@ export default {
             return this.$store.state.loader.submenu_opened;
         },
         image_source(){
-            return '/storage/' + this.auth_user.avatar || ''
+            return this.auth_user.avatar || ''
         }
 
     },
