@@ -79,7 +79,7 @@
                                 <template v-slot:prepend-item>
                                     <v-list-item ripple @click="selectAllYear">
                                         <v-list-item-action>
-                                            <v-icon :color="filterYearSelected.length > 0 ? 'indigo darken-4' : ''"> {{ icon }} </v-icon>
+                                            <v-icon :color="filterYearSelected.length > 0 ? 'red darken-4' : ''"> {{ icon }} </v-icon>
                                         </v-list-item-action>
                                         <v-list-item-content>
                                             <v-list-item-title>Select All</v-list-item-title>
@@ -144,7 +144,7 @@
                                 <v-date-picker
                                     v-model="filterDateTo"
                                     scrollable
-                                    :max="Math.max(...distinctYearFromDB).toString() + '-12-31'"
+                                    :max="new Date().toISOString().slice(0,10)"
                                     :min="new Date(filterDateFrom).toISOString().substr(0, 10)"
                                 >
                                     <v-spacer/>
@@ -163,169 +163,8 @@
                         <advance-search
                            :minimumYear="Math.min(...distinctYearFromDB).toString()"
                            @searchParameter="advanceSearchQuery"
+                           @changeSearch="searchOption = 'normal'"
                         />
-                        <!--<v-row class="d-flex">
-                            <v-col v-bind="bp(6)">
-                                <v-text-field v-model="advanceSearch.trackingId" @input="textboxChange" label="Traking ID" class="mx-4" clearable/>
-                            </v-col>
-                            <v-col v-bind="bp(6)">
-                                <v-text-field v-model="advanceSearch.search" @input="textboxChange" label="Subject" class="mx-4" clearable/>
-                            </v-col>
-                            <v-col v-bind="bp(6)">
-                                <v-select class="mx-4" :items="advanceSearch.optionSource" v-model="advanceSearch.source" @change="textboxChange" label="Document Source" dense clearable hide-selected multiple deletable-chips chips>
-                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                        <v-tooltip top>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSourceChip(item)">
-                                                    {{item}}
-                                                </v-chip>
-                                            </template>
-                                            <span >{{item}}</span>
-                                        </v-tooltip>
-                                    </template>
-                                </v-select>
-                            </v-col>
-                            <v-col v-bind="bp(6)">
-                                <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="advanceSearch.type" @change="textboxChange" label="Document Type" dense clearable hide-selected multiple deletable-chips chips>
-                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                        <v-tooltip top>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeTypeChip(item.name)">
-                                                    {{item.name}}
-                                                </v-chip>
-                                            </template>
-                                            <span >{{item.name}}</span>
-                                        </v-tooltip>
-                                    </template>
-                                </v-select>
-                            </v-col>
-                            <v-col v-bind="bp(6)">
-                                <v-combobox
-                                    v-model="advanceSearch.originating"
-                                    :items="offices"
-                                    item-text="name"
-                                    clearable
-                                    hide-selected
-                                    persistent-hint
-                                    label="Originating Office"
-                                    chips
-                                    required
-                                    class="mx-4"
-                                    dense
-                                    multiple
-                                >
-                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                        <v-tooltip top>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeOriginatingChip(item)">
-                                                    {{ item.office_code || item }}
-                                                </v-chip>
-                                            </template>
-                                            <span >{{item.name || item}}</span>
-                                        </v-tooltip>
-                                    </template>
-                                </v-combobox>
-                            </v-col>
-                            <v-col v-bind="bp(6)">
-                                <v-combobox
-                                    v-model="advanceSearch.destination"
-                                    :items="offices"
-                                    item-text="name"
-                                    clearable
-                                    hide-selected
-                                    persistent-hint
-                                    label="Destination Office"
-                                    chips
-                                    multiple
-                                    required
-                                    class="mx-4"
-                                    dense
-                                >
-                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                        <v-tooltip top>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeDestinationChip(item)">
-                                                    {{ item.office_code || item }}
-                                                </v-chip>
-                                            </template>
-                                            <span >{{item.name || item}}</span>
-                                        </v-tooltip>
-                                    </template>
-                                </v-combobox>
-                            </v-col>
-
-                            <v-col v-bind="bp(6)">
-                                <v-combobox
-                                    v-model="advanceSearch.sender"
-                                    :items="all_users"
-                                    item-text="full_name"
-                                    clearable
-                                    hide-selected
-                                    persistent-hint
-                                    label="Sender Name"
-                                    chips
-                                    multiple
-                                    required
-                                    class="mx-4"
-                                >
-                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                        <v-tooltip top>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeSenderChip(item)">
-                                                    {{ item.full_name || item }}
-                                                </v-chip>
-                                            </template>
-                                            <span >{{item.full_name || item}}</span>
-                                        </v-tooltip>
-                                    </template>
-                                </v-combobox>
-                            </v-col>
-                            <v-col v-bind="bp(6)">
-                                <v-dialog
-                                    ref="dialog_created"
-                                    v-model="advanceSearch.optionDateCreated"
-                                    :return-value.sync="advanceSearch.dateCreated"
-                                    persistent
-                                    width="290px"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field
-                                            v-model="advanceSearch.dateCreated"
-                                            label="Date Created"
-                                            prepend-icon=""
-                                            readonly
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            class="mx-4"
-                                            clearable
-                                        />
-                                    </template>
-                                    <v-date-picker
-                                        v-model="advanceSearch.dateCreated"
-                                        scrollable
-                                        :max="new Date().toISOString().slice(0,10)"
-                                        :min="Math.min(...distinctYearFromDB).toString()"
-                                    >
-                                        <v-spacer/>
-                                        <v-btn text color="primary" @click="advanceSearch.optionDateCreated = false"> Cancel </v-btn>
-                                        <v-btn text color="primary" @click="$refs.dialog_created.save(advanceSearch.dateCreated); filterChange(false, true)"> OK </v-btn>
-                                    </v-date-picker>
-                                </v-dialog>
-                            </v-col>
-
-                            <v-col v-bind="bp(12)" align="right">
-                                <v-btn color="#5D97C1" dark class="mb-2 ma-1 pl-13 pr-13" @click="searchOption = 'normal'">
-                                    <v-icon class="ma-1 mr-1">mdi-cancel</v-icon> CANCEL
-                                </v-btn>
-                                <v-btn color="primary" dark class="mb-2 ma-1 ml-0 mr-2 pl-13 pr-13" @click.stop="openDialog('new_office')">
-                                    <v-icon class="ma-1 mr-1">mdi-magnify</v-icon> SEARCH
-                                </v-btn>
-                            </v-col>
-
-                        </v-row>-->
-                         <!--<v-btn v-show="true" color="#81B7DA" class="elevation-2" fab dark small absolute top right @click="searchOption = 'normal'">
-                            <v-icon>mdi-close</v-icon>
-                        </v-btn>-->
                     </v-card>
 
                     <v-row v-if="searchOption == 'normal'" class="d-flex">
@@ -346,7 +185,7 @@
                     <v-row>
                         <v-col v-bind="bp(6)" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
                             <v-btn fab icon raised x-small color = 'primary' title="Restore to Active" style="margin-right:4px;"
-                                @click.prevent="{selectDoc(item.id); viewDialog = true}"
+                                @click.prevent="{restoreDocument(item)}"
                             ><v-icon>mdi-backup-restore</v-icon></v-btn>
                         </v-col>
                         <v-col v-bind="bp(6)" class="pl-0" style="top:50%; text-align:left; ">
@@ -369,51 +208,6 @@
             />
         </v-card>
 
-        <v-row justify="center">
-            <v-dialog v-model="userAE" persistent max-width="1000px">
-                <v-card>
-                    <v-card-title class="headline">{{ formTitle }}</v-card-title>
-                    <v-card-text>
-                        <v-container>
-                            <v-form ref="form" lazy-validation>
-                                <v-row>hey hey</v-row>
-                                <v-row justify="end">
-                                    <v-btn color="primary" class="mb-5 mt-10 ma-5" @click="userAE = false">Close</v-btn>
-                                    <v-btn color="primary" class="mb-5 mt-10 ma-5" dark> SAVE </v-btn>
-                                </v-row>
-                            </v-form>
-                        </v-container>
-                    </v-card-text>
-                </v-card>
-            </v-dialog>
-        </v-row>
-
-        <v-row justify="center">
-            <v-dialog v-model="delete_dialog" persistent max-width="450px">
-                <v-card color="grey lighten-2">
-                    <v-card-title class="headline">
-                        <v-icon class="mr-2" size="30px">mdi-delete-circle</v-icon> Delete Office
-                    </v-card-title>
-                    <v-card-text>
-                        Are you sure you want to delete office from the list? <br> <strong>- {{ delete_info.name }}</strong>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary darken-1" text @click="delete_dialog = false"> Cancel </v-btn>
-                        <v-btn color="primary darken-1" text @click.prevent="deleteOffice"> Confirm </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-row>
-
-        <office-table-modal
-            v-if="office_info && form_dialog == true"
-            :form_dialog="form_dialog"
-            :selected_office="office_info"
-            :dialog_title="dialog_title"
-            @close-dialog="closeDialog('form')"
-        />
-
         <excel-dialog
             v-if="dialog_title && excel_dialog == true"
             :excel_dialog="excel_dialog"
@@ -426,7 +220,6 @@
 </template>
 
 <script>
-    import OfficeTableModal from './components/OfficeTableModal';
     import ExcelDialog from './components/ExcelDialog';
     import TableModal from './components/TableModal';
     import { colors, breakpoint } from '../../constants';
@@ -435,7 +228,7 @@
     import AdvanceSearch from './components/ArchiveAdvanceSearch'
 
     export default {
-        components: { OfficeTableModal, ExcelDialog, TableModal, AdvanceSearch },
+        components: { ExcelDialog, TableModal, AdvanceSearch },
         data() {
             return {
                 activeDoc: null,
@@ -452,25 +245,13 @@
                     { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
-                form_dialog: false,
                 excel_dialog: false,
                 dialog_for: 'new_office',
                 dialog_title: '',
-                office_info: '',
-                delete_dialog: false,
-                delete_info: {
-                    id: '',
-                    name: ''
-                },
-                switch1: true,
-                expanded: [],
                 filterDateDialogFrom: false,
                 filterDateFrom: new Date().toISOString().substr(0, 10),
                 filterDateDialogTo: false,
                 filterDateTo: new Date().toISOString().substr(0, 10),
-                items: ['Foo', 'Bar', 'Fizz', 'Buzz'],
-                formTitle: 'advance serch',
-                userAE: false,
                 searchOption: 'normal',
                 table: [],
                 distinctYearFromDB:[],
@@ -480,57 +261,23 @@
                 isByYear: false,
                 filter: {},
                 tableData: [],
-                /*advanceSearch: {
-                    trackingId: '',
-                    subject: '',
-                    source: '',
-                    type: '',
-                    originating: '',
-                    destination: '',
-                    sender: '',
-                    dateCreated: null,
-                    optionSource: [
-                        'External',
-                        'Internal'
-                    ],
-                    optionDateCreated: false,
-                },*/
-
-            }
-        },
-        watch: {
-            menu (val) {
-                val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
             }
         },
         computed: {
             ...mapGetters(['document_types', 'offices', 'all_users', 'documentsArchive', 'datatable_loader', 'auth_user', 'request']),
-            /*offices() {
-                var offices = JSON.parse(JSON.stringify(this.$store.state.offices.offices));
-                offices.forEach(office => {
-                    office.builded_office_name = office.office_code + ' - ' + office.name
-                });
-                return offices;
-            },*/
-            extendedData: {
-                get: function () {
-                    //console.log('getter');
-                    if (this.documentsArchive.length) {
-                        var selected = this.documentsArchive[0].selected
-                        var dataRes = (selected.filter == 'Year')? selected.year.data : selected.date.data
-                        var data = JSON.parse(JSON.stringify(dataRes)).map(doc=>{
-                            doc.is_external = doc.is_external ? 'External' : 'Internal'
-                            doc.sender_name = doc.sender?.name ?? doc.sender_name
-                            doc.originating_office = doc.origin_office?.name ?? doc.originating_office
-                            doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
-                            return doc
-                        })
-                        this.tableData = data
-                        return data
-                    }
-                },
-                set: function (data) {
-                    //console.log('setter')
+            extendedData() {
+                if (this.documentsArchive.length) {
+                    var selected = this.documentsArchive[0].selected
+                    var dataRes = (selected.filter == 'Year')? selected.year.data : selected.date.data
+                    var data = JSON.parse(JSON.stringify(dataRes)).map(doc=>{
+                        doc.is_external = doc.is_external ? 'External' : 'Internal'
+                        doc.sender_name = doc.sender?.name ?? doc.sender_name
+                        doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+                        doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
+                        return doc
+                    })
+                    this.tableData = data
+                    return data
                 }
             },
             selected_document() {
@@ -542,7 +289,7 @@
                 return this.filterYearSelected.length === this.distinctYearFromDB.length
             },
             icon () {
-                if (this.allData) return 'mdi-close-box'
+                if (this.allData) return 'mdi-minus-box'
                 return 'mdi-checkbox-blank-outline'
             },
         },
@@ -551,30 +298,14 @@
                 console.log('search param:')
                 console.log(param)
             },
-            /*removeOriginatingChip(item){
-                this.advanceSearch.originating.splice(this.advanceSearch.originating.indexOf(item), 1)
-                this.advanceSearch.originating = [...this.advanceSearch.originating]
-            },
-            removeDestinationChip(item){
-                this.advanceSearch.destination.splice(this.advanceSearch.destination.indexOf(item), 1)
-                this.advanceSearch.destination = [...this.advanceSearch.destination]
-                //console.log(objIndex)
-            },
-            removeSourceChip(item){
-                this.advanceSearch.source.splice(this.advanceSearch.source.indexOf(item), 1)
-                this.advanceSearch.source = [...this.advanceSearch.source]
-            },
-            removeTypeChip(item){
-                this.advanceSearch.type.splice(this.advanceSearch.type.indexOf(item), 1)
-                this.advanceSearch.type = [...this.advanceSearch.type]
-            },
-            removeSenderChip(item){
-                this.advanceSearch.sender.splice(this.advanceSearch.sender.indexOf(item), 1)
-                this.advanceSearch.sender = [...this.advanceSearch.sender]
-                //console.log(objIndex)
-            },*/
             bp(col){
                 return breakpoint(col)
+            },
+            restoreDocument(item){
+                var tracking = item.tracking_records.map(rec=>rec.id)
+                console.log('d:' + tracking)
+                console.log(Math.max(...tracking))
+                //console.log(item.tracking_records)
             },
             filterBy(){
                 this.filter = {}
@@ -661,80 +392,11 @@
                     }
                 })
             },
-            textboxChange(value){
-
-                /*var advanceSearch = {
-                    trackingId: '',
-                    subject: '',
-                    source: '',
-                    type: '',
-                    originating: '',
-                    destination: '',
-                    sender: '',
-                    dateCreated: ''
-                }*/
-
-                //console.log(value)
-                //console.log(this.$refs)
-
-                //console.log(this.advanceSearch)
-
-                //this.$refs.trackingId.value)
-                //trackingId
-                //console.log(`${this.searchOption} : ` + value)
-            },
             getTrackingCodeColor(document, document_type_id) {
                 return colors[document_type_id];
             },
-            editOffice(item){
-                var mode = 'edit_office';
-                item.form_mode = mode;
-                this.office_info = item;
-                this.openDialog(mode);
-            },
-            deleteConfirmationDialog(item){
-                Object.assign(this.delete_info, item);
-                this.delete_dialog = true;
-            },
-            deleteOffice(){
-                this.$store.dispatch('deleteOffice', this.delete_info.id).then(() => {
-                    if(this.request.status == 'success') {
-                        this.$store.dispatch('setSnackbar', {
-                            type: 'success',
-                            message: this.request.message
-                        })
-                        .then(() => {
-                            this.$store.dispatch('getOffices');
-                        });
-                    } else if(this.request.status == 'failed') {
-                        this.$store.dispatch('setSnackbar', {
-                            type: 'error',
-                            message: this.request.message
-                        })
-                        .then(() => { });
-                    }
-                    this.delete_dialog = false;
-                });
-            },
             openDialog(key){
                 switch (key) {
-                    case 'new_office':
-                        this.office_info = {
-                            id: '',
-                            name: '',
-                            address: '',
-                            office_code: '',
-                            contact_number: '',
-                            contact_email: '',
-                            form_mode: 'new_office'
-                        };
-                        this.dialog_title = 'Office Details';
-                        this.form_dialog = true
-                        break;
-                    case 'edit_office':
-                        this.dialog_title = 'Office Details';
-                        this.form_dialog = true
-                        break;
                     case 'import_office':
                         this.dialog_for = 'importOfficeList';
                         this.dialog_title = 'Import Office List Via Excel File';
@@ -752,9 +414,6 @@
             },
             closeDialog(key){
                 switch (key) {
-                    case 'form':
-                        this.form_dialog = false;
-                        break;
                     case 'excel':
                         this.excel_dialog = false;
                         break;
@@ -767,12 +426,6 @@
         async mounted() {
             await this.mountState()
             this.$store.dispatch('unsetLoader')
-            //console.log('hhhhhhhhhh')
-            //console.log(breakpoint(2))
-
-            //console.log(this.bp(6));
-            //console.log(this.bp([2,3,4,5,6]));
-            //console.log(this.$root)
         }
     }
 </script>
