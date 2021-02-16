@@ -36,12 +36,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('get_non_page_active_documents', 'DocumentController@getNonPaginatedActiveDocuments');
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
-        Route::post('receive_document_confirm/{id}', 'DocumentController@receiveDocument');
-        Route::post('forward_document_confirm/{id}', 'DocumentController@forwardDocument');
-        Route::post('terminate_document_confirm/{id}', 'DocumentController@terminateDocument');
-        Route::post('acknowledge_document_confirm/{id}', 'DocumentController@acknowledgeDocument');
-        Route::post('hold_reject_document_confirm/{id}', 'DocumentController@holdRejectDocument');
-        Route::post('change_date_document_confirm/{id}', 'DocumentController@changeDateDocument');
+        Route::post('receive_document_confirm/{document}', 'DocumentController@receiveDocument');
+        Route::post('forward_document_confirm/{document}', 'DocumentController@forwardDocument');
+        Route::post('terminate_document_confirm/{document}', 'DocumentController@terminateDocument');
+        Route::post('acknowledge_document_confirm/{document}', 'DocumentController@acknowledgeDocument');
+        Route::post('hold_reject_document_confirm/{document}', 'DocumentController@holdRejectDocument');
+
         Route::post('add_new_office', 'OfficeController@addNewOffice');
         Route::post('update_existing_office', 'OfficeController@updateExistingOffice');
         Route::post('delete_office/{id}', 'OfficeController@deleteOffice');

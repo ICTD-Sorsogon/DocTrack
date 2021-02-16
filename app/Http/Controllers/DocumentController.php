@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Events\DocumentEvent;
 use App\Http\Requests\DocumentPostRequest;
 use Auth;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Document;
+use App\Models\DocumentRecipient;
 use App\Models\DocumentType;
 use App\Models\TrackingRecord;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class DocumentController extends Controller
         $document= Document::find($id);
     }
 
-    public function receiveDocument(Request $request)
+    public function receiveDocument(Document $document, Request $request)
     {
         DB::beginTransaction();
         try {
@@ -60,7 +61,6 @@ class DocumentController extends Controller
             $tracking_record->save();
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$request,null,null, 'receive'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -70,11 +70,22 @@ class DocumentController extends Controller
             throw $error;
         }
         DB::commit();
+
+        $document->document_recipient()->whereDestinationOffice($request->recipient_id)->update([
+            'received' => 1
+        ]);
+
         return [$tracking_record];
     }
 
-    public function forwardDocument(Request $request)
+    public function forwardDocument(Document $document, Request $request)
     {
+        abort_if($request->forwarded_to == auth()->user()->office->id, 403);
+        abort_if($document->multiple, 403);
+
+        $recipient = $document->document_recipient()->whereDestinationOffice($request->forwarded_to)->first();
+
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -89,18 +100,6 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
 
-            $destination = json_decode($tracking_record->document->destination_office_id);
-
-            array_push($destination,$request->forwarded_to);
-            $tracking_record->document->update(['status' => 'forwarded',
-                'destination_office_id' => $destination,
-                'acknowledged' => false]);
-
-
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$request,null,null, 'forward'));
-
-
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
@@ -109,6 +108,26 @@ class DocumentController extends Controller
             throw $error;
         }
         DB::commit();
+
+        if(optional($recipient)->forwarded){
+           $recipient->update([
+                'acknowledged' => 0,
+                'received' => 0,
+                'forwarded' => 0
+            ]);
+
+            return [$tracking_record];
+        }
+
+        $destination = $document->destination_office_id->push($request->forwarded_to);
+        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
+
+        $document->update(['status' => 'forwarded' ]);
+
+        $document->document_recipient()->create([
+            'document_id' => $document->id, 'destination_office' => $request->forwarded_to
+        ]);
+
         return [$tracking_record];
     }
 
@@ -132,7 +151,6 @@ class DocumentController extends Controller
             $tracking_record->document->delete();
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$subject,$remarks, $approved_by, 'terminate'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -145,8 +163,13 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
-    public function acknowledgeDocument(Request $request)
+    public function acknowledgeDocument(Document $document, Request $request)
     {
+        $document->update(['priority_level' => $request->priority_levels ]);
+
+        DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
+            ->update(['acknowledged' => 1]);
+
         $remarks = $request->remarks;
         $subject = $request->subject;
 
@@ -160,11 +183,9 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['acknowledged' => true]);
             $tracking_record->document->update(['priority_level' => $request->priority_levels]);
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$subject,$remarks,null, 'acknowledge'));
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -194,7 +215,6 @@ class DocumentController extends Controller
             $tracking_record->document->update(['status' => $request->hold_reject]);
 
             $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id, $status, $subject,null, 'holdreject'));
 
 
         } catch (ValidationException $error) {
@@ -232,12 +252,25 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
-
-        return $document->updateOrCreate(
+       $document = $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
         );
 
+        $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(  
+            $document->destination_office_id
+        );
+
+        foreach($document->destination as $office){
+            DocumentRecipient::updateOrCreate(
+                [ 'document_id' => $document->id, 'destination_office' => $office->id ],
+                [ 'document_id' => $document->id, 'destination_office' => $office->id ]); 
+        };
+
+       DocumentRecipient::whereDocumentId($document->id)
+            ->whereIn('destination_office', $diff->toArray())->forceDelete();
+
+       return $document;
     }
 
     public function trackingReports() {
