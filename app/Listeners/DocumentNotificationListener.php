@@ -32,13 +32,14 @@ class DocumentNotificationListener
     public function handle(DocumentEvent $event)
     {
         extract(get_object_vars($event));
-
+        
         $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
+        $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
         $sender_id = $document->sender_name;
         $name = User::all()->find($sender_id);
         $document_data = Document::all()->find($document->id);
         $user_office_id = User::where('office_id', $document->originating_office)->get();
-
+        
         switch ($document->status) {
             case 'created':
                 $docket_office = User::where('office_id', 37)->get();
@@ -86,12 +87,11 @@ class DocumentNotificationListener
                         $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
                         $notification->save();
                     }
-
+                    
                 }
             break;
-                
+            
             case 'acknowledged':
-                
                 foreach ($notify_user as $key => $value) {
                     $notification = new Notification();
                     $notification->document_id = $document_data->id;
@@ -105,7 +105,6 @@ class DocumentNotificationListener
                 }
 
                 $sender_notif = User::where('office_id', $sender_id)->get();
-
                     $notification = new Notification();
                     $notification->document_id = $document_data->id;
                     $notification->user_id = $sender_notif[0]->id;
@@ -116,7 +115,7 @@ class DocumentNotificationListener
                     $notification->message = 'Document '.$document_data->subject.' has been acknowledged.';
                     $notification->save();
                 
-                $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
+                
                     foreach ($originating_notif as $key => $value) {
                         $notification = new Notification();
                         $notification->document_id = $document_data->id;
@@ -142,16 +141,42 @@ class DocumentNotificationListener
             break;
 
             case 'terminated':
-                $remarks = $event->old_values;
-                $subject = $event->request_obj;
-                $approved_by = $event->approved_by;
+                // $remarks = $event->old_values;
+                // $subject = $event->request_obj;
+                // $approved_by = $event->approved_by;
 
-                $log = new Log();
-                $log->user_id = $event->user_id;
-                $log->action = 'Document terminate';
-                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
-                    '.$approved_by.'with remarks: '.$remarks;
-                return $log->save();
+                // $log = new Log();
+                // $log->user_id = $event->user_id;
+                // $log->action = 'Document terminate';
+                // $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
+                //     '.$approved_by.'with remarks: '.$remarks;
+                // return $log->save();
+
+                $docket_offices = User::where('office_id', 37)->get();
+
+                foreach($docket_offices as $docket_office){
+                    $notification = new Notification();
+                    $notification->document_id = $document->id;
+                    $notification->user_id = $docket_office->id;
+                    $notification->office_id = 37;
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->status = 0;
+                    $notification->message = 'Document created by your office '.$document->subject.' has been terminated.';
+                    $notification->save();
+                }
+
+                // foreach ($originating_notif as $key => $value) {
+                //     $notification = new Notification();
+                //     $notification->document_id = $document_data->id;
+                //     $notification->user_id = $value['id'];
+                //     $notification->office_id = $value['office_id'];
+                //     $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                //     . $name->last_name . ' ' . $name->suffix;
+                //     $notification->status = 0;
+                //     $notification->message = 'Document created by your office '.$document_data->subject.' has been terminated.';
+                //     $notification->save();
+                // }
             break;
 
             case 'forwarded':
