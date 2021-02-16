@@ -37,6 +37,7 @@
          @print="openDialog"
          :documents="userDocuments"
          :datatable_loader="datatable_loader"
+         :incoming="!tab"
          ></data-table>
         </v-tab-item>
     </v-tabs-items>
@@ -63,9 +64,8 @@ export default {
     computed: {
         ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
         userDocuments() {
-            let type = this.tab ? 'originating_office' : 'destination_office_id'
-            return JSON.parse(JSON.stringify(this.documents))
-            .filter( doc => this.tab ? doc[type] == this.auth_user.office_id : doc['originating_office'] != this.auth_user.office_id )
+            let type = this.tab ? 'outgoing' : 'incoming'
+            return JSON.parse(JSON.stringify(this.documents))[type]
             .map(doc => {
                 doc.sender=false
                 if(!this.tab){

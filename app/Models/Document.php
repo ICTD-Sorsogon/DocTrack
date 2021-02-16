@@ -7,6 +7,7 @@ use App\Models\Traits\TrackingNumberBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Document extends Model
 {
@@ -32,11 +33,15 @@ class Document extends Model
 
     protected $hidden = ['destination_office_id'];
 
-    protected $appends = ['destination', 'recipient'];
-    
+    protected $appends = ['destination', 'recipient', 'multiple'];
+   
     public function document_recipient()
     {
        return $this->hasMany(DocumentRecipient::class);
+    }
+
+    public function getMultipleAttribute(){
+        return $this->destination_office_id->count() > 1;
     }
 
     public function getRecipientAttribute(){
@@ -105,15 +110,18 @@ class Document extends Model
     {
         $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
 
-        if($user->isAdmin()){
-            $document->leftJoin('document_recipients', 'documents.id', '=', 'document_id');
-        }
-
         if($user->isUser()){
-            $document
-            ->whereRaw(" originating_office = {$user->office_id} ")
-            ->orWhereHas('document_recipient', function($query) use($user){ 
-                $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1");});
+
+            $outgoing = $document->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
+
+            $incoming = $document->with(['document_recipient' => function ($query){
+                               $query->whereDestinationOffice(auth()->user()->office->id);
+                        }])
+                        ->whereHas('document_recipient', function($query) use($user){ 
+                        $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
+
+            return compact('incoming', 'outgoing');
+            
         }
 
         return $document->orderBy('documents.created_at', 'DESC')->get();

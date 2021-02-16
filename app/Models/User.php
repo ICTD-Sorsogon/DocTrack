@@ -44,7 +44,7 @@ class User extends Authenticatable
 
     public function isUser()
     {
-        return $this->role->name === 'user';
+        return in_array($this->role->name, ['user','go']);
     }
 
     public function office()

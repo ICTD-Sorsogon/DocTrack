@@ -72,16 +72,15 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="!isEditable(item) && !item.received ">
-						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block
-						>
+					<v-col v-if="incoming && !item.received ">
+						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
 							</v-icon>
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="!isEditable(item) && (isAdmin || item.received) && !item.multiple">
+					<v-col v-if="incoming && (isAdmin || item.received) && !item.multiple">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
@@ -148,7 +147,7 @@ import {mapGetters} from 'vuex'
 
 export default {
 	components: {TableModal},
-	props: ['documents', 'datatable_loader'],
+	props: ['documents', 'datatable_loader', 'incoming'],
 	data() {
 		return {
 			activeDoc: null,

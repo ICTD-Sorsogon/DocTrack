@@ -71,7 +71,7 @@ class DocumentController extends Controller
         }
         DB::commit();
 
-        $document->recipient->first()->update([
+        $document->document_recipient()->whereDestinationOffice($request->recipient_id)->update([
             'received' => 1
         ]);
 
@@ -80,6 +80,12 @@ class DocumentController extends Controller
 
     public function forwardDocument(Document $document, Request $request)
     {
+        abort_if($request->forwarded_to == auth()->user()->office->id, 403);
+        abort_if($document->multiple, 403);
+
+        $recipient = $document->document_recipient()->whereDestinationOffice($request->forwarded_to)->first();
+
+
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -93,16 +99,6 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-           
-            $destination = $tracking_record->document->destination_office_id->push($request->forwarded);
-
-            $tracking_record->document->update(['status' => 'forwarded', 
-                'destination_office_id' => $destination, 
-                'acknowledged' => false]);
-
-
-            $user_id = Auth::user()->id;
-
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -112,6 +108,26 @@ class DocumentController extends Controller
             throw $error;
         }
         DB::commit();
+
+        if(optional($recipient)->forwarded){
+           $recipient->update([
+                'acknowledged' => 0,
+                'received' => 0,
+                'forwarded' => 0
+            ]);
+
+            return [$tracking_record];
+        }
+
+        $destination = $document->destination_office_id->push($request->forwarded_to);
+        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
+
+        $document->update(['status' => 'forwarded' ]);
+
+        $document->document_recipient()->create([
+            'document_id' => $document->id, 'destination_office' => $request->forwarded_to
+        ]);
+
         return [$tracking_record];
     }
 
