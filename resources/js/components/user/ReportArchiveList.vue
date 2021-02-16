@@ -196,6 +196,17 @@
                     </v-row>
                 </template>
 
+                <template v-slot:[`item.destination`]="{ item }">
+                    <v-tooltip :key="destination.office_code" v-for="destination in item.destination" top>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-chip color="primary" v-bind="attrs" v-on="on" :x-small="item.destination.length > 1" >
+                                {{destination.office_code}}
+                            </v-chip>
+                        </template>
+                        <span>{{destination.name}}</span>
+                    </v-tooltip>
+                </template>
+
                 <v-alert slot="no-results" :value="true" type="error" icon="mdi-alert" align="left">
                     Your search for "{{ search }}" found no results.
                 </v-alert>
@@ -239,7 +250,7 @@
                     { text: 'Source', value: 'is_external' },
                     { text: 'Type', value: 'document_type.name' },
                     { text: 'Originating Office', value: 'originating_office' },
-                    { text: 'Destination Office', value: 'destination.name' },
+                    { text: 'Destination Office', value: 'destination' },
                     { text: 'Sender', value: 'sender_name' },
                     { text: 'Date Created', value: 'created_at' },
                     { text: 'Action', value: 'actions', align: 'center', },
@@ -295,8 +306,85 @@
         },
         methods: {
             advanceSearchQuery(param) {
-                console.log('search param:')
-                console.log(param)
+                //console.log('search param:')
+                //console.log(param)
+                var parameter = []
+                const column = ['trackingId', 'subject', 'source', 'type', 'originating', 'destination', 'sender', 'dateCreated']
+                const {trackingId, subject, source, type, originating, destination, sender, dateCreated} = param;
+                let ptrackingId = (trackingId == null? '' : trackingId.trim() != '')? trackingId.trim() : ''
+                let psubject = (subject == null? '' : subject.trim() != '')? subject.trim() : ''
+                let psource = (source.length > 0)? source : ''
+                let ptype = (type.length > 0)? type : ''
+                let poriginating = (originating.length > 0)? originating : ''
+                let pdestination = (destination.length > 0)? destination : ''
+                let psender = (sender.length > 0)? sender : ''
+                let pdateCreated = (dateCreated != null)? dateCreated : ''
+
+                column.forEach((col)=>{
+                    if (eval('p'+col) != '') {
+                        parameter.push('p'+col)
+                    }
+                })
+
+                var data = this.extendedData.filter((document)=>{
+                    var findedData = false
+                    parameter.forEach((par)=>{
+                    return ptrackingId == document.tracking_code ||
+                           psubject == document.subject ||
+                           psource.includes(document.is_external) ||
+                           ptype.includes(document.document_type.name) ||
+                           poriginating.map(o=>o.id).includes(document.origin_office.id) ||
+                           pdestination.map(o=>o.id).includes(document.origin_office.id) ||
+                           //todo sender
+                           pdateCreated == document.created_at;
+                    })
+                    return findedData
+
+                           //console.log(poriginating.map(o=>o.id).includes(document.origin_office.id))
+                    /*var hh = false
+                    parameter.forEach((par)=>{
+                        if (par == 'ptrackingId' && document.tracking_code == eval(par)) {
+                            hh = true
+                        }
+                        if (par == 'psubject' && document.subject == eval(par)) {
+                            hh = true
+                        }
+                        if (par == 'psource') {
+                            eval(par).forEach((source)=>{
+                                if (document.is_external == source){
+                                    hh = true
+                                    //console.log('gg')
+                                }
+                            })
+                            //console.log(document,eval(par))
+                        }
+                        if (par == 'ptype') {
+                            eval(par).forEach((type)=>{
+                                if (document.document_type.name == type){
+                                    hh = true
+                                }
+                            })
+                        }
+                        hh = false
+                    })
+                    return hh*/
+                })
+
+                //setTimeout(() => {
+                    console.log(data)
+                //}, 5000);
+
+                //console.log('param:' + ptrackingId, psubject)
+                /*let watchSearchParam =  trackingId == null? '' : trackingId.trim() != ''? true:false ||
+                                        subject == null? '' : subject.trim() != ''? true:false ||
+                                        source.length > 0 ||
+                                        type.length > 0 ||
+                                        originating.length > 0 ||
+                                        destination.length > 0 ||
+                                        sender.length > 0 ||
+                                        dateCreated != null;
+                return (watchSearchParam)? true:false*/
+
             },
             bp(col){
                 return breakpoint(col)

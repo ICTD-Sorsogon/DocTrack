@@ -180,7 +180,7 @@
                     </v-card>
                 </template>
             </v-dialog>
-            <v-btn color="primary" dark class="mb-2 ma-1 ml-0 mr-2 pl-13 pr-13" @click.stop="$emit('searchParameter', advanceSearch)">
+            <v-btn color="primary" :dark="hasSearchParam" :disabled="!hasSearchParam" class="mb-2 ma-1 ml-0 mr-2 pl-13 pr-13" @click.stop="submitSearchParameter">
                 <v-icon class="ma-1 mr-1">mdi-magnify</v-icon> SEARCH
             </v-btn>
         </v-col>
@@ -205,10 +205,7 @@ export default {
                 destination: [],
                 sender: [],
                 dateCreated: null,
-                optionSource: [
-                    'External',
-                    'Internal'
-                ],
+                optionSource: ['External', 'Internal'],
                 optionDateCreated: false,
             }
         }
@@ -238,6 +235,18 @@ export default {
     },
     computed: {
         ...mapGetters(['document_types', 'offices', 'all_users', 'auth_user']),
+        hasSearchParam(){
+            const {trackingId, subject, source, type, originating, destination, sender, dateCreated} = this.advanceSearch;
+            let watchSearchParam =  (trackingId == null? '' : trackingId.trim() != '')? true:false ||
+                                    (subject == null? '' : subject.trim() != '')? true:false ||
+                                    source.length > 0 ||
+                                    type.length > 0 ||
+                                    originating.length > 0 ||
+                                    destination.length > 0 ||
+                                    sender.length > 0 ||
+                                    dateCreated != null;
+            return (watchSearchParam)? true:false
+        }
     },
     methods: {
         removeSelectedChips(el, item){
@@ -246,6 +255,17 @@ export default {
         },
         bp(col){
             return breakpoint(col)
+        },
+        submitSearchParameter(){
+            if (this.hasSearchParam) {
+                this.$emit('searchParameter', this.advanceSearch)
+            } else {
+                this.$store.dispatch('setSnackbar', {
+                    title: 'Invalid!',
+                    type: 'error',
+                    message: 'Please input some parameter for search'
+                })
+            }
         }
     }
 }

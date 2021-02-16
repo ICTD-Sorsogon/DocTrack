@@ -104,7 +104,7 @@ class Document extends Model
         $isByYear = ($request->filterBy == 'Year')?true:false;
         $selected = $request->selected;
 
-        $document = static::with('document_type','origin_office', 'destination', 'sender', 'tracking_records')->onlyTrashed();
+        $document = static::with('document_type','origin_office', 'sender', 'tracking_records')->onlyTrashed();
         //$document = static::with(['document_type','origin_office', 'sender', 'tracking_records'])->onlyTrashed();
 
         if ($user->isUser()) {
