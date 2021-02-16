@@ -25,7 +25,7 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('.row > :nth-child(4) > .v-btn').click() // acknowledge document
+        cy.get('.row > :nth-child(2) > .v-btn').click() // acknowledge document
         cy.get(':nth-child(5) > :nth-child(1) > .v-input > .v-input__control > .v-input__slot')
         .click().type('High').type('{enter}')
         cy.contains('Remarks').parent().type('LGMT')
@@ -40,7 +40,7 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('td > .row > :nth-child(1) > .v-btn').click()
+        cy.get('td > .row > :nth-child(1) > .v-btn').click()// receive document
         cy.contains('Through').parent().click()
         cy.contains('Docket Office').parent().click()
         cy.contains('Approved by').parent().type('Atty Paul Jazmin')
@@ -48,12 +48,6 @@ describe('Document Flow', () => {
         cy.get('.my-2 > .v-btn > .v-btn__content').click()
         cy.get('.v-card__actions > :nth-child(3)').click()
         cy.get('.v-snack__action > .v-btn').click()
-        cy.get('.v-app-bar__nav-icon').click()
-        cy.get('.col > .v-btn > .v-btn__content').click()
-        cy.get('.v-card__actions > :nth-child(2)').click()
-        cy.get('input[name=username]').type('VGO')
-        cy.get('input[name=password]').type('secret')
-        cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
         cy.get('td > .row > :nth-child(1) > .v-btn').click() //forward document
@@ -74,7 +68,7 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('.row > :nth-child(4) > .v-btn').click() // acknowledge document
+        cy.get('.row > :nth-child(2) > .v-btn').click() // acknowledge document
         cy.get(':nth-child(5) > :nth-child(1) > .v-input > .v-input__control > .v-input__slot')
         .click().type('Low').type('{enter}')
         cy.contains('Remarks').parent().type('LGMT')
@@ -89,7 +83,17 @@ describe('Document Flow', () => {
         cy.get('button[type=submit]').click()
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
-        cy.get('.row > :nth-child(2) > .v-btn').click() // terminal document
+        cy.get('td > .row > :nth-child(1) > .v-btn').click() // receive document
+        cy.contains('Through').parent().click()
+        cy.contains('Docket Office').parent().click()
+        cy.contains('Approved by').parent().type('Atty Paul Jazmin')
+        cy.contains('Remarks').parent().type('Baka Kano to!')
+        cy.get('.my-2 > .v-btn > .v-btn__content').click()
+        cy.get('.v-card__actions > :nth-child(3)').click()
+        cy.get('.v-snack__action > .v-btn').click()
+        cy.contains('Search').siblings('input').type('New Documents')
+        cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
+        cy.get('td > .row > :nth-child(2) > .v-btn').click()// terminate document
         cy.contains('Approved by').parent().type('Atty Paul Jazmin')
         cy.contains('Remarks').parent().type('Olanaps!')
         cy.get('.my-2 > .v-btn > .v-btn__content').click()
