@@ -232,6 +232,7 @@ class DocumentController extends Controller
         DB::beginTransaction();
         try {
             $tracking_record = TrackingRecord::find($request->id);
+            $tracking_record->action = 'date changed';
             $tracking_record->update([
                 'last_touched' => Carbon::parse($updatedTime)
                 ]);
