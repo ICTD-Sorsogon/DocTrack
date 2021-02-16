@@ -212,6 +212,28 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
+    public function changeDateDocument(Request $request)
+    {
+        $updatedTime = $request->date_filed. ' ' .$request->time_filed;
+        DB::beginTransaction();
+        try {
+            $tracking_record = TrackingRecord::find($request->id);
+            $tracking_record->update([
+                'created_at' => Carbon::parse($updatedTime),
+                'last_touched' => Carbon::parse($updatedTime)
+                ]);
+
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$tracking_record];
+    }
+
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
        $document = $document->updateOrCreate(

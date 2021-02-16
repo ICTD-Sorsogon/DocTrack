@@ -15,7 +15,7 @@ class TrackingRecord extends Model
     protected $fillable = [
         'document_id', 'action', 'status',
         'approved_by', 'touched_by', 'last_touched',
-        'forwarded_by', 'forwarded_to', 'remarks','destination'
+        'forwarded_by', 'forwarded_to', 'remarks','destination', 'created_at'
     ];
 
     protected $appends = [
