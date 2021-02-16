@@ -106,10 +106,6 @@ class DocumentController extends Controller
 
     public function terminateDocument(Request $request)
     {
-        $remarks = $request->documentRemarks;
-        $approved_by = $request->approved_by;
-        $subject = $request->subject;
-
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -122,9 +118,6 @@ class DocumentController extends Controller
             $tracking_record->save();
             $tracking_record->document->update(['status' => 'terminated']);
             $tracking_record->document->delete();
-
-            $user_id = Auth::user()->id;
-            event(new DocumentEvent($user_id,$subject,$remarks, $approved_by, 'terminate'));
 
         } catch (ValidationException $error) {
             DB::rollback();

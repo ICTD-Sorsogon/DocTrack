@@ -32,14 +32,17 @@ class DocumentNotificationListener
     public function handle(DocumentEvent $event)
     {
         extract(get_object_vars($event));
+
         $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
-        
+        $sender_id = $document->sender_name;
+        $name = User::all()->find($sender_id);
+        $document_data = Document::all()->find($document->id);
+        $user_office_id = User::where('office_id', $document->originating_office)->get();
+
         switch ($document->status) {
             case 'created':
-                $sender_id = $document->sender_name;
-                $name = User::all()->find($sender_id);
                 $docket_office = User::where('office_id', 37)->get();
-                $document_data = Document::all()->find($document->id);
+
                 $document_old = $document->getOriginal();
                 $document_new = $document->getAttributes();
                 
@@ -87,26 +90,7 @@ class DocumentNotificationListener
                 }
             break;
                 
-            case 'update':
-                $subject = $event->request_obj->subject;
-                $old_values = json_encode($event->old_values);
-                $old_subject = $event->old_values->subject;
-                $data = json_encode($event->request_obj);
-       
-                $log = new Log();
-                $log->user_id = $event->user_id;
-                $log->new_values = $data;
-                $log->original_values = $old_values;
-                $log->action = 'Document update';
-                $log->remarks = 'Document has been successfully updated from : '.$old_subject.' to '.$subject;
-            return $log->save();
-
-            break;
-
             case 'acknowledged':
-                $sender_id = $document->sender_name;
-                $name = User::all()->find($sender_id);
-                $document_data = Document::all()->find($document->id);
                 
                 foreach ($notify_user as $key => $value) {
                     $notification = new Notification();
@@ -121,6 +105,7 @@ class DocumentNotificationListener
                 }
 
                 $sender_notif = User::where('office_id', $sender_id)->get();
+
                     $notification = new Notification();
                     $notification->document_id = $document_data->id;
                     $notification->user_id = $sender_notif[0]->id;
@@ -130,6 +115,19 @@ class DocumentNotificationListener
                     $notification->status = 0;
                     $notification->message = 'Document '.$document_data->subject.' has been acknowledged.';
                     $notification->save();
+                
+                $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
+                    foreach ($originating_notif as $key => $value) {
+                        $notification = new Notification();
+                        $notification->document_id = $document_data->id;
+                        $notification->user_id = $value['id'];
+                        $notification->office_id = $value['office_id'];
+                        $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                        . $name->last_name . ' ' . $name->suffix;
+                        $notification->status = 0;
+                        $notification->message = 'Document created by your office '.$document_data->subject.' has been acknowledged.';
+                        $notification->save();
+                    }
             break;
 
             case 'holdreject':
@@ -143,7 +141,7 @@ class DocumentNotificationListener
                 return $log->save();
             break;
 
-            case 'terminate':
+            case 'terminated':
                 $remarks = $event->old_values;
                 $subject = $event->request_obj;
                 $approved_by = $event->approved_by;
@@ -157,24 +155,22 @@ class DocumentNotificationListener
             break;
 
             case 'forwarded':
+                $forwarded_by = Office::find($document->tracking_records[3]->forwarded_by);
+                $through = $document->tracking_records[3]->through;
 
-                $sender_id = $document->sender_name;
-                $name = User::all()->find($sender_id);
-                $document_data = Document::all()->find($document->id);
-                $user_office_id = User::where('office_id', $document->originating_office)->get();
-
-                $forwarded_by = Office::find($document->tracking_records[4]->forwarded_by);
-                $forwarded_to = Office::find($document->tracking_records[4]->forwarded_to);
-                $through = $document->tracking_records[4]->through;
+                $destination_office_arr = json_decode($document->destination_office_id);
+                $destination_office = Office::find(end($destination_office_arr));
+                $notify_user = User::whereIn('office_id', [$destination_office->id])->get();
 
                 $notification = new Notification();
                 $notification->document_id = $document_data->id;
-                $notification->user_id = $sender_id;
-                $notification->office_id = $document->tracking_records[4]->forwarded_to;
+                $notification->user_id = $notify_user[0]->id;
+                $notification->office_id = end($destination_office_arr);
                 $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                . $name->last_name . ' ' . $name->suffix;
+                    . $name->last_name . ' ' . $name->suffix;
                 $notification->status = 0;
-                $notification->message = 'Document '.$document_data->subject.' is forwarded to your office by '. $forwarded_by->name . ' through ' . $through;
+                $notification->message = 'Document '.$document_data->subject.' is forwarded to your office by '
+                    . $forwarded_by->name . ' through ' . $through;
                 $notification->save(); 
                 
                 $docket_offices = User::where('office_id', 37)->get();
@@ -184,19 +180,16 @@ class DocumentNotificationListener
                     $notification->user_id = $docket_office->id;
                     $notification->office_id = 37;
                     $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
+                        . $name->last_name . ' ' . $name->suffix;
                     $notification->status = 0;
-                    $notification->message = 'Document '.$document_data->subject.' is forwarded to '. $forwarded_to->name . ' from ' . $forwarded_by->name . ' through ' . $through;
+                    $notification->message = 'Document '.$document_data->subject.' is forwarded to '
+                        . $destination_office->name . ' from ' . $forwarded_by->name . ' through ' . $through;
                     $notification->save();
                 }
 
             break;
 
             case 'received':
-                $sender_id = $document->sender_name;
-                $name = User::all()->find($sender_id);
-                $document_data = Document::all()->find($document->id);
-                $user_office_id = User::where('office_id', $document->originating_office)->get();
                 $receiver_fullname = Auth::user()->last_name. ', ' . Auth::user()->first_name. ' ' . Auth::user()->middle_name;
                 $office_received = Office::find(Auth::user()->office_id);
 

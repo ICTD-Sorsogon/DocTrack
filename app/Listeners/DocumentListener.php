@@ -54,7 +54,8 @@ class DocumentListener
         if(!$document->wasRecentlyCreated && 
             $document->status != 'acknowledged' &&
             $document->status != 'received' &&
-            $document->status != 'forwarded'
+            $document->status != 'forwarded' &&
+            $document->status != 'terminated'
             ){
             $new = $document;
             $old = $document->getOriginal();
@@ -166,8 +167,8 @@ class DocumentListener
                 $tracking_records = $document->tracking_records;
                 $remarks = $document->remarks;
                 $subject = $document->subject;
-                $approved_by = $tracking_records[4]->approved_by;
-                $through = $tracking_records[4]->through;
+                $approved_by = $tracking_records[3]->approved_by;
+                $through = $tracking_records[3]->through;
                 
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
