@@ -403,7 +403,8 @@ export default {
             return this.$route.params.type;
         },
         selected_document() {
-            let userDoc = !this.is_admin && this.$route.params.type == 'terminate' ? this.documents['outgoing'] : this.documents['incoming']
+
+            let userDoc = !this.is_admin && ['terminate', 'Change Date'].includes(this.$route.params.type) ? this.documents['outgoing'] : this.documents['incoming']
 
             return JSON.parse(JSON.stringify( this.is_admin ? this.documents : userDoc)).map(doc=>{
 				doc.is_external = doc.is_external ? 'External' : 'Internal'
