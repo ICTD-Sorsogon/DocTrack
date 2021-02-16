@@ -6,7 +6,7 @@
 		:items="extendedData"
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
-		item-key="id"
+		item-key="keys"
 		:loading="datatable_loader"
         :sort-by="['priority_level']"
         :sort-desc="[false]"
@@ -47,7 +47,7 @@
 			</td>
 		</template>
 		<template v-slot:[`item.destination`]="{ item }">
-				<v-tooltip :key="destination.office_code" v-for="destination in item.destination" top>
+				<v-tooltip v-if="destination" :key="destination.office_code" v-for="destination in item.destination" top>
 					<template v-slot:activator="{ on, attrs }">
 						<v-chip color="primary" v-bind="attrs" v-on="on" :x-small="item.destination.length > 1" >
 							{{destination.office_code}}
@@ -72,18 +72,17 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="!isEditable(item) && !item.received ">
-						<v-btn @click.prevent="redirectToReceivePage(item.id, 'receive')" text color="#FFCA28" block
-						>
+					<v-col v-if="incoming && !item.received ">
+						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
 							</v-icon>
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="isAdmin || item.received">
+					<v-col v-if="incoming && (isAdmin || item.received) && !item.multiple">
 						<v-btn
-							link @click.prevent="redirectToReceivePage(item.id, 'forward')" text color="#9575CD" block
+							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
 							<v-icon left>
 								mdi-email-send-outline
@@ -91,8 +90,8 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col>
-						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'terminal')" text color="#F06292" block
+					<v-col v-if="(isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)">
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
 								mdi-email-off-outline
@@ -100,8 +99,8 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isAdmin">
-						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'acknowledge')" text color="#4CAF50" block
+                    <v-col v-if="isAdmin && !item.acknowledged">
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
 								mdi-email-check-outline
@@ -110,7 +109,7 @@
 						</v-btn>
 					</v-col>
                     <v-col v-if="isGO">
-						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Change Date')" text color="#E65100" block
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'Change Date')" text color="#E65100" block
 						>
 							<v-icon left>
 								mdi-calendar-edit
@@ -119,7 +118,7 @@
 						</v-btn>
 					</v-col>
                     <v-col>
-						<v-btn link @click.prevent="redirectToReceivePage(item.id, 'Hold or Reject')" text color="#F44336" block
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
 						>
 							<v-icon left>
 								mdi-email-alert-outline
@@ -148,7 +147,7 @@ import {mapGetters} from 'vuex'
 
 export default {
 	components: {TableModal},
-	props: ['documents', 'datatable_loader'],
+	props: ['documents', 'datatable_loader', 'incoming'],
 	data() {
 		return {
 			activeDoc: null,
@@ -178,10 +177,17 @@ export default {
 		},
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+				doc.keys = doc.id + ' ' + (doc.recipient_id ?? '')
                 doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
+				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
+
+				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
+                  doc[status] = doc.recipient.every( recipient => recipient[status] )
+                }
+
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'High'
                 }
@@ -213,14 +219,14 @@ export default {
 		selectDoc(id){
 			this.activeDoc = id
 		},
-        redirectToReceivePage(id, type) {
+        redirectToReceivePage(item, type) {
             /**
             * TODO:
             * Save the document id or the document object to Vuex instead because the dynamic routing is messing
             * up the Vuex getter for auth_user creating a call for receive_document/auth_user which is non-existent
             **/
             if (this.$route.name !== "Receive Document") {
-                this.$router.push({ name: "Receive Document" , params: {type:type, id: id}});
+                this.$router.push({ name: "Receive Document" , params: {type:type, item: item, id: item.id}});
             }
         },
 		isEditable(docOrigin) {

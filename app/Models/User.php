@@ -44,7 +44,7 @@ class User extends Authenticatable
 
     public function isUser()
     {
-        return $this->role->name === 'user';
+        return in_array($this->role->name, ['user','go']);
     }
 
     public function office()
@@ -89,6 +89,6 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return $this->role_id === 1;
+        return $this->role->name === 'admin';
     }
 }

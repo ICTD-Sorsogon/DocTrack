@@ -398,12 +398,14 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['find_document' , 'documents' , 'find_document']),
+        ...mapGetters(['find_document' , 'documents' , 'find_document', 'is_admin']),
         types() {
             return this.$route.params.type;
         },
         selected_document() {
-                return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+            let userDoc = !this.is_admin && this.$route.params.type == 'terminate' ? this.documents['outgoing'] : this.documents['incoming']
+
+            return JSON.parse(JSON.stringify( this.is_admin ? this.documents : userDoc)).map(doc=>{
 				doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
 				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
@@ -495,6 +497,7 @@ export default {
         },
         sanitize() {
             this.form.destination = this.form.destination[0].id
+            this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id
         },
         receiveDocumentConfirm() {
             this.btnloading = true;
@@ -649,9 +652,8 @@ export default {
         },
     },
     mounted() {
-        console.log(this.selected_document)
         this.$store.dispatch('unsetLoader');
-        this.form = this.find_document(this.$route.params.id);
+        this.form = this.$route.params.item ?? this.selected_document;
     }
 
 }
