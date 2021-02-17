@@ -66,7 +66,9 @@ class DocumentController extends Controller
         }
         DB::commit();
 
-        $document->document_recipient->find($request->recipient_id)->update(['received' => true]);
+        $document->document_recipient->where('destination_office', auth()->user()->office->id)->first()->update([
+            'received' => true
+        ]);
 
         return [$tracking_record];
     }
@@ -112,7 +114,7 @@ class DocumentController extends Controller
         $destination = $document->destination_office_id->push($request->forwarded_to);
         $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
 
-        $document->update(['status' => 'forwarded' ]);
+        $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
 
         $document->document_recipient()->create([
             'document_id' => $document->id, 'destination_office' => $request->forwarded_to
@@ -133,8 +135,16 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            $tracking_record->document->update(['status' => 'terminated']);
-            $tracking_record->document->delete();
+            
+            $admin = auth()->user()->isAdmin();
+
+            DocumentRecipient::where(['document_id' => $request->id, 
+                                      'destination_office' => $request->recipient_id])->delete();
+
+            if($admin){
+                $tracking_record->document->update(['status' => 'terminated']);
+                $tracking_record->document->delete();
+            }
 
         } catch (\Exception $error) {
             DB::rollback();
