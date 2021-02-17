@@ -108,7 +108,7 @@
 							Acknowledge
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isGO">
+                    <v-col v-if="isGO && !item.acknowledged">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Change Date')" text color="#E65100" block
 						>
 							<v-icon left>
