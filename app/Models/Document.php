@@ -37,7 +37,7 @@ class Document extends Model
     protected $hidden = ['destination_office_id'];
 
     protected $appends = ['destination', 'recipient', 'multiple'];
-   
+
     public function document_recipient()
     {
        return $this->hasMany(DocumentRecipient::class);
@@ -120,7 +120,7 @@ class Document extends Model
             $incoming = Document::with(['document_recipient' => function ($query){
                                $query->whereDestinationOffice(auth()->user()->office->id);
                         }])
-                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0 AND deleted_at = NULL");})->get();
+                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
 
             return compact('incoming', 'outgoing');
         }
