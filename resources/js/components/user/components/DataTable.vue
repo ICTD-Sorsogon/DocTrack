@@ -59,7 +59,7 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item) && !item.acknowledged">
+					<v-col v-if="isEditable(item) && !Boolean(item.acknowledged)">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && !item.received ">
+					<v-col v-if="(incoming || item.DO_reciever ) && !Boolean(item.received)">
 						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
@@ -80,7 +80,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && (isAdmin || item.received) && !item.multiple && !item.forwarded">
+					<v-col v-if="(incoming || item.DO_reciever ) && (isAdmin || Boolean(item.received)) && !item.multiple && !Boolean(item.forwarded)">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)) && !item.forwarded">
+					<v-col v-if="((isEditable(item) && Boolean(item.acknowledged) && Boolean(item.received)) ||  (!isAdmin && item.received)) && !item.forwarded">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -99,7 +99,7 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isAdmin && !item.acknowledged">
+                    <v-col v-if="isAdmin && !Boolean(item.acknowledged)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
@@ -117,7 +117,7 @@
 							Change Date
 						</v-btn>
 					</v-col>
-                    <v-col v-if="incoming && item.recieved && !item.forwarded">
+                    <v-col v-if="incoming && Boolean(item.recieved) && !Boolean(item.forwarded)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
 						>
 							<v-icon left>

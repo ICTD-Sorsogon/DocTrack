@@ -120,7 +120,7 @@ class DocumentController extends Controller
         }
 
         $destination = $document->destination_office_id->push($request->forwarded_to);
-        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
+        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => Carbon::now()]);
 
         $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
 
@@ -176,7 +176,7 @@ class DocumentController extends Controller
         $document->update(['priority_level' => $request->priority_levels ]);
 
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
-            ->update(['acknowledged' => 1]);
+            ->update(['acknowledged' => Carbon::now()]);
 
         $remarks = $request->remarks;
         $subject = $request->subject;

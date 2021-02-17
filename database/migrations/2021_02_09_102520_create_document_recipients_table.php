@@ -17,11 +17,11 @@ class CreateDocumentRecipientsTable extends Migration
             $table->id('recipient_id');
             $table->foreignId('document_id')->constrained('documents')->onDelete('cascade')->nullable();
             $table->integer('destination_office');
-            $table->boolean('acknowledged')->default(false);
-            $table->boolean('received')->default(false);
-            $table->boolean('forwarded')->default(false);
-            $table->boolean('rejected')->default(false);
-            $table->boolean('hold')->default(false);
+            $table->dateTime('acknowledged')->nullable();
+            $table->dateTime('received')->nullable();
+            $table->dateTime('forwarded')->nullable();
+            $table->dateTime('rejected')->nullable();
+            $table->dateTime('hold')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
