@@ -15,7 +15,7 @@ class TrackingRecord extends Model
     protected $fillable = [
         'document_id', 'action', 'status',
         'approved_by', 'touched_by', 'last_touched',
-        'forwarded_by', 'forwarded_to', 'remarks','destination', 'created_at'
+        'forwarded_by', 'forwarded_to', 'remarks','destination'
     ];
 
     protected $appends = [
@@ -24,7 +24,7 @@ class TrackingRecord extends Model
 
     public function getDateFiledAttribute()
     {
-        return Carbon::parse($this->attributes['created_at'])->diffForHumans();
+        return Carbon::parse($this->attributes['last_touched'])->diffForHumans();
     }
 
     public function user()

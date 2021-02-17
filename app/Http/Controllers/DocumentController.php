@@ -241,8 +241,8 @@ class DocumentController extends Controller
         DB::beginTransaction();
         try {
             $tracking_record = TrackingRecord::find($request->id);
+            $tracking_record->action = 'date changed';
             $tracking_record->update([
-                'created_at' => Carbon::parse($updatedTime),
                 'last_touched' => Carbon::parse($updatedTime)
                 ]);
 
@@ -264,14 +264,14 @@ class DocumentController extends Controller
             $request->validated()
         );
 
-        $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(  
+        $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(
             $document->destination_office_id
         );
 
         foreach($document->destination as $office){
             DocumentRecipient::updateOrCreate(
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
-                [ 'document_id' => $document->id, 'destination_office' => $office->id ]); 
+                [ 'document_id' => $document->id, 'destination_office' => $office->id ]);
         };
 
        DocumentRecipient::whereDocumentId($document->id)

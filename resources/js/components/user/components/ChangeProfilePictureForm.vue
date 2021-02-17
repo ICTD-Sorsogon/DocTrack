@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-col align="center" justify="end">
-            <v-img max-height="350" max-width="450" :src="url"></v-img>
+            <v-img class="radius" :src="url"></v-img>
         </v-col>
 
         <ValidationObserver ref="observer" v-slot="{ valid }">
@@ -93,3 +93,13 @@ export default {
 
 }
 </script>
+
+<style>
+.radius {
+    border-radius: 50%;
+    background-size: cover;
+    max-width: 200px;
+    height: 200px;
+    float: left;
+}
+</style>
