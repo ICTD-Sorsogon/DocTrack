@@ -278,6 +278,14 @@ class DocumentController extends Controller
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
 
+       TrackingRecord::create([
+            'action' => 'created',
+            'document_id' => $document->id,
+            'touched_by' => auth()->user()->id,
+            'remarks' => $document->remarks,
+            'last_touched' => Carbon::now()
+       ]);
+
        return $document;
     }
 
