@@ -22,12 +22,13 @@ class TrackingRecordFactory extends Factory
      */
     public function definition()
     {
-        $status = ['created', 'received', 'forwarded', 'on hold', 'rejected', 'terminated', 'acknowledged', 'date changed'];
+        $status = ['created', 'received', 'forwarded', 'on hold',
+        'rejected', 'terminated', 'acknowledged', 'date changed', 'edited'];
         $from = ['docket office' , 'personal', 'email', 'others'];
 
         return [
            'document_id' => null,
-           'action' => $status[rand(0, 7)],
+           'action' => $status[rand(0, 8)],
            'through' => $from[rand(0,3)],
            'touched_by' => null,
            'last_touched' => Carbon::createFromTimeStamp($this->faker->dateTimeBetween('-360 days', 'now')->getTimestamp()),

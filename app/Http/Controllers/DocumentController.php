@@ -135,11 +135,11 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            
+
             $admin = auth()->user()->isAdmin();
 
-            DocumentRecipient::where(['document_id' => $request->id, 
-                                      'destination_office' => $request->recipient_id])->delete();
+            DocumentRecipient::where(['document_id' => $request->id,
+                                      'destination_office' => auth()->user()->office->id])->delete();
 
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
@@ -257,6 +257,14 @@ class DocumentController extends Controller
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
+
+       TrackingRecord::create([
+            'action' => 'created',
+            'document_id' => $document->id,
+            'touched_by' => auth()->user()->id,
+            'remarks' => $document->remarks,
+            'last_touched' => Carbon::now()
+       ]);
 
        return $document;
     }
