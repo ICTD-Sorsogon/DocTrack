@@ -22,6 +22,10 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        $pics = ['images/brook.jfif', 'images/chopper.jpg', 'images/franky.jpg',
+                'images/jinbei.jfif', 'images/nami.png', 'images/robin.jpg',
+                'images/sanji.png', 'images/usopp.png'];
+
         return [
             'role_id' => rand(1, 3),
             'username' => $this->faker->username,
@@ -33,7 +37,8 @@ class UserFactory extends Factory
             'gender' => rand(1, 2),
             'birthday' => $this->faker->date,
             'id_number' => $this->faker->ssn,
-            'office_id' => rand(1, 3),
+            'office_id' => rand(3, 19),
+            'avatar' => $pics[rand(0,7)],
             'is_active' => true,
             'created_at' => $this->faker->dateTimeBetween($startDate = '-1 years', $endDate = 'now', $timezone = null)
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Office;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OfficeEvent
+class OfficeEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -18,6 +19,7 @@ class OfficeEvent
     public $request_obj;
     public $type;
     public $old_values;
+    public $offices;
     /**
      * Create a new event instance.
      *
@@ -29,6 +31,8 @@ class OfficeEvent
         $this->request_obj = $request_obj;
         $this->old_values = $old_values;
         $this->type = $type;
+
+        $this->offices = Office::all();
     }
 
     /**
@@ -38,6 +42,6 @@ class OfficeEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return new Channel('offices');
     }
 }

@@ -8,31 +8,57 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class Document extends Model
 {
     use HasFactory;
     use SoftDeletes;
     use TrackingNumberBuilder;
+    use \Askedio\SoftCascade\Traits\SoftCascadeTrait;
+
+    protected $softCascade = ['document_recipient'];
 
     protected $fillable = [
         'tracking_code', 'subject', 'document_type_id',
-        'destination_office_id', 'current_office', 'sender_name',
+        'destination_office_id', 'sender_name',
         'page_count', 'date_filed', 'is_terminal', 'is_external',
         'remarks', 'attachment_page_count', 'status', 'priority_level','acknowledged'
     ];
 
     protected $dispatchesEvents = [
         'saved' => DocumentEvent::class,
-        'deleting' => DocumentEvent::class,
+        // 'deleting' => DocumentEvent::class,
+    ];
+
+    protected $casts = [
+        'destination_office_id' => 'collection'
     ];
 
     protected $hidden = ['destination_office_id'];
 
-    protected $appends = ['destination'];
+    protected $appends = ['destination', 'recipient', 'multiple'];
+
+    public function document_recipient()
+    {
+       return $this->hasMany(DocumentRecipient::class);
+    }
+
+    public function getMultipleAttribute(){
+        return $this->destination_office_id->count() > 1;
+    }
+
+    public function getRecipientAttribute(){
+        $recipient = DocumentRecipient::whereDocumentId($this->id);
+        if(!auth()->user()->can('update', $this)){
+            $recipient->whereDestinationOffice(auth()->user()->office->id);
+        }
+
+        return $recipient->get();
+    }
 
     public function getDestinationAttribute()
     {
-        $value = auth()->user()->can('update', $this) ? json_decode($this->attributes['destination_office_id']) : [auth()->user()->office->id];
+        $value = auth()->user()->can('update', $this) ? json_decode(optional($this->attributes)['destination_office_id']) : [auth()->user()->office->id];
         return Office::whereIn('id', $value)->get();
     }
 
@@ -53,11 +79,6 @@ class Document extends Model
         });
     }
 
-    public function current_office()
-    {
-        return $this->belongsTo('App\Models\Office', 'current_office_id');
-    }
-
     public function origin_office()
     {
         return $this->belongsTo('App\Models\Office', 'originating_office');
@@ -70,7 +91,7 @@ class Document extends Model
 
     public function tracking_records()
     {
-        return $this->hasMany('App\Models\TrackingRecord', 'document_id');
+        return $this->hasMany('App\Models\TrackingRecord');
     }
 
     public function document_type()
@@ -93,10 +114,18 @@ class Document extends Model
         $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
 
         if($user->isUser()){
-            $document->whereRaw("((json_contains(`destination_office_id`, {$user->office_id}) AND acknowledged = 1) OR originating_office = {$user->office_id} )");
+
+            $outgoing = $document->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
+
+            $incoming = Document::with(['document_recipient' => function ($query){
+                               $query->whereDestinationOffice(auth()->user()->office->id);
+                        }])
+                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
+
+            return compact('incoming', 'outgoing');
         }
 
-        return $document->orderBy('created_at', 'DESC')->get();
+        return $document->orderBy('documents.created_at', 'DESC')->get();
     }
 
     public static function allDocumentsArchive(User $user, $request)

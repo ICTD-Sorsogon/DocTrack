@@ -23,4 +23,9 @@ class Office extends Model
     {
         return $this->hasMany('App\Models\Document', 'originating_office');
     }
+
+    public function notification()
+    {
+        return $this->hasMany('App\Models\Notification');
+    }
 }

@@ -180,6 +180,66 @@
                         ></v-select>
                         </ValidationProvider>
                     </v-col>
+                    <v-col cols="12" xl="6" lg="6" md="6" v-if="types=='Change Date'">
+                        <v-dialog
+                            ref="date_dialog"
+                            v-model="datepicker_modal"
+                            :return-value.sync="form.date_filed"
+                            persistent
+                            width="290px"
+                        >
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-text-field
+                                    v-model="form.date_filed"
+                                    label="Date Filed"
+                                    prepend-inner-icon="mdi-calendar"
+                                    readonly
+                                    outlined
+                                    v-bind="attrs"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="form.date_filed" scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn text color="primary" @click="datepicker_modal = false">
+                                    Cancel
+                                </v-btn>
+                                <v-btn text color="primary" @click="$refs.date_dialog.save(form.date_filed)">
+                                    OK
+                                </v-btn>
+                            </v-date-picker>
+                        </v-dialog>
+                    </v-col>
+                     <v-col cols="12" xl="6" lg="6" md="12" v-if="types=='Change Date'">
+                        <v-dialog
+                            ref="time_dialog"
+                            v-model="timepicker_modal"
+                            :return-value.sync="form.time_filed"
+                            persistent
+                            width="290px"
+                        >
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-text-field
+                                    v-model="form.time_filed"
+                                    label="Time Filed"
+                                    prepend-inner-icon="mdi-clock-time-four-outline"
+                                    readonly
+                                    outlined
+                                    v-bind="attrs"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-time-picker v-if="timepicker_modal" v-model="form.time_filed" full-width>
+                                <v-spacer></v-spacer>
+                                <v-btn text color="primary" @click="timepicker_modal = false">
+                                    Cancel
+                                </v-btn>
+                                <v-btn text color="primary" @click="$refs.time_dialog.save(form.time_filed)">
+                                    OK
+                                </v-btn>
+                            </v-time-picker>
+                        </v-dialog>
+                    </v-col>
                     <v-col cols="12" xl="12" lg="12" md="12">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-textarea
@@ -267,6 +327,20 @@
                                     </v-icon>
                                     Hold or Reject
                             </v-btn>
+                            <v-btn
+                                v-if="types=='Change Date'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="valid"
+                                :disabled="!valid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-calendar-check-outline
+                                    </v-icon>
+                                    Save
+                            </v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -303,6 +377,9 @@
                         <v-btn v-if="types=='Hold or Reject'" color="primary darken-1" text @click.prevent="holdRejectDocumentConfirm">
                             Hold or Reject
                         </v-btn>
+                        <v-btn v-if="types=='Change Date'" color="primary darken-1" text @click.prevent="changeDateDocumentConfirm">
+                            Save
+                        </v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -321,12 +398,15 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['find_document' , 'documents' , 'find_document']),
+        ...mapGetters(['find_document' , 'documents' , 'find_document', 'is_admin']),
         types() {
             return this.$route.params.type;
         },
         selected_document() {
-                return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
+
+            let userDoc = !this.is_admin && ['terminate', 'Change Date'].includes(this.$route.params.type) ? this.documents['outgoing'] : this.documents['incoming']
+
+            return JSON.parse(JSON.stringify( this.is_admin ? this.documents : userDoc)).map(doc=>{
 				doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
 				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
@@ -349,6 +429,8 @@ export default {
         return {
             btnloading: false,
             documentDialog: false,
+            datepicker_modal: false,
+            timepicker_modal: false,
             coming_from: [
                 { show: 'Docket Office', value: 'docket office' },
                 { show: 'Email', value: 'email' },
@@ -360,9 +442,9 @@ export default {
                 { show: 'Reject', value: 'rejected' }
             ],
             priority_level: [
-                { show: 'High', value: '3' },
+                { show: 'High', value: '1' },
                 { show: 'Medium', value: '2' },
-                { show: 'Low', value: '1' }
+                { show: 'Low', value: '3' }
             ],
             temp: {
                 sample_data: 'sample'
@@ -380,6 +462,8 @@ export default {
                 forwarded_to: '',
                 status: '',
                 hold_reject: '',
+                date_filed: '',
+                time_filed: '',
             },
             defaultItem: {
                 document_id: '',
@@ -394,6 +478,8 @@ export default {
                 forwarded_to: '',
                 status: '',
                 hold_reject: '',
+                date_filed: '',
+                time_filed: '',
             }
         }
     },
@@ -412,6 +498,7 @@ export default {
         },
         sanitize() {
             this.form.destination = this.form.destination[0].id
+            this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id
         },
         receiveDocumentConfirm() {
             this.btnloading = true;
@@ -539,11 +626,35 @@ export default {
                 });
                 this.closeDocumentDialog()
         },
+        changeDateDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("changeDateDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
     },
     mounted() {
-        console.log(this.selected_document)
         this.$store.dispatch('unsetLoader');
-        this.form = this.find_document(this.$route.params.id);
+        this.form = this.$route.params.item ?? this.selected_document;
     }
 
 }
