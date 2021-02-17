@@ -340,7 +340,7 @@
                     })
                     return findedData
 
-                    //console.log(poriginating.map(o=>o.id).includes(document.origin_office.id))
+                       //console.log(poriginating.map(o=>o.id).includes(document.origin_office.id))
                     /*var hh = false
                     parameter.forEach((par)=>{
                         if (par == 'ptrackingId' && document.tracking_code == eval(par)) {
