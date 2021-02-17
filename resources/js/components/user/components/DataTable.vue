@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="incoming && !item.received ">
+					<v-col v-if="(incoming || item.DO_reciever ) && !item.received ">
 						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
@@ -80,7 +80,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="incoming && (isAdmin || item.received) && !item.multiple">
+					<v-col v-if="(incoming || item.DO_reciever ) && (isAdmin || item.received) && !item.multiple && !item.forwarded">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="(isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)">
+					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)) && !item.forwarded">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -117,7 +117,7 @@
 							Change Date
 						</v-btn>
 					</v-col>
-                    <v-col>
+                    <v-col v-if="incoming && item.recieved && !item.forwarded">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
 						>
 							<v-icon left>
@@ -183,6 +183,8 @@ export default {
 				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
+				doc.DO_reciever = doc.destination.find(target => target.office_code == "DO")
+
 
 				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
                   doc[status] = doc.recipient.every( recipient => recipient[status] )

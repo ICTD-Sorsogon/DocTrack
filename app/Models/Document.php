@@ -7,13 +7,16 @@ use App\Models\Traits\TrackingNumberBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
+
 
 class Document extends Model
 {
     use HasFactory;
     use SoftDeletes;
     use TrackingNumberBuilder;
+    use \Askedio\SoftCascade\Traits\SoftCascadeTrait;
+
+    protected $softCascade = ['document_recipient'];
 
     protected $fillable = [
         'tracking_code', 'subject', 'document_type_id',
@@ -24,7 +27,7 @@ class Document extends Model
 
     protected $dispatchesEvents = [
         'saved' => DocumentEvent::class,
-        'deleting' => DocumentEvent::class,
+        // 'deleting' => DocumentEvent::class,
     ];
 
     protected $casts = [
@@ -118,8 +121,8 @@ class Document extends Model
                                $query->whereDestinationOffice(auth()->user()->office->id);
                         }])
                         ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
+
             return compact('incoming', 'outgoing');
-            
         }
 
         return $document->orderBy('documents.created_at', 'DESC')->get();

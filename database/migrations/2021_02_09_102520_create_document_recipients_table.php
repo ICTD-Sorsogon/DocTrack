@@ -15,7 +15,7 @@ class CreateDocumentRecipientsTable extends Migration
     {
         Schema::create('document_recipients', function (Blueprint $table) {
             $table->id('recipient_id');
-            $table->foreignId('document_id')->constrained('documents')->nullable();
+            $table->foreignId('document_id')->constrained('documents')->onDelete('cascade')->nullable();
             $table->integer('destination_office');
             $table->boolean('acknowledged')->default(false);
             $table->boolean('received')->default(false);
