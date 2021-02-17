@@ -150,7 +150,8 @@ class DocumentController extends Controller
             
             $admin = auth()->user()->isAdmin();
 
-            DocumentRecipient::where(['document_id' => $admin ? $request->id : $request->recipient_id ])->delete();
+            DocumentRecipient::where(['document_id' => $request->id, 
+                                      'destination_office' => $request->recipient_id])->delete();
 
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
