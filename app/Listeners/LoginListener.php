@@ -28,7 +28,7 @@ class LoginListener
      */
     public function handle(LoginEvent $event)
     {
-        switch($event->type){
+        switch ($event->type) {
             case 'login':
                 $username = json_encode($event->request_obj->username);
 

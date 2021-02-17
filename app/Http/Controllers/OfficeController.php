@@ -9,6 +9,7 @@ use DB;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Office;
+use App\Models\TrackingRecord;
 use Illuminate\Http\Request;
 
 class OfficeController extends Controller
@@ -168,13 +169,25 @@ class OfficeController extends Controller
     public function getTrackingList()
     {
         $stat = [];
+        $result = TrackingRecord::all()->groupBy(['document_id','destination']);
+        $office = Office::all();
+        $documents = Document::all();
+        foreach($result as $document){
+            foreach($document as $destinations){
+                foreach($destinations as $destination){                    
+                    $stat[$destination->document_id][$office->find($destination->destination)->office_code][$destination->action] = $destination->last_touched;                                                                     
+                    $stat[$destination->document_id][$office->find($destination->destination)->office_code]['document'] = $documents->find($destination->document_id);                                                                     
+                }                                                                            
+            }                                                                 
+        }
+        return $stat;
         $document =  Document::with('tracking_records')
             ->get()
             ->groupBy('originating_office')
             ->filter(function($val,$key){return is_numeric($key);});
 
         foreach (Office::all() as $office) {
-           $stat[$office->name]['count'] = @$document[$office->id]?->count() ?? 0;
+           $stat[$office->name]['count'] = @optional($document[$office->id])->count() ?? 0;
            $stat[$office->name]['document'] = $document[$office->id] ?? null;
         } 
 

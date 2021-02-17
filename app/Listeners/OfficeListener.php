@@ -27,7 +27,7 @@ class OfficeListener
      */
     public function handle(OfficeEvent $event)
     {
-        switch($event->type){
+        switch ($event->type) {
             case 'create':
                 $office_name = $event->request_obj->name;
                 $office_code = $event->request_obj->office_code;
@@ -37,7 +37,8 @@ class OfficeListener
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
                 $log->action = 'Office create';
-                $log->remarks = 'New office has been successfully created with office name of : '.$office_name.' and office code of: '.$office_code;
+                $log->remarks = 'New office has been successfully created with office name of : '.$office_name.
+                    ' and office code of: '.$office_code;
                 return $log->save();
             break;
 
@@ -52,7 +53,8 @@ class OfficeListener
                 $log->new_values = $data;
                 $log->original_values = $old_values;
                 $log->action = 'Office update';
-                $log->remarks = 'Office has been successfully updated with new office name of : '.$name.' and office code of: '.$code;
+                $log->remarks = 'Office has been successfully updated with new office name of : 
+                    '.$name.' and office code of: '.$code;
                 return $log->save();
             break;
 
@@ -63,7 +65,8 @@ class OfficeListener
                 $log = new Log;
                 $log->user_id = $event->user_id;
                 $log->action = 'Office delete';
-                $log->remarks = 'Office has been successfully deleted with office name of : '.$office_name.' and office code of: '.$office_code;
+                $log->remarks = 'Office has been successfully deleted with office name of : 
+                    '.$office_name.' and office code of: '.$office_code;
                 return $log->save();
             break;
 

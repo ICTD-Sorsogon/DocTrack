@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\Hello;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('import_new_office', 'OfficeController@importNewOffice');
 
         Route::get('tracking_reports', 'DocumentController@trackingReports');
+
+        Route::get('notifs', 'NotificationController@index');
+        Route::put('notifs/{notifs}', 'NotificationController@update');
 
     });
 

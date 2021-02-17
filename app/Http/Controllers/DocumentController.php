@@ -59,12 +59,7 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-
-            $user_id = Auth::user()->id;
-
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
+            $tracking_record->document->update(['status' => 'received']);
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -100,9 +95,6 @@ class DocumentController extends Controller
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
 
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -133,10 +125,6 @@ class DocumentController extends Controller
 
     public function terminateDocument(Request $request)
     {
-        $remarks = $request->documentRemarks;
-        $approved_by = $request->approved_by;
-        $subject = $request->subject;
-
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -158,11 +146,6 @@ class DocumentController extends Controller
                 $tracking_record->document->delete();
             }
 
-            $user_id = Auth::user()->id;
-
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -190,10 +173,7 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['priority_level' => $request->priority_levels]);
-
-            $user_id = Auth::user()->id;
+            $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
 
         } catch (ValidationException $error) {
             DB::rollback();

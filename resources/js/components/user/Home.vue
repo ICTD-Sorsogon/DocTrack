@@ -151,6 +151,11 @@
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
         <v-spacer></v-spacer>
 
+        <!-- NOTIFICATION!! -->
+        <div v-if="notif" class="outside" v-on:click="away()"></div>
+        <notification-item style="margin-top:580px; margin-left:200px" v-if="notif"></notification-item>
+        <notification v-on:showNotif="showNotif" style="margin-right:15px"></notification>
+
         <router-link to="/account_settings">
             <v-avatar v-if="image_source === '/storage/null'" color="indigo">
                 <img src="/images/defaultpic.jpg" alt="default_picture">
@@ -182,11 +187,17 @@
 </template>
 
 <script>
+import Notification from './Notification'
+import NotificationItem from './NotificationItem'
 // TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
 import LogoutDialog from './components/LogoutDialog';
 export default {
-    components: { LogoutDialog },
+    components:{
+        Notification,
+        NotificationItem,
+        LogoutDialog
+    },
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
@@ -212,10 +223,21 @@ export default {
         return {
             drawer: null,
             group: null,
+            messages: 5,
+            notif: false,
         }
     },
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
+
+        showNotif(){
+            this.notif = !this.notif
+        },
+
+        away() {
+            this.notif = !this.notif;
+        },
+
         logout(){
             var path = this.$router.currentRoute.path.split('/');
             if (path.length >= 3) {
@@ -285,10 +307,18 @@ export default {
             }
         },
     },
+    created(){
+        Echo.channel('documents'+this.auth_user.office_id)
+        .listen('DocumentEvent', (e) => {
+            this.$store.dispatch('getActiveDocuments');
+            this.$store.dispatch('getNotifs');
+        })
+    },
     beforeCreate() {
         this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
+
     },
 }
 </script>
@@ -299,5 +329,12 @@ export default {
 }
 .namespace {
     background:rgba(0, 0, 0, 0.09);
+}
+.outside {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
 }
 </style>
