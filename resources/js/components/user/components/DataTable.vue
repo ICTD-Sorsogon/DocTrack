@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)) && !item.forwarded">
+					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)) && item.forwarded">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -197,8 +197,12 @@ export default {
                     doc.prio_text = 'Medium'
 
                 }
-                else if (doc.priority_level == 3)
-                    doc.prio_text = 'Low'
+                else if (doc.priority_level == 3) {
+                     doc.prio_text = 'Low'
+                }
+                else if (doc.priority_level == 4) {
+                     doc.prio_text = 'Indefinite'
+                }
                 else
                     doc.prio_text = 'None'
 				return doc
@@ -248,7 +252,7 @@ export default {
 
 <style>
 .uniform {
-    width: 80px;
+    width: 100px;
     justify-content: center;
 }
 .trackin {
