@@ -15,13 +15,13 @@ class CreateDocumentRecipientsTable extends Migration
     {
         Schema::create('document_recipients', function (Blueprint $table) {
             $table->id('recipient_id');
-            $table->foreignId('document_id')->constrained('documents')->onDelete('cascade')->nullable();
+            $table->foreignId('document_id')->constrained('documents')->nullable();
             $table->integer('destination_office');
-            $table->dateTime('acknowledged')->nullable();
-            $table->dateTime('received')->nullable();
-            $table->dateTime('forwarded')->nullable();
-            $table->dateTime('rejected')->nullable();
-            $table->dateTime('hold')->nullable();
+            $table->boolean('acknowledged')->default(false);
+            $table->boolean('received')->default(false);
+            $table->boolean('forwarded')->default(false);
+            $table->boolean('rejected')->default(false);
+            $table->boolean('hold')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
