@@ -12,6 +12,7 @@ use App\Models\Document;
 use App\Models\DocumentRecipient;
 use App\Models\DocumentType;
 use App\Models\TrackingRecord;
+use App\Models\TrackingSummary;
 use Illuminate\Http\Request;
 
 class DocumentController extends Controller
@@ -61,7 +62,11 @@ class DocumentController extends Controller
             $tracking_record->save();
 
             $user_id = Auth::user()->id;
-
+            TrackingSummary::create([
+                'action' => 'received',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
@@ -90,6 +95,7 @@ class DocumentController extends Controller
         try {
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $request->id;
+            $tracking_record->destination = $request->forwarded_to;
             $tracking_record->action = 'forwarded';
             $tracking_record->through = $request->through;
             $tracking_record->approved_by = $request->approved_by;
@@ -99,7 +105,12 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-
+            
+            TrackingSummary::create([
+                'action' => 'forwarded',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
@@ -120,7 +131,7 @@ class DocumentController extends Controller
         }
 
         $destination = $document->destination_office_id->push($request->forwarded_to);
-        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => Carbon::now()]);
+        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
 
         $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
 
@@ -131,7 +142,7 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
-    public function terminateDocument(Request $request)
+    public function terminateDocument(Document $document, Request $request)
     {
         $remarks = $request->documentRemarks;
         $approved_by = $request->approved_by;
@@ -141,6 +152,7 @@ class DocumentController extends Controller
         try {
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $request->id;
+            $tracking_record->destination = auth()->user()->office->id;
             $tracking_record->action = 'terminated';
             $tracking_record->approved_by = $request->approved_by;
             $tracking_record->touched_by = Auth::user()->id;
@@ -149,7 +161,7 @@ class DocumentController extends Controller
             $tracking_record->save();
 
             $admin = auth()->user()->isAdmin();
-
+            
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
@@ -176,23 +188,31 @@ class DocumentController extends Controller
         $document->update(['priority_level' => $request->priority_levels ]);
 
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
-            ->update(['acknowledged' => Carbon::now()]);
+            ->update(['acknowledged' => true]);
 
         $remarks = $request->remarks;
         $subject = $request->subject;
 
         DB::beginTransaction();
         try {
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $request->id;
-            $tracking_record->action = 'acknowledged';
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $request->documentRemarks;
-            $tracking_record->save();
-            $tracking_record->document->update(['status' => 'acknowledged']);
-            $tracking_record->document->update(['priority_level' => $request->priority_levels]);
-
+            foreach($document->destination as $destination) {
+                $tracking_record = new TrackingRecord();
+                $tracking_record->document_id = $request->id;
+                $tracking_record->action = 'acknowledged';
+                $tracking_record->destination = $destination->id;
+                $tracking_record->touched_by = Auth::user()->id;
+                $tracking_record->last_touched = Carbon::now();
+                $tracking_record->remarks = $request->documentRemarks;
+                $tracking_record->save();
+                $tracking_record->document->update(['status' => 'acknowledged']);
+                $tracking_record->document->update(['priority_level' => $request->priority_levels]);
+            }
+           
+            TrackingSummary::create([
+                'action' => 'acknowledged',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
             $user_id = Auth::user()->id;
 
         } catch (ValidationException $error) {
@@ -273,18 +293,24 @@ class DocumentController extends Controller
             DocumentRecipient::updateOrCreate(
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ]);
+            TrackingRecord::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'destination' => $office->id,
+                'touched_by' => auth()->user()->id,
+                'remarks' => $document->remarks,
+                'last_touched' => Carbon::now()
+            ]);
         };
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
 
-       TrackingRecord::create([
+        TrackingSummary::create([
             'action' => 'created',
             'document_id' => $document->id,
-            'touched_by' => auth()->user()->id,
-            'remarks' => $document->remarks,
-            'last_touched' => Carbon::now()
-       ]);
+            'office_id' => auth()->user()->office->id
+        ]);
 
        return $document;
     }
