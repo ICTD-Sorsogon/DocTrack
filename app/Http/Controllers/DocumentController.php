@@ -142,14 +142,11 @@ class DocumentController extends Controller
                                       'destination_office' => auth()->user()->office->id])->delete();
 
             $document->status = 'terminated'; 
-            DocumentEvent::dispatch($document);
+            DocumentEvent::dispatch($document); 
 
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
                 $tracking_record->document->delete();
-
-                // $document->status = 'terminated'; 
-                // DocumentEvent::dispatch($document);
             }
 
         } catch (\Exception $error) {
