@@ -59,7 +59,7 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item) && !Boolean(item.acknowledged)">
+					<v-col v-if="isEditable(item) && !item.acknowledged">
 						<v-btn
 							@click="$emit('editDocument', item.id)"
 							text
@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && !Boolean(item.received)">
+					<v-col v-if="incoming && !item.received ">
 						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
@@ -80,7 +80,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && (isAdmin || Boolean(item.received)) && !item.multiple && !Boolean(item.forwarded)">
+					<v-col v-if="incoming && (isAdmin || item.received) && !item.multiple">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && Boolean(item.acknowledged) && Boolean(item.received)) ||  (!isAdmin && Boolean(item.received))) && !Boolean(item.forwarded)">
+					<v-col v-if="(isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -99,7 +99,7 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isAdmin && !Boolean(item.acknowledged)">
+                    <v-col v-if="isAdmin && !item.acknowledged">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
@@ -108,7 +108,7 @@
 							Acknowledge
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isGO && !Boolean(item.acknowledged)">
+                    <v-col v-if="isGO">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Change Date')" text color="#E65100" block
 						>
 							<v-icon left>
@@ -117,7 +117,7 @@
 							Change Date
 						</v-btn>
 					</v-col>
-                    <v-col v-if="incoming && Boolean(item.recieved) && !Boolean(item.forwarded)">
+                    <v-col>
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
 						>
 							<v-icon left>
@@ -183,13 +183,11 @@ export default {
 				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
-				doc.DO_reciever = doc.destination.find(target => target.office_code == "DO")
-
 
 				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
-                  doc[status] = doc.recipient.every( recipient => Boolean(recipient[status]))
+                  doc[status] = doc.recipient.every( recipient => recipient[status] )
                 }
-				
+
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'High'
                 }
