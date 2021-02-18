@@ -201,4 +201,16 @@ class OfficeController extends Controller
         // return $offices;
     }
 
+    public function listOfficeNames()
+    {
+        $offices = Office::select('id', 'name', 'office_code')->get()->keyBy('id');
+        foreach($offices as $office) {
+            $office['delayed'] = 0;
+            $office['transactions'] = 0;
+            $office['fastest'] = 0;
+            $office['slowest'] = 0;
+            $office['efficiency'] = 0;
+        }
+        return $offices;
+    }
 }

@@ -55,121 +55,39 @@ export default {
         //TOFIX elapse time for fastest and longest transaction should check
         // in b/w transaction by checking previous last_touched
         all_documents(){
-            let documents = JSON.parse(JSON.stringify(
-                this.$store.state.documents.tracking_reports
-            ));
+            // console.time("Execution Time")
+            let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
+            let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
+            for (const [key, value] of Object.entries(summaries)) {
+                if (value.length === 1) {
+                    console.log('single entry');
+                }
+                for(var i = 0; i < value.length; i++) {
+                    console.log(value[i]);
+                    // value.forEach(element =>{
+                    //     offices[element.office_id].transactions++;
+                    // })
+                    // console.log(new Date(value[i].created_at).getDate()- new Date(value[i-1].created_at).getDate());
 
-            documents.forEach(document => {
-                var temp = 0;
-                document.diff = [];
-                document.senderDelayed = 0;
-                document.receiverDelayed = 0;
-                document.docketDelayed = 0;
-                document.tracking_records.forEach(tracking => {
-                    document.diff.push({action:tracking.action,last_touched:tracking.last_touched,office:tracking.user.office.name});
-                });
-                // console.log(document)
-            });
-            console.log(documents);
-            // return documents;
+                    // var date1 = new Date(value[i].created_at).getDate();
+                    // var date2 = new Date(value[i-1].created_at).getDate();
+                    // var diff = (date2 - date1);
+                    // if(diff > 7) {
+                        // offices[value.office_id].delayed++;
+                    // }
+                    // offices[value.office_id].transactions++;
+                }
+                // value.forEach(element => {
+                //     if(element.multiple) {
+                //         console.log('multiple entry');
+                //     }else {
+
+                //     }
+                // });
+            }
+            // console.log(offices);
+            // console.timeEnd("Execution Time");
         },
-        // all_documents(){
-        //     let offices = JSON.parse(JSON.stringify(
-        //         this.$store.state.documents.tracking_reports
-        //     ));
-        //     offices.forEach(element => {
-        //         var max = 0;
-        //         var min = (element.transaction === 0 ? 0 : Number.POSITIVE_INFINITY);
-        //         var total_average = 0;
-        //         var temp=0;
-        //         var delta = 0;
-        //         var days = 0;
-        //         element.delayed = 0;
-        //         forEach(element.documents, function(element2) {
-        //             element2.forEach(element3 => {
-        //                 let created_at = new Date(element3.last_touched);
-        //                 let now_date = new Date();
-        //                 // console.log('past ',created_at ,"now ", now_date)
-        //                 let difference = now_date.getDate() - created_at.getDate();
-        //                 // console.log(difference)
-        //                 // if (max < difference ) {
-        //                 //     max = difference ;
-        //                 //     element.longestDelay = this.getTimeHours(created_at,now_date);
-        //                 // }
-        //                 // if (min > difference ) {
-        //                 //     min = difference;
-        //                 //     element.fastestTransaction = this.getTimeHours(created_at, now_date)
-        //                 // }
-        //             });
-        //             if(last(element2).action != 'received') {
-        //                 var dates = map(element2, 'last_touched');
-        //                 var start = 0;
-        //                 var end = 0;
-        //                 var difference = [];
-        //                  if (dates.length > 1) {
-        //                     for(var i = 0; i < dates.length - 1; i++) {
-        //                         start = new Date(dates[i]);
-        //                         end = new Date(dates[i+1]);
-        //                         var diff = end.getDate() - start.getDate();
-        //                         if (diff > 7) {
-        //                             element.delayed += 1;
-        //                         }
-        //                         difference.push(end - start);
-        //                     }
-        //                     let average = mean(difference);
-        //                     element2.average = average;
-        //                     temp += average;
-        //                 }
-        //             }
-        //         });
-        //         element.average = temp;
-        //         delta = Math.abs(element.average) / 1000;
-        //         var days = Math.floor(delta / 86400);
-        //         delta -= days * 86400;
-        //         var hours = Math.floor(delta / 3600) % 24;
-        //         delta -= hours * 3600;
-        //         var minutes = Math.floor(delta / 60) % 60;
-        //         delta -= minutes * 60;
-        //         var seconds = delta % 60;
-        //         element.avg_time = `${days}d${hours}h${minutes}m${seconds}s`
-        //         // element.tracking_records.forEach(element => {
-        //         //     console.log(_.meanBy(element, 'touched_by'));
-        //         // });
-
-        //         // element.tracking_records.forEach(element => {
-        //         //     console.log(element);
-        //         // })
-        //         // var max = 0;
-        //         // var min = (element.tracking_records.length === 0 ? 0 : Number.POSITIVE_INFINITY);
-        //         // element.delayed = 0;
-        //         // element.efficiency = 0;
-        //         // element.longestDelay = '';
-        //         // element.fastestTransaction  = '';
-        //         // element.tracking_records.forEach(el => {
-        //         //     let created_at = new Date(el.created_at);
-        //         //     let now_date = new Date();
-        //         //     let difference = now_date.getDate() - created_at.getDate();
-        //         //     let total = element.tracking_records.length;
-        //         //     // if (max < difference ) {
-        //         //     //     max = difference ;
-        //         //     //     element.longestDelay = this.getTimeHours(created_at, now_date);
-        //         //     // }
-        //         //     // if (min > difference ) {
-        //         //     //     min = difference;
-        //         //     //     element.fastestTransaction = this.getTimeHours(created_at, now_date)
-        //         //     // }
-
-        //         //     if (difference > 7) {
-        //         //         element.delayed += 1;
-
-        //         //     }
-        //         //      element.efficiency = (((total - element.delayed )
-        //         //      / total) * 100);
-        //         // });
-        //     });
-        //     // console.log(offices);
-        //     return offices;
-        // }
     },
     methods: {
         getTimeHours(past, present) {
@@ -201,10 +119,9 @@ export default {
         }
     },
     mounted() {
-        this.$store.dispatch('getDocument');
-        this.$store.dispatch('getAllUsers');
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
+        this.$store.dispatch('getOfficeNameList');
     }
 }
 </script>

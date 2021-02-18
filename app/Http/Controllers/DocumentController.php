@@ -71,6 +71,12 @@ class DocumentController extends Controller
             'received' => true
         ]);
 
+        TrackingSummary::create([
+            'action' => 'received',
+            'document_id' => $document->id,
+            'office_id' => auth()->user()->office_id
+        ]);
+
         return [$tracking_record];
     }
 
@@ -96,6 +102,13 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
+
+            TrackingSummary::create([
+                'action' => 'forwarded',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office_id
+            ]);
+
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -273,25 +286,24 @@ class DocumentController extends Controller
                 'remarks' => $document->remarks,
                 'last_touched' => Carbon::now()
             ]);
+
+            TrackingSummary::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
+
         };
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
 
-        TrackingSummary::create([
-            'action' => 'created',
-            'document_id' => $document->id,
-            'office_id' => auth()->user()->office->id
-        ]);
-
        return $document;
     }
 
-    public function trackingReports() {
-        $documents = Document::withTrashed()
-            ->with('tracking_records', 'tracking_records.user', 'tracking_records.user.office')
-            ->get();
-        $office = collect($documents)->groupBy('tracking_records.user.office');
-        return $documents;
+    public function trackingReports()
+    {
+        $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
+        return $summary;
     }
 }

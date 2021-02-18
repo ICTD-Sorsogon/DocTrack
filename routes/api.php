@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::group(['namespace' => 'App\Http\Controllers'], function () {
-        Route::post('login', 'LoginController@login');
-        Route::post('logout', 'LoginController@logout');
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
         Route::post('add_new_user', 'UserController@addNewUser');
@@ -50,6 +48,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('import_new_office', 'OfficeController@importNewOffice');
 
         Route::get('tracking_reports', 'DocumentController@trackingReports');
+        Route::get('list_office_names', 'OfficeController@listOfficeNames');
 
         Route::get('notifs', 'NotificationController@index');
         Route::put('notifs/{notifs}', 'NotificationController@update');
