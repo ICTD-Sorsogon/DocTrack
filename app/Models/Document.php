@@ -112,7 +112,6 @@ class Document extends Model
     public static function allDocuments(User $user)
     {
         $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
-
         if($user->isUser()){
 
             $outgoing = $document->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
