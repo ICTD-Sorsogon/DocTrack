@@ -105,7 +105,7 @@ class DocumentNotificationListener
                     $notification->save();
                 }
 
-                $sender_notif = Personnel::where('id', $sender_id)->first();
+                $sender_notif = User::where('id', $sender_id)->first();
                     $notification->document_id = $document_data->id;
                     $notification->user_id = $sender_notif->id;
                     $notification->office_id = $sender_notif->office_id;
