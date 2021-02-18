@@ -27,7 +27,7 @@ class AccountListener
      */
     public function handle(AccountEvent $event)
     {
-        switch($event->type){
+        switch ($event->type) {
             case 'fullname':
                 $old_values = json_encode($event->old_values);
                 $data = json_encode($event->request_obj);
@@ -41,7 +41,8 @@ class AccountListener
                 $log->new_values = $data;
                 $log->original_values = $old_values;
                 $log->action = 'Account fullname update';
-                $log->remarks = 'Account fullname has been successfully updated to : '.$last_name.', '.$first_name.', '.$middle_name.' '.$suffix;
+                $log->remarks = 'Account fullname has been successfully updated to : 
+                    '.$last_name.', '.$first_name.', '.$middle_name.' '.$suffix;
                 return $log->save();
             break;
 
@@ -61,7 +62,8 @@ class AccountListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->action = 'Account username update';
-                $log->remarks = 'Account username has been successfully updated from : '.$old_values.' to '.$username;
+                $log->remarks = 'Account username has been successfully updated from : 
+                    '.$old_values.' to '.$username;
                 return $log->save();
             break;
         }

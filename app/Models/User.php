@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Log');
     }
 
+    public function notification()
+    {
+        return $this->hasMany('App\Models\Notification');
+    }
+
     public function canEditThisDoc($id)
     {
         return $this->office->documents->find($id) || $this->isAdmin();
@@ -86,5 +91,4 @@ class User extends Authenticatable
     {
         return $this->role->name === 'admin';
     }
-
 }

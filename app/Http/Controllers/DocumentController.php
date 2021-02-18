@@ -60,16 +60,7 @@ class DocumentController extends Controller
             $tracking_record->last_touched = Carbon::now();
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-
-            $user_id = Auth::user()->id;
-            TrackingSummary::create([
-                'action' => 'received',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
-            ]);
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
+            $tracking_record->document->update(['status' => 'received']);
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -105,15 +96,6 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
-            
-            TrackingSummary::create([
-                'action' => 'forwarded',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
-            ]);
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -144,10 +126,6 @@ class DocumentController extends Controller
 
     public function terminateDocument(Document $document, Request $request)
     {
-        $remarks = $request->documentRemarks;
-        $approved_by = $request->approved_by;
-        $subject = $request->subject;
-
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -161,7 +139,7 @@ class DocumentController extends Controller
             $tracking_record->save();
 
             $admin = auth()->user()->isAdmin();
-            
+
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
@@ -170,11 +148,6 @@ class DocumentController extends Controller
                 $tracking_record->document->delete();
             }
 
-            $user_id = Auth::user()->id;
-
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
         } catch (\Exception $error) {
             DB::rollback();
             throw $error;
@@ -204,10 +177,9 @@ class DocumentController extends Controller
                 $tracking_record->last_touched = Carbon::now();
                 $tracking_record->remarks = $request->documentRemarks;
                 $tracking_record->save();
-                $tracking_record->document->update(['status' => 'acknowledged']);
-                $tracking_record->document->update(['priority_level' => $request->priority_levels]);
+                $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
             }
-           
+
             TrackingSummary::create([
                 'action' => 'acknowledged',
                 'document_id' => $document->id,

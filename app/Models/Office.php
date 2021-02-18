@@ -28,4 +28,9 @@ class Office extends Model
     {
         return $this->hasMany('App\Models\TrackingSummary');
     }
+
+    public function notification()
+    {
+        return $this->hasMany('App\Models\Notification');
+    }
 }
