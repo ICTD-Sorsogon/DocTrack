@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && Boolean(item.acknowledged) && Boolean(item.received)) ||  (!isAdmin && item.received)) && !item.forwarded">
+					<v-col v-if="((isEditable(item) && Boolean(item.acknowledged) && Boolean(item.received)) ||  (!isAdmin && Boolean(item.received))) && !Boolean(item.forwarded)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -108,7 +108,7 @@
 							Acknowledge
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isGO && !item.acknowledged">
+                    <v-col v-if="isGO && !Boolean(item.acknowledged)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Change Date')" text color="#E65100" block
 						>
 							<v-icon left>
@@ -187,9 +187,9 @@ export default {
 
 
 				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
-                  doc[status] = doc.recipient.every( recipient => recipient[status] )
+                  doc[status] = doc.recipient.every( recipient => Boolean(recipient[status]))
                 }
-
+				
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'High'
                 }
