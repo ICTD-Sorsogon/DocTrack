@@ -192,7 +192,7 @@ class DocumentListener
                 ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
                 return $log->save();
             break;
-        }*/
+        }
     }
 
     public function destinationOffice($document, $type) {

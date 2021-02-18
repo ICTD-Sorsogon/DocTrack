@@ -43,6 +43,11 @@ class Document extends Model
        return $this->hasMany(DocumentRecipient::class);
     }
 
+    public function document_recipient_with_trashed()
+    {
+        return $this->hasMany(DocumentRecipient::class)->withTrashed();
+    }
+
     public function getMultipleAttribute(){
         return $this->destination_office_id->count() > 1;
     }
@@ -111,7 +116,7 @@ class Document extends Model
 
     public static function allDocuments(User $user)
     {
-        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
+        /*$document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
 
         if($user->isUser()){
 
@@ -125,7 +130,22 @@ class Document extends Model
             return compact('incoming', 'outgoing');
         }
 
-        return $document->orderBy('documents.created_at', 'DESC')->get();
+        return $document->orderBy('documents.created_at', 'DESC')->get();*/
+
+
+
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records', 'document_recipient_with_trashed'])->onlyTrashed();
+        if ($user->isUser()) {
+            //$document->where("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+            $outgoing = $document->where('originating_office', auth()->user()->office->id)->orderBy('created_at', 'DESC')->get();
+            $incoming = Document::where('originating_office', auth()->user()->office->id)
+                        ->whereHas('document_recipient_with_trashed', function($query) use($user){
+                            $query->where('destination_office', auth()->user()->office->id);
+                        })->onlyTrashed()->get();
+            return compact('incoming', 'outgoing');
+        }
+        //dd($document->orderBy('created_at', 'DESC')->get());
+        return $document->orderBy('created_at', 'DESC')->get();
     }
 
     public static function allDocumentsArchive(User $user, $request)
@@ -133,7 +153,55 @@ class Document extends Model
         $isByYear = ($request->filterBy == 'Year')?true:false;
         $selected = $request->selected;
 
-        $document = static::with('document_type','origin_office', 'sender', 'tracking_records')->onlyTrashed();
+        /*$document = static::with(['document_type','origin_office', 'sender', 'tracking_records', 'document_recipient_with_trashed']);
+        if($user->isUser()){
+            $outgoing = $document->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
+            $incoming = Document::with(['document_recipient' => function ($query){
+                               $query->whereDestinationOffice(auth()->user()->office->id);
+                        }])
+                        ->whereHas('document_recipient', function($query) use($user){
+                            $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");
+                        })->get();
+            return compact('incoming', 'outgoing');
+        }
+        //return $document->whereHas('document_recipient_with_trashed')->onlyTrashed()->get();
+        return $document->orderBy('documents.created_at', 'DESC')->onlyTrashed()->get();*/
+
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records', 'document_recipient_with_trashed'])->onlyTrashed();
+
+        if ($user->isUser()) {
+            $document->where("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+
+            $outgoing = $document->where('originating_office', $user->office_id)->orderBy('created_at', 'DESC')->get();
+            $incoming = Document::with(['document_recipient_with_trashed' => function ($query){
+                               $query->where('originating_office', $user->office_id);
+                        }])
+                        ->whereHas('document_recipient_with_trashed', function($query) use($user){
+                            $query->whereRaw("destination_office = {$user->office_id}");
+                        })->onlyTrashed()->get();
+
+            return compact('incoming', 'outgoing');
+            //$document->whereRaw("(destination_office_id = {$user->office_id} OR originating_office = {$user->office_id} )");
+            //$document->whereJsonContains('destination_office_id', $user->office_id)->where('acknowledged', 1)->orWhere('originating_office', $user->office_id);
+        }
+
+        $document->when(!$isByYear, function ($query) use ($selected) {
+                    return $query->whereBetween('created_at', [$selected[0].' 00:00:00', $selected[1].' 23:59:59']);
+                })->when($isByYear, function ($query) use ($selected) {
+                    return $query->whereIn(Document::raw('YEAR(`created_at`)'), $selected);
+                });
+
+        $docu = $document->orderBy('created_at', 'DESC')->get();
+        $year = static::select(Document::raw('YEAR(created_at) as year'))
+            ->onlyTrashed()
+            ->distinct()
+            ->get()
+            ->pluck('year');
+
+        return response()->json(['data' => $docu, 'year' => $year]);
+
+
+        /*$document = static::with('document_type','origin_office', 'sender', 'tracking_records')->onlyTrashed();
         //$document = static::with(['document_type','origin_office', 'sender', 'tracking_records'])->onlyTrashed();
 
         if ($user->isUser()) {
@@ -154,6 +222,6 @@ class Document extends Model
             ->get()
             ->pluck('year');
 
-        return response()->json(['data' => $docu, 'year' => $year]);
+        return response()->json(['data' => $docu, 'year' => $year]);*/
     }
 }
