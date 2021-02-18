@@ -123,7 +123,7 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
-    public function terminateDocument(Request $request)
+    public function terminateDocument(Document $document, Request $request)
     {
         DB::beginTransaction();
         try {
@@ -141,9 +141,15 @@ class DocumentController extends Controller
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
+            $document->status = 'terminated'; 
+            DocumentEvent::dispatch($document);
+
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
                 $tracking_record->document->delete();
+
+                // $document->status = 'terminated'; 
+                // DocumentEvent::dispatch($document);
             }
 
         } catch (\Exception $error) {
