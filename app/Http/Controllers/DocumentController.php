@@ -156,13 +156,8 @@ class DocumentController extends Controller
 
     public function acknowledgeDocument(Document $document, Request $request)
     {
-        $document->update(['priority_level' => $request->priority_levels ]);
-
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
             ->update(['acknowledged' => 1]);
-
-        $remarks = $request->remarks;
-        $subject = $request->subject;
 
         DB::beginTransaction();
         try {

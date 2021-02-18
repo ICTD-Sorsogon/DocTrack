@@ -104,7 +104,7 @@ class DocumentNotificationListener
                     $notification->save();
                 }
 
-                $sender_notif = User::where('office_id', $sender_id)->get();
+                $sender_notif = User::where('office_id', json_decode($sender_id))->get();
                     $notification = new Notification();
                     $notification->document_id = $document_data->id;
                     $notification->user_id = $sender_notif[0]->id;
