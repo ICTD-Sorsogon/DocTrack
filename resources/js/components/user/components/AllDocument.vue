@@ -67,10 +67,8 @@ export default {
             let type = this.tab ? 'outgoing' : 'incoming'
             return JSON.parse(JSON.stringify(this.documents))[type]
             .map(doc => {
-                doc.sender=false
                 if(!this.tab){
                   doc.recipient_id = doc.recipient[0].recipient_id
-                  doc.sender=true
                 }
               return doc
             })

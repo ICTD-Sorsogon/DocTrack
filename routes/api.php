@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::group(['namespace' => 'App\Http\Controllers'], function () {
-        // Route::post('login', 'LoginController@login');
-        // Route::post('logout', 'LoginController@logout');
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
         Route::post('add_new_user', 'UserController@addNewUser');
