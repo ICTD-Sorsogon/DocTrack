@@ -20,9 +20,9 @@
                         class="mx-4"
                     />
                 </template>
-                <template v-slot:[`item.efficiency`] = "{ item }">
-                    {{item.efficiency}}%
-                </template>
+                <!-- <template v-slot:[`item.efficiency`] = "{ item }">
+                    {{item.efficiency}}
+                </template> -->
                 </v-data-table>
             </v-col>
         </v-row>
@@ -30,8 +30,7 @@
 </template>
 
 <script>
-import {map, forEach, last, mean} from 'lodash';
-import { min, max } from './../../constants';
+import {map, forEach, last, mean , castArray} from 'lodash';
 export default {
     data() {
         return {
@@ -42,13 +41,13 @@ export default {
                     align: 'start',
                     value: 'name',
                 }
-                // ,
-                // { text: 'All Transaction', value: 'transaction_count' },
-                // { text: 'Delayed Document', value: 'delayed' },
+                ,
+                { text: 'All Transaction', value: 'transactions' },
+                { text: 'Delayed Document', value: 'delayed' },
                 // { text: 'Fastest Transaction', value: 'fastestTransaction' },
                 // { text: 'Slowest Transaction', value: 'longestDelay' },
                 // { text: 'Average Transaction Speed', value: 'speed' },
-                // { text: 'Efficiency Rating', value: 'efficiency' },
+                { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
     },
@@ -59,69 +58,47 @@ export default {
             // console.time("Execution Time")
             let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
             let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
+            let data = [];
             for (const [key, value] of Object.entries(summaries)) {
+                if (value.length === 0) {
+                    offices[value[i].office_id].slowest = 0;
+                    offices[value[i].office_id].fastest = 0;
+                    offices[value[i].office_id].transactions = 0;
+                }
+                
                 if (value.length === 1) {
                     console.log('single entry');
                 }
-                // console.log(value.length)
-                for(var i = 0; i <= value.length - 1; i++) {
-                    // console.log(value[i])
-                    // value[i].document.forEach(element => {
-                        var min = max;
-                        var max = min;
-                        var date1 = new Date(value[i].created_at);
-                        var date2 = new Date(value[i+1].created_at);
-                        diff = date2.getDate() - date1.getDate();
-                        if(value[i].document.multiple) {
-                            if (diff) {
-
-                            }
+                for (var i = 0; i <= value.length - 1; i++) {
+                        if (value[i].document.multiple) {
+                            console.log('multiple entry');
                         } else {
                             var diff = 0;
                             if (i != value.length - 1) {
-                                offices[value[i].office_id].transactions++; //goods na
-                                if(diff > 7) {
-                                    offices[value[i].office_id].delayed++; //goods na
+                                offices[value[i].office_id].transactions++;
+                                var date1 = new Date(value[i].created_at);
+                                var date2 = new Date(value[i+1].created_at);
+                                diff = date2.getDate() - date1.getDate();
+                                if (diff > 7) {
+                                    offices[value[i].office_id].delayed++;
                                 }
+                            } else {
+                                offices[value[i].office_id].transactions++;
                             }
                         }
-                    // });
-                    
+                        offices[value[i].office_id].efficiency = 
+                            (offices[value[i].office_id].transactions -
+                            offices[value[i].office_id].delayed)
                 }
-                
+                //better solution for this
+                for (const [key, value] of Object.entries(offices)) {
+                    value.efficiency = value.transactions !== 0 ?`${(value.transactions - value.delayed) /
+                        value.transactions * 100}%` : 'None';
+                    data.push(value);
+                }
             }
-            console.log(offices);
-            // console.timeEnd("Execution Time");
+            return data;
         },
-    },
-    methods: {
-        getTimeHours(past, present) {
-            var present = new Date(present);
-            var past = new Date(past);
-            var delta = Math.abs(present - past) / 1000;
-            var days = Math.floor(delta / 86400);
-            delta -= days * 86400;
-            var hours = Math.floor(delta / 3600) % 24;
-            delta -= hours * 3600;
-            var minutes = Math.floor(delta / 60) % 60;
-            delta -= minutes * 60;
-            var seconds = delta % 60;
-            return days +"d " + hours + "h " + minutes + "m";
-        },
-        averageElapsedTime(time_array) {
-            if (time_array.length < 2) {
-                return;
-            }
-            var start = 0;
-            var end = 0;
-            var difference = [];
-            for(i = 0; i < time_array.length; i++) {
-                start = new Date(time_array[i]);
-                end = new Date(time_array[i+1]);
-                difference.push(start.getTime() - end.getTime());
-            }
-            return _.mean(difference);
-        }
     },
     mounted() {
         this.$store.dispatch('unsetLoader');
