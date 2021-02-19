@@ -140,23 +140,23 @@ class DocumentListener
             break;
 
             case 'holdreject':
-                $status = $event->request_obj;
-                $subject = $event->old_values;
+                $status = $document->status;
+                $subject = $document->subject;
 
                 $log = new Log();
-                $log->user_id = $event->user_id;
+                $log->user_id = auth()->user()->id;
                 $log->action = 'Document hold or reject';
                 $log->remarks = 'Document '.$subject.' is '.$status;
                 return $log->save();
             break;
 
-            case 'deleting':
-                $remarks = $event->old_values;
-                $subject = $event->request_obj;
-                $approved_by = $event->approved_by;
+            case 'terminated':
+                $subject = $document->subject;
+                $approved_by = $document->approved_by;
+                $remarks = $document->remarks;
 
                 $log = new Log();
-                $log->user_id = $event->user_id;
+                $log->user_id = auth()->user()->id;
                 $log->action = 'Document terminate';
                 $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
                     '.$approved_by.'with remarks: '.$remarks;
