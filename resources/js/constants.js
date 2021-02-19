@@ -51,3 +51,6 @@ export const priority_level = {
     2 : '#FFA726',
     1 : '#F44336'
 };
+
+export const max = 99999;
+export const min = 0;

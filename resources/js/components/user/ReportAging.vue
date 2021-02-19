@@ -31,6 +31,7 @@
 
 <script>
 import {map, forEach, last, mean} from 'lodash';
+import { min, max } from './../../constants';
 export default {
     data() {
         return {
@@ -62,30 +63,34 @@ export default {
                 if (value.length === 1) {
                     console.log('single entry');
                 }
-                for(var i = 0; i < value.length; i++) {
-                    console.log(value[i]);
-                    // value.forEach(element =>{
-                    //     offices[element.office_id].transactions++;
-                    // })
-                    // console.log(new Date(value[i].created_at).getDate()- new Date(value[i-1].created_at).getDate());
+                // console.log(value.length)
+                for(var i = 0; i <= value.length - 1; i++) {
+                    // console.log(value[i])
+                    // value[i].document.forEach(element => {
+                        var min = max;
+                        var max = min;
+                        var date1 = new Date(value[i].created_at);
+                        var date2 = new Date(value[i+1].created_at);
+                        diff = date2.getDate() - date1.getDate();
+                        if(value[i].document.multiple) {
+                            if (diff) {
 
-                    // var date1 = new Date(value[i].created_at).getDate();
-                    // var date2 = new Date(value[i-1].created_at).getDate();
-                    // var diff = (date2 - date1);
-                    // if(diff > 7) {
-                        // offices[value.office_id].delayed++;
-                    // }
-                    // offices[value.office_id].transactions++;
+                            }
+                        } else {
+                            var diff = 0;
+                            if (i != value.length - 1) {
+                                offices[value[i].office_id].transactions++; //goods na
+                                if(diff > 7) {
+                                    offices[value[i].office_id].delayed++; //goods na
+                                }
+                            }
+                        }
+                    // });
+                    
                 }
-                // value.forEach(element => {
-                //     if(element.multiple) {
-                //         console.log('multiple entry');
-                //     }else {
-
-                //     }
-                // });
+                
             }
-            // console.log(offices);
+            console.log(offices);
             // console.timeEnd("Execution Time");
         },
     },
