@@ -123,7 +123,7 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
-    public function terminateDocument(Request $request)
+    public function terminateDocument(Document $document, Request $request)
     {
         DB::beginTransaction();
         try {
@@ -141,6 +141,9 @@ class DocumentController extends Controller
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
+            $document->status = 'terminated'; 
+            DocumentEvent::dispatch($document); 
+
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
                 $tracking_record->document->delete();
@@ -156,13 +159,8 @@ class DocumentController extends Controller
 
     public function acknowledgeDocument(Document $document, Request $request)
     {
-        $document->update(['priority_level' => $request->priority_levels ]);
-
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
             ->update(['acknowledged' => 1]);
-
-        $remarks = $request->remarks;
-        $subject = $request->subject;
 
         DB::beginTransaction();
         try {

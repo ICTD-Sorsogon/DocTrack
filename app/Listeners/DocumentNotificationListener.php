@@ -6,6 +6,7 @@ use App\Events\DocumentEvent;
 use App\Models\Document;
 use App\Models\Notification;
 use App\Models\Office;
+use App\Models\Personnel;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,7 +34,7 @@ class DocumentNotificationListener
     {
         extract(get_object_vars($event));
         
-        $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
+    $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
         $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
         $sender_id = $document->sender_name;
         $name = User::all()->find($sender_id);
@@ -104,11 +105,10 @@ class DocumentNotificationListener
                     $notification->save();
                 }
 
-                $sender_notif = User::where('office_id', $sender_id)->get();
-                    $notification = new Notification();
+                $sender_notif = User::where('id', $sender_id)->first();
                     $notification->document_id = $document_data->id;
-                    $notification->user_id = $sender_notif[0]->id;
-                    $notification->office_id = $sender_notif[0]->office_id;
+                    $notification->user_id = $sender_notif->id;
+                    $notification->office_id = $sender_notif->office_id;
                     $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
                     . $name->last_name . ' ' . $name->suffix;
                     $notification->status = 0;
@@ -141,17 +141,6 @@ class DocumentNotificationListener
             break;
 
             case 'terminated':
-                // $remarks = $event->old_values;
-                // $subject = $event->request_obj;
-                // $approved_by = $event->approved_by;
-
-                // $log = new Log();
-                // $log->user_id = $event->user_id;
-                // $log->action = 'Document terminate';
-                // $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
-                //     '.$approved_by.'with remarks: '.$remarks;
-                // return $log->save();
-
                 $docket_offices = User::where('office_id', 37)->get();
 
                 foreach($docket_offices as $docket_office){
@@ -166,17 +155,19 @@ class DocumentNotificationListener
                     $notification->save();
                 }
 
-                // foreach ($originating_notif as $key => $value) {
-                //     $notification = new Notification();
-                //     $notification->document_id = $document_data->id;
-                //     $notification->user_id = $value['id'];
-                //     $notification->office_id = $value['office_id'];
-                //     $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                //     . $name->last_name . ' ' . $name->suffix;
-                //     $notification->status = 0;
-                //     $notification->message = 'Document created by your office '.$document_data->subject.' has been terminated.';
-                //     $notification->save();
-                // }
+                foreach ($originating_notif as $key => $value) {
+                    $office = Office::where('id', $value->office_id)->get();
+
+                    $notification = new Notification();
+                    $notification->document_id = $document_data->id;
+                    $notification->user_id = $value['id'];
+                    $notification->office_id = $value['office_id'];
+                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->status = 0;
+                    $notification->message = 'Document created by your office '.$document_data->subject.' has been terminated by ' . $office[0]->name. '.';
+                    $notification->save();
+                }
             break;
 
             case 'forwarded':
