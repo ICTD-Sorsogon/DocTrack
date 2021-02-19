@@ -186,8 +186,7 @@ class DocumentController extends Controller
 
     public function holdRejectDocument(Request $request)
     {
-        $status = $request->hold_reject;
-        $subject = $request->subject;
+        dd($request->hold_reject);
 
         DB::beginTransaction();
         try {

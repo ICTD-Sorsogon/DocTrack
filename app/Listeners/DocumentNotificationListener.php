@@ -155,17 +155,19 @@ class DocumentNotificationListener
                 }
 
                 foreach ($originating_notif as $key => $value) {
-                    $office = Office::where('id', $value->office_id)->get();
+                    $office = Office::where('id', auth()->user()->office_id)->first();
 
-                    $notification = new Notification();
-                    $notification->document_id = $document_data->id;
-                    $notification->user_id = $value['id'];
-                    $notification->office_id = $value['office_id'];
-                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
-                    $notification->status = 0;
-                    $notification->message = 'Document created by your office '.$document_data->subject.' has been terminated by ' . $office[0]->name. '.';
-                    $notification->save();
+                    if($office->id != $value['office_id']){
+                        $notification = new Notification();
+                        $notification->document_id = $document_data->id;
+                        $notification->user_id = $value['id'];
+                        $notification->office_id = $value['office_id'];
+                        $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                        . $name->last_name . ' ' . $name->suffix;
+                        $notification->status = 0;
+                        $notification->message = 'Document created by your office '.$document_data->subject.' has been terminated by ' . $office->name. '.';
+                        $notification->save();
+                    }
                 }
             break;
 

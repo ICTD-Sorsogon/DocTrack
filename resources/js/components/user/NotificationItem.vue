@@ -59,13 +59,8 @@ export default {
         notifs(){
             let newNotif = JSON.parse(JSON.stringify(this.$store.state.users.notifs))
             let allUsers = JSON.parse(JSON.stringify(this.$store.state.users.all_users))
-            let allOffices = JSON.parse(JSON.stringify(this.$store.state.offices.offices))
             newNotif.forEach(notif => {
                 allUsers.forEach(user => {
-                    // if(notif.user_id == user.id){
-                    //     // notif.name  = (user.first_name + ' ' + user.middle_name + ' ' + user.last_name + ' ' + (user.suffix ?? '')).trim()
-                    //     notif.avatar  =  user.avatar
-                    // }
                     if(notif.sender_name.toLowerCase().replace(/\s/g, '').replace(/,/g, '') == user.full_name.toLowerCase().replace(/\s/g, '')){
                         notif.avatar = user.avatar
                     }
