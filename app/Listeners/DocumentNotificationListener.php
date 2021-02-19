@@ -33,7 +33,6 @@ class DocumentNotificationListener
     public function handle(DocumentEvent $event)
     {
         extract(get_object_vars($event));
-        
     $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
         $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
         $sender_id = $document->sender_name;
@@ -105,15 +104,15 @@ class DocumentNotificationListener
                     $notification->save();
                 }
 
-                $sender_notif = User::where('id', $sender_id)->first();
-                    $notification->document_id = $document_data->id;
-                    $notification->user_id = $sender_notif->id;
-                    $notification->office_id = $sender_notif->office_id;
-                    $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
-                    $notification->status = 0;
-                    $notification->message = 'Document '.$document_data->subject.' has been acknowledged.';
-                    $notification->save();
+                // $sender_notif = User::where('id', $sender_id)->first();
+                //     $notification->document_id = $document_data->id;
+                //     $notification->user_id = $sender_notif->id;
+                //     $notification->office_id = $sender_notif->office_id;
+                //     $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
+                //     . $name->last_name . ' ' . $name->suffix;
+                //     $notification->status = 0;
+                //     $notification->message = 'Document '.$document_data->subject.' has been acknowledged.';
+                //     $notification->save();
                 
                 
                     foreach ($originating_notif as $key => $value) {
@@ -171,8 +170,10 @@ class DocumentNotificationListener
             break;
 
             case 'forwarded':
-                $forwarded_by = Office::find($document->tracking_records[3]->forwarded_by);
-                $through = $document->tracking_records[3]->through;
+                $forwarded_data = last($document->tracking_records->toArray());
+
+                $forwarded_by = Office::find($forwarded_data['forwarded_by']);
+                $through = $forwarded_data['through'];
 
                 $destination_office_arr = json_decode($document->destination_office_id);
                 $destination_office = Office::find(end($destination_office_arr));
