@@ -26,7 +26,7 @@
                     </v-list-item-avatar>
 
                     <v-list-item-content>
-                        <v-list-item-title style="color:black;" v-html="item.sender_name"></v-list-item-title>
+                        <v-list-item-title style="color:black;"><strong>{{item.tracking_code}} - {{item.subject}}</strong></v-list-item-title>
                         <v-list-item-subtitle style="color:black" v-html="item.message"></v-list-item-subtitle>
                         <h6 style="font-weight:50; color: gray" v-html="item.created_at"></h6>
                     </v-list-item-content>
@@ -61,9 +61,7 @@ export default {
             let allUsers = JSON.parse(JSON.stringify(this.$store.state.users.all_users))
             newNotif.forEach(notif => {
                 allUsers.forEach(user => {
-                    if(notif.sender_name.toLowerCase().replace(/\s/g, '').replace(/,/g, '') == user.full_name.toLowerCase().replace(/\s/g, '')){
-                        notif.avatar = user.avatar
-                    }
+                    notif.avatar = user.avatar
                 });
                 
             });

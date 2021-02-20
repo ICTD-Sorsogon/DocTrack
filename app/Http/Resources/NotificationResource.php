@@ -22,7 +22,8 @@ class NotificationResource extends JsonResource
             'message' => $this->message,
             'status' => $this->status,
             'badge' => $this->badge,
-            'sender_name' => $this->sender_name,
+            'tracking_code' => $this->tracking_code,
+            'subject' => $this->subject,
             'created_at' => $this->created_at->diffForHumans(),
         ];
     }
