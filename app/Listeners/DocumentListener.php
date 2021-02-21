@@ -164,11 +164,12 @@ class DocumentListener
             break;
 
             case 'forwarded':
-                $tracking_records = $document->tracking_records;
+                $forwarded_data = last($document->tracking_records->toArray());
+
                 $remarks = $document->remarks;
                 $subject = $document->subject;
-                $approved_by = $tracking_records[3]->approved_by;
-                $through = $tracking_records[3]->through;
+                $approved_by = $forwarded_data['approved_by'];
+                $through = $forwarded_data['through'];
                 
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
@@ -179,9 +180,10 @@ class DocumentListener
             break;
 
             case 'received':
-                $tracking_records = $document->tracking_records;
-                $through = $tracking_records[2]->through;
-                $approved_by = $tracking_records[2]->approved_by;
+                $received_data = last($document->tracking_records->toArray());
+
+                $through = $received_data['through'];
+                $approved_by = $received_data['approved_by'];
                 $remarks = $document->remarks;
                 $subject = $document->subject;
 

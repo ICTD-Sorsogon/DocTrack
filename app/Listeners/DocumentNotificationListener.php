@@ -65,34 +65,35 @@ class DocumentNotificationListener
                     }
 
 
-                } else {
-                    foreach ($notify_user as $key => $value) {
-                        $notification = new Notification();
-                        $notification->document_id = $document->id;
-                        $notification->user_id = $value['id'];
-                        $notification->office_id = $value['office_id'];
-                        $notification->tracking_code = $document->tracking_code;
-                        $notification->subject = $document->subject;
-                        $notification->status = 0;
-                        $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
-                        $notification->save();
-                    }
+                } 
+                // else {
+                //     foreach ($notify_user as $key => $value) {
+                //         $notification = new Notification();
+                //         $notification->document_id = $document->id;
+                //         $notification->user_id = $value['id'];
+                //         $notification->office_id = $value['office_id'];
+                //         $notification->tracking_code = $document->tracking_code;
+                //         $notification->subject = $document->subject;
+                //         $notification->status = 0;
+                //         $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
+                //         $notification->save();
+                //     }
 
-                    if($document->originating_office != 37){
-                        foreach($docket_offices as $docket_office){
-                            $notification = new Notification();
-                            $notification->document_id = $document->id;
-                            $notification->user_id = $docket_office->id;
-                            $notification->office_id = 37;
-                            $notification->tracking_code = $document->tracking_code;
-                            $notification->subject = $document->subject;
-                            $notification->status = 0;
-                            $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
-                            $notification->save();
-                        }
-                    }
+                //     if($document->originating_office != 37){
+                //         foreach($docket_offices as $docket_office){
+                //             $notification = new Notification();
+                //             $notification->document_id = $document->id;
+                //             $notification->user_id = $docket_office->id;
+                //             $notification->office_id = 37;
+                //             $notification->tracking_code = $document->tracking_code;
+                //             $notification->subject = $document->subject;
+                //             $notification->status = 0;
+                //             $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
+                //             $notification->save();
+                //         }
+                //     }
                     
-                }
+                // }
             break;
             
             case 'acknowledged':
