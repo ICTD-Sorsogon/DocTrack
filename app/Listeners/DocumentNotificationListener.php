@@ -34,44 +34,38 @@ class DocumentNotificationListener
     {
         extract(get_object_vars($event));
 
-        $document_data = Document::all()->find($document->id);
-        $sender_id = $document->sender_name;
-        $name = User::all()->find($sender_id) ?? $sender_id;
-        $document_data = Document::all()->find($document->id);
-        $user_office_id = User::where('office_id', $document->originating_office)->get();
-
         switch ($document->status) {
             case 'created':
                 $action = $document->wasRecentlyCreated;
                 $notification = new Notification();
-                $notification->document_id = $document_data->id;
+                $notification->document_id = $document->id;
                 $notification->user_id = auth()->user()->id;
                 $notification->office_id = 37;
                 $notification->action = $action ? 'created' : 'updated';
                 $notification->status = 0;
-                $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been {$notification->action} by " . auth()->user()->fullname . ".";
+                $notification->message = "Document {$document->subject} with {$document->tracking_code} tracking code has been {$notification->action} by " . auth()->user()->fullname . ".";
                 $notification->save();
             break;
 
             case 'acknowledged':
                 foreach ($document->destination_office_id as $key => $destination) {
                     $notification = new Notification();
-                    $notification->document_id = $document_data->id;
+                    $notification->document_id = $document->id;
                     $notification->user_id = auth()->user()->id;
                     $notification->office_id = $destination;
                     $notification->action = 'acknowledged';
                     $notification->status = 0;
-                    $notification->message = "You got new document {$document_data->subject} with {$document_data->tracking_code} tracking code from {$document->origin_office->name}.";
+                    $notification->message = "You got new document {$document->subject} with {$document->tracking_code} tracking code from {$document->origin_office->name}.";
                     $notification->save();
                 }
 
                     $notification = new Notification();
-                    $notification->document_id = $document_data->id;
+                    $notification->document_id = $document->id;
                     $notification->user_id = auth()->user()->id;
                     $notification->office_id = $document->origin_office->id;
                     $notification->action = 'acknowledged';
                     $notification->status = 0;
-                    $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been acknowledged.";
+                    $notification->message = "Your document {$document->subject} with {$document->tracking_code} tracking code has been acknowledged.";
                     $notification->save();
             break;
 
@@ -83,7 +77,7 @@ class DocumentNotificationListener
                 $notification->office_id = $document->origin_office->id;
                 $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
-                $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been hold/reject by" . auth()->user()->fullname . ".";
+                $notification->message = "Your document {$document->subject} with {$document->tracking_code} tracking code has been hold/reject by" . auth()->user()->fullname . ".";
                 $notification->save();
 
             break;
@@ -96,7 +90,7 @@ class DocumentNotificationListener
                 $notification->action = 'forwarded';
                 $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
-                $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
+                $notification->message = "Document {$document->subject} with {$document->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
                 $notification->save();
 
                 $notification = new Notification();
@@ -105,28 +99,28 @@ class DocumentNotificationListener
                 $notification->action = 'forwarded';
                 $notification->office_id = $document->originating_office;
                 $notification->status = 0;
-                $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
+                $notification->message = "Your document {$document->subject} with {$document->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
                 $notification->save();
             break;
 
             case 'received':
                     $notification = new Notification();
-                    $notification->document_id = $document_data->id;
+                    $notification->document_id = $document->id;
                     $notification->user_id = auth()->user()->id;
                     $notification->office_id = $document->origin_office->id;
                     $notification->action = 'recieved';
                     $notification->status = 0;
-                    $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been recieved.";
+                    $notification->message = "Your document {$document->subject} with {$document->tracking_code} tracking code has been recieved.";
                     $notification->save();
 
                 if($document->origin_office->office_code != "DO"){
                     $notification = new Notification();
-                    $notification->document_id = $document_data->id;
+                    $notification->document_id = $document->id;
                     $notification->user_id = auth()->user()->id;
                     $notification->office_id = 37;
                     $notification->action = 'recieved';
                     $notification->status = 0;
-                    $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been recieved.";
+                    $notification->message = "Document {$document->subject} with {$document->tracking_code} tracking code has been recieved.";
                     $notification->save();
                 }
             break;
