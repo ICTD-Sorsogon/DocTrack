@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received)) && item.forwarded">
+					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received))">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>

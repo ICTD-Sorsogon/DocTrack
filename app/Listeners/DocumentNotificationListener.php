@@ -83,8 +83,7 @@ class DocumentNotificationListener
                 $notification->document_id = $document->id;
                 $notification->user_id = auth()->user->id;
                 $notification->office_id = $document->origin_office->id;
-                $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                . $name->last_name . ' ' . $name->suffix;
+                $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
                 $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been hold/reject by" . auth()->user()->fullname . ".";
                 $notification->save();
@@ -106,8 +105,7 @@ class DocumentNotificationListener
                 $notification->user_id = auth()->user()->id;
                 $notification->office_id = 37;
                 $notification->action = 'forwarded';
-                $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                . $name->last_name . ' ' . $name->suffix;
+                $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
                 $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
                 $notification->save();
@@ -117,8 +115,6 @@ class DocumentNotificationListener
                 $notification->user_id = auth()->user()->id;
                 $notification->action = 'forwarded';
                 $notification->office_id = $document->destination_office_id->first();
-                $notification->sender_name = $name->first_name . ', ' . $name->middle_name . ', '
-                . $name->last_name . ' ' . $name->suffix;
                 $notification->status = 0;
                 $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
                 $notification->save();
