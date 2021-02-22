@@ -3,11 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\DocumentEvent;
-use App\Models\Document;
 use App\Models\Notification;
-use App\Models\Office;
-use App\Models\Personnel;
-use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
