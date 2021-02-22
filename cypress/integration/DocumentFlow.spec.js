@@ -51,7 +51,6 @@ describe('Document Flow', () => {
         cy.contains('Search').siblings('input').type('New Documents')
         cy.get(':nth-child(1) > :nth-child(10) > .v-icon').click()
         cy.get('td > .row > :nth-child(1) > .v-btn').click() //forward document
-        cy.contains('Forwarded by').parent().type('Docking Office').type('{enter}')
         cy.contains('Forwarded to').parent().type('Provincial Human Resource Management Office').type('{enter}')
         cy.contains('Through').parent().click()
         cy.contains('Others').parent().click()
