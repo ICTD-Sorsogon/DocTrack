@@ -9,8 +9,9 @@
     "license": "MIT",
     "require": {
         "php": "^7.3 || ^8.0",
-        "beyondcode/laravel-websockets": "^1.9",
         "askedio/laravel-soft-cascade": "^8.1",
+        "beyondcode/laravel-websockets": "^1.9",
+        "doctrine/dbal": "^3.0",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
