@@ -497,8 +497,8 @@ export default {
             this.documentDialog = false
         },
         sanitize() {
-            this.form.destination = this.form.destination[0].id
-            this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id
+            this.form.destination = this.form.destination[0].id;
+            this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id;
             this.form.forwarded_by = this.form.forwarded_by.id;
         },
         receiveDocumentConfirm() {

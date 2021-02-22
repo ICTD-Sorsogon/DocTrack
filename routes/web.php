@@ -1,6 +1,5 @@
 <?php
 
-use App\Events\Hello;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,11 +22,13 @@ use Illuminate\Support\Facades\Route;
 //     return view('auth/login');
 // });
 
-Route::get('/{any}', function () {
-    return view('welcome');
-})->where('any', '.*');
-
 Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('laravel-websockets','BeyondCode\LaravelWebSockets\Dashboard\Http\Controllers\ShowDashboard');
+
+Route::get('/{any}', function () {
     return view('welcome');
 })->where('any', '.*');
 
