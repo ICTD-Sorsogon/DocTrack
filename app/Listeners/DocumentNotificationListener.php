@@ -114,7 +114,7 @@ class DocumentNotificationListener
                 $notification->document_id = $document->id;
                 $notification->user_id = auth()->user()->id;
                 $notification->action = 'forwarded';
-                $notification->office_id = $document->destination_office_id->first();
+                $notification->office_id = $document->originating_office;
                 $notification->status = 0;
                 $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
                 $notification->save();
