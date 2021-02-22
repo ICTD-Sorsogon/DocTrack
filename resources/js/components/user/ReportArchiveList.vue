@@ -514,6 +514,7 @@
         async mounted() {
             await this.mountState()
             this.$store.dispatch('unsetLoader')
+            //this.$store.commit('RESET_ARCHIVE_STATE')
         }
     }
 </script>

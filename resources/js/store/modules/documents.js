@@ -1,4 +1,5 @@
 import axios from "axios";
+import { constant } from "lodash";
 
 const state = {
     types: '',
@@ -42,10 +43,14 @@ const actions = {
         const response = await axios.post(`/api/get_archive_documents`, (
             (filter.filterBy == 'Year')? {selected: filter.year.list, filterBy: 'Year'} : {selected: filter.date.list, filterBy: 'Date'}
         ))
-        const data = response.data.data
-        filter.yearFromDb = response.data.year
-        filter.hasNewTerminated = false
-        await commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data})
+        if (response?.data?.data != undefined) {
+            const data = response.data.data
+            filter.yearFromDb = response.data.year
+            filter.hasNewTerminated = false
+            await commit('GET_ALL_ARCHIVE_DOCUMENTS', {...filter, data})
+        } else {
+            commit('SET_SNACKBAR', { showing: true, title: 'FAILED', text: 'Error fetching data', color: '#F45448', icon : 'mdi-close-thick' })
+        }
     },
     async getNonPaginatedActiveDocuments({ commit }) {
         const response = await axios.get(`/api/get_non_page_active_documents`);
@@ -254,6 +259,9 @@ const mutations = {
             }
         }
         //state.documentsArchive = []
+    },
+    RESET_ARCHIVE_STATE(state) {
+        state.documentsArchive = []
     },
     SET_CURRENT_PAGE(state, data) {
         state.documents.current_page = data;
