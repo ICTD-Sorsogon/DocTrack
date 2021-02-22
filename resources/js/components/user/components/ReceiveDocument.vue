@@ -498,7 +498,7 @@ export default {
         },
         sanitize() {
             this.form.destination = this.form.destination[0].id
-            this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id
+            this.form.recipient_id = this.is_admin ? null : this.form.recipient[0].recipient_id
         },
         receiveDocumentConfirm() {
             this.btnloading = true;
