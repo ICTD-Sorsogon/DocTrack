@@ -242,7 +242,7 @@ const actions = {
     async seenNotif({ commit }, notif) {
         await axios.put(`/api/notifs/${notif.id}`, notif)
         .then(response => {
-            commit('SEEN_NOTIF', notif.id);
+            dispatch('getNotifs')
         })
         .catch(error => {
             var snackbar_error ={
@@ -255,10 +255,10 @@ const actions = {
         });
     },
 
-    async seenBadge({ commit }, badge) {
+    async seenBadge({ dispatch, commit }, badge) {
         await axios.put(`/api/badge`, badge)
         .then(response => {
-            commit('SEEN_BADGE', badge.user_id);
+            dispatch('getNotifs')
         })
         .catch(error => {
             var snackbar_error ={
@@ -311,18 +311,6 @@ const mutations = {
     GET_NOTIFS(state, response) {
         state.notifs = response;
     },
-
-    SEEN_NOTIF(state, id) {
-        state.notifs.forEach(notif => {
-            notif.id ==  id ? notif.status = 1 : 0
-        });
-    },
-
-    SEEN_BADGE(state, id) {
-        state.notifs.forEach(notif => {
-            notif.id ==  id ? notif.badge = 1 : 0
-        });
-    }
 }
 
 export default {
