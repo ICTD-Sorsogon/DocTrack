@@ -31,23 +31,18 @@ class DocumentEvent implements ShouldBroadcast
         $this->user = Auth()->user();
 
         if($document->status == 'created'){
-            if($document->wasRecentlyCreated){
-                array_push($this->broadcastMe, new Channel('documents37'));
-            } else {
-                array_push($this->broadcastMe, new Channel('documents37'));
-            }
-            
+            array_push($this->broadcastMe, new Channel('documents37'));
         }
 
         if($document->status == 'received'){
-            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
-            array_push($this->broadcastMe, new Channel('documents37'));
+            array_push($this->broadcastMe, 
+                    new Channel('documents'. json_decode($document->originating_office)),
+                    new Channel('documents37'));
         }
 
         if($document->status == 'forwarded'){
-            $destination_office = json_decode($document->destination_office_id);
             array_push($this->broadcastMe, new Channel('documents37'));
-            array_push($this->broadcastMe, new Channel('documents'. end($destination_office)));
+            array_push($this->broadcastMe, new Channel('documents'. $document->destination_office_id->first));
         }
 
         if($document->status == 'terminated'){
@@ -57,10 +52,11 @@ class DocumentEvent implements ShouldBroadcast
 
         if($document->status == 'acknowledged'){
             $document_length = count(json_decode($document->destination_office_id)); 
-            for($index = 0; $index < $document_length; $index++){
-                array_push($this->broadcastMe, new Channel('documents'. json_decode($document->destination_office_id)[$index]));
+
+            foreach ($document->destination_office_id as $destination){
+                array_push($this->broadcastMe, new Channel('documents'. $destination)); 
             }
-            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->sender_name)));
+
             array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
         }
 

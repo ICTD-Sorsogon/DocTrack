@@ -44,91 +44,37 @@ class DocumentNotificationListener
 
         switch ($document->status) {
             case 'created':
-                $docket_office = User::where('office_id', 37)->get();
-
-                $document_old = $document->getOriginal();
-                $document_new = $document->getAttributes();
-
-                $docket_offices = User::where('office_id', 37)->get();
-                if($document->wasRecentlyCreated){
-
-                    foreach($docket_offices as $docket_office){
-                        $notification = new Notification();
-                        $notification->document_id = $document_data->id;
-                        $notification->user_id = $docket_office->id;
-                        $notification->office_id = 37;
-                        $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                        . $name->last_name . ' ' . $name->suffix;
-                        $notification->status = 0;
-                        $notification->message = 'Document '.$document_data->subject.' has been created.';
-                        $notification->save();
-                    }
-
-
-                } else {
-                    foreach ($notify_user as $key => $value) {
-                        $notification = new Notification();
-                        $notification->document_id = $document_data->id;
-                        $notification->user_id = $value['id'];
-                        $notification->office_id = $value['office_id'];
-                        $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                        . $name->last_name . ' ' . $name->suffix;
-                        $notification->status = 0;
-                        $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
-                        $notification->save();
-                    }
-
-                    foreach($docket_offices as $docket_office){
-                        $notification = new Notification();
-                        $notification->document_id = $document_data->id;
-                        $notification->user_id = $docket_office->id;
-                        $notification->office_id = 37;
-                        $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                        . $name->last_name . ' ' . $name->suffix;
-                        $notification->status = 0;
-                        $notification->message = 'Document '.$document_old['subject'].' has been updated to '.$document_new['subject'].'.';
-                        $notification->save();
-                    }
-
-                }
+                $action = $document->wasRecentlyCreated;
+                $notification = new Notification();
+                $notification->document_id = $document_data->id;
+                $notification->user_id = auth()->user()->id;
+                $notification->office_id = 37;
+                $notification->action = $action ? 'created' : 'updated';
+                $notification->status = 0;
+                $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been {$notification->action} by " . auth()->user()->fullname . ".";
+                $notification->save();
             break;
 
             case 'acknowledged':
-                foreach ($notify_user as $key => $value) {
+                foreach ($document->destination_office_id as $key => $destination) {
                     $notification = new Notification();
                     $notification->document_id = $document_data->id;
-                    $notification->user_id = $value->id;
-                    $notification->office_id = $value->office_id;
-                    $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->user_id = auth()->user()->id;
+                    $notification->office_id = $destination;
+                    $notification->action = 'acknowledged';
                     $notification->status = 0;
-                    $notification->message = 'Document '.$document_data->subject.' has been acknowledged and will be deliver to your office.';
+                    $notification->message = "You got new document {$document_data->subject} with {$document_data->tracking_code} tracking code from {$document->origin_office->name}.";
                     $notification->save();
                 }
 
-                    // $sender_notif = User::where('id', $sender_id)->first();
+                    $notification = new Notification();
                     $notification->document_id = $document_data->id;
-                    // dd();
                     $notification->user_id = auth()->user()->id;
-                    $notification->office_id = auth()->user()->office_id;
-                    $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->office_id = $document->origin_office->id;
+                    $notification->action = 'acknowledged';
                     $notification->status = 0;
-                    $notification->message = 'Document '.$document_data->subject.' has been acknowledged.';
+                    $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been acknowledged.";
                     $notification->save();
-
-
-                    foreach ($originating_notif as $key => $value) {
-                        $notification = new Notification();
-                        $notification->document_id = $document_data->id;
-                        $notification->user_id = $value['id'];
-                        $notification->office_id = $value['office_id'];
-                        $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                        . $name->last_name . ' ' . $name->suffix;
-                        $notification->status = 0;
-                        $notification->message = 'Document created by your office '.$document_data->subject.' has been acknowledged.';
-                        $notification->save();
-                    }
             break;
 
             case 'holdreject':
@@ -208,29 +154,23 @@ class DocumentNotificationListener
             break;
 
             case 'received':
-                $receiver_fullname = Auth::user()->last_name. ', ' . Auth::user()->first_name. ' ' . Auth::user()->middle_name;
-                $office_received = Office::find(Auth::user()->office_id);
-
-                $notification = new Notification();
-                $notification->document_id = $document_data->id;
-                $notification->user_id = $sender_id;
-                $notification->office_id = $user_office_id[0]->office_id;
-                $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                . $name->last_name . ' ' . $name->suffix;
-                $notification->status = 0;
-                $notification->message = 'Document '.$document_data->subject.' has been received by '. $receiver_fullname . ' at ' . $office_received->name;
-                $notification->save();
-
-                $docket_offices = User::where('office_id', 37)->get();
-                foreach($docket_offices as $docket_office){
                     $notification = new Notification();
                     $notification->document_id = $document_data->id;
-                    $notification->user_id = $docket_office->id;
-                    $notification->office_id = 37;
-                    $notification->sender_name = gettype($name) == 'string' ? $name : $name->first_name . ', ' . $name->middle_name . ', '
-                    . $name->last_name . ' ' . $name->suffix;
+                    $notification->user_id = auth()->user()->id;
+                    $notification->office_id = $document->origin_office->id;
+                    $notification->action = 'recieved';
                     $notification->status = 0;
-                    $notification->message = 'Document '.$document_data->subject.' has been received by '. $receiver_fullname . ' at ' . $office_received->name;
+                    $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been recieved.";
+                    $notification->save();
+
+                if($document->origin_office->office_code != "DO"){
+                    $notification = new Notification();
+                    $notification->document_id = $document_data->id;
+                    $notification->user_id = auth()->user()->id;
+                    $notification->office_id = 37;
+                    $notification->action = 'recieved';
+                    $notification->status = 0;
+                    $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been recieved.";
                     $notification->save();
                 }
             break;

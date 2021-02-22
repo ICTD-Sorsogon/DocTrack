@@ -18,15 +18,12 @@
                     :class="highlight(item.status)"
                     ripple
                     >
-                    <v-list-item-avatar class="elevation-3" v-if="item.avatar != null">
-                        <v-img :src="item.avatar"></v-img>
-                    </v-list-item-avatar>
-                    <v-list-item-avatar class="elevation-5" v-else>
-                        <v-img :src="default_image"></v-img>
+                    <v-list-item-avatar class="elevation-3" >
+                        <v-img :src="item.avatar || default_image"></v-img>
                     </v-list-item-avatar>
 
                     <v-list-item-content>
-                        <v-list-item-title style="color:black;" v-html="item.sender_name"></v-list-item-title>
+                        <v-list-item-title style="color:black;" v-html="item.office_code"></v-list-item-title>
                         <v-list-item-subtitle style="color:black" v-html="item.message"></v-list-item-subtitle>
                         <h6 style="font-weight:50; color: gray" v-html="item.created_at"></h6>
                     </v-list-item-content>
@@ -57,35 +54,20 @@ export default {
     computed:{
         ...mapGetters(['documents','auth_user']),
         notifs(){
-            let newNotif = JSON.parse(JSON.stringify(this.$store.state.users.notifs))
-            let allUsers = JSON.parse(JSON.stringify(this.$store.state.users.all_users))
-            let allOffices = JSON.parse(JSON.stringify(this.$store.state.offices.offices))
-            newNotif.forEach(notif => {
-                allUsers.forEach(user => {
-                    // if(notif.user_id == user.id){
-                    //     // notif.name  = (user.first_name + ' ' + user.middle_name + ' ' + user.last_name + ' ' + (user.suffix ?? '')).trim()
-                    //     notif.avatar  =  user.avatar
-                    // }
-                    if(notif.sender_name.toLowerCase().replace(/\s/g, '').replace(/,/g, '') == user.full_name.toLowerCase().replace(/\s/g, '')){
-                        notif.avatar = user.avatar
-                    }
-                });
-                
-            });
-            return  newNotif
+            return JSON.parse(JSON.stringify(this.$store.state.users.notifs))
         }
     },
     mounted(){
         this.$store.dispatch('getNotifs');
         this.$store.dispatch('getAllUsers');
     },
-    created(){
-        Echo.channel('documents'+this.auth_user.office_id)
-        .listen('DocumentEvent', (e) => {
-            this.$store.dispatch('getActiveDocuments');
-            this.$store.dispatch('getNotifs');
-        })
-    },
+    // created(){
+    //     Echo.channel('documents'+this.auth_user.office_id)
+    //     .listen('DocumentEvent', (e) => {
+    //         this.$store.dispatch('getActiveDocuments');
+    //         this.$store.dispatch('getNotifs');
+    //     })
+    // },
     methods:{
         closeDialog(){
             this.dialog = false
