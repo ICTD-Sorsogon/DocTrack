@@ -42,8 +42,10 @@ class NotificationController extends Controller
      */
     public function seen_badge(Request $request)
     {
-        $all_notif = Notification::where('user_id', Auth::user()->id);
-        $all_notif->update([ 'badge' => 1 ]);
+        foreach($request->badge_data as $badge){
+            $all_notif = Notification::where('id', $badge['id']);
+            $all_notif->update([ 'badge' => 1 ]);
+        }
 
         return response('Update');
     }

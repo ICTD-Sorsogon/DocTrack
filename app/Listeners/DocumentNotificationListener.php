@@ -86,15 +86,6 @@ class DocumentNotificationListener
                 $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been hold/reject by" . auth()->user()->fullname . ".";
                 $notification->save();
 
-
-                $status = $event->request_obj;
-                $subject = $event->old_values;
-
-                $log = new Log();
-                $log->user_id = $event->user_id;
-                $log->action = 'Document hold or reject';
-                $log->remarks = 'Document '.$subject.' is '.$status;
-                return $log->save();
             break;
 
             case 'forwarded':

@@ -35,8 +35,8 @@ import NotificationItem from './NotificationItem'
           },
     },
     methods:{
-      showNotif(item){
-          this.$store.dispatch('seenBadge', {user_id: this.$store.state.users.user.id, status: 1});
+      showNotif(){
+          this.$store.dispatch('seenBadge', {badge_data: this.$store.state.users.notifs});
 
           this.$emit('showNotif')
       },

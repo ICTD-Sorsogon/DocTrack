@@ -51,8 +51,6 @@ class DocumentEvent implements ShouldBroadcast
         }
 
         if($document->status == 'acknowledged'){
-            $document_length = count(json_decode($document->destination_office_id)); 
-
             foreach ($document->destination_office_id as $destination){
                 array_push($this->broadcastMe, new Channel('documents'. $destination)); 
             }
