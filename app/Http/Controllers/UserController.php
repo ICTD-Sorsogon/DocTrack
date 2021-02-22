@@ -32,7 +32,7 @@ class UserController extends Controller
 
     public function getAuthUser(): User
     {
-        return User::with('office', 'division', 'unit', 'sector')->find(Auth::id());
+        return User::with('office')->find(Auth::id());
     }
 
     public function getAllUsers(): Collection
