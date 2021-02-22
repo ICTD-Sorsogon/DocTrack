@@ -65,7 +65,7 @@
                             disabled
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" xl="6" lg="6" md="6">
+                    <v-col cols="12" :xl="types=='forward'? 4 : 6" :lg="types=='forward'? 4 : 6" :md="types=='forward'? 4 : 6">
                         <v-text-field
                             v-model="selected_document.page_count"
                             label="Page Count"
@@ -74,7 +74,7 @@
                             disabled
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" xl="6" lg="6" md="6">
+                    <v-col cols="12" :xl="types=='forward'? 4 : 6" :lg="types=='forward'? 4 : 6" :md="types=='forward'? 4 : 6">
                         <v-text-field
                             v-model="selected_document.attachment_page_count"
                             label="Attachment Page Count"
@@ -83,8 +83,7 @@
                             disabled
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="6" md="6" v-if="types=='forward'">
-                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
+                    <v-col cols="12" xl="4" lg="4" md="4" v-if="types=='forward'">
                         <v-select
                             v-model="form.forwarded_by"
                             :items="offices"
@@ -94,13 +93,10 @@
                             outlined
                             prepend-inner-icon="mdi-office-building-outline"
                             :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
-                            required
-                            :error-messages="errors"
-                            :success="valid"
+                            disabled
                         ></v-select>
-                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="6" md="6" v-if="types=='forward'">
+                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='forward'">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-model="form.forwarded_to"
@@ -398,7 +394,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['find_document' , 'documents' , 'find_document', 'is_admin']),
+        ...mapGetters(['find_document' , 'documents' , 'find_document', 'is_admin', 'auth_user']),
         types() {
             return this.$route.params.type;
         },
@@ -418,6 +414,9 @@ export default {
         },
         offices() {
             return this.$store.state.offices.offices;
+        },
+        users() {
+            return this.$store.state.users.all_users;
         },
     },
     watch: {
@@ -459,7 +458,7 @@ export default {
                 through: '',
                 approved_by: '',
                 documentRemarks: '',
-                forwarded_by: '',
+                forwarded_by: this.auth_user?.office_id || '',
                 forwarded_to: '',
                 status: '',
                 hold_reject: '',
@@ -500,6 +499,7 @@ export default {
         sanitize() {
             this.form.destination = this.form.destination[0].id
             this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id
+            this.form.forwarded_by = this.form.forwarded_by.id;
         },
         receiveDocumentConfirm() {
             this.btnloading = true;
@@ -529,6 +529,7 @@ export default {
         },
         forwardDocumentConfirm() {
             this.btnloading = true;
+            this.sanitize();
                 this.$store.dispatch("forwardDocumentConfirm", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {
                         this.$store.dispatch('setSnackbar', {
@@ -656,6 +657,7 @@ export default {
     mounted() {
         this.$store.dispatch('unsetLoader');
         this.form = this.$route.params.item ?? this.selected_document;
+        this.form.forwarded_by = this.auth_user.office;
     }
 
 }
