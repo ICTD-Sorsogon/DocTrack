@@ -226,7 +226,6 @@ const actions = {
     async getNotifs({ commit, state }) {
         await axios.get('/api/notifs')
         .then(response =>{
-            console.log(response.data)
             commit('GET_NOTIFS', response.data);
         })
         .catch(error => {
@@ -257,10 +256,9 @@ const actions = {
     },
 
     async seenBadge({ commit }, badge) {
-        console.log(badge);
         await axios.put(`http://127.0.0.1:8000/api/badge`, badge)
         .then(response => {
-            commit('SEEN_BADGE', badge.id);
+            commit('SEEN_BADGE', badge.user_id);
         })
         .catch(error => {
             var snackbar_error ={
