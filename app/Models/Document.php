@@ -84,11 +84,6 @@ class Document extends Model
         return $this->belongsTo('App\Models\Office', 'originating_office');
     }
 
-    public function destination()
-    {
-       return $this->belongsTo('App\Models\Office');
-    }
-
     public function tracking_records()
     {
         return $this->hasMany('App\Models\TrackingRecord');
@@ -104,21 +99,13 @@ class Document extends Model
         return $this->belongsTo('App\Models\Personnel', 'sender_name');
     }
 
-    public function tracker()
-    {
-        return $this->hasMany('App\Models\TrackingRecord');
-    }
-
     public static function allDocuments(User $user)
     {
         $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
         if($user->isUser()){
 
             $outgoing = (clone $document)->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
-
-            $incoming = $document->with(['document_recipient' => function ($query){
-                               $query->whereDestinationOffice(auth()->user()->office->id);
-                        }])
+            $incoming = $document
                         ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
 
             return compact('incoming', 'outgoing');
