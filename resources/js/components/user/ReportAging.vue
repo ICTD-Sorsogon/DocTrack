@@ -45,9 +45,9 @@ export default {
                 ,
                 { text: 'All Transaction', value: 'transactions' },
                 { text: 'Delayed Document', value: 'delayed' },
-                // { text: 'Fastest Transaction', value: 'fastestTransaction' },
-                // { text: 'Slowest Transaction', value: 'longestDelay' },
-                // { text: 'Average Transaction Speed', value: 'speed' },
+                { text: 'Fastest Transaction', value: 'min' },
+                { text: 'Slowest Transaction', value: 'max' },
+                { text: 'Average Transaction Speed', value: 'mean' },
                 { text: 'Efficiency Rating', value: 'efficiency' },
             ],
         }
@@ -94,14 +94,20 @@ export default {
             }
             for (const [key, value] of Object.entries(offices)) {
                 if(value.transaction_speed.length > 0){
-
                     let transaction_speed_list = value.transaction_speed
                     let transaction_min = Math.min.apply(Math, transaction_speed_list)
                     let transaction_max = Math.max.apply(Math, transaction_speed_list)
 
-                    console.log('min',this.timeConversion(transaction_min),'max', this.timeConversion(transaction_max), 'mean', this.timeConversion(mean( transaction_speed_list )))
+                    value.min = this.timeConversion(transaction_min)
+                    value.max = this.timeConversion(transaction_max)
+                    value.mean = this.timeConversion(mean( transaction_speed_list ))
 
+                } else {
+                    value.min = 'None'
+                    value.max = 'None'
+                    value.mean = 'None'
                 }
+
                 value.efficiency = value.transactions !== 0 ?`${((value.transactions - value.delayed) /
                     value.transactions * 100).toFixed(2)}%` : 'None';
                 data.push(value);
