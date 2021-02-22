@@ -116,81 +116,22 @@ class Document extends Model
 
     public static function allDocuments(User $user)
     {
-        /*$document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
 
         if($user->isUser()){
 
-            $ot = $document->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
+            $outgoing = $document->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
 
-            $in = Document::with(['document_recipient' => function ($query){
+            $incoming = Document::with(['document_recipient' => function ($query){
                                $query->whereDestinationOffice(auth()->user()->office->id);
                         }])
                         ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
 
-            return compact('in', 'ot');
+            return compact('incoming', 'outgoing');
         }
 
-        return $document->orderBy('documents.created_at', 'DESC')->get();*/
+        return $document->orderBy('documents.created_at', 'DESC')->get();
 
-
-
-
-
-
-
-
-
-        /*$document = static::select('documents.*', static::raw('YEAR(created_at) as year'))
-                        ->with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed'])->onlyTrashed();
-        if ($user->isUser()) {
-            $ot = $document->where('originating_office', auth()->user()->office->id)->orderBy('created_at', 'DESC')->get();
-            $in = Document::with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed' => function ($query){
-                                $query->whereDestinationOffice(auth()->user()->office->id);
-                            }])->withTrashed()
-                            ->whereHas('incoming_trashed', function($query) use($user){
-                                $query->where('destination_office', $user->office_id)->onlyTrashed();
-                            })->get();
-            $year_out = collect($document->pluck('year')->unique())->flatten();
-            $year_inc = collect(DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))
-                            ->where('destination_office', $user->office_id)->onlyTrashed()->get()->pluck('year')->unique()
-                        )->flatten();
-            $document = $ot->merge($in);
-            //$year = $document->pluck('year');
-
-        }
-        if ($user->isAdmin()){
-           $document->orderBy('created_at', 'DESC');
-           //$year = $document->pluck('year');
-           $year = collect($document->pluck('year')->unique())->flatten();
-        }
-
-        return response()->json([
-            'data' => ($user->isAdmin())?$document->get() : $document,
-            'year' => ($user->isAdmin())?$year : $year_out->merge($year_inc)
-        ]);*/
-
-    }
-
-    public static function getYr($document)
-    {
-        return collect($document->pluck('year')->unique())->flatten();
-    }
-
-    public static function userYearCollection()
-    {
-        $oId = auth()->user()->office->id;
-        $in = Document::with('origin_office')->select(Document::raw('YEAR(created_at) as year'))->where('originating_office', $oId)->onlyTrashed()->get();
-        $ot = DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))->where('destination_office', $oId)->onlyTrashed()->get();
-        return static::getYr($in)->merge(static::getYr($ot));
-    }
-
-    public static function filter($document, $selected, $isByYear)
-    {
-        return $document->when(!$isByYear, function ($uquery) use ($selected, $isByYear) {
-            return $uquery->whereBetween('created_at', [$selected[0].' 00:00:00', $selected[1].' 23:59:59']);
-        })->when($isByYear, function ($uquery) use ($selected) {
-            return $uquery->whereIn(DocumentRecipient::raw('YEAR(`created_at`)'), $selected);
-        });
     }
 
     public static function allDocumentsArchive(User $user, $request)
@@ -260,6 +201,40 @@ class Document extends Model
             'year' => ($user->isAdmin())?$year : static::userYearCollection() //$year_out->merge($year_inc)
         ]);
 
+        //backup
+        /*$document = static::select('documents.*', static::raw('YEAR(created_at) as year'))
+                        ->with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed'])->onlyTrashed();
+        if ($user->isUser()) {
+            $ot = $document->where('originating_office', auth()->user()->office->id)->orderBy('created_at', 'DESC')->get();
+            $in = Document::with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed' => function ($query){
+                                $query->whereDestinationOffice(auth()->user()->office->id);
+                            }])->withTrashed()
+                            ->whereHas('incoming_trashed', function($query) use($user){
+                                $query->where('destination_office', $user->office_id)->onlyTrashed();
+                            })->get();
+            $year_out = collect($document->pluck('year')->unique())->flatten();
+            $year_inc = collect(DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))
+                            ->where('destination_office', $user->office_id)->onlyTrashed()->get()->pluck('year')->unique()
+                        )->flatten();
+            $document = $ot->merge($in);
+            //$year = $document->pluck('year');
+
+        }
+        if ($user->isAdmin()){
+           $document->orderBy('created_at', 'DESC');
+           //$year = $document->pluck('year');
+           $year = collect($document->pluck('year')->unique())->flatten();
+        }
+
+        return response()->json([
+            'data' => ($user->isAdmin())?$document->get() : $document,
+            'year' => ($user->isAdmin())?$year : $year_out->merge($year_inc)
+        ]);*/
+        //backup
+
+
+
+
 
 
 
@@ -286,4 +261,27 @@ class Document extends Model
 
         return response()->json(['data' => $docu, 'year' => $year]);*/
     }
+
+    public static function getYr($document)
+    {
+        return collect($document->pluck('year')->unique())->flatten();
+    }
+
+    public static function userYearCollection()
+    {
+        $oId = auth()->user()->office->id;
+        $in = Document::with('origin_office')->select(Document::raw('YEAR(created_at) as year'))->where('originating_office', $oId)->onlyTrashed()->get();
+        $ot = DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))->where('destination_office', $oId)->onlyTrashed()->get();
+        return static::getYr($in)->merge(static::getYr($ot));
+    }
+
+    public static function filter($document, $selected, $isByYear)
+    {
+        return $document->when(!$isByYear, function ($uquery) use ($selected, $isByYear) {
+            return $uquery->whereBetween('created_at', [$selected[0].' 00:00:00', $selected[1].' 23:59:59']);
+        })->when($isByYear, function ($uquery) use ($selected) {
+            return $uquery->whereIn(DocumentRecipient::raw('YEAR(`created_at`)'), $selected);
+        });
+    }
+
 }

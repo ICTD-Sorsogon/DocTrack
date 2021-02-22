@@ -268,6 +268,7 @@ export default {
                 sessionStorage.clear();
                 this.$router.push({ name: "Login"});
             }
+            this.$store.commit('RESET_ARCHIVE_STATE')
         },
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
