@@ -226,14 +226,7 @@ const actions = {
     async getNotifs({ commit, state }) {
         await axios.get('/api/notifs')
         .then(response =>{
-            let data = []
-            response.data.data.forEach(notification => {
-                console.log(notification)
-                if(notification.office_id == state.user.office_id && notification.user_id == state.user.id){
-                    data.push(notification)
-                }
-            });
-            commit('GET_NOTIFS', data);
+            commit('GET_NOTIFS', response.data);
         })
         .catch(error => {
             var snackbar_error ={
