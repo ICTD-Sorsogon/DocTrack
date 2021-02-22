@@ -36,9 +36,11 @@ class DocumentNotificationListener
 
         $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
         $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
-        $user_office_id = User::where('office_id', $document->originating_office)->get();
         $docket_offices = User::where('office_id', 37)->get();
         $office = Office::where('id', auth()->user()->office_id)->first();
+        $document_data = Document::all()->find($document->id);
+        $sender_id = $document->sender_name;
+        $name = User::all()->find($sender_id);
 
         switch ($document->status) {
             case 'created':
@@ -88,34 +90,30 @@ class DocumentNotificationListener
 
             case 'terminated':
 
-                if($document->originating_office != 37){
+                if($document->origin_office->office_code != "DO"){
                     foreach($docket_offices as $docket_office){
                         $notification = new Notification();
-                        $notification->document_id = $document->id;
-                        $notification->user_id = $docket_office->id;
+                        $notification->document_id = $document_data->id;
+                        $notification->user_id = auth()->user()->id;
                         $notification->office_id = 37;
-                        $notification->tracking_code = $document->tracking_code;
-                        $notification->subject = $document->subject;
+                        $notification->action = 'terminated';
                         $notification->status = 0;
-                        $notification->message = 'Document created by '.$office->name.' - '.$document->subject.' has been terminated.';
+                        $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been terminated.";
                         $notification->save();
                     }
                 }
 
                 foreach ($originating_notif as $key => $value) {
-
-                    if($office->id != $value['office_id']){
-                        $notification = new Notification();
-                        $notification->document_id = $document->id;
-                        $notification->user_id = $value['id'];
-                        $notification->office_id = $value['office_id'];
-                        $notification->tracking_code = $document->tracking_code;
-                        $notification->subject = $document->subject;
-                        $notification->status = 0;
-                        $notification->message = 'Document created by your office '.$document->subject.' has been terminated by ' . $office->name. '.';
-                        $notification->save();
-                    }
+                    $notification = new Notification();
+                    $notification->document_id = $document_data->id;
+                    $notification->user_id = $value['id'];
+                    $notification->office_id = $value['office_id'];
+                    $notification->action = 'terminated';
+                    $notification->status = 0;
+                    $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been terminated.";
+                    $notification->save();
                 }
+
             break;
 
             case 'forwarded':

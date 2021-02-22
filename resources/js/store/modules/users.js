@@ -226,6 +226,7 @@ const actions = {
     async getNotifs({ commit, state }) {
         await axios.get('/api/notifs')
         .then(response =>{
+            console.log(response.data)
             commit('GET_NOTIFS', response.data);
         })
         .catch(error => {
