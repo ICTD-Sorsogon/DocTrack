@@ -240,7 +240,7 @@ const actions = {
     },
 
     async seenNotif({ commit }, notif) {
-        await axios.put(`http://127.0.0.1:8000/api/notifs/${notif.id}`, notif)
+        await axios.put(`/api/notifs/${notif.id}`, notif)
         .then(response => {
             commit('SEEN_NOTIF', notif.id);
         })
@@ -256,7 +256,7 @@ const actions = {
     },
 
     async seenBadge({ commit }, badge) {
-        await axios.put(`http://127.0.0.1:8000/api/badge`, badge)
+        await axios.put(`/api/badge`, badge)
         .then(response => {
             commit('SEEN_BADGE', badge.user_id);
         })

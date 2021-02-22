@@ -24,14 +24,7 @@ import NotificationItem from './NotificationItem'
     computed:{
         ...mapGetters(["auth_user"]),
         notifs() {
-            let newNotif = JSON.parse(JSON.stringify(this.$store.state.users.notifs))
-            let count = 0
-            newNotif.forEach(notif => {
-                if(notif.badge == 0){
-                    count++
-                }
-            });
-            return count
+            return this.$store.state.users.notif.reduce((counter, notif)=>{ counter += notif.badge; return counter },0)
           },
     },
     methods:{
