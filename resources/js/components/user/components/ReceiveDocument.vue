@@ -444,7 +444,8 @@ export default {
             priority_level: [
                 { show: 'High', value: '1' },
                 { show: 'Medium', value: '2' },
-                { show: 'Low', value: '3' }
+                { show: 'Low', value: '3' },
+                { show: 'Indefinite', value: '4' }
             ],
             temp: {
                 sample_data: 'sample'

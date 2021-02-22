@@ -42,7 +42,7 @@ class DocumentEvent implements ShouldBroadcast
 
         if($document->status == 'forwarded'){
             array_push($this->broadcastMe, new Channel('documents37'));
-            array_push($this->broadcastMe, new Channel('documents'. $document->destination_office_id->first));
+            array_push($this->broadcastMe, new Channel('documents'. $document->originating_office));
         }
 
         if($document->status == 'terminated'){

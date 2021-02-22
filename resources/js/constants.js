@@ -47,6 +47,7 @@ export const snackbar_icon = {
 };
 
 export const priority_level = {
+    4 : '#64DD17',
     3 : '#03A9F4',
     2 : '#FFA726',
     1 : '#F44336'

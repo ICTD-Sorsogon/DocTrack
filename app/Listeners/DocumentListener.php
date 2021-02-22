@@ -31,27 +31,10 @@ class DocumentListener
      * @return void
      */
     public function handle(DocumentEvent $event)
-    { 
+    {
         extract(get_object_vars($event));
 
-        if($document->wasRecentlyCreated){
-            foreach($document->destination as $office){
-                TrackingRecord::create([
-                    'action' => 'created',
-                    'destination' => $office->id,
-                    'document_id' => $document->id,
-                    'touched_by' => auth()->user()->id,
-                    'remarks' => $document->remarks,
-                    'last_touched' => Carbon::now()
-                ]);
-            };
-        }
-
-        // return false;
-        // $type = ['edited', 'created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
-        // $message = 'Document has been successfully';
-
-        if(!$document->wasRecentlyCreated && 
+        if(!$document->wasRecentlyCreated &&
             $document->status != 'acknowledged' &&
             $document->status != 'received' &&
             $document->status != 'forwarded' &&
@@ -101,11 +84,11 @@ class DocumentListener
                 if($document->wasRecentlyCreated){
                     $destinationOffce = '';
                     $document_length = count(json_decode($document->destination_office_id));
-        
+
                     for($index = 0; $index < $document_length; $index++){
                         $destinationOffce .= json_decode($document->destination)[$index]->name . ', ';
                     }
-        
+
                         $data_object = (object) array(
                             'subject' => $document->subject,
                             'sender_name' => $document->sender_name,
@@ -115,11 +98,11 @@ class DocumentListener
                             'document_type_id' => $document->document_type_id,
                             'page_count' => $document->page_count,
                         );
-        
-        
+
+
                         $subject = $document->subject;
                         $data = json_encode($data_object);
-        
+
                         $log = new Log();
                         $log->user_id = auth()->user()->id;
                         $log->new_values = $data;
@@ -158,7 +141,7 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document terminate';
-                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
+                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by:
                     '.$approved_by.'with remarks: '.$remarks;
                 return $log->save();
             break;

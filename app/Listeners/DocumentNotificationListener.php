@@ -34,13 +34,11 @@ class DocumentNotificationListener
     {
         extract(get_object_vars($event));
 
-        $notify_user = User::whereIn('office_id', json_decode($document->getAttributes()['destination_office_id']))->get();
-        $originating_notif = User::where('office_id', json_decode($document->originating_office))->get();
-        $docket_offices = User::where('office_id', 37)->get();
-        $office = Office::where('id', auth()->user()->office_id)->first();
         $document_data = Document::all()->find($document->id);
         $sender_id = $document->sender_name;
-        $name = User::all()->find($sender_id);
+        $name = User::all()->find($sender_id) ?? $sender_id;
+        $document_data = Document::all()->find($document->id);
+        $user_office_id = User::where('office_id', $document->originating_office)->get();
 
         switch ($document->status) {
             case 'created':
@@ -54,7 +52,7 @@ class DocumentNotificationListener
                 $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been {$notification->action} by " . auth()->user()->fullname . ".";
                 $notification->save();
             break;
-            
+
             case 'acknowledged':
                 foreach ($document->destination_office_id as $key => $destination) {
                     $notification = new Notification();
@@ -78,6 +76,17 @@ class DocumentNotificationListener
             break;
 
             case 'holdreject':
+
+                $notification = new Notification();
+                $notification->document_id = $document->id;
+                $notification->user_id = auth()->user->id;
+                $notification->office_id = $document->origin_office->id;
+                $notification->sender_name = auth()->user()->fullname;
+                $notification->status = 0;
+                $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been hold/reject by" . auth()->user()->fullname . ".";
+                $notification->save();
+
+
                 $status = $event->request_obj;
                 $subject = $event->old_values;
 
@@ -88,70 +97,25 @@ class DocumentNotificationListener
                 return $log->save();
             break;
 
-            case 'terminated':
-
-                if($document->origin_office->office_code != "DO"){
-                    foreach($docket_offices as $docket_office){
-                        $notification = new Notification();
-                        $notification->document_id = $document_data->id;
-                        $notification->user_id = auth()->user()->id;
-                        $notification->office_id = 37;
-                        $notification->action = 'terminated';
-                        $notification->status = 0;
-                        $notification->message = "Document {$document_data->subject} with {$document_data->tracking_code} tracking code has been terminated.";
-                        $notification->save();
-                    }
-                }
-
-                foreach ($originating_notif as $key => $value) {
-                    $notification = new Notification();
-                    $notification->document_id = $document_data->id;
-                    $notification->user_id = $value['id'];
-                    $notification->office_id = $value['office_id'];
-                    $notification->action = 'terminated';
-                    $notification->status = 0;
-                    $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been terminated.";
-                    $notification->save();
-                }
-
-            break;
-
             case 'forwarded':
-                $forwarded_data = last($document->tracking_records->toArray());
-
-                $forwarded_by = Office::find($forwarded_data['forwarded_by']);
-                $through = $forwarded_data['through'];
-
-                $destination_office_arr = json_decode($document->destination_office_id);
-                $destination_office = Office::find(end($destination_office_arr));
-                $notify_user = User::whereIn('office_id', [$destination_office->id])->get();
+                $notification = new Notification();
+                $notification->document_id = $document->id;
+                $notification->user_id = auth()->user()->id;
+                $notification->office_id = 37;
+                $notification->action = 'forwarded';
+                $notification->sender_name = auth()->user()->fullname;
+                $notification->status = 0;
+                $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
+                $notification->save();
 
                 $notification = new Notification();
                 $notification->document_id = $document->id;
-                $notification->user_id = $notify_user[0]->id;
-                $notification->office_id = end($destination_office_arr);
-                $notification->tracking_code = $document->tracking_code;
-                $notification->subject = $document->subject;
+                $notification->user_id = auth()->user()->id;
+                $notification->action = 'forwarded';
+                $notification->office_id = $document->destination_office_id->first();
                 $notification->status = 0;
-                $notification->message = 'Document '.$document->subject.' is forwarded to your office by '
-                    . $forwarded_by->name . ' through ' . $through;
-                $notification->save(); 
-                
-                if($document->originating_office != 37){
-                    foreach($docket_offices as $docket_office){
-                        $notification = new Notification();
-                        $notification->document_id = $document->id;
-                        $notification->user_id = $docket_office->id;
-                        $notification->office_id = 37;
-                        $notification->tracking_code = $document->tracking_code;
-                        $notification->subject = $document->subject;
-                        $notification->status = 0;
-                        $notification->message = 'Document '.$document->subject.' is forwarded to '
-                            . $destination_office->name . ' from ' . $forwarded_by->name . ' through ' . $through;
-                        $notification->save();
-                    }
-                }
-
+                $notification->message = "Your document {$document_data->subject} with {$document_data->tracking_code} tracking code has been forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->name}.";
+                $notification->save();
             break;
 
             case 'received':
