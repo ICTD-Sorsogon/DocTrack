@@ -65,11 +65,13 @@ export default {
                         offices[value[0].office_id].transactions+= created.length;
                         let acknowledged = value.filter(value => value.action === 'acknowledged');
                         if (acknowledged.length > 0) {
+                            offices[value[0].office_id].transactions+= acknowledged.length;
                             if (new Date(acknowledged[0].created_at).getDate() -
                                     new Date(created[0].created_at).getDate() > 7) offices[value[i].office_id].delayed++
                             let received = value.filter(value => value.action === 'received');
                             if (received.length > 0) {
                                 received.forEach(element => {
+                                    offices[element.office_id].transactions++
                                     if (new Date(element.created_at).getDate() -
                                         new Date(acknowledged[0].created_at).getDate() > 7) offices[value[i].office_id].delayed++
                                 });
