@@ -52,20 +52,33 @@ export default {
         }
     },
     computed: {
+        // TODO: Check the output against different cases
         summaries(){
             let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
             let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
             let data = [];
-            console.time("Exec")
             for (const [key, value] of Object.entries(summaries)) {
                 if (value.length === 1) offices[value[0].office_id].transactions++
                 else {
-                    if (value.filter(value => value.action === 'created').length > 1) {
-
+                    let created = value.filter(value => value.action === 'created');
+                    if (created.length > 1) {
+                        offices[value[0].office_id].transactions+= created.length;
+                        let acknowledged = value.filter(value => value.action === 'acknowledged');
+                        if (acknowledged.length > 0) {
+                            if (new Date(acknowledged[0].created_at).getDate() -
+                                    new Date(created[0].created_at).getDate() > 7) offices[value[i].office_id].delayed++
+                            let received = value.filter(value => value.action === 'received');
+                            if (received.length > 0) {
+                                received.forEach(element => {
+                                    if (new Date(element.created_at).getDate() -
+                                        new Date(acknowledged[0].created_at).getDate() > 7) offices[value[i].office_id].delayed++
+                                });
+                            }
+                        }
                     } else {
                         for (var i = 0; i < value.length -1; i++) {
                             if (i !== value.length - 1) {
-                                if (new Date(value[i+1].created_at).getDate() -
+                                if (new Date(value[i + 1].created_at).getDate() -
                                     new Date(value[i].created_at).getDate() > 7) offices[value[i].office_id].delayed++
                             }
                             offices[value[i].office_id].transactions++;
@@ -78,7 +91,7 @@ export default {
                     value.transactions * 100).toFixed(2)}%` : 'None';
                 data.push(value);
             }
-            console.timeEnd("Exec")
+            console.log(data);
             return data;
         },
     },
