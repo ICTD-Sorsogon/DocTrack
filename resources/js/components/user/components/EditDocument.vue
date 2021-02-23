@@ -67,7 +67,7 @@
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
                                 v-model="form.destination_office_id"
-                                :items="offices"
+                                :items="office"
                                 item-text="name"
                                 clearable
                                 hide-selected
@@ -197,6 +197,9 @@ export default {
     },
     computed: {
         ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'find_document']),
+        office() {
+            return JSON.parse(JSON.stringify(this.offices)).filter(office => office.id != this.auth_user.office_id)
+        },
         created_at() {
             return new Date(this.form.created_at).toDateString()
         },
