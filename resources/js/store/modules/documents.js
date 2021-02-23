@@ -25,10 +25,6 @@ const getters = {
 }
 
 const actions = {
-    async getDocument({commit}) {
-        const response = await axios.get(`/api/tracking_list`);
-        commit('GET_ALL_DOCUMENTS', response.data);
-    },
     async updateDocument({commit}, form) {
         commit('UPDATE_DOCUMENT', form);
     },
@@ -188,10 +184,7 @@ const actions = {
     },
     async documentReports({ commit }) {
         const response = await axios.get('/api/tracking_reports')
-        .then(response => {
-            commit('GET_TRACKING_REPORTS', response.data);
-        });
-
+        commit('GET_TRACKING_REPORTS', response.data);
     },
     async setDocument({ commit }, document) {
         commit('SET_SELECTED_DOCUMENT', document);
