@@ -31,7 +31,7 @@
 
 <script>
 const week_in_milliseconds = 604800000;
-import {mean} from 'lodash';
+import {max, min, mean} from 'lodash';
 export default {
     data() {
         return {
@@ -66,10 +66,10 @@ export default {
                         offices[created[0].office_id].transactions+= created.length;
                         let acknowledged = value.filter(value => value.action === 'acknowledged');
                         if (acknowledged.length > 0) {
-                            offices[acknowledged[0].office_id].transactions+= acknowledged[0].document.destination.length;
+                            offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
                             offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
                             if (new Date(acknowledged[0].created_at).getTime() -
-                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed+=acknowledged[0].document.destination.length
+                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed+=acknowledged[0].document.destination.length
                             let received = value.filter(value => value.action === 'received');
                             if (received.length > 0) {
                                 received.forEach(element => {
@@ -95,8 +95,8 @@ export default {
             for (const [key, value] of Object.entries(offices)) {
                 if(value.transaction_speed.length > 0){
                     let transaction_speed_list = value.transaction_speed
-                    value.min = this.timeConversion(Math.min.apply(Math, transaction_speed_list))
-                    value.max = this.timeConversion(Math.max.apply(Math, transaction_speed_list))
+                    value.min = this.timeConversion(min(transaction_speed_list))
+                    value.max = this.timeConversion(max(transaction_speed_list))
                     value.mean = this.timeConversion(mean( transaction_speed_list ))
                 } else {
                     value.min = value.max = value.mean = 'Not available'
