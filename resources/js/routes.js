@@ -98,24 +98,19 @@ export default {
                 },
                 // FIXME: Fix bug for submenu when using reports/'pathname'
                 {
+                    path: 'tracking_report',
+                    component: ReportAging,
+                    name: 'Document Tracking Report'
+                },
+                {
                     path: 'archive_list',
                     component: ReportArchiveList,
                     name: 'Archive List'
                 },
                 {
-                    path: 'aging',
-                    component: ReportAging,
-                    name: 'Document Aging Report'
-                },
-                {
                     path: 'logs',
                     component: ReportLog,
                     name: 'Log Report'
-                },
-                {
-                    path: 'master_list',
-                    component: ReportMasterList,
-                    name: 'Document Master List'
                 },
                 {
                     path: 'office_list',

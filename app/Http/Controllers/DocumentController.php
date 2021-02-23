@@ -12,6 +12,7 @@ use App\Models\Document;
 use App\Models\DocumentRecipient;
 use App\Models\DocumentType;
 use App\Models\TrackingRecord;
+use App\Models\TrackingSummary;
 use Illuminate\Http\Request;
 
 class DocumentController extends Controller
@@ -75,6 +76,12 @@ class DocumentController extends Controller
             'received' => true
         ]);
 
+        TrackingSummary::create([
+            'action' => 'received',
+            'document_id' => $document->id,
+            'office_id' => auth()->user()->office_id
+        ]);
+
         return [$tracking_record];
     }
 
@@ -90,6 +97,7 @@ class DocumentController extends Controller
         try {
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $request->id;
+            $tracking_record->destination = $request->forwarded_to;
             $tracking_record->action = 'forwarded';
             $tracking_record->through = $request->through;
             $tracking_record->approved_by = $request->approved_by;
@@ -99,6 +107,12 @@ class DocumentController extends Controller
             $tracking_record->forwarded_to = $request->forwarded_to;
             $tracking_record->remarks = $request->documentRemarks;
             $tracking_record->save();
+
+            TrackingSummary::create([
+                'action' => 'forwarded',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office_id
+            ]);
 
         } catch (\Exception $error) {
             DB::rollback();
@@ -134,6 +148,7 @@ class DocumentController extends Controller
         try {
             $tracking_record = new TrackingRecord();
             $tracking_record->document_id = $request->id;
+            $tracking_record->destination = auth()->user()->office->id;
             $tracking_record->action = 'terminated';
             $tracking_record->approved_by = $request->approved_by;
             $tracking_record->touched_by = Auth::user()->id;
@@ -146,8 +161,8 @@ class DocumentController extends Controller
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
-            $document->status = 'terminated'; 
-            DocumentEvent::dispatch($document); 
+            $document->status = 'terminated';
+            DocumentEvent::dispatch($document);
 
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
@@ -165,18 +180,28 @@ class DocumentController extends Controller
     public function acknowledgeDocument(Document $document, Request $request)
     {
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
-            ->update(['acknowledged' => 1]);
+            ->update(['acknowledged' => true]);
 
         DB::beginTransaction();
         try {
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $request->id;
-            $tracking_record->action = 'acknowledged';
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $request->documentRemarks;
-            $tracking_record->save();
-            $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
+            foreach($document->destination as $destination) {
+                $tracking_record = new TrackingRecord();
+                $tracking_record->document_id = $request->id;
+                $tracking_record->action = 'acknowledged';
+                $tracking_record->destination = $destination->id;
+                $tracking_record->touched_by = Auth::user()->id;
+                $tracking_record->last_touched = Carbon::now();
+                $tracking_record->remarks = $request->documentRemarks;
+                $tracking_record->save();
+                $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
+            }
+
+            TrackingSummary::create([
+                'action' => 'acknowledged',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
+            $user_id = Auth::user()->id;
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -251,16 +276,21 @@ class DocumentController extends Controller
         foreach($document->destination as $office){
             DocumentRecipient::updateOrCreate(
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
-                [ 'document_id' => $document->id, 'destination_office' => $office->id ]);
-
-                TrackingRecord::create([
-                    'action' => 'created',
-                    'document_id' => $document->id,
-                    'destination' => $office->id,
-                    'touched_by' => auth()->user()->id,
-                    'remarks' => $document->remarks,
-                    'last_touched' => Carbon::now()
-               ]);
+                [ 'document_id' => $document->id, 'destination_office' => $office->id ]
+            );
+            TrackingSummary::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
+            TrackingRecord::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'destination' => $office->id,
+                'touched_by' => auth()->user()->id,
+                'remarks' => $document->remarks,
+                'last_touched' => Carbon::now()
+            ]);
         };
 
        DocumentRecipient::whereDocumentId($document->id)
@@ -269,11 +299,9 @@ class DocumentController extends Controller
        return $document;
     }
 
-    public function trackingReports() {
-        $documents = Document::withTrashed()
-            ->with('tracking_records', 'tracking_records.user', 'tracking_records.user.office')
-            ->get();
-        $office = collect($documents)->groupBy('tracking_records.user.office');
-        return $documents;
+    public function trackingReports()
+    {
+        $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
+        return $summary;
     }
 }
