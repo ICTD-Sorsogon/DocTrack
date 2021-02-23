@@ -324,9 +324,6 @@
             return touched_by.avatar ?? '/images/defaultpic.jpg'
         }
     },
-    mounted() {
-        console.log(this.tracking_records)
-    },
 }
 </script>
 

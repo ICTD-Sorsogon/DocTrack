@@ -24,7 +24,7 @@ import NotificationItem from './NotificationItem'
     computed:{
         ...mapGetters(["auth_user"]),
         notifs() {
-            return this.$store.state.users.notif.reduce((counter, notif)=>{ counter += notif.badge; return counter },0)
+            return this.$store.state.users.notifs.reduce((counter, notif)=>{ counter += !(+notif.badge); return counter },0)
           },
     },
     methods:{

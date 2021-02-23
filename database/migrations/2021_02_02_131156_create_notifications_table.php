@@ -22,7 +22,7 @@ class CreateNotificationsTable extends Migration
             $table->text('action')->nullable();
             $table->text('message');
             $table->boolean('status')->default(false);
-            $table->text('badge')->default(false);
+            $table->boolean('badge')->default(false);
             $table->timestamps();
         });
     }
