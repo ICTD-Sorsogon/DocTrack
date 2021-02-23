@@ -54,14 +54,15 @@ export default {
                 if (value.length === 1) offices[value[0].office_id].transactions++
                 else {
                     let created = value.filter(value => value.action === 'created');
-                    if (created.length > 1) {
-                        offices[created[0].office_id].transactions+= created.length;
+                    if (created.length !== 0) {
+                        console.log(created[0].document.destination.length);
+                        offices[created[0].office_id].transactions+= created[0].document.destination.length;
                         let acknowledged = value.filter(value => value.action === 'acknowledged');
-                        if (acknowledged.length > 0) {
+                        if (acknowledged.length !== 0) {
                             offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
                             offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
                             if (new Date(acknowledged[0].created_at).getTime() -
-                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed+=acknowledged[0].document.destination.length
+                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed += acknowledged[0].document.destination.length
                             let received = value.filter(value => value.action === 'received');
                             if (received.length > 0) {
                                 received.forEach(element => {

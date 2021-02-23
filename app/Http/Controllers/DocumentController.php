@@ -264,11 +264,12 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
+        // FIXME: Editing a document creates a new record in the tracking_summaries table
+        // TODO: Highlight in front end menu, Forward not tracked in fastest and slowest
        $document = $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
         );
-
         $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(
             $document->destination_office_id
         );
@@ -278,11 +279,6 @@ class DocumentController extends Controller
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ]
             );
-            TrackingSummary::create([
-                'action' => 'created',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
-            ]);
             TrackingRecord::create([
                 'action' => 'created',
                 'document_id' => $document->id,
@@ -292,6 +288,14 @@ class DocumentController extends Controller
                 'last_touched' => Carbon::now()
             ]);
         };
+        // Should only create one creation record in the summary
+        if($document->wasRecentlyCreated) {
+            TrackingSummary::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
+        }
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
