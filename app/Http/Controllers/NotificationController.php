@@ -6,6 +6,7 @@ use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
 use App\Models\Office;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -16,51 +17,7 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        return NotificationResource::collection(Notification::latest()->get());
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Notification  $notification
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Office $office, Notification $notification)
-    {
-        return new NotificationResource($notification);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Notification  $notification
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Notification $notification)
-    {
-        //
+        return Notification::whereOfficeId(auth()->user()->office->id)->latest()->get();
     }
 
     /**
@@ -70,12 +27,28 @@ class NotificationController extends Controller
      * @param  \App\Models\Notification  $notification
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Notification $notifs)
+    public function seen_notif(Request $request, Notification $notifs)
     {
         $notifs->update($request->all());
         return response('Update');
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Notification  $notification
+     * @return \Illuminate\Http\Response
+     */
+    public function seen_badge(Request $request)
+    {
+        foreach($request->badge_data as $badge){
+            $all_notif = Notification::where('id', $badge['id']);
+            $all_notif->update([ 'badge' => 1 ]);
+        }
+
+        return response('Update');
+    }
     /**
      * Remove the specified resource from storage.
      *

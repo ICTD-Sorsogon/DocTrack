@@ -37,7 +37,7 @@ class DocumentFactory extends Factory
             'originating_office' => $source ? rand(3, 12) : $this->faker->name,
             'destination_office_id' => [ rand(1, 19)],
             'sender_name' => $source == 0 ? rand(3, 12) : $this->faker->name,
-            'priority_level' => rand(1,3),
+            'priority_level' => rand(1,4),
             'page_count' => rand(1, 50),
             'status' => $status[rand(0,6)],
             'remarks' => $this->faker->realText(100),

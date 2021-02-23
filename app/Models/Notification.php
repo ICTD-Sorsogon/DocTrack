@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +15,23 @@ class Notification extends Model
         'status'
     ];
 
+    protected $appends = ['avatar', 'office_code'];
+
+    public function getAvatarAttribute()
+    {
+        return $this->user->avatar;
+    }
+    
+    public function getOfficeCodeAttribute()
+    {
+        return $this->user->office->name;
+    }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->diffForHumans();
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id');
@@ -21,7 +39,7 @@ class Notification extends Model
 
     public function office()
     {
-        return $this->hasMany('App\Models\User', 'office_id');
+        return $this->belongsTo('App\Models\Office');
     }
 
     public function document()

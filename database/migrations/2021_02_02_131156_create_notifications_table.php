@@ -18,9 +18,11 @@ class CreateNotificationsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('document_id')->unsigned();
             $table->integer('office_id')->unsigned();
-            $table->text('sender_name');
+            $table->text('sender_name')->nullable();
+            $table->text('action')->nullable();
             $table->text('message');
             $table->boolean('status')->default(false);
+            $table->boolean('badge')->default(false);
             $table->timestamps();
         });
     }

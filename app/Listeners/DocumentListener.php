@@ -31,31 +31,16 @@ class DocumentListener
      * @return void
      */
     public function handle(DocumentEvent $event)
-    { 
+    {
         extract(get_object_vars($event));
 
-        if($document->wasRecentlyCreated){
-            foreach($document->destination as $office){
-                TrackingRecord::create([
-                    'action' => 'created',
-                    'destination' => $office->id,
-                    'document_id' => $document->id,
-                    'touched_by' => auth()->user()->id,
-                    'remarks' => $document->remarks,
-                    'last_touched' => Carbon::now()
-                ]);
-            };
-        }
-
-        // return false;
-        // $type = ['edited', 'created', 'received', 'forwarded', 'processing', 'on hold', 'rejected', 'terminated', 'acknowledged'];
-        // $message = 'Document has been successfully';
-
-        if(!$document->wasRecentlyCreated && 
+        if(!$document->wasRecentlyCreated &&
             $document->status != 'acknowledged' &&
             $document->status != 'received' &&
             $document->status != 'forwarded' &&
-            $document->status != 'terminated'
+            $document->status != 'terminated' &&
+            $document->status != 'holdreject'
+
             ){
             $new = $document;
             $old = $document->getOriginal();
@@ -101,11 +86,11 @@ class DocumentListener
                 if($document->wasRecentlyCreated){
                     $destinationOffce = '';
                     $document_length = count(json_decode($document->destination_office_id));
-        
+
                     for($index = 0; $index < $document_length; $index++){
                         $destinationOffce .= json_decode($document->destination)[$index]->name . ', ';
                     }
-        
+
                         $data_object = (object) array(
                             'subject' => $document->subject,
                             'sender_name' => $document->sender_name,
@@ -115,11 +100,11 @@ class DocumentListener
                             'document_type_id' => $document->document_type_id,
                             'page_count' => $document->page_count,
                         );
-        
-        
+
+
                         $subject = $document->subject;
                         $data = json_encode($data_object);
-        
+
                         $log = new Log();
                         $log->user_id = auth()->user()->id;
                         $log->new_values = $data;
@@ -140,36 +125,39 @@ class DocumentListener
             break;
 
             case 'holdreject':
-                $status = $event->request_obj;
-                $subject = $event->old_values;
+                $status = $document->status;
+                $subject = $document->subject;
 
                 $log = new Log();
-                $log->user_id = $event->user_id;
+                $log->user_id = auth()->user()->id;
                 $log->action = 'Document hold or reject';
                 $log->remarks = 'Document '.$subject.' is '.$status;
                 return $log->save();
             break;
 
-            case 'deleting':
-                $remarks = $event->old_values;
-                $subject = $event->request_obj;
-                $approved_by = $event->approved_by;
+            case 'terminated':
+                $received_data = last($document->tracking_records->toArray());
+
+                $subject = $document->subject;
+                $approved_by = $received_data['approved_by'];
+                $remarks = $document->remarks;
 
                 $log = new Log();
-                $log->user_id = $event->user_id;
+                $log->user_id = auth()->user()->id;
                 $log->action = 'Document terminate';
-                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by: 
+                $log->remarks = 'Document '.$subject.' has been successfully terminated and approved by:
                     '.$approved_by.'with remarks: '.$remarks;
                 return $log->save();
             break;
 
             case 'forwarded':
-                $tracking_records = $document->tracking_records;
+                $forwarded_data = last($document->tracking_records->toArray());
+
                 $remarks = $document->remarks;
                 $subject = $document->subject;
-                $approved_by = $tracking_records[3]->approved_by;
-                $through = $tracking_records[3]->through;
-                
+                $approved_by = $forwarded_data['approved_by'];
+                $through = $forwarded_data['through'];
+
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document forward';
@@ -179,9 +167,10 @@ class DocumentListener
             break;
 
             case 'received':
-                $tracking_records = $document->tracking_records;
-                $through = $tracking_records[2]->through;
-                $approved_by = $tracking_records[2]->approved_by;
+                $received_data = last($document->tracking_records->toArray());
+
+                $through = $received_data['through'];
+                $approved_by = $received_data['approved_by'];
                 $remarks = $document->remarks;
                 $subject = $document->subject;
 

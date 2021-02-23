@@ -21,29 +21,18 @@ import NotificationItem from './NotificationItem'
     components:{
         NotificationItem,
     },
-    data () {
-        return {
-            // show: false,
-            // notif: true,
-        }
-    },
     computed:{
         ...mapGetters(["auth_user"]),
-        notifs(){
-            let newNotif = JSON.parse(JSON.stringify(this.$store.state.users.notifs))
-            let count = 0
-            newNotif.forEach(notif => {
-                if(notif.status == 0){
-                    count++
-                }
-            });
-            return count
-        }
+        notifs() {
+            return this.$store.state.users.notifs.reduce((counter, notif)=>{ counter += !(+notif.badge); return counter },0)
+          },
     },
     methods:{
-        showNotif(event){
+      showNotif(){
+          this.$store.dispatch('seenBadge', {badge_data: this.$store.state.users.notifs});
+
           this.$emit('showNotif')
-        },
+      },
     },
     mounted(){
         Echo.channel('documents'+this.auth_user.office_id)

@@ -32,6 +32,11 @@ class DocumentController extends Controller
         return $documents->allDocuments(Auth::user());
     }
 
+    public function getAllArchiveDocuments(Document $documents, Request $request)
+    {
+        return $documents->allDocumentsArchive(Auth::user(), $request);
+    }
+
     public function getNonPaginatedActiveDocuments()
     {
         $documents = Document::where('current_office_id', Auth::user()->office_id)
@@ -211,9 +216,6 @@ class DocumentController extends Controller
 
     public function holdRejectDocument(Request $request)
     {
-        $status = $request->hold_reject;
-        $subject = $request->subject;
-
         DB::beginTransaction();
         try {
             $tracking_record = new TrackingRecord();
@@ -225,7 +227,6 @@ class DocumentController extends Controller
             $tracking_record->save();
             $tracking_record->document->update(['status' => $request->hold_reject]);
 
-            $user_id = Auth::user()->id;
 
 
         } catch (ValidationException $error) {
@@ -276,6 +277,7 @@ class DocumentController extends Controller
             DocumentRecipient::updateOrCreate(
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ]);
+<<<<<<< HEAD
             TrackingRecord::create([
                 'action' => 'created',
                 'document_id' => $document->id,
@@ -291,6 +293,17 @@ class DocumentController extends Controller
                 'office_id' => auth()->user()->office->id
             ]);
 
+=======
+
+                TrackingRecord::create([
+                    'action' => 'created',
+                    'document_id' => $document->id,
+                    'destination' => $office->id,
+                    'touched_by' => auth()->user()->id,
+                    'remarks' => $document->remarks,
+                    'last_touched' => Carbon::now()
+               ]);
+>>>>>>> 21f0929157b139777b3509edf5f59651edea7647
         };
 
        DocumentRecipient::whereDocumentId($document->id)
