@@ -74,9 +74,10 @@ export default {
             if(item.status == 0){
                 this.$store.dispatch('seenNotif', {id: item.id, status: 1});
             }
+
             this.selected_document = Object.values(JSON.parse(JSON.stringify(this.documents))).flat().find(document => {
                 return document.id == item.document_id
-            })
+            }) ?? {}
 
             this.dialog = !!this.selected_document
         },
