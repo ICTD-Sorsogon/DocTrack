@@ -239,7 +239,7 @@ const actions = {
         });
     },
 
-    async seenNotif({ commit }, notif) {
+    async seenNotif({ dispatch, commit }, notif) {
         await axios.put(`/api/notifs/${notif.id}`, notif)
         .then(response => {
             dispatch('getNotifs')
