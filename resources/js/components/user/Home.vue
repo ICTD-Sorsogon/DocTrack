@@ -57,23 +57,13 @@
                 <v-list-item
                     :input-value="$route.name === 'Document Aging Report' ? true:false"
                     link
-                    @click.prevent="getAgingReport"
+                    @click.prevent="getTrackingReport"
                     v-ripple="{ class: 'white--text' }"
                 >
                     <v-list-item-icon>
                         <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Tracking</v-list-item-title>
-                </v-list-item>
-                <v-list-item
-                    :input-value="$route.name === 'Document Master List' ? true:false"
-                    link @click.prevent="getMasterListReport"
-                    v-ripple="{ class: 'white--text' }"
-                >
-                    <v-list-item-icon>
-                        <v-icon>mdi-timeline-text</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
                 <v-list-item
                     :input-value="$route.name === 'Office List' ? true:false"
@@ -264,11 +254,11 @@ export default {
                 this.$router.push({ name: "All Active Documents"});
             }
         },
-        getAgingReport() {
-            if(this.$route.name !== 'Document Aging Report') {
+        getTrackingReport() {
+            if(this.$route.name !== 'Document Tracking Report') {
                 this.$store.dispatch('setLoader');
                 this.$store.commit('TOGGLE_SUBMENU', true);
-                this.$router.push({ name: "Document Aging Report"});
+                this.$router.push({ name: "Document Tracking Report"});
             }
         },
         getLogs() {
@@ -276,13 +266,6 @@ export default {
                 this.$store.dispatch('setLoader');
                 this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Log Report"});
-            }
-        },
-        getMasterListReport() {
-            if(this.$route.name !== 'Document Master List') {
-                this.$store.dispatch('setLoader');
-                this.$store.commit('TOGGLE_SUBMENU', true);
-                this.$router.push({ name: "Document Master List"});
             }
         },
         getOfficeListReport() {
