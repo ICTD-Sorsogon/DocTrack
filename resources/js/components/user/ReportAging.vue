@@ -11,6 +11,7 @@
                     :items-per-page="10"
                     :headers="headers"
                     class="elevation-1"
+                    :custom-filter="filterOnlyOffice"
                 >
                 <template v-slot:top>
                     <v-text-field
@@ -43,12 +44,12 @@ export default {
                     value: 'name',
                 }
                 ,
-                { text: 'All Transaction', value: 'transactions' },
-                { text: 'Delayed Document', value: 'delayed' },
-                { text: 'Fastest Transaction', value: 'min' },
-                { text: 'Slowest Transaction', value: 'max' },
-                { text: 'Average Transaction Speed', value: 'mean' },
-                { text: 'Efficiency Rating', value: 'efficiency' },
+                { text: 'All Transaction', value: 'transactions', filterable:false},
+                { text: 'Delayed Document', value: 'delayed', filterable:false},
+                { text: 'Fastest Transaction', value: 'min', filterable:false},
+                { text: 'Slowest Transaction', value: 'max', filterable:false},
+                { text: 'Average Transaction Speed', value: 'mean', filterable:false},
+                { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
             ],
         }
     },
@@ -114,6 +115,12 @@ export default {
         this.$store.dispatch('getOfficeNameList');
     },
     methods: {
+        filterOnlyOffice (value, search, item) {
+            return value != null &&
+            search != null &&
+            typeof value === 'string' &&
+            value.toString().toLowerCase().indexOf(search) !== -1
+        },
         timeConversion(millisec) {
             var seconds = Math.trunc(millisec / 1000);
             var minutes = Math.trunc(millisec / (1000 * 60));
