@@ -38,12 +38,7 @@ export default {
         return {
             search: '',
             headers: [
-                {
-                    text: 'Office',
-                    align: 'start',
-                    value: 'name',
-                }
-                ,
+                { text: 'Office', align: 'start',value: 'name'},
                 { text: 'All Transaction', value: 'transactions', filterable:false},
                 { text: 'Delayed Document', value: 'delayed', filterable:false},
                 { text: 'Fastest Transaction', value: 'min', filterable:false},
