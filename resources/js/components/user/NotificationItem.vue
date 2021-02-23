@@ -61,13 +61,6 @@ export default {
         this.$store.dispatch('getNotifs');
         this.$store.dispatch('getAllUsers');
     },
-    // created(){
-    //     Echo.channel('documents'+this.auth_user.office_id)
-    //     .listen('DocumentEvent', (e) => {
-    //         this.$store.dispatch('getActiveDocuments');
-    //         this.$store.dispatch('getNotifs');
-    //     })
-    // },
     methods:{
         closeDialog(){
             this.dialog = false
@@ -82,14 +75,11 @@ export default {
                 this.$store.dispatch('seenNotif', {id: item.id, status: 1});
             }
 
-            this.selected_document = []
-            this.documents.forEach(document => {
-                if(document.id == item.document_id){
-                    this.selected_document = document
-                    this.dialog = true
-                }
-            });
+            this.selected_document = Object.values(JSON.parse(JSON.stringify(this.documents))).flat().find(document => {
+                return document.id == item.document_id
+            }) ?? {}
 
+            this.dialog = !!this.selected_document
         },
     }
 }

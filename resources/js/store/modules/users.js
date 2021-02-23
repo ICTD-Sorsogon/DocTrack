@@ -239,11 +239,26 @@ const actions = {
         });
     },
 
-    async seenNotif({ commit }, notif) {
-        await axios.put(`http://127.0.0.1:8000/api/notifs/${notif.id}`, notif)
+    async seenNotif({ dispatch, commit }, notif) {
+        await axios.put(`/api/notifs/${notif.id}`, notif)
         .then(response => {
-            console.log(response)
-            commit('SEEN_NOTIF', notif.id);
+            dispatch('getNotifs')
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
+    async seenBadge({ dispatch, commit }, badge) {
+        await axios.put(`/api/badge`, badge)
+        .then(response => {
+            dispatch('getNotifs')
         })
         .catch(error => {
             var snackbar_error ={
@@ -296,12 +311,6 @@ const mutations = {
     GET_NOTIFS(state, response) {
         state.notifs = response;
     },
-
-    SEEN_NOTIF(state, id) {
-        state.notifs.forEach(notif => {
-            notif.id ==  id ? notif.status = 1 : 0
-        });
-    }
 }
 
 export default {

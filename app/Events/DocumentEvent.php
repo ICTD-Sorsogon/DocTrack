@@ -46,13 +46,11 @@ class DocumentEvent implements ShouldBroadcast
         }
 
         if($document->status == 'terminated'){
-            // array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
-            // array_push($this->broadcastMe, new Channel('documents37'));
+            array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
+            array_push($this->broadcastMe, new Channel('documents37'));
         }
 
         if($document->status == 'acknowledged'){
-            $document_length = count(json_decode($document->destination_office_id));
-
             foreach ($document->destination_office_id as $destination){
                 array_push($this->broadcastMe, new Channel('documents'. $destination));
             }
