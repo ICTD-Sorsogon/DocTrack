@@ -32,7 +32,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('get_document_track_record/{document}', 'DocumentController@getDocTrackRecord');
         Route::get('get_document_details/{id}', 'DocumentController@getSelectedDocument');
         Route::get('office_list', 'OfficeController@getOfficeList');
-        Route::get('tracking_list', 'OfficeController@getTrackingList');
         Route::get('get_non_page_active_documents', 'DocumentController@getNonPaginatedActiveDocuments');
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
@@ -49,6 +48,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('import_new_office', 'OfficeController@importNewOffice');
 
         Route::get('tracking_reports', 'DocumentController@trackingReports');
+        Route::get('list_office_names', 'OfficeController@listOfficeNames');
 
         Route::get('notifs', 'NotificationController@index');
         Route::put('notifs/{notifs}', 'NotificationController@seen_notif');
