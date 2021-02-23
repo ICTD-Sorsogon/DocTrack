@@ -38,7 +38,9 @@ class DocumentListener
             $document->status != 'acknowledged' &&
             $document->status != 'received' &&
             $document->status != 'forwarded' &&
-            $document->status != 'terminated'
+            $document->status != 'terminated' &&
+            $document->status != 'holdreject'
+
             ){
             $new = $document;
             $old = $document->getOriginal();
@@ -134,8 +136,10 @@ class DocumentListener
             break;
 
             case 'terminated':
+                $received_data = last($document->tracking_records->toArray());
+
                 $subject = $document->subject;
-                $approved_by = $document->approved_by;
+                $approved_by = $received_data['approved_by'];
                 $remarks = $document->remarks;
 
                 $log = new Log();
@@ -153,7 +157,7 @@ class DocumentListener
                 $subject = $document->subject;
                 $approved_by = $forwarded_data['approved_by'];
                 $through = $forwarded_data['through'];
-                
+
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document forward';
