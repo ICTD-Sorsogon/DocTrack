@@ -55,6 +55,17 @@
                     </v-list-item-content>
                 </template>
                 <v-list-item
+                    :input-value="$route.name === 'Archive List' ? true:false"
+                    link
+                    @click.prevent="getArchiveListReport"
+                    v-ripple="{ class: 'primary--text' }"
+                >
+                    <v-list-item-icon>
+                        <v-icon>mdi-archive-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Archive</v-list-item-title>
+                </v-list-item>
+                <v-list-item
                     :input-value="$route.name === 'Document Aging Report' ? true:false"
                     link
                     @click.prevent="getAgingReport"
@@ -76,6 +87,7 @@
                     <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
                 <v-list-item
+                    v-if="auth_user.role_id === 1"
                     :input-value="$route.name === 'Office List' ? true:false"
                     link
                     @click.prevent="getOfficeListReport"
@@ -256,12 +268,20 @@ export default {
                 sessionStorage.clear();
                 this.$router.push({ name: "Login"});
             }
+            this.$store.commit('RESET_ARCHIVE_STATE')
         },
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
                 this.$store.commit('TOGGLE_SUBMENU', false);
                 this.$router.push({ name: "All Active Documents"});
+            }
+        },
+        getArchiveListReport() {
+            if(this.$route.name !== 'Archive List') {
+                this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
+                this.$router.push({ name: "Archive List"});
             }
         },
         getAgingReport() {

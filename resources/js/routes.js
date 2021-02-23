@@ -8,6 +8,7 @@ import NewDocument from './components/user/components/NewDocument';
 import EditDocument from './components/user/components/EditDocument';
 import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
+import ReportArchiveList from './components/user/ReportArchiveList';
 import ReportAging from './components/user/ReportAging';
 import ReportLog from './components/user/ReportLog';
 import ReportMasterList from './components/user/ReportMasterList';
@@ -96,6 +97,11 @@ export default {
                     name: 'Terminal Document'
                 },
                 // FIXME: Fix bug for submenu when using reports/'pathname'
+                {
+                    path: 'archive_list',
+                    component: ReportArchiveList,
+                    name: 'Archive List'
+                },
                 {
                     path: 'aging',
                     component: ReportAging,

@@ -68,7 +68,7 @@ class OfficeController extends Controller
             }
         }*/
 
-        
+
         DB::beginTransaction();
         try {
             foreach($request['office_data'] as $office_data){
@@ -84,7 +84,7 @@ class OfficeController extends Controller
                     $office->contact_number = $offices["Contact_Number"];
                     $office->contact_email = $offices["Email_Address"];
                     $office->save();
-                    
+
                 }
             }
         } catch (ValidationException $error) {
@@ -189,7 +189,7 @@ class OfficeController extends Controller
         foreach (Office::all() as $office) {
            $stat[$office->name]['count'] = @optional($document[$office->id])->count() ?? 0;
            $stat[$office->name]['document'] = $document[$office->id] ?? null;
-        } 
+        }
 
         return $stat;
         // $offices = Office::with('users.tracking_records')->get();
