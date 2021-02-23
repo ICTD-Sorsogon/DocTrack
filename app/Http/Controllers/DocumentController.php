@@ -161,8 +161,8 @@ class DocumentController extends Controller
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
-            $document->status = 'terminated'; 
-            DocumentEvent::dispatch($document); 
+            $document->status = 'terminated';
+            DocumentEvent::dispatch($document);
 
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
@@ -276,8 +276,13 @@ class DocumentController extends Controller
         foreach($document->destination as $office){
             DocumentRecipient::updateOrCreate(
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
-                [ 'document_id' => $document->id, 'destination_office' => $office->id ]);
-<<<<<<< HEAD
+                [ 'document_id' => $document->id, 'destination_office' => $office->id ]
+            );
+            TrackingSummary::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
             TrackingRecord::create([
                 'action' => 'created',
                 'document_id' => $document->id,
@@ -286,24 +291,6 @@ class DocumentController extends Controller
                 'remarks' => $document->remarks,
                 'last_touched' => Carbon::now()
             ]);
-
-            TrackingSummary::create([
-                'action' => 'created',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
-            ]);
-
-=======
-
-                TrackingRecord::create([
-                    'action' => 'created',
-                    'document_id' => $document->id,
-                    'destination' => $office->id,
-                    'touched_by' => auth()->user()->id,
-                    'remarks' => $document->remarks,
-                    'last_touched' => Carbon::now()
-               ]);
->>>>>>> 21f0929157b139777b3509edf5f59651edea7647
         };
 
        DocumentRecipient::whereDocumentId($document->id)

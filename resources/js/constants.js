@@ -53,10 +53,6 @@ export const priority_level = {
     1 : '#F44336'
 };
 
-<<<<<<< HEAD
-export const max = 99999;
-export const min = 0;
-=======
 export const breakpoint = (col) => {
     if (Array.isArray(col)) {
         return {
@@ -78,4 +74,3 @@ export const breakpoint = (col) => {
         }
     }
 };
->>>>>>> 21f0929157b139777b3509edf5f59651edea7647

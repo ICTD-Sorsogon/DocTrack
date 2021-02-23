@@ -157,18 +157,8 @@ class OfficeController extends Controller
         return [$office];
     }
 
-    public function bulkUserTrackingList(Office $office)
-    {
-        $collection = [];
-        foreach ($office->users as $users) {
-            array_push($collection, $users->tracking_records);
-        }
-        return $collection;
-    }
-
     public function listOfficeNames()
     {
-<<<<<<< HEAD
         $offices = Office::select('id', 'name', 'office_code')->get()->keyBy('id');
         $offices->map(function ($office) {
             $office['delayed'] = $office['transactions'] = $office['efficiency'] = 0 ;
@@ -176,38 +166,5 @@ class OfficeController extends Controller
             return $office;
         });
         return $offices;
-=======
-        $stat = [];
-        $result = TrackingRecord::all()->groupBy(['document_id','destination']);
-        $office = Office::all();
-        $documents = Document::all();
-        foreach($result as $document){
-            foreach($document as $destinations){
-                foreach($destinations as $destination){                    
-                    $stat[$destination->document_id][$office->find($destination->destination)->office_code][$destination->action] = $destination->last_touched;                                                                     
-                    $stat[$destination->document_id][$office->find($destination->destination)->office_code]['document'] = $documents->find($destination->document_id);                                                                     
-                }                                                                            
-            }                                                                 
-        }
-        return $stat;
-        $document =  Document::with('tracking_records')
-            ->get()
-            ->groupBy('originating_office')
-            ->filter(function($val,$key){return is_numeric($key);});
-
-        foreach (Office::all() as $office) {
-           $stat[$office->name]['count'] = @optional($document[$office->id])->count() ?? 0;
-           $stat[$office->name]['document'] = $document[$office->id] ?? null;
-        }
-
-        return $stat;
-        // $offices = Office::with('users.tracking_records')->get();
-        // foreach ($offices as $office) {
-        //     $office['transaction_count'] = collect($this->bulkUserTrackingList($office))->collapse()->count();
-        //     $office['documents'] = collect($this->bulkUserTrackingList($office))->collapse()->groupBy('document_id');
-        //     unset($office->users);
-        // }
-        // return $offices;
->>>>>>> 21f0929157b139777b3509edf5f59651edea7647
     }
 }

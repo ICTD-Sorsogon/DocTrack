@@ -104,7 +104,6 @@ class Document extends Model
         return $this->belongsTo('App\Models\Personnel', 'sender_name');
     }
 
-<<<<<<< HEAD
     public function tracker()
     {
         return $this->hasMany('App\Models\TrackingRecord');
@@ -115,8 +114,6 @@ class Document extends Model
         return $this->hasMany('App\Models\TrackingSummary');
     }
 
-=======
->>>>>>> 21f0929157b139777b3509edf5f59651edea7647
     public static function allDocuments(User $user)
     {
         $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
