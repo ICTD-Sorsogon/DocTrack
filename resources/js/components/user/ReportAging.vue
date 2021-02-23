@@ -21,9 +21,6 @@
                         class="mx-4"
                     />
                 </template>
-                <!-- <template v-slot:[`item.efficiency`] = "{ item }">
-                    {{item.efficiency}}
-                </template> -->
                 </v-data-table>
             </v-col>
         </v-row>
