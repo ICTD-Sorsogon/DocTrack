@@ -1,10 +1,12 @@
 const state = {
     offices: [],
+    office_names: []
 }
 
 const getters = {
     offices: state => state.offices,
     offices_loading: state => state.office_list_loading,
+    office_names_list: state => state.office_names
 }
 
 const actions = {
@@ -96,6 +98,10 @@ const actions = {
             commit('SNACKBAR_STATUS', res)
         });
     },
+    async getOfficeNameList({ commit }) {
+        const response = await axios.get('api/list_office_names');
+        commit('GET_LIST_OFFICE_NAMES', response.data)
+    }
 }
 
 const mutations = {
@@ -103,6 +109,9 @@ const mutations = {
         state.offices = offices;
     },
     EDIT_OFFICE () {
+    },
+    GET_LIST_OFFICE_NAMES(state, office_list) {
+        state.office_names = office_list;
     },
 }
 
