@@ -1,5 +1,4 @@
 import axios from "axios";
-import { constant } from "lodash";
 
 const state = {
     types: '',
@@ -252,17 +251,11 @@ const mutations = {
             } else {
                 state.documentsArchive[0].year = response.yearFromDb.map(String)
                 state.documentsArchive[0].hasNewTerminated = false
-                if (response.filterBy == 'Year') {
-                    state.documentsArchive[0].selected.filter = response.filterBy
-                    state.documentsArchive[0].selected.year.text = response.filterBy
-                    state.documentsArchive[0].selected.year.list = response.year.list
-                    state.documentsArchive[0].selected.year.data = response.data
-                } else {
-                    state.documentsArchive[0].selected.filter = response.filterBy
-                    state.documentsArchive[0].selected.date.text = response.filterBy
-                    state.documentsArchive[0].selected.date.list = response.date.list
-                    state.documentsArchive[0].selected.date.data = response.data
-                }
+                var filter = response.filterBy.toLowerCase();
+                state.documentsArchive[0].selected.filter = response.filterBy
+                state.documentsArchive[0].selected[filter].text = response.filterBy
+                state.documentsArchive[0].selected[filter].list = response[filter].list
+                state.documentsArchive[0].selected[filter].data = response.data
             }
         }
         //state.documentsArchive = []
