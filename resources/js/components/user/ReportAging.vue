@@ -62,11 +62,11 @@ export default {
                 else {
                     let created = value.filter(value => value.action === 'created');
                     if (created.length > 1) {
-                        offices[value[0].office_id].transactions+= created.length;
+                        offices[created[0].office_id].transactions+= created.length;
                         let acknowledged = value.filter(value => value.action === 'acknowledged');
                         if (acknowledged.length > 0) {
-                            offices[value[0].office_id].transactions+= acknowledged.length;
-                            offices[value[0].office_id].transaction_speed.push( new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime() )
+                            offices[acknowledged[0].office_id].transactions+= acknowledged[0].document.destination.length;
+                            offices[acknowledged[0].office_id].transaction_speed.push( new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime() )
                             if (new Date(acknowledged[0].created_at).getDay() -
                                     new Date(created[0].created_at).getDay() > 7) offices[value[i].office_id].delayed++
                             let received = value.filter(value => value.action === 'received');
