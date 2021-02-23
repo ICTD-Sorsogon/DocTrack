@@ -38,7 +38,8 @@ class DocumentListener
             $document->status != 'acknowledged' &&
             $document->status != 'received' &&
             $document->status != 'forwarded' &&
-            $document->status != 'terminated'
+            $document->status != 'terminated' &&
+            $document->status != 'holdreject'
             ){
             $new = $document;
             $old = $document->getOriginal();
@@ -153,7 +154,7 @@ class DocumentListener
                 $subject = $document->subject;
                 $approved_by = $forwarded_data['approved_by'];
                 $through = $forwarded_data['through'];
-                
+
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document forward';
