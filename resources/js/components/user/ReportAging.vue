@@ -54,7 +54,6 @@ export default {
         }
     },
     computed: {
-        // TODO: Check the output against different cases
         summaries(){
             let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
             let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
