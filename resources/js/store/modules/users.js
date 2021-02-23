@@ -18,6 +18,8 @@ const state = {
     all_users_loading: true,
     user_full_name: '',
     logs: [],
+    notifs: [],
+    count_notifs: [],
 }
 
 const getters = {
@@ -26,6 +28,7 @@ const getters = {
     all_users: state => state.all_users,
     all_users_complete: state => state.all_users_complete,
     logs: state => state.logs,
+    notifs: state => state.notifs,
     is_admin: state => state.user.role_id == 1,
     find_user: ({all_users}) => (id) => all_users.find(user => user.id == id),
 }
@@ -156,11 +159,6 @@ const actions = {
         });
     },
 
-    async getLogs({ commit }) {
-        const response = await axios.get('/api/logs');
-        commit('GET_LOGS', response.data);
-    },
-
     async updateFullname({ commit }, form) {
         const response = await axios.put('api/update_fullname', form)
         .then(response => {
@@ -223,7 +221,56 @@ const actions = {
             };
             commit('SNACKBAR_STATUS', snackbar_error);
         });
-    }
+    },
+
+    async getNotifs({ commit, state }) {
+        await axios.get('/api/notifs')
+        .then(response =>{
+            commit('GET_NOTIFS', response.data);
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
+    async seenNotif({ dispatch, commit }, notif) {
+        await axios.put(`/api/notifs/${notif.id}`, notif)
+        .then(response => {
+            dispatch('getNotifs')
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
+    async seenBadge({ dispatch, commit }, badge) {
+        await axios.put(`/api/badge`, badge)
+        .then(response => {
+            dispatch('getNotifs')
+        })
+        .catch(error => {
+            var snackbar_error ={
+                message: error.response.data.errors,
+                status: 'error',
+                title: error.response.data.message,
+                type: 'error'
+            };
+            commit('SNACKBAR_STATUS', snackbar_error);
+        });
+    },
+
 }
 
 const mutations = {
@@ -260,7 +307,10 @@ const mutations = {
     },
     GET_LOGS(state, response) {
         state.logs = response;
-    }
+    },
+    GET_NOTIFS(state, response) {
+        state.notifs = response;
+    },
 }
 
 export default {

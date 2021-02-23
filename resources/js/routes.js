@@ -8,6 +8,7 @@ import NewDocument from './components/user/components/NewDocument';
 import EditDocument from './components/user/components/EditDocument';
 import ReceiveDocument from './components/user/components/ReceiveDocument'
 import DocumentAction from './components/user/DocumentAction';
+import ReportArchiveList from './components/user/ReportArchiveList';
 import ReportAging from './components/user/ReportAging';
 import ReportLog from './components/user/ReportLog';
 import ReportMasterList from './components/user/ReportMasterList';
@@ -97,19 +98,19 @@ export default {
                 },
                 // FIXME: Fix bug for submenu when using reports/'pathname'
                 {
-                    path: 'aging',
+                    path: 'tracking_report',
                     component: ReportAging,
-                    name: 'Document Aging Report'
+                    name: 'Document Tracking Report'
+                },
+                {
+                    path: 'archive_list',
+                    component: ReportArchiveList,
+                    name: 'Archive List'
                 },
                 {
                     path: 'logs',
                     component: ReportLog,
                     name: 'Log Report'
-                },
-                {
-                    path: 'master_list',
-                    component: ReportMasterList,
-                    name: 'Document Master List'
                 },
                 {
                     path: 'office_list',

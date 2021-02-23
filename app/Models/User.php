@@ -37,6 +37,13 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $appends = ['fullname'];
+
+    public function getFullnameAttribute()
+    {
+        return implode(' ', $this->only('first_name', 'middle_name', 'last_name'));
+    }
+
     public function role()
     {
         return $this->belongsTo('App\Models\Role');
@@ -50,16 +57,6 @@ class User extends Authenticatable
     public function office()
     {
         return $this->belongsTo('App\Models\Office');
-    }
-
-    public function division()
-    {
-        return $this->belongsTo('App\Models\Division');
-    }
-
-    public function unit()
-    {
-        return $this->belongsTo('App\Models\Unit');
     }
 
     public function sector()
@@ -77,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Log');
     }
 
+    public function notification()
+    {
+        return $this->hasMany('App\Models\Notification');
+    }
+
     public function canEditThisDoc($id)
     {
         return $this->office->documents->find($id) || $this->isAdmin();
@@ -86,5 +88,4 @@ class User extends Authenticatable
     {
         return $this->role->name === 'admin';
     }
-
 }

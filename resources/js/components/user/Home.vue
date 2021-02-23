@@ -55,25 +55,26 @@
                     </v-list-item-content>
                 </template>
                 <v-list-item
+                    :input-value="$route.name === 'Archive List' ? true:false"
+                    link
+                    @click.prevent="getArchiveListReport"
+                    v-ripple="{ class: 'primary--text' }"
+                >
+                    <v-list-item-icon>
+                        <v-icon>mdi-archive-outline</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-title>Archive</v-list-item-title>
+                </v-list-item>
+                <v-list-item
                     :input-value="$route.name === 'Document Aging Report' ? true:false"
                     link
-                    @click.prevent="getAgingReport"
+                    @click.prevent="getTrackingReport"
                     v-ripple="{ class: 'white--text' }"
                 >
                     <v-list-item-icon>
                         <v-icon>mdi-timeline-clock-outline</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Tracking</v-list-item-title>
-                </v-list-item>
-                <v-list-item
-                    :input-value="$route.name === 'Document Master List' ? true:false"
-                    link @click.prevent="getMasterListReport"
-                    v-ripple="{ class: 'white--text' }"
-                >
-                    <v-list-item-icon>
-                        <v-icon>mdi-timeline-text</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-title>Master List</v-list-item-title>
                 </v-list-item>
                 <v-list-item
                     :input-value="$route.name === 'Office List' ? true:false"
@@ -151,6 +152,11 @@
         <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
         <v-spacer></v-spacer>
 
+        <!-- NOTIFICATION!! -->
+        <div v-if="notif" class="outside" v-on:click="away()"></div>
+        <notification-item style="margin-top:580px; margin-left:200px" v-if="notif"></notification-item>
+        <notification v-on:showNotif="showNotif" style="margin-right:15px"></notification>
+
         <router-link to="/account_settings">
             <v-avatar v-if="image_source === '/storage/null'" color="indigo">
                 <img src="/images/defaultpic.jpg" alt="default_picture">
@@ -182,11 +188,17 @@
 </template>
 
 <script>
+import Notification from './Notification'
+import NotificationItem from './NotificationItem'
 // TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
 import LogoutDialog from './components/LogoutDialog';
 export default {
-    components: { LogoutDialog },
+    components:{
+        Notification,
+        NotificationItem,
+        LogoutDialog
+    },
     computed: {
         ...mapGetters(['auth_user', 'page_loader']),
         currentRouteName() {
@@ -204,7 +216,7 @@ export default {
             return this.$store.state.loader.submenu_opened;
         },
         image_source(){
-            return this.auth_user.avatar || ''
+            return "/" + this.auth_user.avatar || ''
         }
 
     },
@@ -212,10 +224,21 @@ export default {
         return {
             drawer: null,
             group: null,
+            messages: 5,
+            notif: false,
         }
     },
     methods: {
         ...mapActions(['removeAuthUser', 'unsetLoader']),
+
+        showNotif(){
+            this.notif = !this.notif
+        },
+
+        away() {
+            this.notif = !this.notif;
+        },
+
         logout(){
             var path = this.$router.currentRoute.path.split('/');
             if (path.length >= 3) {
@@ -234,6 +257,7 @@ export default {
                 sessionStorage.clear();
                 this.$router.push({ name: "Login"});
             }
+            this.$store.commit('RESET_ARCHIVE_STATE')
         },
         getAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
@@ -242,11 +266,18 @@ export default {
                 this.$router.push({ name: "All Active Documents"});
             }
         },
-        getAgingReport() {
-            if(this.$route.name !== 'Document Aging Report') {
+        getTrackingReport() {
+            if(this.$route.name !== 'Document Tracking Report') {
                 this.$store.dispatch('setLoader');
                 this.$store.commit('TOGGLE_SUBMENU', true);
-                this.$router.push({ name: "Document Aging Report"});
+                this.$router.push({ name: "Document Tracking Report"});
+            }
+        },
+        getArchiveListReport() {
+            if(this.$route.name !== 'Archive List') {
+                this.$store.dispatch('setLoader');
+                this.$store.commit('TOGGLE_SUBMENU', true);
+                this.$router.push({ name: "Archive List"});
             }
         },
         getLogs() {
@@ -254,13 +285,6 @@ export default {
                 this.$store.dispatch('setLoader');
                 this.$store.commit('TOGGLE_SUBMENU', true);
                 this.$router.push({ name: "Log Report"});
-            }
-        },
-        getMasterListReport() {
-            if(this.$route.name !== 'Document Master List') {
-                this.$store.dispatch('setLoader');
-                this.$store.commit('TOGGLE_SUBMENU', true);
-                this.$router.push({ name: "Document Master List"});
             }
         },
         getOfficeListReport() {
@@ -285,10 +309,18 @@ export default {
             }
         },
     },
+    created(){
+        Echo.channel('documents'+this.auth_user.office_id)
+        .listen('DocumentEvent', (e) => {
+            this.$store.dispatch('getActiveDocuments');
+            this.$store.dispatch('getNotifs');
+        })
+    },
     beforeCreate() {
         this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
         this.$store.dispatch("getActiveDocuments")
+
     },
 }
 </script>
@@ -299,5 +331,12 @@ export default {
 }
 .namespace {
     background:rgba(0, 0, 0, 0.09);
+}
+.outside {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0px;
+  left: 0px;
 }
 </style>

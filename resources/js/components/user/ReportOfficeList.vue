@@ -99,8 +99,8 @@
             v-if="dialog_title && excel_dialog == true"
             :excel_dialog="excel_dialog"
             :dialog_title="dialog_title"
+            :dialog_type="dialog_type"
             :dialog_for="dialog_for"
-            :dialog_type ="dialog_type"
             @close-dialog="closeDialog('excel')"
         />
 
@@ -129,7 +129,7 @@
                 form_dialog: false,
                 excel_dialog: false,
                 dialog_for: 'new_office',
-                dialog_type: null,
+                dialog_type: '',
                 dialog_title: '',
                 office_info: '',
                 delete_dialog: false,
@@ -201,13 +201,13 @@
                     case 'import_office':
                         this.dialog_for = 'importOfficeList';
                         this.dialog_title = 'Import Office List Via Excel File';
-                        this.dialog_type = 'import'
+                        this.dialog_type = 'import';
                         this.excel_dialog = true
                         break;
                     case 'export_office':
                         this.dialog_for = 'exportOfficeList';
                         this.dialog_title = 'Export Office List Via Excel File';
-                        this.dialog_type = 'export'
+                        this.dialog_type = 'export';
                         this.excel_dialog = true
                         break;
                 }
@@ -224,6 +224,13 @@
             }
         },
         mounted() {
+            // Echo.channel('offices')
+            // .listen('OfficeEvent', (e) =>{
+            //     console.log(e)
+            //     console.log('working echo')
+
+            // })
+
             this.$store.dispatch('unsetLoader');
         }
     }

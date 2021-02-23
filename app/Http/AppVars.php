@@ -13,7 +13,7 @@ class AppVars
     {
         $settings = [];
         $login_user = User::where('id', Auth::id());
-        $settings['auth_user'] = $login_user->with(['role', 'office', 'division', 'unit', 'sector'])->first();
+        $settings['auth_user'] = $login_user->with(['role', 'office' ])->first();
         $encoded = json_encode($settings);
         $encoded = addslashes($encoded);
         return $encoded;

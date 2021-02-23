@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\Hello;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,8 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::group(['namespace' => 'App\Http\Controllers'], function () {
-        Route::post('login', 'LoginController@login');
-        Route::post('logout', 'LoginController@logout');
         Route::get('auth_user', 'UserController@getAuthUser');
         Route::get('all_users', 'UserController@getAllUsers');
         Route::post('add_new_user', 'UserController@addNewUser');
@@ -29,10 +28,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('update_password', 'UserController@updatePassword');
         Route::get('document_type_list', 'DocumentController@getDocumentTypes');
         Route::get('get_active_documents', 'DocumentController@getAllActiveDocuments');
+        Route::post('get_archive_documents', 'DocumentController@getAllArchiveDocuments');
         Route::get('get_document_track_record/{document}', 'DocumentController@getDocTrackRecord');
         Route::get('get_document_details/{id}', 'DocumentController@getSelectedDocument');
         Route::get('office_list', 'OfficeController@getOfficeList');
-        Route::get('tracking_list', 'OfficeController@getTrackingList');
         Route::get('get_non_page_active_documents', 'DocumentController@getNonPaginatedActiveDocuments');
         Route::get('logs', 'LogController@index');
         Route::post('add_new_document/{document?}', 'DocumentController@addNewDocument');
@@ -49,6 +48,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('import_new_office', 'OfficeController@importNewOffice');
 
         Route::get('tracking_reports', 'DocumentController@trackingReports');
+        Route::get('list_office_names', 'OfficeController@listOfficeNames');
+
+        Route::get('notifs', 'NotificationController@index');
+        Route::put('notifs/{notifs}', 'NotificationController@seen_notif');
+        Route::put('badge', 'NotificationController@seen_badge');
 
     });
 

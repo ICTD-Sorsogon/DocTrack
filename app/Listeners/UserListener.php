@@ -16,7 +16,6 @@ class UserListener
      */
     public function __construct()
     {
-
     }
 
     /**
@@ -27,7 +26,7 @@ class UserListener
      */
     public function handle(UserEvent $event)
     {
-        switch($event->type){
+        switch ($event->type) {
             case 'create':
                 $username = json_decode($event->request_obj)->username;
                 $role_id = json_decode($event->request_obj)->role_id;
@@ -39,11 +38,12 @@ class UserListener
                 $log->user_id = $event->user_id;
                 $log->new_values = $event->request_obj;
                 $log->action = 'User create';
-                $log->remarks = 'New account has been successfully created for '.$last_name.', '.$first_name.', '.$middle_name.'  with username of '.$username.' and role id of '.$role_id;
+                $log->remarks = 'New account has been successfully created for '.$last_name.', '.$first_name.',
+                    '.$middle_name.'  with username of '.$username.' and role id of '.$role_id;
 
                 return $log->save();
             break;
-            
+
             case 'update':
                 $old_values = json_encode($event->old_values);
                 $data = json_encode($event->request_obj);
@@ -57,7 +57,8 @@ class UserListener
                 $log->new_values = $data;
                 $log->original_values = $old_values;
                 $log->action = 'User update';
-                $log->remarks = 'Account has been successfully updated for '.$last_name.', '.$first_name.', '.$middle_name.'  with username of '.$username;
+                $log->remarks = 'Account has been successfully updated for '.$last_name.', '.$first_name.',
+                    '.$middle_name.'  with username of '.$username;
                 return $log->save();
             break;
 

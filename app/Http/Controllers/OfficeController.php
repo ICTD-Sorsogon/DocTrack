@@ -9,6 +9,7 @@ use DB;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Office;
+use App\Models\TrackingRecord;
 use Illuminate\Http\Request;
 
 class OfficeController extends Controller
@@ -67,7 +68,7 @@ class OfficeController extends Controller
             }
         }*/
 
-        
+
         DB::beginTransaction();
         try {
             foreach($request['office_data'] as $office_data){
@@ -83,7 +84,7 @@ class OfficeController extends Controller
                     $office->contact_number = $offices["Contact_Number"];
                     $office->contact_email = $offices["Email_Address"];
                     $office->save();
-                    
+
                 }
             }
         } catch (ValidationException $error) {
@@ -156,36 +157,14 @@ class OfficeController extends Controller
         return [$office];
     }
 
-    public function bulkUserTrackingList(Office $office)
+    public function listOfficeNames()
     {
-        $collection = [];
-        foreach ($office->users as $users) {
-            array_push($collection, $users->tracking_records);
-        }
-        return $collection;
+        $offices = Office::select('id', 'name', 'office_code')->get()->keyBy('id');
+        $offices->map(function ($office) {
+            $office['delayed'] = $office['transactions'] = $office['efficiency'] = 0 ;
+            $office['transaction_speed'] = [];
+            return $office;
+        });
+        return $offices;
     }
-
-    public function getTrackingList()
-    {
-        $stat = [];
-        $document =  Document::with('tracking_records')
-            ->get()
-            ->groupBy('originating_office')
-            ->filter(function($val,$key){return is_numeric($key);});
-
-        foreach (Office::all() as $office) {
-           $stat[$office->name]['count'] = @$document[$office->id]?->count() ?? 0;
-           $stat[$office->name]['document'] = $document[$office->id] ?? null;
-        } 
-
-        return $stat;
-        // $offices = Office::with('users.tracking_records')->get();
-        // foreach ($offices as $office) {
-        //     $office['transaction_count'] = collect($this->bulkUserTrackingList($office))->collapse()->count();
-        //     $office['documents'] = collect($this->bulkUserTrackingList($office))->collapse()->groupBy('document_id');
-        //     unset($office->users);
-        // }
-        // return $offices;
-    }
-
 }
