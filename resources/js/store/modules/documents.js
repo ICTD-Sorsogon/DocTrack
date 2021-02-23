@@ -25,10 +25,6 @@ const getters = {
 }
 
 const actions = {
-    async getDocument({commit}) {
-        const response = await axios.get(`/api/tracking_list`);
-        commit('GET_ALL_DOCUMENTS', response.data);
-    },
     async updateDocument({commit}, form) {
         commit('UPDATE_DOCUMENT', form);
     },
@@ -188,10 +184,7 @@ const actions = {
     },
     async documentReports({ commit }) {
         const response = await axios.get('/api/tracking_reports')
-        .then(response => {
-            commit('GET_TRACKING_REPORTS', response.data);
-        });
-
+        commit('GET_TRACKING_REPORTS', response.data);
     },
     async setDocument({ commit }, document) {
         commit('SET_SELECTED_DOCUMENT', document);
@@ -224,24 +217,31 @@ const mutations = {
         state.documents = response;
     },
     GET_ALL_ARCHIVE_DOCUMENTS(state, response) {
-        if (response.action == "new") {
+        async function newState(mutate, filter) {
             state.documentsArchive = []
-            state.documentsArchive.push({
-                year: response.yearFromDb.map(String),
+            await state.documentsArchive.push({
+                year: filter.yearFromDb.map(String) || [],
                 selected: {
                     filter: 'Date',
                     date: {
                         text: 'Date',
                         list: [ new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10) ],
-                        data: response.data
+                        data: filter.data || []
                     },
                     year: { text: 'Year', list: [], data: [] }
                 },
-                hasNewTerminated: false
+                hasNewTerminated: (mutate == 'newTerminated')? true:false
             })
+        }
+        if (response.action == "new") {
+            newState('new', response)
         } else {
             if (response.hasNewTerminated) {
-                state.documentsArchive[0].hasNewTerminated = true
+                if (state.documentsArchive.length) {
+                    state.documentsArchive[0].hasNewTerminated = true
+                } else {
+                    newState('newTerminated', {yearFromDb: [new Date().getFullYear()], data: []})
+                }
             } else {
                 state.documentsArchive[0].year = response.yearFromDb.map(String)
                 state.documentsArchive[0].hasNewTerminated = false

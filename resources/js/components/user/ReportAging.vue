@@ -7,10 +7,11 @@
             <v-col cols="12">
                   <v-data-table
                     :search="search"
-                    :items="all_documents"
+                    :items="summaries"
                     :items-per-page="10"
                     :headers="headers"
                     class="elevation-1"
+                    :custom-filter="filterOnlyOffice"
                 >
                 <template v-slot:top>
                     <v-text-field
@@ -20,9 +21,6 @@
                         class="mx-4"
                     />
                 </template>
-                <template v-slot:[`item.efficiency`] = "{ item }">
-                    {{item.efficiency}}%
-                </template>
                 </v-data-table>
             </v-col>
         </v-row>
@@ -30,181 +28,100 @@
 </template>
 
 <script>
-import {map, forEach, last, mean} from 'lodash';
+const week_in_milliseconds = 604800000;
+import {max, min, mean} from 'lodash';
 export default {
     data() {
         return {
             search: '',
             headers: [
-                {
-                    text: 'Office',
-                    align: 'start',
-                    value: 'name',
-                }
-                // ,
-                // { text: 'All Transaction', value: 'transaction_count' },
-                // { text: 'Delayed Document', value: 'delayed' },
-                // { text: 'Fastest Transaction', value: 'fastestTransaction' },
-                // { text: 'Slowest Transaction', value: 'longestDelay' },
-                // { text: 'Average Transaction Speed', value: 'speed' },
-                // { text: 'Efficiency Rating', value: 'efficiency' },
+                { text: 'Office', align: 'start',value: 'name'},
+                { text: 'All Transaction', value: 'transactions', filterable:false},
+                { text: 'Delayed Document', value: 'delayed', filterable:false},
+                { text: 'Fastest Transaction', value: 'min', filterable:false},
+                { text: 'Slowest Transaction', value: 'max', filterable:false},
+                { text: 'Average Transaction Speed', value: 'mean', filterable:false},
+                { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
             ],
         }
     },
     computed: {
-        //TOFIX elapse time for fastest and longest transaction should check
-        // in b/w transaction by checking previous last_touched
-        all_documents(){
-            let documents = JSON.parse(JSON.stringify(
-                this.$store.state.documents.tracking_reports
-            ));
-
-            documents.forEach(document => {
-                var temp = 0;
-                document.diff = [];
-                document.senderDelayed = 0;
-                document.receiverDelayed = 0;
-                document.docketDelayed = 0;
-                document.tracking_records.forEach(tracking => {
-                    document.diff.push({action:tracking.action,last_touched:tracking.last_touched,office:tracking.user.office.name});
-                });
-                // console.log(document)
-            });
-            console.log(documents);
-            // return documents;
-        },
-        // all_documents(){
-        //     let offices = JSON.parse(JSON.stringify(
-        //         this.$store.state.documents.tracking_reports
-        //     ));
-        //     offices.forEach(element => {
-        //         var max = 0;
-        //         var min = (element.transaction === 0 ? 0 : Number.POSITIVE_INFINITY);
-        //         var total_average = 0;
-        //         var temp=0;
-        //         var delta = 0;
-        //         var days = 0;
-        //         element.delayed = 0;
-        //         forEach(element.documents, function(element2) {
-        //             element2.forEach(element3 => {
-        //                 let created_at = new Date(element3.last_touched);
-        //                 let now_date = new Date();
-        //                 // console.log('past ',created_at ,"now ", now_date)
-        //                 let difference = now_date.getDate() - created_at.getDate();
-        //                 // console.log(difference)
-        //                 // if (max < difference ) {
-        //                 //     max = difference ;
-        //                 //     element.longestDelay = this.getTimeHours(created_at,now_date);
-        //                 // }
-        //                 // if (min > difference ) {
-        //                 //     min = difference;
-        //                 //     element.fastestTransaction = this.getTimeHours(created_at, now_date)
-        //                 // }
-        //             });
-        //             if(last(element2).action != 'received') {
-        //                 var dates = map(element2, 'last_touched');
-        //                 var start = 0;
-        //                 var end = 0;
-        //                 var difference = [];
-        //                  if (dates.length > 1) {
-        //                     for(var i = 0; i < dates.length - 1; i++) {
-        //                         start = new Date(dates[i]);
-        //                         end = new Date(dates[i+1]);
-        //                         var diff = end.getDate() - start.getDate();
-        //                         if (diff > 7) {
-        //                             element.delayed += 1;
-        //                         }
-        //                         difference.push(end - start);
-        //                     }
-        //                     let average = mean(difference);
-        //                     element2.average = average;
-        //                     temp += average;
-        //                 }
-        //             }
-        //         });
-        //         element.average = temp;
-        //         delta = Math.abs(element.average) / 1000;
-        //         var days = Math.floor(delta / 86400);
-        //         delta -= days * 86400;
-        //         var hours = Math.floor(delta / 3600) % 24;
-        //         delta -= hours * 3600;
-        //         var minutes = Math.floor(delta / 60) % 60;
-        //         delta -= minutes * 60;
-        //         var seconds = delta % 60;
-        //         element.avg_time = `${days}d${hours}h${minutes}m${seconds}s`
-        //         // element.tracking_records.forEach(element => {
-        //         //     console.log(_.meanBy(element, 'touched_by'));
-        //         // });
-
-        //         // element.tracking_records.forEach(element => {
-        //         //     console.log(element);
-        //         // })
-        //         // var max = 0;
-        //         // var min = (element.tracking_records.length === 0 ? 0 : Number.POSITIVE_INFINITY);
-        //         // element.delayed = 0;
-        //         // element.efficiency = 0;
-        //         // element.longestDelay = '';
-        //         // element.fastestTransaction  = '';
-        //         // element.tracking_records.forEach(el => {
-        //         //     let created_at = new Date(el.created_at);
-        //         //     let now_date = new Date();
-        //         //     let difference = now_date.getDate() - created_at.getDate();
-        //         //     let total = element.tracking_records.length;
-        //         //     // if (max < difference ) {
-        //         //     //     max = difference ;
-        //         //     //     element.longestDelay = this.getTimeHours(created_at, now_date);
-        //         //     // }
-        //         //     // if (min > difference ) {
-        //         //     //     min = difference;
-        //         //     //     element.fastestTransaction = this.getTimeHours(created_at, now_date)
-        //         //     // }
-
-        //         //     if (difference > 7) {
-        //         //         element.delayed += 1;
-
-        //         //     }
-        //         //      element.efficiency = (((total - element.delayed )
-        //         //      / total) * 100);
-        //         // });
-        //     });
-        //     // console.log(offices);
-        //     return offices;
-        // }
-    },
-    methods: {
-        getTimeHours(past, present) {
-            var present = new Date(present);
-            var past = new Date(past);
-            var delta = Math.abs(present - past) / 1000;
-            var days = Math.floor(delta / 86400);
-            delta -= days * 86400;
-            var hours = Math.floor(delta / 3600) % 24;
-            delta -= hours * 3600;
-            var minutes = Math.floor(delta / 60) % 60;
-            delta -= minutes * 60;
-            var seconds = delta % 60;
-            return days +"d " + hours + "h " + minutes + "m";
-        },
-        averageElapsedTime(time_array) {
-            if (time_array.length < 2) {
-                return;
+        summaries(){
+            let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
+            let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
+            let data = [];
+            for (const [key, value] of Object.entries(summaries)) {
+                if (value.length === 1) offices[value[0].office_id].transactions++
+                else {
+                    let created = value.filter(value => value.action === 'created');
+                    if (created.length > 1) {
+                        offices[created[0].office_id].transactions+= created.length;
+                        let acknowledged = value.filter(value => value.action === 'acknowledged');
+                        if (acknowledged.length > 0) {
+                            offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
+                            offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
+                            if (new Date(acknowledged[0].created_at).getTime() -
+                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed+=acknowledged[0].document.destination.length
+                            let received = value.filter(value => value.action === 'received');
+                            if (received.length > 0) {
+                                received.forEach(element => {
+                                    offices[element.office_id].transactions++
+                                    offices[element.office_id].transaction_speed.push(new Date(element.created_at).getTime() - new Date(acknowledged[0].created_at).getTime())
+                                    if (new Date(element.created_at).getTime() -
+                                        new Date(acknowledged[0].created_at).getTime() > week_in_milliseconds) offices[acknowledged[0].office_id].delayed++
+                                });
+                            }
+                        }
+                    } else {
+                        for (var i = 0; i < value.length; i++) {
+                            if (i !== value.length - 1) {
+                                if (new Date(value[i + 1].created_at).getTime() -
+                                    new Date(value[i].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed++
+                                offices[value[i].office_id].transaction_speed.push(new Date(value[i + 1].created_at).getTime() - new Date(value[i].created_at).getTime())
+                            }
+                            offices[value[i].office_id].transactions++;
+                        }
+                    }
+                }
             }
-            var start = 0;
-            var end = 0;
-            var difference = [];
-            for(i = 0; i < time_array.length; i++) {
-                start = new Date(time_array[i]);
-                end = new Date(time_array[i+1]);
-                difference.push(start.getTime() - end.getTime());
+            for (const [key, value] of Object.entries(offices)) {
+                if(value.transaction_speed.length > 0){
+                    let transaction_speed_list = value.transaction_speed
+                    value.min = this.timeConversion(min(transaction_speed_list))
+                    value.max = this.timeConversion(max(transaction_speed_list))
+                    value.mean = this.timeConversion(mean( transaction_speed_list ))
+                } else {
+                    value.min = value.max = value.mean = 'Not available'
+                }
+                value.efficiency = value.transactions !== 0 ?`${((value.transactions - value.delayed) /
+                    value.transactions * 100).toFixed(2)}%` : 'Not available';
+                data.push(value);
             }
-            return _.mean(difference);
-        }
+            return data;
+        },
     },
     mounted() {
-        this.$store.dispatch('getDocument');
-        this.$store.dispatch('getAllUsers');
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
+        this.$store.dispatch('getOfficeNameList');
+    },
+    methods: {
+        filterOnlyOffice (value, search, item) {
+            return value != null &&
+            search != null &&
+            typeof value === 'string' &&
+            value.toString().toLowerCase().indexOf(search) !== -1
+        },
+        timeConversion(millisec) {
+            var seconds = Math.trunc(millisec / 1000);
+            var minutes = Math.trunc(millisec / (1000 * 60));
+            var hours = Math.trunc(millisec / (1000 * 60 * 60));
+            var days = Math.trunc(millisec / (1000 * 60 * 60 * 24));
+            if (seconds < 60) return `${seconds}s`;
+            else if (minutes < 60) return `${minutes}m`;
+            else if (hours < 24) return `${hours}h`;
+            else return `${days}d`
+        }
     }
 }
 </script>
