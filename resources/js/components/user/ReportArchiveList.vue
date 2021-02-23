@@ -207,6 +207,8 @@
                     </v-tooltip>
                 </template>
 
+                <template v-slot:[`item.created_at`] = "{ item }"> {{ dateCreated(item) }} </template>
+
                 <v-alert slot="no-results" :value="true" type="error" icon="mdi-alert" align="left">
                     Your search for "{{ search }}" found no results.
                 </v-alert>
@@ -305,6 +307,14 @@
             },
         },
         methods: {
+            dateCreated(item){
+                var u = this.auth_user
+                if (u.role_id > 1 && item.origin_office.id != u.office_id) {
+                    var value = item.incoming_trashed.find(o => o.destination_office == u.office_id ).created_at
+                    return new Date(value).toISOString().substr(0, 10) || ''
+                }
+                return item.created_at
+            },
             advanceSearchQuery(param) {
                 //console.log('search param:')
                 //console.log(param)
