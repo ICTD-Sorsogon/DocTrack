@@ -270,7 +270,6 @@ class DocumentController extends Controller
             ['id' => $document->id],
             $request->validated()
         );
-        dd($document);
         $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(
             $document->destination_office_id
         );
@@ -289,6 +288,14 @@ class DocumentController extends Controller
                 'last_touched' => Carbon::now()
             ]);
         };
+        // Should only create one creation record in the summary
+        if($document->wasRecentlyCreated) {
+            TrackingSummary::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office->id
+            ]);
+        }
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
