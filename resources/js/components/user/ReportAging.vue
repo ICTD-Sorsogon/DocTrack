@@ -30,6 +30,7 @@
 </template>
 
 <script>
+const week_in_milliseconds = 604800000;
 import {mean} from 'lodash';
 export default {
     data() {
@@ -67,25 +68,25 @@ export default {
                         if (acknowledged.length > 0) {
                             offices[acknowledged[0].office_id].transactions+= acknowledged[0].document.destination.length;
                             offices[acknowledged[0].office_id].transaction_speed.push( new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime() )
-                            if (new Date(acknowledged[0].created_at).getDay() -
-                                    new Date(created[0].created_at).getDay() > 7) offices[value[i].office_id].delayed++
+                            if (new Date(acknowledged[0].created_at).getTime() -
+                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed++
                             let received = value.filter(value => value.action === 'received');
                             if (received.length > 0) {
                                 received.forEach(element => {
                                     offices[element.office_id].transactions++
                                     offices[element.office_id].transaction_speed.push( new Date(element.created_at).getTime() - new Date(acknowledged[0].created_at).getTime())
-                                    if (new Date(element.created_at).getDay() -
-                                        new Date(acknowledged[0].created_at).getDay() > 7) offices[value[i].office_id].delayed++
+                                    if (new Date(element.created_at).getTime() -
+                                        new Date(acknowledged[0].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed++
                                 });
                             }
                         }
                     } else {
-                        for (var i = 0; i < value.length -1; i++) {
+                        for (var i = 0; i < value.length; i++) {
                             if (i !== value.length - 1) {
-                                if (new Date(value[i + 1].created_at).getDay() -
-                                    new Date(value[i].created_at).getDay() > 7) offices[value[i].office_id].delayed++
+                                if (new Date(value[i + 1].created_at).getTime() -
+                                    new Date(value[i].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed++
+                                offices[value[i].office_id].transaction_speed.push( new Date(value[i + 1].created_at).getTime() - new Date(value[i].created_at).getTime())
                             }
-                            offices[value[i].office_id].transaction_speed.push( new Date(value[i + 1].created_at).getTime() - new Date(value[i].created_at).getTime())
                             offices[value[i].office_id].transactions++;
                         }
                     }
