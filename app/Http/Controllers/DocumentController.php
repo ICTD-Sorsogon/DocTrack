@@ -270,7 +270,6 @@ class DocumentController extends Controller
             ['id' => $document->id],
             $request->validated()
         );
-        dd($document);
         $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(
             $document->destination_office_id
         );
