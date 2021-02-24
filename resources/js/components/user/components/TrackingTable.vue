@@ -1,34 +1,30 @@
 <template>
-    <v-card flat>
-        <v-card-title primary-title>
-            Tracking Reports
-        </v-card-title>
-            <v-row>
-                <v-col cols="12">
-                    <v-data-table
-                        :search="search"
-                        :items="summaries"
-                        :items-per-page="10"
-                        :headers="headers"
-                        class="elevation-1"
-                        :custom-filter="filterOnlyOffice"
-                    >
-                    <template v-slot:top>
-                        <v-text-field
-                            prepend-inner-icon="mdi-magnify"
-                            v-model="search"
-                            label="Search"
-                            class="mx-4"
-                        />
-                    </template>
-                    </v-data-table>
-                </v-col>
-            </v-row>
-    </v-card>
+    <v-row>
+        <v-col cols="12">
+            <v-data-table
+                :search="search"
+                :items="summaries"
+                :items-per-page="10"
+                :headers="headers"
+                class="elevation-1"
+                :custom-filter="filterOnlyOffice"
+            >
+            <template v-slot:top>
+                <v-text-field
+                    prepend-inner-icon="mdi-magnify"
+                    v-model="search"
+                    label="Search"
+                    class="mx-4"
+                />
+            </template>
+            </v-data-table>
+        </v-col>
+    </v-row>
 </template>
 <script>
 const week_in_milliseconds = 604800000;
-import {max, min, mean} from 'lodash';
+import { delay_filter } from '../../../constants';
+import { max, min, mean } from 'lodash';
 export default {
     data() {
         return {
@@ -42,20 +38,6 @@ export default {
                 { text: 'Average Transaction Speed', value: 'mean', filterable:false},
                 { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
             ],
-            items: [
-                {
-                color: '#1F7087',
-                src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
-                title: 'Supermodel',
-                artist: 'Foster the People',
-                },
-                {
-                color: '#952175',
-                src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
-                title: 'Halcyon Days',
-                artist: 'Ellie Goulding',
-                },
-            ],
         }
     },
     computed: {
@@ -64,27 +46,24 @@ export default {
             let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
             let data = [];
             for (const [key, value] of Object.entries(summaries)) {
-                // console.log(value)
+                let created = value.filter(value => value.action === 'created');
+                let acknowledged = value.filter(value => value.action === 'acknowledged');
+                let received = value.filter(value => value.action === 'received');
                 if (value.length === 1) offices[value[0].office_id].transactions++
                 else {
-                    let created = value.filter(value => value.action === 'created');
                     if (created.length !== 0) {
-                        // console.log(created[0].document.destination.length);
                         offices[created[0].office_id].transactions+= created[0].document.destination.length;
-                        let acknowledged = value.filter(value => value.action === 'acknowledged');
                         if (acknowledged.length !== 0) {
-                            let forwarded = value.filter(value => value.action === 'forwarded');
                             offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
                             offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
                             if (new Date(acknowledged[0].created_at).getTime() -
-                                    new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed += acknowledged[0].document.destination.length
-                            let received = value.filter(value => value.action === 'received');
+                                    new Date(created[0].created_at).getTime() > delay_filter[acknowledged[0].document.priority_level - 1]) offices[value[0].office_id].delayed += acknowledged[0].document.destination.length
                             if (received.length > 0) {
                                 received.forEach(element => {
                                     offices[element.office_id].transactions++
                                     offices[element.office_id].transaction_speed.push(new Date(element.created_at).getTime() - new Date(acknowledged[0].created_at).getTime())
                                     if (new Date(element.created_at).getTime() -
-                                        new Date(acknowledged[0].created_at).getTime() > week_in_milliseconds) offices[acknowledged[0].office_id].delayed++
+                                        new Date(acknowledged[0].created_at).getTime() > delay_filter[acknowledged[0].document.priority_level - 1]) offices[acknowledged[0].office_id].delayed++
                                 });
                             }
                         }
@@ -92,7 +71,7 @@ export default {
                         for (var i = 0; i < value.length; i++) {
                             if (i !== value.length - 1) {
                                 if (new Date(value[i + 1].created_at).getTime() -
-                                    new Date(value[i].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed++
+                                    new Date(value[i].created_at).getTime() > delay_filter[value[i].document.priority_level - 1]) offices[value[i].office_id].delayed++
                                 offices[value[i].office_id].transaction_speed.push(new Date(value[i + 1].created_at).getTime() - new Date(value[i].created_at).getTime())
                                 if (forwarded.length !== 0) {
                                     offices[acknowledged[0].office_id].transactions += 1;

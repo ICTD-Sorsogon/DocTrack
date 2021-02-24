@@ -12,6 +12,7 @@ const state = {
     selected_document: {},
     id: '',
     tracking_reports: [],
+    office_reports: []
 
 }
 
@@ -22,6 +23,7 @@ const getters = {
     documentsArchive: state => state.documentsArchive,
     document_types: state => state.document_types,
     selected_document: state => state.selected_document,
+    office_reports_get: state => state.office_reports
 }
 
 const actions = {
@@ -191,6 +193,10 @@ const actions = {
     },
     async unsetDocument({ commit }) {
         commit('UNSET_SELECTED_DOCUMENT');
+    },
+    async officeReports({ commit }) {
+        const response = await axios.get('/api/office_reports')
+        commit('GET_OFFICE_REPORTS', response.data);
     }
 }
 
@@ -280,6 +286,9 @@ const mutations = {
     },
     GET_TRACKING_REPORTS(state, reports) {
         state.tracking_reports = reports;
+    },
+    GET_OFFICE_REPORTS(state, reports) {
+        state.office_reports = reports;
     }
 }
 

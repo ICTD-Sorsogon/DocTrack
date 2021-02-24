@@ -308,4 +308,11 @@ class DocumentController extends Controller
         $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
         return $summary;
     }
+
+    public function officeReports()
+    {
+        $summary = TrackingSummary::with('office', 'document')->where('office_id', auth()->user()->office->id)
+        ->get();
+        return $summary;
+    }
 }

@@ -3,7 +3,7 @@
         <v-card-title primary-title>
             Tracking Reports
         </v-card-title>
-        <div v-if="auth_user.username == 'admin'">
+        <div v-if="auth_user.role_id == 1">
             <tracking-table/>
         </div>
         <div v-else>
@@ -26,10 +26,12 @@ export default {
         ...mapGetters(['auth_user']),
     },
     mounted() {
-        console.log(this.auth_user)
+        // console.log(this.auth_user);
+        this.$store.dispatch('officeReports');
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
         this.$store.dispatch('getOfficeNameList');
+        // console.log(this.$store.getters.office_reports_get);
     }
 }
 </script>
