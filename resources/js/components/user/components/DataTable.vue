@@ -245,7 +245,7 @@ export default {
 					return (this.incoming || this.isReceiver(item)) && !item.received
 				},
 				'hold':() => {
-					return (this.incoming || (this.isReceiver(item)  && item.received) || (this.isAdmin && item.acknowledged)) && !item.forwarded && !item.hold
+					return ((this.incoming && this.isReceiver(item)  && item.received) || (this.isAdmin && item.acknowledged)) && !item.forwarded && !item.hold
 				},
                 'release':() => {
                     return (this.isAdmin && item.hold)
