@@ -197,7 +197,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'find_document']),
+        ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'is_admin']),
         office() {
             return JSON.parse(JSON.stringify(this.offices)).filter(office => office.id != this.auth_user.office_id)
         },
@@ -216,7 +216,15 @@ export default {
             }
         },
         selected_document() {
-            return this.find_document(this.$route.params.id)
+
+            let userDoc = !this.is_admin && ['terminate', 'Change Date'].includes(this.$route.params.type) ? this.documents['outgoing'] : this.documents['incoming']
+
+            return JSON.parse(JSON.stringify( this.is_admin ? this.documents : userDoc)).map(doc=>{
+				doc.is_external = doc.is_external ? 'External' : 'Internal'
+				doc.sender_name = doc.sender?.name ?? doc.sender_name
+				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
+				return doc
+			}).find(doc => doc.id == this.$route.params.id)
         },
         destination() {
             return this.form.destination_office_id
@@ -298,7 +306,7 @@ export default {
             });
         },
         fillForm(){
-            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
+            this.form = this.$route.params.type != 'create' ? this.$route.params.item ?? this.selected_document : this.form
         },
     },
     watch: {
