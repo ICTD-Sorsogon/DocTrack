@@ -146,12 +146,12 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
-    async holdRejectDocumentConfirm({ commit }, form) {
-        await axios.post(`/api/hold_reject_document_confirm/${form.id}`, form)
+    async holdDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/hold_document_confirm/${form.id}`, form)
         .then(response => {
             const data = {
                 status: 'SUCCESS',
-                message: `${form.subject} was ${form.hold_reject}!`,
+                message: `${form.subject} was successfully hold!`,
             }
             commit('SNACKBAR_STATUS', data)
 
@@ -170,6 +170,24 @@ const actions = {
             const data = {
                 status: 'SUCCESS',
                 message: `${form.subject} was updated!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
+    async releaseDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/release_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was successfully released!`,
             }
             commit('SNACKBAR_STATUS', data)
 
