@@ -117,13 +117,22 @@
 							Change Date
 						</v-btn>
 					</v-col>
-                    <v-col v-if="visibleButton('hold_reject',item)">
-						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
+                    <v-col v-if="visibleButton('hold',item)">
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold')" text color="#F44336" block
 						>
 							<v-icon left>
 								mdi-email-alert-outline
 							</v-icon>
-							Hold or Reject
+							Hold
+						</v-btn>
+					</v-col>
+                    <v-col v-if="visibleButton('release',item)">
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'Release')" text color="#F50057" block
+						>
+							<v-icon left>
+								mdi-email-mark-as-unread
+							</v-icon>
+							Release
 						</v-btn>
 					</v-col>
 				</v-row>
@@ -225,21 +234,23 @@ export default {
 				},
 				'acknowledge': () => {
 					return this.isAdmin && !item.acknowledged
-				}, 
+				},
 				'terminate': () => {
 					return (this.isEditable(item) && !item.acknowledged) ||  (this.isReceiver(item) && item.received) || (this.isAdmin && item.received)
-				}, 
+				},
 				'forward': () => {
 					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded
-				}, 
+				},
 				'receive': () => {
 					return (this.incoming || this.isReceiver(item)) && !item.received
-				}, 
-				'hold_reject':() => {
-					return (this.incoming || this.isReceiver(item) || this.isAdmin) && item.received && !item.forwarded
-				}
+				},
+				'hold':() => {
+					return (this.incoming || (this.isReceiver(item)  && item.received) || (this.isAdmin && item.acknowledged)) && !item.forwarded && !item.hold
+				},
+                'release':() => {
+                    return (this.isAdmin && item.hold)
+                }
 			}
-			debugger
 			return rules[type]()
 
 		},

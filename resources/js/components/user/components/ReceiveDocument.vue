@@ -142,24 +142,7 @@
                         ></v-text-field>
                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='Hold or Reject'">
-                        <ValidationProvider rules="required" v-slot="{ errors, valid }">
-                        <v-select
-                            v-model="form.hold_reject"
-                            :items="status_options"
-                            item-text="show"
-                            item-value="value"
-                            label="Status"
-                            prepend-inner-icon="mdi-file-document-edit-outline"
-                            :menu-props="{ bottom: true, offsetY: true, transition: 'slide-y-transition'}"
-                            required
-                            outlined
-                            :error-messages="errors"
-                            :success="valid"
-                        ></v-select>
-                        </ValidationProvider>
-                    </v-col>
-                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge'">
+                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge' || ('hold' || 'release' && isAdmin)">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-model="form.priority_levels"
@@ -310,7 +293,7 @@
                                     Acknowledge
                             </v-btn>
                             <v-btn
-                                v-if="types=='Hold or Reject'"
+                                v-if="types=='Hold'"
                                 color="primary"
                                 :loading="btnloading"
                                 @click.prevent="showDocumentDialog"
@@ -321,7 +304,7 @@
                                     <v-icon left dark>
                                         mdi-email-alert-outline
                                     </v-icon>
-                                    Hold or Reject
+                                    Hold
                             </v-btn>
                             <v-btn
                                 v-if="types=='Change Date'"
@@ -336,6 +319,20 @@
                                         mdi-calendar-check-outline
                                     </v-icon>
                                     Save
+                            </v-btn>
+                            <v-btn
+                                v-if="types=='Release'"
+                                color="primary"
+                                :loading="btnloading"
+                                @click.prevent="showDocumentDialog"
+                                type="submit"
+                                :dark="valid"
+                                :disabled="!valid"
+                                >
+                                    <v-icon left dark>
+                                        mdi-email-mark-as-unread
+                                    </v-icon>
+                                    Release
                             </v-btn>
                         </div>
                     </v-col>
@@ -370,11 +367,14 @@
                         <v-btn v-if="types=='acknowledge'" color="primary darken-1" text @click.prevent="acknowledgeDocumentConfirm">
                             Acknowledge
                         </v-btn>
-                        <v-btn v-if="types=='Hold or Reject'" color="primary darken-1" text @click.prevent="holdRejectDocumentConfirm">
-                            Hold or Reject
+                        <v-btn v-if="types=='Hold'" color="primary darken-1" text @click.prevent="holdDocumentConfirm">
+                            Hold
                         </v-btn>
                         <v-btn v-if="types=='Change Date'" color="primary darken-1" text @click.prevent="changeDateDocumentConfirm">
                             Save
+                        </v-btn>
+                        <v-btn v-if="types=='Release'" color="primary darken-1" text @click.prevent="releaseDocumentConfirm">
+                            Release
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -418,6 +418,9 @@ export default {
         users() {
             return this.$store.state.users.all_users;
         },
+        isAdmin() {
+			return this.auth_user.role_id == 1
+		},
     },
     watch: {
         documentDialog (val) {
@@ -437,10 +440,6 @@ export default {
                 { show: 'Personal', value: 'personal' },
                 { show: 'Others', value: 'others' }
             ],
-            status_options: [
-                { show: 'Hold', value: 'on hold' },
-                { show: 'Reject', value: 'rejected' }
-            ],
             priority_level: [
                 { show: 'High', value: '1' },
                 { show: 'Medium', value: '2' },
@@ -459,7 +458,6 @@ export default {
                 forwarded_by: this.auth_user?.office_id || '',
                 forwarded_to: '',
                 status: '',
-                hold_reject: '',
                 date_filed: '',
                 time_filed: '',
             },
@@ -475,7 +473,6 @@ export default {
                 forwarded_by: '',
                 forwarded_to: '',
                 status: '',
-                hold_reject: '',
                 date_filed: '',
                 time_filed: '',
             }
@@ -603,9 +600,9 @@ export default {
                 });
                 this.closeDocumentDialog()
         },
-        holdRejectDocumentConfirm() {
+        holdDocumentConfirm() {
             this.btnloading = true;
-                this.$store.dispatch("holdRejectDocumentConfirm", this.form).then(() => {
+                this.$store.dispatch("holdDocumentConfirm", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {
                         this.$store.dispatch('setSnackbar', {
                            type: 'success',
@@ -631,6 +628,31 @@ export default {
         changeDateDocumentConfirm() {
             this.btnloading = true;
                 this.$store.dispatch("changeDateDocumentConfirm", this.form).then(() => {
+                    if(this.request.status == 'SUCCESS') {
+                        this.$store.dispatch('setSnackbar', {
+                           type: 'success',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                            this.$store.dispatch('getActiveDocuments');
+                            this.$router.push({ name: "All Active Documents"});
+                        });
+                    } else if (this.request.status == 'FAILED') {
+                        this.$store.dispatch('setSnackbar', {
+                            type: 'error',
+                            message: this.request.message,
+                        })
+                        .then(() => {
+                            this.btnloading = false;
+                        });
+                    }
+                });
+                this.closeDocumentDialog()
+        },
+        releaseDocumentConfirm() {
+            this.btnloading = true;
+                this.$store.dispatch("releaseDocumentConfirm", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {
                         this.$store.dispatch('setSnackbar', {
                            type: 'success',
