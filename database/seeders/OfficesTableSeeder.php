@@ -212,13 +212,6 @@ class OfficesTableSeeder extends Seeder
                 'contact_email' => 'pnreo@sorsogon.gov.ph',
             ],
             [
-                'name' => 'Office of the Provincial Natural Resources and Environment Officer',
-                'address' => 'Capitol Compound, Burabod, Sorsogon City, Sorsogon',
-                'office_code' => 'PNREO',
-                'contact_number' => '',
-                'contact_email' => 'pnreo@sorsogon.gov.ph',
-            ],
-            [
                 'name' => 'Office of the Provincial Cooperative Officer',
                 'address' => 'Capitol Compound, Burabod, Sorsogon City, Sorsogon',
                 'office_code' => 'PCO',
@@ -233,11 +226,11 @@ class OfficesTableSeeder extends Seeder
                 'contact_email' => 'lic@sorsogon.gov.ph',
             ],
             [
-                'name' => 'Office of the Provincial Tourism Officer',
+                'name' => 'Sorsogon Provincial Tourism Culture and Arts Officer',
                 'address' => 'Capitol Compound, Burabod, Sorsogon City, Sorsogon',
-                'office_code' => 'PTO',
+                'office_code' => 'SPTCAO',
                 'contact_number' => '',
-                'contact_email' => 'pto@sorsogon.gov.ph',
+                'contact_email' => 'sptcao@sorsogon.gov.ph',
             ],
             [
                 'name' => 'Office of the Provincial Internal Control Officer',
@@ -263,7 +256,7 @@ class OfficesTableSeeder extends Seeder
             [
                 'name' => 'Sorsogon Community College',
                 'address' => 'Kasanggayahan Compound, Arellano Street, Salog, Sorsogon City, Sorsogon',
-                'office_code' => 'OPW',
+                'office_code' => 'SCC',
                 'contact_number' => '(056) 255 0390',
                 'contact_email' => 'ssc@sorsogonstatecollege.edu.ph',
             ],
