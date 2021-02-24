@@ -190,6 +190,20 @@ const actions = {
     },
     async unsetDocument({ commit }) {
         commit('UNSET_SELECTED_DOCUMENT');
+    },
+    //restore
+    async restoreDocument({ commit }, document) {
+        await axios.post('/api/restore_document', document)
+        .then(response => {
+            //commit('SET_SNACKBAR', { showing: true, title: 'SUCCESS', text: 'Successfully Restored', color: '#5BB55E', icon : 'mdi-check-bold' })
+            //commit('GET_ALL_ARCHIVE_DOCUMENTS', { action: 'update', hasNewTerminated: true })
+            console.log('response from db:')
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+            //commit('SET_SNACKBAR', { showing: true, title: 'FAILED', text: 'Error fetching data', color: '#F45448', icon : 'mdi-close-thick' })
+        });
     }
 }
 

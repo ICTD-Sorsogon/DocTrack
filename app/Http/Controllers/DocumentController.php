@@ -304,4 +304,18 @@ class DocumentController extends Controller
         $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
         return $summary;
     }
+
+    public function restoreDocument(Request $request)
+    {
+        dump($request);
+        if ($request->table == 'documents') {
+            dump('docs');
+            dump($request->id);
+            //Document::class;
+        } else {
+            dump('user');
+            dump($request->id['recipient_id']);
+            dump($request->id['document_id']);
+        }
+    }
 }
