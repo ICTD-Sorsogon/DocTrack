@@ -74,3 +74,7 @@ export const breakpoint = (col) => {
         }
     }
 };
+
+export const delay_filter = [
+    604800000, 1296000000, 2592000000, Infinity
+];
