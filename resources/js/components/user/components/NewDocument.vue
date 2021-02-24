@@ -369,11 +369,6 @@ export default {
                 }
             });
         },
-        debuggerButton() {
-        },
-        createAndForward() {
-            // TODO: Create new document then forward to office
-        },
     },
     mounted() {
         this.$store.dispatch('unsetLoader');

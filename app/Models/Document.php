@@ -121,7 +121,7 @@ class Document extends Model
 
             $outgoing = (clone $document)->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
             $incoming = $document
-                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND rejected = 0");})->get();
+                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1");})->get();
 
             return compact('incoming', 'outgoing');
         }
