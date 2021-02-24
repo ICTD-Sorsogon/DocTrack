@@ -144,7 +144,6 @@
 import TableModal from './TableModal';
 import { colors, priority_level } from '../../../constants';
 import {mapGetters} from 'vuex'
-
 export default {
 	components: {TableModal},
 	props: ['documents', 'datatable_loader', 'incoming'],
@@ -184,18 +183,14 @@ export default {
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
 				doc.DO_reciever = doc.destination.find(target => target.office_code == "DO")
-
-
 				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
                   doc[status] = doc.recipient.every( recipient => recipient[status] )
                 }
-
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'High'
                 }
                 else if(doc.priority_level == 2) {
                     doc.prio_text = 'Medium'
-
                 }
                 else if (doc.priority_level == 3) {
                      doc.prio_text = 'Low'
@@ -246,10 +241,8 @@ export default {
             return priority_level[type];
         }
 	}
-
 }
 </script>
-
 <style>
 .uniform {
     width: 100px;
