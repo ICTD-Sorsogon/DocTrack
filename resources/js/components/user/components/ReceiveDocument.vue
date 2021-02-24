@@ -142,7 +142,7 @@
                         ></v-text-field>
                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge' || ('hold' || 'release' && isAdmin)">
+                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge' || (['Hold', 'Release'].includes(types) && isAdmin)">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-model="form.priority_levels"
