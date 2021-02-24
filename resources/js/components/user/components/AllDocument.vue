@@ -102,7 +102,7 @@ export default {
             this.$router.push({ name: "Edit Document", params:{type: 'create'} });
             }
         },
-        editDocument(id) {
+        editDocument(item) {
             if (this.$route.name !== "Edit Document") {
                 this.$store.dispatch("setLoader");
                 this.$router.push({ name:"Edit Document", params: { item: item, id: item.id, type: 'edit'}});
