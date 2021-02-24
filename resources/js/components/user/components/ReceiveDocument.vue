@@ -430,6 +430,7 @@ export default {
             documentDialog: false,
             datepicker_modal: false,
             timepicker_modal: false,
+            sent: false,
             coming_from: [
                 { show: 'Docket Office', value: 'docket office' },
                 { show: 'Email', value: 'email' },
@@ -446,9 +447,6 @@ export default {
                 { show: 'Low', value: '3' },
                 { show: 'Indefinite', value: '4' }
             ],
-            temp: {
-                sample_data: 'sample'
-            },
             form: {
                 document_id: '',
                 action: '',
@@ -503,7 +501,7 @@ export default {
         },
         receiveDocumentConfirm() {
             this.btnloading = true;
-            this.sanitize();
+            !this.sent && this.sanitize();
                 this.$store.dispatch("receiveDocumentConfirm", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {
                         this.$store.dispatch('setSnackbar', {
@@ -525,11 +523,12 @@ export default {
                         });
                     }
                 });
+                this.sent = true
                 this.closeDocumentDialog()
         },
         forwardDocumentConfirm() {
             this.btnloading = true;
-            this.sanitize();
+            !this.sent && this.sanitize();
                 this.$store.dispatch("forwardDocumentConfirm", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {
                         this.$store.dispatch('setSnackbar', {
@@ -551,6 +550,7 @@ export default {
                         });
                     }
                 });
+                this.sent = true
                 this.closeDocumentDialog()
         },
         terminateDocumentConfirm() {
