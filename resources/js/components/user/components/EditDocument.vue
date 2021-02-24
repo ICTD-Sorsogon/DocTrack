@@ -67,7 +67,7 @@
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                             <v-combobox
                                 v-model="form.destination_office_id"
-                                :items="offices"
+                                :items="office"
                                 item-text="name"
                                 clearable
                                 hide-selected
@@ -79,12 +79,13 @@
                                 chips
                                 multiple
                                 required
+                                deletable-chips
                             >
-                            <template v-slot:selection="{ attrs, item, parent, selected }">
+                            <template v-slot:selection="{ attrs, item, parent, select, selected }">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-chip color="primary" v-bind="attrs" v-on="on"  >
-                                        {{ item.office_code || item }}
+                                    <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeChip(item.id)">
+                                         {{ item.office_code || item }}
                                     </v-chip>
                                 </template>
                                 <span >{{item.name || item}}</span>
@@ -197,6 +198,9 @@ export default {
     },
     computed: {
         ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'find_document']),
+        office() {
+            return JSON.parse(JSON.stringify(this.offices)).filter(office => office.id != this.auth_user.office_id)
+        },
         created_at() {
             return new Date(this.form.created_at).toDateString()
         },
@@ -242,6 +246,11 @@ export default {
         }
     },
     methods: {
+        removeChip(id){
+            this.form.destination_office_id = this.form.destination_office_id.filter(data => {
+                return data.id != id
+            })
+        },
         navigateAllDocuments() {
             if(this.$route.name !== 'All Active Documents') {
                 this.$store.dispatch('setLoader');
