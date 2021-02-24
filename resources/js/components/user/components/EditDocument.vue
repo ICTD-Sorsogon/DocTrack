@@ -216,15 +216,9 @@ export default {
             }
         },
         selected_document() {
-
-            let userDoc = !this.is_admin && ['terminate', 'Change Date'].includes(this.$route.params.type) ? this.documents['outgoing'] : this.documents['incoming']
-
-            return JSON.parse(JSON.stringify( this.is_admin ? this.documents : userDoc)).map(doc=>{
-				doc.is_external = doc.is_external ? 'External' : 'Internal'
-				doc.sender_name = doc.sender?.name ?? doc.sender_name
-				doc.originating_office = doc.origin_office?.name ?? doc.originating_office
-				return doc
-			}).find(doc => doc.id == this.$route.params.id)
+        return Object.values(JSON.parse(JSON.stringify(this.documents))).flat().find(document => {
+                    return document.id == this.$route.params.id
+                })
         },
         destination() {
             return this.form.destination_office_id
@@ -311,7 +305,7 @@ export default {
     },
     watch: {
         destination(value) {
-            if(typeof value[value.length - 1] != 'object' && value.length > 1){
+            if(value?.length > 1 && typeof value[value.length - 1] != 'object'){
                this.$nextTick(() => this.destination.pop())
             }
         }
