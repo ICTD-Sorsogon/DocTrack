@@ -59,9 +59,9 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item) && !item.acknowledged">
+					<v-col v-if="visibleButton('edit', item)">
 						<v-btn
-							@click="$emit('editDocument', item.id)"
+							@click="$emit('editDocument', item)"
 							text
 							color="#26A69A"
 							block
@@ -72,7 +72,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && !item.received ">
+					<v-col v-if="visibleButton('receive', item)">
 						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
@@ -80,7 +80,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && (isAdmin || item.received) && !item.multiple && !item.forwarded">
+					<v-col v-if="visibleButton('forward', item)">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
@@ -90,7 +90,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received))">
+					<v-col v-if="visibleButton('terminate', item)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -99,7 +99,7 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isAdmin && !item.acknowledged">
+                    <v-col v-if="visibleButton('acknowledge',item)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
@@ -117,7 +117,7 @@
 							Change Date
 						</v-btn>
 					</v-col>
-                    <v-col v-if="incoming && item.recieved && !item.forwarded">
+                    <v-col v-if="visibleButton('hold_reject',item)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
 						>
 							<v-icon left>
@@ -182,7 +182,8 @@ export default {
 				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
-				doc.DO_reciever = doc.destination.find(target => target.office_code == "DO")
+
+
 				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
                   doc[status] = doc.recipient.every( recipient => recipient[status] )
                 }
@@ -214,6 +215,31 @@ export default {
         }
 	},
 	methods: {
+		visibleButton(type, item) {
+			let rules = {
+				'edit': () => {
+					return (this.isEditable(item) || this.isAdmin) && !item.acknowledged && !item.received
+				},
+				'acknowledge': () => {
+					return this.isAdmin && !item.acknowledged
+				}, 
+				'terminate': () => {
+					return (this.isEditable(item) && !item.acknowledged) ||  (this.isReceiver(item) && item.received) || (this.isAdmin && item.received)
+				}, 
+				'forward': () => {
+					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded
+				}, 
+				'receive': () => {
+					return (this.incoming || this.isReceiver(item)) && !item.received
+				}, 
+				'hold_reject':() => {
+					return (this.incoming || this.isReceiver(item) || this.isAdmin) && item.received && !item.forwarded
+				}
+			}
+			debugger
+			return rules[type]()
+
+		},
 		closeDialog(){
 			this.dialog = false
 		},
@@ -231,7 +257,10 @@ export default {
             }
         },
 		isEditable(docOrigin) {
-			return this.auth_user.office_id == docOrigin.origin_office?.id || this.isAdmin
+			return this.auth_user.office_id == docOrigin.origin_office?.id
+		},
+		isReceiver(doc){
+			return !!doc.destination.find(target => target.id == this.auth_user.office_id)
 		},
 		getTrackingCodeColor(document, document_type_id) {
             // document.color = colors[document_type_id];

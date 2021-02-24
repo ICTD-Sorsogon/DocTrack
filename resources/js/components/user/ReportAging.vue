@@ -3,33 +3,22 @@
         <v-card-title primary-title>
             Tracking Reports
         </v-card-title>
-        <v-row>
-            <v-col cols="12">
-                  <v-data-table
-                    :search="search"
-                    :items="summaries"
-                    :items-per-page="10"
-                    :headers="headers"
-                    class="elevation-1"
-                    :custom-filter="filterOnlyOffice"
-                >
-                <template v-slot:top>
-                    <v-text-field
-                        prepend-inner-icon="mdi-magnify"
-                        v-model="search"
-                        label="Search"
-                        class="mx-4"
-                    />
-                </template>
-                </v-data-table>
-            </v-col>
-        </v-row>
+        <div v-if="auth_user.username == 'admin'">
+            <tracking-table/>
+        </div>
+        <div v-else>
+            <office-table/>
+        </div>
     </v-card>
 </template>
 
 <script>
 const week_in_milliseconds = 604800000;
 import {max, min, mean} from 'lodash';
+import { mapGetters } from 'vuex';
+import TrackingTable from './components/TrackingTable';
+import OfficeTable from './components/OfficeTable';
+import OfficeTableModal from './components/OfficeTableModal.vue';
 export default {
     data() {
         return {
@@ -43,9 +32,28 @@ export default {
                 { text: 'Average Transaction Speed', value: 'mean', filterable:false},
                 { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
             ],
+            items: [
+                {
+                color: '#1F7087',
+                src: 'https://cdn.vuetifyjs.com/images/cards/foster.jpg',
+                title: 'Supermodel',
+                artist: 'Foster the People',
+                },
+                {
+                color: '#952175',
+                src: 'https://cdn.vuetifyjs.com/images/cards/halcyon.png',
+                title: 'Halcyon Days',
+                artist: 'Ellie Goulding',
+                },
+            ],
         }
     },
+    components:{
+        TrackingTable,
+        OfficeTable
+    },
     computed: {
+        ...mapGetters(['auth_user']),
         summaries(){
             let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
             let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
@@ -107,6 +115,7 @@ export default {
         },
     },
     mounted() {
+        console.log(this.auth_user)
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
         this.$store.dispatch('getOfficeNameList');
