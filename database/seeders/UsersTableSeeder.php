@@ -38,7 +38,7 @@ class UsersTableSeeder extends Seeder
         // User::factory()->create(['username' => 'HRMO', 'role_id' => 2, 'office_id' => '17', 'avatar' => 'images/luffy.png']);
         foreach(Office::all() as $office) {
             if ($office->code === 'GO') User::factory()->create(['username' => $office->office_code, 'role_id' => 3, 'office_id' => $office->id, 'avatar' => 'images/zoro.png']);
-            if ($office->code === 'admin') User::factory()->create(['username' => $office->office_code, 'role_id' => 1, 'office_id' => $office->id, 'avatar' => 'images/luffy.png']);
+            if ($office->code === 'DO') User::factory()->create(['username' => $office->office_code, 'role_id' => 1, 'office_id' => $office->id, 'avatar' => 'images/luffy.png']);
             User::factory()->create(['username' => $office->office_code, 'role_id' => 2, 'office_id' => $office->id, 'avatar' => self::$images[rand(0, 8)]]);
         }
 
