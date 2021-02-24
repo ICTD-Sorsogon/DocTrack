@@ -51,16 +51,21 @@ export default {
             let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
             let data = [];
             for (const [key, value] of Object.entries(summaries)) {
+                // console.log(value)
                 if (value.length === 1) offices[value[0].office_id].transactions++
                 else {
                     let created = value.filter(value => value.action === 'created');
                     if (created.length !== 0) {
-                        console.log(created[0].document.destination.length);
+                        // console.log(created[0].document.destination.length);
                         offices[created[0].office_id].transactions+= created[0].document.destination.length;
                         let acknowledged = value.filter(value => value.action === 'acknowledged');
                         if (acknowledged.length !== 0) {
+                            let forwarded = value.filter(value => value.action === 'forwarded');
                             offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
                             offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
+                            if (forwarded.length !== 0) {
+                                offices[acknowledged[0].office_id].transactions += 1;
+                            }
                             if (new Date(acknowledged[0].created_at).getTime() -
                                     new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed += acknowledged[0].document.destination.length
                             let received = value.filter(value => value.action === 'received');
