@@ -63,9 +63,6 @@ export default {
                             let forwarded = value.filter(value => value.action === 'forwarded');
                             offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
                             offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
-                            if (forwarded.length !== 0) {
-                                offices[acknowledged[0].office_id].transactions += 1;
-                            }
                             if (new Date(acknowledged[0].created_at).getTime() -
                                     new Date(created[0].created_at).getTime() > week_in_milliseconds) offices[value[0].office_id].delayed += acknowledged[0].document.destination.length
                             let received = value.filter(value => value.action === 'received');
@@ -84,6 +81,9 @@ export default {
                                 if (new Date(value[i + 1].created_at).getTime() -
                                     new Date(value[i].created_at).getTime() > week_in_milliseconds) offices[value[i].office_id].delayed++
                                 offices[value[i].office_id].transaction_speed.push(new Date(value[i + 1].created_at).getTime() - new Date(value[i].created_at).getTime())
+                                if (forwarded.length !== 0) {
+                                    offices[acknowledged[0].office_id].transactions += 1;
+                                }
                             }
                             offices[value[i].office_id].transactions++;
                         }
