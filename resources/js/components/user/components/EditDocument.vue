@@ -84,7 +84,7 @@
                             <template v-slot:selection="{ attrs, item, parent, select, selected }">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeChip(item.id)">
+                                    <v-chip color="primary" v-bind="attrs" v-on="on" @click="select" :input-value="selected" close @click:close="removeChip(item.id)">
                                          {{ item.office_code || item }}
                                     </v-chip>
                                 </template>
