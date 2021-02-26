@@ -41,4 +41,9 @@ class TrackingRecord extends Model
     {
         return $this->belongsTo('App\Models\Document');
     }
+
+    public function document_recipient()
+    {
+        return $this->hasMany('App\Models\DocumentRecipient', 'document_id', 'document_id')->where('destination_office', $this->destination);
+    }
 }
