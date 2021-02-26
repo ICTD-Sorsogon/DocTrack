@@ -199,7 +199,7 @@ class DocumentController extends Controller
             TrackingSummary::create([
                 'action' => 'acknowledged',
                 'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
+                'office_id' => auth()->user()->office_id
             ]);
             $user_id = Auth::user()->id;
 
@@ -250,12 +250,14 @@ class DocumentController extends Controller
         $updatedTime = $request->date_filed. ' ' .$request->time_filed;
         DB::beginTransaction();
         try {
-            $tracking_record = TrackingRecord::find($request->id);
+            $tracking_record = TrackingRecord::where('document_id', $request->id)->first();
             $tracking_record->action = 'date changed';
             $tracking_record->update([
                 'last_touched' => Carbon::parse($updatedTime)
                 ]);
-
+            TrackingSummary::where('document_id', $tracking_record->document_id)
+            ->where('office_id', auth()->user()->office_id)
+            ->update(['created_at' => Carbon::parse($updatedTime)]);
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
@@ -327,7 +329,7 @@ class DocumentController extends Controller
             TrackingSummary::create([
                 'action' => 'created',
                 'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
+                'office_id' => auth()->user()->office_id
             ]);
         }
 
@@ -345,7 +347,7 @@ class DocumentController extends Controller
 
     public function officeReports()
     {
-        $summary = TrackingSummary::with('office', 'document')->where('office_id', auth()->user()->office->id)
+        $summary = TrackingSummary::with('office', 'document')->where('office_id', auth()->user()->office_id)
         ->get();
         return $summary;
     }
