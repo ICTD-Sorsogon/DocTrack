@@ -132,6 +132,11 @@ class Document extends Model
 
     public static function allDocumentsArchive(User $user, $request)
     {
+        /*$document = static::select('documents.*', static::raw('YEAR(created_at) as year'))
+                        ->with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed'])->withTrashed()
+                        ->whereHas('incoming_trashed', function($query) use($user){
+                            $query->withTrashed();
+                        });*/
         $document = static::select('documents.*', static::raw('YEAR(created_at) as year'))
                         ->with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed'])->onlyTrashed();
         $year = static::getYr($document);

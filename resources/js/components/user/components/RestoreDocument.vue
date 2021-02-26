@@ -1,77 +1,71 @@
 <template>
     <v-dialog v-model="param.dialog" persistent scrollable max-width="1000px">
         <v-card v-if="param">
-            <v-container>
-            <v-row>
-                <v-col cols="6" sm="6">
-                <v-card-title primary-title> {{ param.title}} </v-card-title>
-                </v-col>
-                <v-col cols="6" sm="6">
-                    <v-card-actions class="mr-1">
-                        <v-spacer></v-spacer>
-                        <v-btn x-large color="gray" @click="$emit('close-dialog')" icon>
-                        <v-icon>mdi-close</v-icon>
-                        </v-btn>
-                    </v-card-actions>
-                </v-col>
-            </v-row>
-            </v-container>
+            <v-toolbar color="primary" dark>
+                <v-row>
+                    <v-col cols="6" sm="6">
+                        <v-card-title primary-title> {{ param.title}} </v-card-title>
+                    </v-col>
+                    <v-col cols="6" sm="6">
+                        <v-card-actions class="mr-0">
+                            <v-spacer/>
+                            <v-btn x-large color="gray" @click="$emit('close-dialog')" icon> <v-icon>mdi-close</v-icon> </v-btn>
+                        </v-card-actions>
+                    </v-col>
+                </v-row>
+            </v-toolbar>
             <v-card-text>
-                <v-list-item two-line v-for="docu in param.document.incoming_trashed" :key="docu.recipient_id">
-                    <v-list-item-content>
-                        <v-list-item-title>Created Date:| {{ docu.created_at }}</v-list-item-title>
-                        <v-list-item-subtitle>Office: | {{ docu.destination_office }}</v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
+                <v-simple-table>
+                    <template v-slot:top>
+                        <!--<v-list-item>rey
+                        <v-list-item-content>
+                            <v-list-item-title>Single-line item</v-list-item-title>
+                        </v-list-item-content>
+                        </v-list-item>-->
+                       <div class="mt-6">
+                            <tr>
+                                <td>Document Origin: <strong> {{ param.document.origin_office.name + ' (' + param.document.origin_office.office_code + ')' }} </strong>  </td>
+                                <td> <v-btn width="100%" color="primary" style="background-color:#C0DFFD" class="ml-5" rounded text @click="confirmRestore('All', param.document)">Restore All</v-btn> </td>
+                            </tr>
+                       </div>
+                    </template>
+                    <template v-slot:default>
+                        <thead>
+                            <tr>
+                                <th class="text-left"> Nameu </th>
+                                <th class="text-left"> Calories </th>
+                                <th class="text-center"> Action </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="docu in param.document.incoming_trashed" :key="docu.recipient_id">
+                                <td>Created Date:| {{ docu.created_at }}</td>
+                                <td>Office: | {{ docu.destination_office }}</td>
+                                <td> <v-btn width="100%" color="primary" rounded text @click="confirmRestore('', docu)" :disabled="docu.deleted_at == null">Restore</v-btn> </td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-simple-table>
 
 
-                <v-list two-line>
-                    <v-list-item-group
-                        v-model="selected"
-                        active-class="pink--text"
-                        multiple
-                    >
-                        <template v-for="(item, index) in items">
-                        <v-list-item :key="item.title" @click="gg">
-                            <template v-slot:default="{ active }">
-                            <v-list-item-content>
-                                <v-list-item-title v-text="item.title"></v-list-item-title>
+                <!--<v-btn color="primary" class="ma-2" dark @click="dialog2 = true"> Open Dialog 2 </v-btn>-->
+                <v-dialog v-model="dialog2" max-width="500px" persistent>
+                    <v-card>
+                        <v-card-title> Confirm Restore</v-card-title>
+                        <v-card-text>
+                            <v-text-field label="Office Code*" required>eryreyery</v-text-field>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer/>
+                                <v-btn color="primary" class="ma-1" text @click="dialog2 = false"> CANCEL </v-btn>
+                                <v-btn color="primary" class="ma-1" dark @click="restoreDocument"> SUBMIT </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
 
-                                <v-list-item-subtitle
-                                class="text--primary"
-                                v-text="item.headline"
-                                ></v-list-item-subtitle>
 
-                                <v-list-item-subtitle v-text="item.subtitle"></v-list-item-subtitle>
-                            </v-list-item-content>
 
-                            <v-list-item-action>
-                                <v-list-item-action-text v-text="item.action"></v-list-item-action-text>
 
-                                <v-icon
-                                v-if="!active"
-                                color="grey lighten-1"
-                                >
-                                mdi-star-outline
-                                </v-icon>
-
-                                <v-icon
-                                v-else
-                                color="yellow darken-3"
-                                >
-                                mdi-star
-                                </v-icon>
-                            </v-list-item-action>
-                            </template>
-                        </v-list-item>
-
-                        <v-divider
-                            v-if="index < items.length - 1"
-                            :key="index"
-                        ></v-divider>
-                        </template>
-                    </v-list-item-group>
-                </v-list>
 
                 <!--<ValidationObserver ref="observer" v-slot="{ valid }">
                     <v-form ref="form" lazy-validation>
@@ -149,39 +143,12 @@
                 },
                 valid: false,
                 btnloading: false,
-                selected: [2],
-                items: [
-                    {
-                    action: '15 min',
-                    headline: 'Brunch this weekend?',
-                    subtitle: `I'll be in your neighborhood doing errands this weekend. Do you want to hang out?`,
-                    title: 'Ali Connors',
-                    },
-                    {
-                    action: '2 hr',
-                    headline: 'Summer BBQ',
-                    subtitle: `Wish I could come, but I'm out of town this weekend.`,
-                    title: 'me, Scrott, Jennifer',
-                    },
-                    {
-                    action: '6 hr',
-                    headline: 'Oui oui',
-                    subtitle: 'Do you have Paris recommendations? Have you ever been?',
-                    title: 'Sandra Adams',
-                    },
-                    {
-                    action: '12 hr',
-                    headline: 'Birthday gift',
-                    subtitle: 'Have any ideas about what we should get Heidi for her birthday?',
-                    title: 'Trevor Hansen',
-                    },
-                    {
-                    action: '18hr',
-                    headline: 'Recipe to try',
-                    subtitle: 'We should eat this: Grate, Squash, Corn, and tomatillo Tacos.',
-                    title: 'Britta Holt',
-                    },
-                ],
+                dialog2: false,
+                restoreParam: {
+                    isRoot: false,
+                    dbId: '',
+                    documentId: ''
+                }
             }
         },
         computed: {
@@ -190,79 +157,44 @@
             }
         },
         methods: {
-            gg() {
+            restoreDocument() {
                 console.log('clicked')
-                //this.selected.pop()
-            }
-            /*saveNewOffice(){
-                if(JSON.stringify(this.form) === JSON.stringify(this.form_old)){
-                    this.$store.dispatch('setSnackbar', {
-                        type: 'info',
-                        message: 'No changes found',
-                    })
-                }else{
-                    this.btnloading = true;
-                    this.$store.dispatch("createNewOffice", this.form).then(() => {
-                        if(this.request.status == 'success') {
-                            this.$store.dispatch('setSnackbar', {
-                                type: 'success',
-                                message: this.request.message,
-                            })
-                            .then(() => {
-                                this.btnloading = false;
-                                this.$refs.form.reset();
-                                this.$refs.observer.reset();
-                                this.$store.dispatch('getOffices');
-                            });
-                        } else if(this.request.status == 'failed'){
-                            this.$store.dispatch('setSnackbar', {
-                                type: 'error',
-                                message: this.request.message,
-                            })
-                            .then(() => {
-                                this.btnloading = false;
-                            });
-                        }
-                    });
-                }
+
+                setTimeout(function() {
+                    this.dialog2 = false
+                }.bind(this), 2000);
             },
-            saveChangesToOffice(){
-                if(JSON.stringify(this.form) === JSON.stringify(this.form_old)){
-                    this.$store.dispatch('setSnackbar', {
-                        type: 'info',
-                        message: 'No changes found'
-                    })
-                }else{
-                    this.btnloading = true;
-                    this.$store.dispatch('updateExistingOffice', this.form).then(() => {
-                        if(this.request.status == 'success') {
-                            this.$store.dispatch('setSnackbar', {
-                                type: 'success',
-                                message: this.request.message
-                            })
-                            .then(() => {
-                                Object.assign(this.form_old, this.form)
-                                this.btnloading = false;
-                                this.$store.dispatch('getOffices');
-                            });
-                        } else if(this.request.status == 'failed'){
-                            this.$store.dispatch('setSnackbar', {
-                                type: 'error',
-                                message: this.request.message
-                            })
-                            .then(() => {
-                                this.btnloading = false;
-                            });
-                        }
-                    });
+            confirmRestore(type, data){
+                this.dialog2 = true
+                if (type == 'All') {
+                    console.log('all')
+                    this.restoreParam = {
+                        isRoot: true,
+                        dbId: data.id,
+                        documentId: data.id
+                    }
+
+                } else {
+                    console.log('each')
+                    this.restoreParam = {
+                        isRoot: false,
+                        dbId: data.recipient_id,
+                        documentId: data.document_id
+                    }
                 }
-            }*/
+                console.log(data)
+                console.log('par:', this.restoreParam)
+
+                this.$store.dispatch('restoreDocument', this.restoreParam).then(() => {
+                    console.log('DONE RESTORED...')
+                })
+            }
         },
         mounted() {
-            //Object.assign(this.form_old, this.selected_office)
-            //Object.assign(this.form, this.selected_office)
-            console.log('restore this:')
-            console.log(this.param.document.incoming_trashed)
+            //console.log('restore this:')
+           // console.log(this.param.document.incoming_trashed)
+           // console.log('all item:')
+            //console.log(this.param.document)
         }
     }
 
