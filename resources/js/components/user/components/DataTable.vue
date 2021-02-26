@@ -6,7 +6,6 @@
 		:items="extendedData"
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
-		item-key="keys"
 		:loading="datatable_loader"
         :sort-by="['priority_level']"
         :sort-desc="[false]"
@@ -177,7 +176,6 @@ export default {
 		},
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
-				doc.keys = doc.id + ' ' + (doc.recipient_id ?? '')
                 doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
 				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
@@ -186,7 +184,7 @@ export default {
 
 
 				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
-                  doc[status] = doc.recipient.every( recipient => recipient[status] )
+                  doc[status] = doc.document_recipient.every( recipient => recipient[status] )
                 }
 
                 if (doc.priority_level == 1) {
@@ -227,13 +225,13 @@ export default {
 					return this.isAdmin && !item.acknowledged
 				}, 
 				'terminate': () => {
-					return (this.isEditable(item) && !item.acknowledged) ||  (this.isReceiver(item) && item.received) || (this.isAdmin && item.received)
+					return (this.isEditable(item) && !item.acknowledged) ||  ((this.isReceiver(item) || item.forwarded) && item.received) || (this.isAdmin && item.received)
 				}, 
 				'forward': () => {
 					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded
 				}, 
 				'receive': () => {
-					return (this.incoming || this.isReceiver(item)) && !item.received
+					return (this.incoming || this.isReceiver(item)) && !item.received && !item.forwarded 
 				}, 
 				'hold_reject':() => {
 					return (this.incoming || this.isReceiver(item) || this.isAdmin) && item.received && !item.forwarded
