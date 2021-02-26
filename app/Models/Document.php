@@ -115,7 +115,7 @@ class Document extends Model
                         ->with(['document_recipient' => function($query) use($user) {
                             $query->whereDestinationOffice($user->id)->get();
                         }])
-                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1");})->get();
+                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND hold = 0");})->get();
 
             return compact('incoming', 'outgoing');
         }
