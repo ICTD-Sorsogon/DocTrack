@@ -256,8 +256,8 @@ class DocumentController extends Controller
                 'last_touched' => Carbon::parse($updatedTime)
                 ]);
             TrackingSummary::where('document_id', $tracking_record->document_id)
-            ->where('office_id', auth()->user()->office_id)
-            ->update(['created_at' => Carbon::parse($updatedTime)]);
+                ->where('office_id', auth()->user()->office_id)
+                ->update(['created_at' => Carbon::parse($updatedTime)]);
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
