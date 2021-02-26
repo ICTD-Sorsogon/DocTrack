@@ -236,10 +236,10 @@ export default {
 					return this.isAdmin && !item.acknowledged
 				},
 				'terminate': () => {
-					return (this.isEditable(item) && !item.acknowledged) ||  (this.isReceiver(item) && item.received) || (this.isAdmin && item.received)
+					return (this.isEditable(item) && !item.acknowledged) ||  (this.isReceiver(item) && item.received && !item.hold) || (this.isAdmin && item.received && !item.hold)
 				},
 				'forward': () => {
-					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded
+					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded && !item.hold
 				},
 				'receive': () => {
 					return (this.incoming || this.isReceiver(item)) && !item.received
@@ -248,7 +248,7 @@ export default {
 					return ((this.incoming && this.isReceiver(item)  && item.received) || (this.isAdmin && item.acknowledged)) && !item.forwarded && !item.hold
 				},
                 'release':() => {
-                    return (this.isAdmin && item.hold)
+                    return ((this.incoming && this.isReceiver(item)  && item.hold) || (this.isAdmin && item.hold))
                 }
 			}
 			return rules[type]()
