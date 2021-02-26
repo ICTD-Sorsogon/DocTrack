@@ -413,7 +413,7 @@ export default {
             return this.$store.state.snackbars.request;
         },
         offices() {
-            return this.$store.state.offices.offices;
+            return this.$store.state.offices.offices.filter(office=>office.id != this.auth_user.office_id);
         },
         users() {
             return this.$store.state.users.all_users;

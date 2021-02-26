@@ -79,6 +79,7 @@
                                 chips
                                 multiple
                                 required
+                                :search-input.sync="search"
                                 deletable-chips
                             >
                             <template v-slot:selection="{ attrs, item, parent, select, selected }">
@@ -231,6 +232,7 @@ export default {
             timepicker_modal: false,
             button_loader: null,
             loading_create_new_document: false,
+            search: null,
             form: {
                 form_type: 'new_document',
                 subject: '',
@@ -305,9 +307,10 @@ export default {
     },
     watch: {
         destination(value) {
-            if(value?.length > 1 && typeof value[value.length - 1] != 'object'){
+            if(value?.length > 0 && typeof value[value.length - 1] != 'object'){
                this.$nextTick(() => this.destination.pop())
             }
+            this.search = null
         }
     },
     mounted() {
