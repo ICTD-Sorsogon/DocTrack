@@ -19,8 +19,15 @@ class TrackingRecord extends Model
     ];
 
     protected $appends = [
-        'date_filed'
+        'date_filed',
+        'touched_user'
     ];
+
+    public function getTouchedUserAttribute($value)
+    { 
+        $value = $this->attributes['touched_by'];
+        return User::with('office')->find($value)->only('avatar', 'office');
+    }
 
     public function getDateFiledAttribute()
     {

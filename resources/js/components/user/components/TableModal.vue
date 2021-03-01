@@ -265,7 +265,7 @@
     >
         <v-timeline-item
         small
-        v-for=" {id, date_filed, action, remarks, touched_by} in tracking_records"
+        v-for=" {id, date_filed, action, remarks, touched_user} in selected_document.tracking_records"
         :color="dotColor(action)"
         :key="id"
         >
@@ -283,10 +283,10 @@
                     <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                         <v-avatar v-bind="attrs" v-on="on" >
-                            <img :src="touched_by_img(touched_by)"/>
+                            <img :src="touched_user.avatar"/>
                         </v-avatar>
                     </template>
-                    <span>{{touched_by.office.name}}</span>
+                    <span>{{touched_user.office.name}}</span>
                     </v-tooltip>
             </v-col>
         </v-row>
@@ -311,18 +311,12 @@
         sender_name({selected_document}) {
             return selected_document.sender?.name ?? selected_document.sender_name
         },
-        tracking_records({selected_document}) {
-            return selected_document.tracking_records.map(record=>{record.touched_by = this.find_user(record.touched_by); return record});
-        }
     },
     methods: {
         dotColor(action){
             let colors = {terminated: 'grey', rejected:'pink', created: 'cyan', acknowledged: 'deep-purple', recieved: 'teal'}
             return colors[action] ?? 'amber'
         },
-        touched_by_img(touched_by){
-            return touched_by.avatar ?? '/images/defaultpic.jpg'
-        }
     },
 }
 </script>
