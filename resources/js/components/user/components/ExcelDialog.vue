@@ -17,9 +17,15 @@
                 </v-row>
                 <v-card-text>
                     <v-form ref="form" lazy-validation>
-                        <v-row v-if="dialog_type == 'export'">
+                        <v-row v-if="dialog_type == 'export' && dialog_for != 'masterList'">
                             <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                                <v-btn @click="dowload" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
+                                <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
+                            </v-col>
+                        </v-row>
+                        <!-- MASTER LIST -->
+                        <v-row v-if="dialog_type == 'export' && dialog_for == 'masterList'">
+                            <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                                <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Master List</v-btn>
                             </v-col>
                         </v-row>
                         <v-row v-if="dialog_type == 'import'">
@@ -150,7 +156,7 @@
                     this.btnloading = false;
                 }
             },
-            dowload(){
+            download(){
                 this[this.dialog_for]()
             },
             importOfficeList(file){
@@ -364,6 +370,93 @@
                 })
                 worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
                 this.saveExcelFile('Office List', workbook);
+            },
+            masterList(){
+                const header_color = this.marian_blue;
+                const type = this.$store.state.documents.documentsArchive[0].selected.filter;
+                const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
+                const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
+
+                let workbook = new Excel.Workbook()
+                let worksheet = workbook.addWorksheet('Archive Master List')
+                worksheet.columns = [
+                    { header: 'Tracking Code', key: 'tracking_code'},
+                    { header: 'Subject', key: 'subject'},
+                    { header: 'Sender', key: 'sender'},
+                    { header: 'Priority Level', key: 'priority_level'},
+                    { header: 'Document Type', key: 'document_type'},
+                    { header: 'Status', key: 'status'},
+                    { header: 'Page Count', key: 'page_count'},
+                    { header: 'Attachment Page Count', key: 'attachment_page_count'},
+                    { header: 'Originating Office', key: 'origin_office'},
+                    { header: 'Destination', key: 'destination'},
+                    { header: 'Remarks', key: 'remarks'},
+                ]
+
+                data.forEach((e, index) => {
+                    let destination_list = ''
+
+                    e.destination.forEach(element => destination_list += element.name + ', ');
+
+                    worksheet.addRow({
+                        tracking_code: e.tracking_code,
+                        subject: e.subject,
+                        sender: e.sender['name'],
+                        priority_level: priority_list[e.priority_level-1],
+                        document_type: e.document_type['name'],
+                        status: e.status,
+                        page_count: e.page_count,
+                        attachment_page_count: e.attachment_page_count,
+                        origin_office: e.origin_office['name'],
+                        destination: destination_list.slice(0, -2),
+                        remarks: e.remarks,
+                    })
+
+                })
+
+                let columnWidth = {}
+                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                    const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+
+                    headerColumns.forEach((v) => {
+                        let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
+
+                        if(columnWidth[v] == undefined){
+                            columnWidth[v] = currentColumnLength
+                        }else{
+                            columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
+                        }
+
+                        if(rowNumber == 1){
+                            worksheet.getCell(`${v}${rowNumber}`).style = {
+                                fill: {
+                                    type: 'pattern',
+                                    pattern:'solid',
+                                    fgColor:{ argb: header_color }
+                                },
+                                font: {
+                                    color: {argb: "ffffff"},
+                                    bold: true
+                                }
+                            }
+                        }else{
+                            worksheet.getCell(`${v}${rowNumber}`).style = {
+                                border: {
+                                    top: { style: 'thin' },
+                                    left: { style: 'thin' },
+                                    bottom: { style: 'thin' },
+                                    right: { style: 'thin' }
+                                }
+                            }
+                        }
+                    })
+                })
+                Object.values(columnWidth).forEach((width, index) => {
+                    worksheet.getColumn(index+1).width = width + 5
+
+                });
+                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                this.saveExcelFile('Archive Master List', workbook);
             },
             saveExcelFile(filename, workbook){
                 var buff = workbook.xlsx.writeBuffer().then(function (data) {
