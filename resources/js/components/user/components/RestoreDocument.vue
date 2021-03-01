@@ -145,6 +145,7 @@
             },
             confirmRestore(type, data, office_code){
                 this.confirmOfficeCode = office_code
+                this.confirmField = ''
                 this.confirmDialog = true
                 if (type == 'All') {
                     this.restoreParam = {
