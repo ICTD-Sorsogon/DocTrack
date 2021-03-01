@@ -19,8 +19,15 @@ class TrackingRecord extends Model
     ];
 
     protected $appends = [
-        'date_filed'
+        'date_filed',
+        'touched_user'
     ];
+
+    public function getTouchedUserAttribute($value)
+    { 
+        $value = $this->attributes['touched_by'];
+        return User::with('office')->find($value)->only('avatar', 'office');
+    }
 
     public function getDateFiledAttribute()
     {
@@ -40,5 +47,10 @@ class TrackingRecord extends Model
     public function document()
     {
         return $this->belongsTo('App\Models\Document');
+    }
+
+    public function document_recipient()
+    {
+        return $this->hasMany('App\Models\DocumentRecipient', 'document_id', 'document_id')->where('destination_office', $this->destination);
     }
 }

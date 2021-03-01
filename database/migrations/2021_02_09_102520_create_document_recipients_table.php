@@ -20,7 +20,6 @@ class CreateDocumentRecipientsTable extends Migration
             $table->boolean('acknowledged')->default(false);
             $table->boolean('received')->default(false);
             $table->boolean('forwarded')->default(false);
-            $table->boolean('rejected')->default(false);
             $table->boolean('hold')->default(false);
             $table->timestamps();
             $table->softDeletes();

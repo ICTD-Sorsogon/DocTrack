@@ -79,12 +79,13 @@
                                 chips
                                 multiple
                                 required
+                                :search-input.sync="search"
                                 deletable-chips
                             >
                             <template v-slot:selection="{ attrs, item, parent, select, selected }">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on, attrs }">
-                                    <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeChip(item.id)">
+                                    <v-chip color="primary" v-bind="attrs" v-on="on" @click="select" :input-value="selected" close @click:close="removeChip(item.id)">
                                          {{ item.office_code || item }}
                                     </v-chip>
                                 </template>
@@ -197,7 +198,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'find_document']),
+        ...mapGetters(['auth_user', 'document_types', 'offices', 'request', 'all_users', 'documents', 'is_admin']),
         office() {
             return JSON.parse(JSON.stringify(this.offices)).filter(office => office.id != this.auth_user.office_id)
         },
@@ -216,7 +217,9 @@ export default {
             }
         },
         selected_document() {
-            return this.find_document(this.$route.params.id)
+        return Object.values(JSON.parse(JSON.stringify(this.documents))).flat().find(document => {
+                    return document.id == this.$route.params.id
+                })
         },
         destination() {
             return this.form.destination_office_id
@@ -229,6 +232,7 @@ export default {
             timepicker_modal: false,
             button_loader: null,
             loading_create_new_document: false,
+            search: null,
             form: {
                 form_type: 'new_document',
                 subject: '',
@@ -298,14 +302,15 @@ export default {
             });
         },
         fillForm(){
-            this.form = this.$route.params.id ? JSON.parse(JSON.stringify(this.selected_document)) : this.form
+            this.form = this.$route.params.type != 'create' ? this.$route.params.item ?? this.selected_document : this.form
         },
     },
     watch: {
         destination(value) {
-            if(typeof value[value.length - 1] != 'object' && value.length > 1){
+            if(value?.length > 0 && typeof value[value.length - 1] != 'object'){
                this.$nextTick(() => this.destination.pop())
             }
+            this.search = null
         }
     },
     mounted() {
