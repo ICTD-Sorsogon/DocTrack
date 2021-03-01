@@ -121,9 +121,9 @@
                 </v-list-item-action>
                 <v-list-item-content>
                     <v-list-item-title>
-                    <v-tooltip :key="destination.office_code" v-for="destination in selected_document.destination_office_id" top>
+                    <v-tooltip :key="destination.office_code" v-for="destination in selected_document.destination" top>
                     <template v-slot:activator="{ on, attrs }">
-                        <v-chip v-bind="attrs" v-on="on" >
+                        <v-chip v-bind="attrs" v-on="on" class="mx-1" >
                         {{destination.office_code}}
                         </v-chip>
                     </template>
@@ -191,7 +191,7 @@
         </v-row>
         <v-divider inset />
         <v-row>
-            <v-col cols="12" xl="4" lg="4" md="4" sm="12">
+            <v-col cols="12" xl="4" lg="6" md="4" sm="12">
             <v-list flat subheader>
                 <v-subheader>Page Count</v-subheader>
                 <v-list-item>
@@ -206,7 +206,7 @@
                 </v-list-item>
             </v-list>
             </v-col>
-            <v-col cols="12" xl="4" lg="4" md="4" sm="12">
+            <v-col cols="12" xl="4" lg="6" md="4" sm="12">
             <v-list flat subheader>
                 <v-subheader>Attachment Page Count</v-subheader>
                 <v-list-item>
@@ -217,22 +217,6 @@
                     <v-list-item-title>{{
                     selected_document.attachment_page_count
                     }}</v-list-item-title>
-                </v-list-item-content>
-                </v-list-item>
-            </v-list>
-            </v-col>
-            <v-col cols="12" xl="4" lg="4" md="4" sm="12">
-            <v-list flat subheader>
-                <v-subheader>Terminal</v-subheader>
-                <v-list-item>
-                <v-list-item-action>
-                    <v-icon>mdi-square-medium</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                    <v-list-item-title v-if="selected_document.is_terminal"
-                    >Yes</v-list-item-title
-                    >
-                    <v-list-item-title v-else>No</v-list-item-title>
                 </v-list-item-content>
                 </v-list-item>
             </v-list>
@@ -314,7 +298,7 @@
     },
     methods: {
         dotColor(action){
-            let colors = {terminated: 'grey', rejected:'pink', created: 'cyan', acknowledged: 'deep-purple', recieved: 'teal'}
+            let colors = {terminated: 'grey', rejected:'pink', created: 'cyan', acknowledged: 'deep-purple', recieved: 'teal', forwarded: 'orange'}
             return colors[action] ?? 'amber'
         },
     },
