@@ -191,19 +191,18 @@ const actions = {
     async unsetDocument({ commit }) {
         commit('UNSET_SELECTED_DOCUMENT');
     },
-    //restore
     async restoreDocument({ commit }, document) {
+        let status = {}
         await axios.post('/api/restore_document', document)
         .then(response => {
-            //commit('SET_SNACKBAR', { showing: true, title: 'SUCCESS', text: 'Successfully Restored', color: '#5BB55E', icon : 'mdi-check-bold' })
-            //commit('GET_ALL_ARCHIVE_DOCUMENTS', { action: 'update', hasNewTerminated: true })
-            console.log('response from db:')
-            console.log(response)
+            status.status = 'success'
+            status.message = `Document successfully restored!`
         })
         .catch(error => {
-            console.log(error)
-            //commit('SET_SNACKBAR', { showing: true, title: 'FAILED', text: 'Error fetching data', color: '#F45448', icon : 'mdi-close-thick' })
+            status.status = 'failed'
+            status.message = `Failed to restore document!`
         });
+        commit('SNACKBAR_STATUS', status)
     }
 }
 
@@ -265,7 +264,6 @@ const mutations = {
                 state.documentsArchive[0].selected[filter].data = response.data
             }
         }
-        //state.documentsArchive = []
     },
     RESET_ARCHIVE_STATE(state) {
         state.documentsArchive = []

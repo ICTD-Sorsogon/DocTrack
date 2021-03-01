@@ -232,6 +232,7 @@
         <restore-document
             v-if="auth_user.role_id ==1 && restore"
             :param="restoreParam"
+            @reload-data="filterChange"
             @close-dialog="closeDialog('restore')"
         />
 
@@ -346,14 +347,7 @@
         },
         methods: {
             dateCreated(item){
-                /*var u = this.auth_user
-                if (u.role_id > 1 && item.origin_office.id != u.office_id) {
-                    var value = item.incoming_trashed.find(o => o.destination_office == u.office_id ).created_at
-                    return new Date(value).toISOString().substr(0, 10) || ''
-                }
-                return item.created_at*/
                 return (!this.getMyDocument(item))? item.created_at : new Date(this.getMyDocument(item).created_at).toISOString().substr(0, 10)
-
             },
             getMyDocument(document) {
                 if (this.auth_user.role_id > 1 && document.origin_office.id != this.auth_user.office_id) {
@@ -426,7 +420,7 @@
                 })
 
                 //setTimeout(() => {
-                    console.log(data)
+                    //console.log(data)
                 //}, 5000);
 
                 //console.log('param:' + ptrackingId, psubject)
@@ -445,45 +439,13 @@
                 return breakpoint(col)
             },
             restoreDocument(item){
-                /*var u = this.auth_user
-                if (u.role_id > 1 && item.origin_office.id != u.office_id) {
-                    console.log('desti')
-                    var value = item.incoming_trashed.find(o => o.destination_office == u.office_id ).recipient_id
-                    console.log('user:inc:', value)
-                  //  return new Date(value).toISOString().substr(0, 10) || ''
-                } else {
-                    console.log('owned:out:', item.id)
-                }*/
-
-                //var document = (!this.getMyDocument(item))? {id:item.id, table: 'documents'} : {id:this.getMyDocument(item), table: 'document_recipients'}
-                //console.log('id:', document)
-                //console.log('docu:', (!this.getMyDocument(item))? item : this.getMyDocument(item) )
-
-                //restoreDocument
-                /*this.$store.dispatch('restoreDocument',
-                    (!this.getMyDocument(item))? {id:item.id, table: 'documents'} : {id:this.getMyDocument(item), table: 'document_recipients'}
-                ).then(() => {
-                    console.log('DONE RESTORED...')
-                });*/
-                console.log('user:', this.auth_user)
-                console.log(item);
-
                 this.restore = true
                 this.restoreParam = {
-                        dialog: true,
-                        title: 'Restore Document',
-                        document: item
-                    }
-
-
-
-                //return item.created_at
-
-                /*console.log(item)
-                var tracking = item.tracking_records.map(rec=>rec.id)
-                console.log('d:' + tracking)
-                console.log(Math.max(...tracking))
-                //console.log(item.tracking_records)*/
+                    dialog: true,
+                    title: 'Restore Document',
+                    document: item,
+                    filter: this.filterOptionSelected
+                }
             },
             filterBy(){
                 this.filter = {}

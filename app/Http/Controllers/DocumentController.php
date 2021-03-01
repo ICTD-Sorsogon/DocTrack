@@ -307,8 +307,6 @@ class DocumentController extends Controller
 
     public function restoreDocument(Request $request)
     {
-        //dump($request);
-        //dd($this->myDocu($request->documentId));
         $docu = $this->myDocu($request->documentId);
         $docu->status = 'received';
         $docu->deleted_at = null;
@@ -317,42 +315,6 @@ class DocumentController extends Controller
         return ($request->isRoot)?
             $this->myDocu($request->documentId)->incoming_trashed()->restore() :
             DocumentRecipient::withTrashed()->where('recipient_id', $request->dbId)->restore();
-
-        //if ($request->isRoot) {
-            //dump('docs');
-            //dump($request->documentId);
-            //Document::class;
-            //$docu = Document::withTrashed()->find($request->dbId)->incoming_trashed()->restore();
-            /*$docu = (clone Document::withTrashed()->find($request->dbId))->restore();
-            $docu->incoming_trashed()->restore();
-            $docu->status = 'received';
-            dd($docu->status);
-            return $docu->save();*/
-            //$docu = Document::withTrashed()->find($request->dbId)->restore();
-          //  $docu
-           // $docu->status = 'received';
-           // return $docu->save();
-            //return  $docu->incoming_trashed()->restore();
-            /*$office->name = $request->name;
-            $office->address = $request->address;
-            $office->office_code = $request->office_code;
-            $office->contact_number = $request->contact_number;
-            $office->contact_email = $request->contact_email;
-            $office->save();*/
-       // } else {
-            //dump('user');
-            //dump($request->documentId);
-            //dump($request->dbId);
-            //return Document::withTrashed()->where('id', $request->documentId)->restore();
-            /*$docu = Document::find($request->dbId);
-            $office->name = $request->name;
-            $office->address = $request->address;
-            $office->office_code = $request->office_code;
-            $office->contact_number = $request->contact_number;
-            $office->contact_email = $request->contact_email;
-            $office->save();*/
-          //  return DocumentRecipient::withTrashed()->where('recipient_id', $request->dbId)->restore();
-        //}
     }
 
     public function myDocu($id)
