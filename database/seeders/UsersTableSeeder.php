@@ -22,6 +22,9 @@ class UsersTableSeeder extends Seeder
         User::factory()->create(['username' => 'MSP', 'role_id' => 2, 'office_id' => '3', 'avatar' => 'images/kaido.jpg']);
         User::factory()->create(['username' => 'SSP', 'role_id' => 2, 'office_id' => '4', 'avatar' => 'images/shanks.jpg']);
         User::factory()->create(['username' => 'HRMO', 'role_id' => 2, 'office_id' => '17', 'avatar' => 'images/luffy.png']);
+        User::factory()->create(['username' => 'PBOO', 'role_id' => 2, 'office_id' => '9', 'avatar' => 'images/shanks.jpg']);
+        User::factory()->create(['username' => 'PAA', 'role_id' => 2, 'office_id' => '7', 'avatar' => 'images/kaido.jpg']);
+        User::factory()->create(['username' => 'PTO', 'role_id' => 2, 'office_id' => '5', 'avatar' => 'images/chopper.jpg']);
         User::factory()->create(['username' => 'admin', 'role_id' => 1, 'office_id' => '37', 'avatar' => 'images/zoro.png']);
         User::factory()->times(14)->create(['role_id'=> 2]);
     }
