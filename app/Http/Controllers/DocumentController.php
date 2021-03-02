@@ -11,12 +11,16 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Models\Document;
 use App\Models\DocumentRecipient;
 use App\Models\DocumentType;
+use App\Models\Office;
 use App\Models\TrackingRecord;
 use App\Models\TrackingSummary;
 use Illuminate\Http\Request;
+use App\Models\TrackingReport;
 
 class DocumentController extends Controller
 {
+    const PRIORITY_LEVEL = [ NULL, 604800000, 1296000000, 2592000000, 'Infinity'];
+
     public function __construct()
     {
         $this->middleware('auth:sanctum');
@@ -82,6 +86,19 @@ class DocumentController extends Controller
             'office_id' => auth()->user()->office_id
         ]);
 
+        $diff = $document->acknowledgedDiff();
+        $office = Office::whereOfficeCode('DO')->first();
+
+        auth()->user()->office->report->increment('transactions');
+
+        if(self::PRIORITY_LEVEL[$document->priority_level] < $diff){
+            $office->report->increment('delayed');
+        }
+
+        $office->report->update([
+            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
+        ]);
+
         return [$tracking_record];
     }
 
@@ -119,6 +136,18 @@ class DocumentController extends Controller
             throw $error;
         }
         DB::commit();
+
+        $office = auth()->user()->office;
+        $office->report->increment('transactions');
+        $diff = $document->receivedDiff();
+
+        if(self::PRIORITY_LEVEL[$document->priority_level] < $diff){
+           $office->report->increment('delayed');
+        }
+
+        $office->report->update([
+            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
+        ]);
 
         if(optional($recipient)->forwarded){
            $recipient->update([
@@ -201,6 +230,27 @@ class DocumentController extends Controller
                 'document_id' => $document->id,
                 'office_id' => auth()->user()->office_id
             ]);
+
+            $diff = $document->created_at->diffInSeconds(Carbon::now());
+            $office = $document->origin_office;
+
+            if($document->status == 'forwarded'){
+                $trackingRecord = $document->where('action', 'forwarded')->get()->last();
+                $office = $trackingRecord->forwardedByOffice;
+                $diff = $trackingRecord->created_at->diffInSeconds(Carbon::now());
+            }
+
+
+            Office::whereOfficeCode('DO')->first()->report->increment('transactions');
+
+            if(self::PRIORITY_LEVEL[$tracking_record->document->priority_level] < $diff){
+                $office->report->increment('delayed');
+            }
+
+            $office->report->update([
+                'speeds' => $office->report->speeds?->push($diff) ?? [$diff] //use optional for php < 8
+            ]);
+            
             $user_id = Auth::user()->id;
 
         } catch (ValidationException $error) {
@@ -306,6 +356,7 @@ class DocumentController extends Controller
             ['id' => $document->id],
             $request->validated()
         );
+
         $diff = DocumentRecipient::whereDocumentId($document->id)->pluck('destination_office')->diff(
             $document->destination_office_id
         );
@@ -331,6 +382,9 @@ class DocumentController extends Controller
                 'document_id' => $document->id,
                 'office_id' => auth()->user()->office_id
             ]);
+
+            TrackingReport::firstOrCreate([ 'office_id' => auth()->user()->office_id])->increment('transactions');
+
         }
 
        DocumentRecipient::whereDocumentId($document->id)
