@@ -127,6 +127,8 @@
     import { mapGetters } from 'vuex';
     import * as Excel from 'exceljs';
 
+    import { breakpoint, xstyle } from '../../../constants';
+
     export default {
         props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
         data() {
@@ -337,7 +339,8 @@
                         new_values: e.new_values
                     })
                 })
-                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
+                /*worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
                     const headerColumns = ['A','B', 'C', 'D', 'E']
                     headerColumns.forEach((v) => {
                         if(rowNumber == 1){
@@ -364,7 +367,7 @@
                         }
                     })
                 })
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]*/
                 this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
@@ -388,7 +391,9 @@
                         Email_Address: e.contact_email
                     })
                 })
-                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
+
+                /*worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
                     const headerColumns = ['A','B', 'C', 'D', 'E']
                     headerColumns.forEach((v) => {
                         if(rowNumber == 1){
@@ -415,7 +420,7 @@
                         }
                     })
                 })
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]*/
                 this.saveExcelFile('Office List', workbook);
             },
             advanceExport(){
@@ -481,6 +486,24 @@
                             }else{
                                 columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
                             }
+                        })
+
+                    })
+
+                    xstyle({ worksheet:worksheet, headercount:11, headercolor:this.marian_blue })
+
+                    /*let columnWidth = {}
+                    worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                        const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+
+                        headerColumns.forEach((v) => {
+                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
+
+                            if(columnWidth[v] == undefined){
+                                columnWidth[v] = currentColumnLength
+                            }else{
+                                columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
+                            }
 
                             if(rowNumber == 1){
                                 worksheet.getCell(`${v}${rowNumber}`).style = {
@@ -506,12 +529,12 @@
                             }
                         })
 
-                    })
+                    })*/
                     Object.values(columnWidth).forEach((width, index) => {
                         worksheet.getColumn(index+1).width = width + 5
 
                     });
-                            worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                            //worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
 
                 });
 
@@ -564,6 +587,20 @@
                 let columnWidth = {}
                 worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
                     const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+                    headerColumns.forEach((v) => {
+                        let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
+
+                        if(columnWidth[v] == undefined){
+                            columnWidth[v] = currentColumnLength
+                        }else{
+                            columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
+                        }
+                    })
+                })
+                xstyle({ worksheet:worksheet, headercount:11, headercolor:this.marian_blue })
+                /*let columnWidth = {}
+                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+                    const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 
                     headerColumns.forEach((v) => {
                         let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
@@ -597,12 +634,12 @@
                             }
                         }
                     })
-                })
+                })*/
                 Object.values(columnWidth).forEach((width, index) => {
                     worksheet.getColumn(index+1).width = width + 5
 
                 });
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
+                //worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
                 this.saveExcelFile('Archive Master List', workbook);
             },
             saveExcelFile(filename, workbook){
@@ -619,6 +656,8 @@
             },
         },
         mounted() {
+            var samp = 5
+            console.log(Array.from({length: samp}, (x,i)=>(i+10).toString(36).toUpperCase()) )
         }
     }
 </script>
