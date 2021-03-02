@@ -19,7 +19,7 @@ use App\Models\TrackingReport;
 
 class DocumentController extends Controller
 {
-    const PRIORITY_LEVEL = [ NULL, 604800000, 1296000000, 2592000000, 'Infinity'];
+    const PRIORITY_LEVEL = [ null => 'NONE', 604800, 1296000, 2592000, 'Infinity'];
 
     public function __construct()
     {
