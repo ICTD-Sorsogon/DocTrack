@@ -149,6 +149,9 @@ class DocumentController extends Controller
             'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
         ]);
 
+        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
+        $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
+
         if(optional($recipient)->forwarded){
            $recipient->update([
                 'acknowledged' => 0,
@@ -159,10 +162,6 @@ class DocumentController extends Controller
             return [$tracking_record];
         }
 
-        $destination = $document->destination_office_id->push($request->forwarded_to);
-        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
-
-        $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
 
         $document->document_recipient()->create([
             'document_id' => $document->id, 'destination_office' => $request->forwarded_to
@@ -222,8 +221,8 @@ class DocumentController extends Controller
                 $tracking_record->last_touched = Carbon::now();
                 $tracking_record->remarks = $request->documentRemarks;
                 $tracking_record->save();
-                $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
             }
+            $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
 
             TrackingSummary::create([
                 'action' => 'acknowledged',

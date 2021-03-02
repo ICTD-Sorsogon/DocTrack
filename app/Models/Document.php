@@ -37,7 +37,7 @@ class Document extends Model
 
     protected $hidden = ['destination_office_id'];
 
-    protected $appends = ['destination', 'recipient', 'multiple'];
+    protected $appends = ['destination', 'multiple'];
 
     public function document_recipient()
     {
@@ -53,19 +53,10 @@ class Document extends Model
         return $this->destination_office_id->count() > 1;
     }
 
-    public function getRecipientAttribute(){
-        $recipient = DocumentRecipient::whereDocumentId($this->id);
-        if(!auth()->user()->can('update', $this)){
-            $recipient->whereDestinationOffice(auth()->user()->office->id);
-        }
-
-        return $recipient->get();
-    }
-
     public function getDestinationAttribute()
     {
         $value = auth()->user()->can('update', $this) ? json_decode(optional($this->attributes)['destination_office_id']) : [auth()->user()->office->id];
-        return Office::whereIn('id', $value)->get();
+        return Office::get()->only($value);
     }
 
     public function setDestinationOfficeIdAttribute($value)
@@ -127,11 +118,14 @@ class Document extends Model
 
     public static function allDocuments(User $user)
     {
-        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records']);
+        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records', 'document_recipient']);
         if($user->isUser()){
 
             $outgoing = (clone $document)->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
             $incoming = $document
+                        ->with(['document_recipient' => function($query) use($user) {
+                            $query->whereDestinationOffice($user->id)->get();
+                        }])
                         ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1");})->get();
 
             return compact('incoming', 'outgoing');

@@ -142,7 +142,7 @@
                         ></v-text-field>
                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge' || (['Hold', 'Release'].includes(types) && isAdmin)">
+                    <v-col cols="12" xl="12" lg="12" md="12" v-if="types=='acknowledge' || (['Hold', 'Release'].includes(types))">
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-model="form.priority_levels"
@@ -413,7 +413,7 @@ export default {
             return this.$store.state.snackbars.request;
         },
         offices() {
-            return this.$store.state.offices.offices;
+            return this.$store.state.offices.offices.filter(office=>office.id != this.auth_user.office_id);
         },
         users() {
             return this.$store.state.users.all_users;
@@ -493,7 +493,7 @@ export default {
         },
         sanitize() {
             this.form.destination = this.form.destination[0].id;
-            this.form.recipient_id = this.is_admin ? null : this.form.recipient[0].recipient_id;
+            this.form.recipient_id = this.is_admin ? null : this.form.document_recipient[0].recipient_id;
             this.form.forwarded_by = this.form.forwarded_by.id;
         },
         receiveDocumentConfirm() {
