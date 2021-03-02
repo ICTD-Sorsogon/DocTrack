@@ -157,21 +157,11 @@
         },
         watch: {
             'export_by'(val) {
-                this.advanceBtn = (val == null) ? true : false
+                this.advanceBtn = (val == null)? true:false
             }
         },
         computed: {
             ...mapGetters(['request']),
-
-            export_list_data () {
-                const type = this.$store.state.documents.documentsArchive[0].selected.filter;
-                const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
-
-                data.forEach((e, index) => {
-
-                })
-            }
-
         },
         methods: {
             randomKey(){
@@ -480,7 +470,7 @@
                         const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 
                         headerColumns.forEach((v) => {
-                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
+                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length
 
                             if(columnWidth[v] == undefined){
                                 columnWidth[v] = currentColumnLength
