@@ -249,7 +249,7 @@ class DocumentController extends Controller
             $office->report->update([
                 'speeds' => $office->report->speeds?->push($diff) ?? [$diff] //use optional for php < 8
             ]);
-            
+
             $user_id = Auth::user()->id;
 
         } catch (ValidationException $error) {
@@ -394,12 +394,12 @@ class DocumentController extends Controller
 
     public function trackingReports()
     {
-       $summary = TrackingReport::with('office')->get();
+       $summary = TrackingReport::with('office');
        if(!auth()->user()->isAdmin()){
             return $summary->only(auth()->user()->office_id)->first();
        }
 
-       return $summary;
+       return $summary->where('transactions', '!=', 0)->get();
     }
 
     public function officeReports()
