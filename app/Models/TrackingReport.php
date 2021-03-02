@@ -16,7 +16,7 @@ class TrackingReport extends Model
 
     protected $casts = ['speeds' => 'collection'];
 
-    protected $appends = ['Efficiency', 'average', 'fastest', 'slowest'];
+    protected $appends = ['efficiency', 'average', 'fastest', 'slowest'];
 
     public function getAverageAttribute()
     {
@@ -36,6 +36,11 @@ class TrackingReport extends Model
     public function getEfficiencyAttribute()
     {
         extract($this->only('transactions', 'delayed'));
-        return $transactions ? number_format(($transactions - $delayed) / $transactions * 100, 2) : 'NOT AVAILABLE';
+        return $transactions ? number_format(($transactions - $delayed) / $transactions * 100, 2) . '%' : 'NOT AVAILABLE';
+    }
+
+    public function office()
+    {
+        return $this->belongsTo('App\Models\Office');
     }
 }

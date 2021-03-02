@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Office;
+use App\Models\TrackingReport;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -283,5 +285,10 @@ class OfficesTableSeeder extends Seeder
             ],
         ];
         DB::table('offices')->insert($offices);
+
+        Office::all()->each(function($office, $key){
+            TrackingReport::create(['office_id' => $office->id]);
+        });
+
     }
 }

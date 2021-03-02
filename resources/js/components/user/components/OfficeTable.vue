@@ -1,25 +1,14 @@
 <template>
     <v-row>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card
-                elevation="2"
-                outlined
-            >
-            <v-card-title>Created</v-card-title>
-            <v-card-text>
-                {{office.created}}
-            </v-card-text>
-            </v-card>
-        </v-col>
 
         <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
             <v-card
                 elevation="2"
                 outlined
             >
-            <v-card-title>Received</v-card-title>
+            <v-card-title>All Transaction</v-card-title>
             <v-card-text>
-                {{office.received}}
+                {{office.transactions}}
             </v-card-text>
             </v-card>
         </v-col>
@@ -28,9 +17,9 @@
                 elevation="2"
                 outlined
             >
-            <v-card-title>Forwarded</v-card-title>
+            <v-card-title>Delayed Documents</v-card-title>
             <v-card-text>
-                {{office.forwarded}}
+                {{office.delayed}}
             </v-card-text>
             </v-card>
         </v-col>
@@ -39,34 +28,55 @@
                 elevation="2"
                 outlined
             >
-            <v-card-title>Transaction</v-card-title>
+            <v-card-title>Fastest Transaction</v-card-title>
             <v-card-text>
-                {{office.transaction}}
+                {{office.fastest}}
+            </v-card-text>
+            </v-card>
+        </v-col>
+        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card
+                elevation="2"
+                outlined
+            >
+            <v-card-title>Slowest Transaction</v-card-title>
+            <v-card-text>
+                {{office.slowest}}
+            </v-card-text>
+            </v-card>
+        </v-col>
+        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card
+                elevation="2"
+                outlined
+            >
+            <v-card-title>Average Transaction Speed</v-card-title>
+            <v-card-text>
+                {{office.average}}
+            </v-card-text>
+            </v-card>
+        </v-col>
+        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card
+                elevation="2"
+                outlined
+            >
+            <v-card-title>Efficiency Rating</v-card-title>
+            <v-card-text>
+                {{office.efficiency}}
             </v-card-text>
             </v-card>
         </v-col>
     </v-row>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 export default {
     computed: {
         ...mapGetters(['auth_user']),
+        ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         office(){
-            let data = [];
-            let reports = JSON.parse(JSON.stringify(this.$store.getters.office_reports_get));
-            let created = 0, received = 0, forwarded = 0, transaction = 0;
-            for (const [key, value] of Object.entries(reports)) {
-                value.action === 'created' ? created++ : 0;
-                value.action === 'received' ? received++ : 0;
-                value.action === 'forwarded' ? forwarded++ : 0;
-            }
-            return {
-                created:created,
-                received:received,
-                forwarded:forwarded,
-                transaction: created + received + forwarded
-            };
+            return this.tracking_reports
         }
     },
     mounted() {

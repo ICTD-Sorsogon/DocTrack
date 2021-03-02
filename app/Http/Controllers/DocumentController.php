@@ -234,7 +234,7 @@ class DocumentController extends Controller
             $office = $document->origin_office;
 
             if($document->status == 'forwarded'){
-                $trackingRecord = $document->where('action', 'forwarded')->get()->last();
+                $trackingRecord = $document->tracking_records->where('action', 'forwarded')->last();
                 $office = $trackingRecord->forwardedByOffice;
                 $diff = $trackingRecord->created_at->diffInSeconds(Carbon::now());
             }
@@ -394,8 +394,12 @@ class DocumentController extends Controller
 
     public function trackingReports()
     {
-        $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
-        return $summary;
+       $summary = TrackingReport::with('office')->get();
+       if(!auth()->user()->isAdmin()){
+            return $summary->only(auth()->user()->office_id)->first();
+       }
+
+       return $summary;
     }
 
     public function officeReports()

@@ -3,7 +3,7 @@
         <v-col cols="12">
             <v-data-table
                 :search="search"
-                :items="summaries"
+                :items="tracking_reports"
                 :items-per-page="10"
                 :headers="headers"
                 class="elevation-1"
@@ -22,104 +22,30 @@
     </v-row>
 </template>
 <script>
-const week_in_milliseconds = 604800000;
-import { delay_filter } from '../../../constants';
-import { max, min, mean } from 'lodash';
+import {mapState} from 'vuex';
+
 export default {
     data() {
         return {
             search: '',
             headers: [
-                { text: 'Office', align: 'start',value: 'name'},
+                { text: 'Office', align: 'start',value: 'office.name'},
                 { text: 'All Transaction', value: 'transactions', filterable:false},
                 { text: 'Delayed Document', value: 'delayed', filterable:false},
-                { text: 'Fastest Transaction', value: 'min', filterable:false},
-                { text: 'Slowest Transaction', value: 'max', filterable:false},
-                { text: 'Average Transaction Speed', value: 'mean', filterable:false},
+                { text: 'Fastest Transaction', value: 'fastest', filterable:false},
+                { text: 'Slowest Transaction', value: 'slowest', filterable:false},
+                { text: 'Average Transaction Speed', value: 'average', filterable:false},
                 { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
             ],
         }
     },
     computed: {
-        summaries(){
-            let summaries = JSON.parse(JSON.stringify(this.$store.state.documents.tracking_reports));
-            let offices = JSON.parse(JSON.stringify(this.$store.state.offices.office_names));
-            let data = [];
-            for (const [key, value] of Object.entries(summaries)) {
-                let created = value.filter(value => value.action === 'created');
-                let acknowledged = value.filter(value => value.action === 'acknowledged');
-                let received = value.filter(value => value.action === 'received');
-                if (value.length === 1) offices[value[0].office_id].transactions++
-                else {
-                    if (created.length !== 0) {
-                        offices[created[0].office_id].transactions+= created[0].document.destination.length;
-                        if (acknowledged.length !== 0) {
-                            offices[acknowledged[0].office_id].transactions += acknowledged[0].document.destination.length;
-                            offices[acknowledged[0].office_id].transaction_speed.push(new Date(acknowledged[0].created_at).getTime() - new Date(created[0].created_at).getTime())
-                            if (new Date(acknowledged[0].created_at).getTime() -
-                                    new Date(created[0].created_at).getTime() > delay_filter[acknowledged[0].document.priority_level - 1]) offices[value[0].office_id].delayed += acknowledged[0].document.destination.length
-                            if (received.length > 0) {
-                                received.forEach(element => {
-                                    offices[element.office_id].transactions++
-                                    offices[element.office_id].transaction_speed.push(new Date(element.created_at).getTime() - new Date(acknowledged[0].created_at).getTime())
-                                    if (new Date(element.created_at).getTime() -
-                                        new Date(acknowledged[0].created_at).getTime() > delay_filter[acknowledged[0].document.priority_level - 1]) offices[acknowledged[0].office_id].delayed++
-                                });
-                            }
-                        }
-                    } else {
-                        for (var i = 0; i < value.length; i++) {
-                            if (i !== value.length - 1) {
-                                if (new Date(value[i + 1].created_at).getTime() -
-                                    new Date(value[i].created_at).getTime() > delay_filter[value[i].document.priority_level - 1]) offices[value[i].office_id].delayed++
-                                offices[value[i].office_id].transaction_speed.push(new Date(value[i + 1].created_at).getTime() - new Date(value[i].created_at).getTime())
-                                if (forwarded.length !== 0) {
-                                    offices[acknowledged[0].office_id].transactions += 1;
-                                }
-                            }
-                            offices[value[i].office_id].transactions++;
-                        }
-                    }
-                }
-            }
-            for (const [key, value] of Object.entries(offices)) {
-                if(value.transaction_speed.length > 0){
-                    let transaction_speed_list = value.transaction_speed
-                    value.min = this.timeConversion(min(transaction_speed_list))
-                    value.max = this.timeConversion(max(transaction_speed_list))
-                    value.mean = this.timeConversion(mean( transaction_speed_list ))
-                } else {
-                    value.min = value.max = value.mean = 'Not available'
-                }
-                value.efficiency = value.transactions !== 0 ?`${((value.transactions - value.delayed) /
-                    value.transactions * 100).toFixed(2)}%` : 'Not available';
-                data.push(value);
-            }
-            return data;
-        },
+        ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
     },
     mounted() {
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
         this.$store.dispatch('getOfficeNameList');
-    },
-    methods: {
-        filterOnlyOffice (value, search, item) {
-            return value != null &&
-            search != null &&
-            typeof value === 'string' &&
-            value.toString().toLowerCase().indexOf(search) !== -1
-        },
-        timeConversion(millisec) {
-            var seconds = Math.trunc(millisec / 1000);
-            var minutes = Math.trunc(millisec / (1000 * 60));
-            var hours = Math.trunc(millisec / (1000 * 60 * 60));
-            var days = Math.trunc(millisec / (1000 * 60 * 60 * 24));
-            if (seconds < 60) return `${seconds}s`;
-            else if (minutes < 60) return `${minutes}m`;
-            else if (hours < 24) return `${hours}h`;
-            else return `${days}d`
-        }
     }
 }
 </script>
