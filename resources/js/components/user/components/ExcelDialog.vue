@@ -355,34 +355,6 @@
                     })
                 })
                 xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
-                /*worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                    const headerColumns = ['A','B', 'C', 'D', 'E']
-                    headerColumns.forEach((v) => {
-                        if(rowNumber == 1){
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                fill: {
-                                    type: 'pattern',
-                                    pattern:'solid',
-                                    fgColor:{ argb: header_color }
-                                },
-                                font: {
-                                    color: {argb: "ffffff"},
-                                    bold: true
-                                }
-                            }
-                        }else{
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                border: {
-                                    top: { style: 'thin' },
-                                    left: { style: 'thin' },
-                                    bottom: { style: 'thin' },
-                                    right: { style: 'thin' }
-                                }
-                            }
-                        }
-                    })
-                })
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]*/
                 this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
@@ -407,35 +379,6 @@
                     })
                 })
                 xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
-
-                /*worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                    const headerColumns = ['A','B', 'C', 'D', 'E']
-                    headerColumns.forEach((v) => {
-                        if(rowNumber == 1){
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                fill: {
-                                    type: 'pattern',
-                                    pattern:'solid',
-                                    fgColor:{ argb: header_color }
-                                },
-                                font: {
-                                    color: {argb: "ffffff"},
-                                    bold: true
-                                }
-                            }
-                        }else{
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                border: {
-                                    top: { style: 'thin' },
-                                    left: { style: 'thin' },
-                                    bottom: { style: 'thin' },
-                                    right: { style: 'thin' }
-                                }
-                            }
-                        }
-                    })
-                })
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]*/
                 this.saveExcelFile('Office List', workbook);
             },
             advanceExport(){
@@ -506,50 +449,10 @@
                     })
 
                     xstyle({ worksheet:worksheet, headercount:11, headercolor:this.marian_blue })
-
-                    /*let columnWidth = {}
-                    worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                        const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-
-                        headerColumns.forEach((v) => {
-                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
-
-                            if(columnWidth[v] == undefined){
-                                columnWidth[v] = currentColumnLength
-                            }else{
-                                columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
-                            }
-
-                            if(rowNumber == 1){
-                                worksheet.getCell(`${v}${rowNumber}`).style = {
-                                    fill: {
-                                        type: 'pattern',
-                                        pattern:'solid',
-                                        fgColor:{ argb: header_color }
-                                    },
-                                    font: {
-                                        color: {argb: "ffffff"},
-                                        bold: true
-                                    }
-                                }
-                            }else{
-                                worksheet.getCell(`${v}${rowNumber}`).style = {
-                                    border: {
-                                        top: { style: 'thin' },
-                                        left: { style: 'thin' },
-                                        bottom: { style: 'thin' },
-                                        right: { style: 'thin' }
-                                    }
-                                }
-                            }
-                        })
-
-                    })*/
                     Object.values(columnWidth).forEach((width, index) => {
                         worksheet.getColumn(index+1).width = width + 5
 
                     });
-                            //worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
 
                 });
 
@@ -613,48 +516,10 @@
                     })
                 })
                 xstyle({ worksheet:worksheet, headercount:11, headercolor:this.marian_blue })
-                /*let columnWidth = {}
-                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                    const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-
-                    headerColumns.forEach((v) => {
-                        let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length ?? 0
-
-                        if(columnWidth[v] == undefined){
-                            columnWidth[v] = currentColumnLength
-                        }else{
-                            columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
-                        }
-
-                        if(rowNumber == 1){
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                fill: {
-                                    type: 'pattern',
-                                    pattern:'solid',
-                                    fgColor:{ argb: header_color }
-                                },
-                                font: {
-                                    color: {argb: "ffffff"},
-                                    bold: true
-                                }
-                            }
-                        }else{
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                border: {
-                                    top: { style: 'thin' },
-                                    left: { style: 'thin' },
-                                    bottom: { style: 'thin' },
-                                    right: { style: 'thin' }
-                                }
-                            }
-                        }
-                    })
-                })*/
                 Object.values(columnWidth).forEach((width, index) => {
                     worksheet.getColumn(index+1).width = width + 5
 
                 });
-                //worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
                 this.saveExcelFile('Archive Master List', workbook);
             },
 
