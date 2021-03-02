@@ -183,12 +183,12 @@
 
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-row>
-                        <v-col v-bind="bp(6)" class="pr-0" style="top:50%; text-align:right; padding-left:0px !important">
+                        <v-col v-if="auth_user.role_id == 1" v-bind="restoreAttribute">
                             <v-btn fab icon raised x-small color = 'primary' title="Restore to Active" style="margin-right:4px;"
                                 @click.prevent="{restoreDocument(item)}"
                             ><v-icon>mdi-backup-restore</v-icon></v-btn>
                         </v-col>
-                        <v-col v-bind="bp(6)" class="pl-0" style="top:50%; text-align:left; ">
+                        <v-col v-bind="viewAttribute">
                             <v-btn fab icon raised x-small color = 'primary' title="View More"
                                 @click.prevent="{selectDoc(item.id); viewDialog = true}"
                             ><v-icon>mdi-more</v-icon></v-btn>
@@ -230,6 +230,13 @@
             @close-dialog="closeDialog('excel')"
         />
 
+        <restore-document
+            v-if="auth_user.role_id ==1 && restore"
+            :param="restoreParam"
+            @reload-data="filterChange"
+            @close-dialog="closeDialog('restore')"
+        />
+
     </div>
 </template>
 
@@ -239,10 +246,12 @@
     import { colors, breakpoint } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
 
-    import AdvanceSearch from './components/ArchiveAdvanceSearch'
+    import AdvanceSearch from './components/ArchiveAdvanceSearch';
+    import restoreDocument from './components/RestoreDocument'
+    import RestoreDocument from './components/RestoreDocument.vue';
 
     export default {
-        components: { ExcelDialog, TableModal, AdvanceSearch },
+        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument },
         data() {
             return {
                 activeDoc: null,
@@ -276,6 +285,8 @@
                 isByYear: false,
                 filter: {},
                 tableData: [],
+                restore: false,
+                restoreParam: []
             }
         },
         computed: {
@@ -307,15 +318,43 @@
                 if (this.allData) return 'mdi-minus-box'
                 return 'mdi-checkbox-blank-outline'
             },
+            styleActRestore() {
+                return { top: '50%', textAlign: 'right', paddingLeft: '0px !important' }
+            },
+            classActRestore() {
+                return 'pr-0'
+            },
+            restoreAttribute(){
+                return {
+                    ...this.bp((this.auth_user.role_id == 1)?6:12),
+                    style: {
+                        top: '50%',
+                        textAlign: 'right',
+                        paddingLeft: '0px !important',
+                        paddingRight: '0px'
+                    }
+                }
+            },
+            viewAttribute(){
+                let isAdmin = this.auth_user.role_id == 1
+                return {
+                    ...this.bp((isAdmin)?6:12),
+                    style: {
+                        top:'50%',
+                        textAlign:(isAdmin)?'left':'center',
+                        paddingLeft:(isAdmin)?'0px':''
+                    }
+                }
+            }
         },
         methods: {
             dateCreated(item){
-                var u = this.auth_user
-                if (u.role_id > 1 && item.origin_office.id != u.office_id) {
-                    var value = item.incoming_trashed.find(o => o.destination_office == u.office_id ).created_at
-                    return new Date(value).toISOString().substr(0, 10) || ''
-                }
-                return item.created_at
+                return (!this.getMyDocument(item))? item.created_at : new Date(this.getMyDocument(item).created_at).toISOString().substr(0, 10)
+            },
+            getMyDocument(document) {
+                if (this.auth_user.role_id > 1 && document.origin_office.id != this.auth_user.office_id) {
+                    return document.incoming_trashed.find(o => o.destination_office == this.auth_user.office_id)
+                } return false
             },
             advanceSearchQuery(param) {
                 //console.log('search param:')
@@ -383,7 +422,7 @@
                 })
 
                 //setTimeout(() => {
-                    console.log(data)
+                    //console.log(data)
                 //}, 5000);
 
                 //console.log('param:' + ptrackingId, psubject)
@@ -402,10 +441,13 @@
                 return breakpoint(col)
             },
             restoreDocument(item){
-                var tracking = item.tracking_records.map(rec=>rec.id)
-                console.log('d:' + tracking)
-                console.log(Math.max(...tracking))
-                //console.log(item.tracking_records)
+                this.restore = true
+                this.restoreParam = {
+                    dialog: true,
+                    title: 'Restore Document',
+                    document: item,
+                    filter: this.filterOptionSelected
+                }
             },
             filterBy(){
                 this.filter = {}
@@ -526,6 +568,9 @@
                         break;
                     case 'dialog':
                         this.viewDialog = false
+                        break;
+                    case 'restore':
+                        this.restore = false
                         break;
                 }
             }

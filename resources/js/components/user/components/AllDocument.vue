@@ -66,12 +66,6 @@ export default {
         userDocuments() {
             let type = this.tab ? 'outgoing' : 'incoming'
             return JSON.parse(JSON.stringify(this.documents))[type]
-            .map(doc => {
-                if(!this.tab){
-                  doc.recipient_id = doc.recipient[0].recipient_id
-                }
-              return doc
-            })
         },
     },
     methods: {
@@ -102,10 +96,10 @@ export default {
             this.$router.push({ name: "Edit Document", params:{type: 'create'} });
             }
         },
-        editDocument(id) {
+        editDocument(item) {
             if (this.$route.name !== "Edit Document") {
                 this.$store.dispatch("setLoader");
-                this.$router.push({ name:"Edit Document", params: {id: id, type: 'edit'}});
+                this.$router.push({ name:"Edit Document", params: { item: item, id: item.id, type: 'edit'}});
             }
         },
     },

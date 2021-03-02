@@ -120,6 +120,9 @@ class DocumentController extends Controller
         }
         DB::commit();
 
+        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
+        $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
+
         if(optional($recipient)->forwarded){
            $recipient->update([
                 'acknowledged' => 0,
@@ -130,10 +133,6 @@ class DocumentController extends Controller
             return [$tracking_record];
         }
 
-        $destination = $document->destination_office_id->push($request->forwarded_to);
-        $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
-
-        $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
 
         $document->document_recipient()->create([
             'document_id' => $document->id, 'destination_office' => $request->forwarded_to
@@ -193,8 +192,8 @@ class DocumentController extends Controller
                 $tracking_record->last_touched = Carbon::now();
                 $tracking_record->remarks = $request->documentRemarks;
                 $tracking_record->save();
-                $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
             }
+            $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
 
             TrackingSummary::create([
                 'action' => 'acknowledged',
@@ -214,20 +213,25 @@ class DocumentController extends Controller
         return [$tracking_record];
     }
 
-    public function holdRejectDocument(Request $request)
+    public function holdDocument(Document $document, Request $request)
     {
         DB::beginTransaction();
         try {
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $request->id;
-            $tracking_record->action = $request->hold_reject;
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $request->documentRemarks;
-            $tracking_record->save();
-            $tracking_record->document->update(['status' => $request->hold_reject]);
-
-
+            foreach($document->destination as $destination) {
+                $tracking_record = new TrackingRecord();
+                $tracking_record->document_id = $request->id;
+                $tracking_record->action = 'on hold';
+                $tracking_record->touched_by = Auth::user()->id;
+                $tracking_record->destination = $destination->id;
+                $tracking_record->last_touched = Carbon::now();
+                $tracking_record->remarks = $request->documentRemarks;
+                $tracking_record->save();
+                $tracking_record->document_recipient->first()->update(['hold' => 1]);
+                $tracking_record->document->update([
+                    'status' => 'on hold',
+                    'priority_level' => $request->priority_levels
+                    ]);
+            }
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -250,6 +254,35 @@ class DocumentController extends Controller
             $tracking_record->update([
                 'last_touched' => Carbon::parse($updatedTime)
                 ]);
+
+        } catch (ValidationException $error) {
+            DB::rollback();
+            throw $error;
+        } catch (\Exception $error) {
+            DB::rollback();
+            throw $error;
+        }
+        DB::commit();
+        return [$tracking_record];
+    }
+
+    public function releaseDocument(Document $document, Request $request)
+    {
+
+        DB::beginTransaction();
+        try {
+            foreach($document->destination as $destination) {
+                $tracking_record = new TrackingRecord();
+                $tracking_record->document_id = $request->id;
+                $tracking_record->action = 'released';
+                $tracking_record->destination = $destination->id;
+                $tracking_record->touched_by = Auth::user()->id;
+                $tracking_record->last_touched = Carbon::now();
+                $tracking_record->remarks = $request->documentRemarks;
+                $tracking_record->save();
+                $tracking_record->document->update(['priority_level' => $request->priority_levels]);
+                $tracking_record->document_recipient->first()->update(['hold' => 0]);
+            }
 
         } catch (ValidationException $error) {
             DB::rollback();
@@ -303,5 +336,22 @@ class DocumentController extends Controller
     {
         $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
         return $summary;
+    }
+
+    public function restoreDocument(Request $request)
+    {
+        $docu = $this->myDocu($request->documentId);
+        $docu->status = 'received';
+        $docu->deleted_at = null;
+        $docu->save();
+
+        return ($request->isRoot)?
+            $this->myDocu($request->documentId)->incoming_trashed()->restore() :
+            DocumentRecipient::withTrashed()->where('recipient_id', $request->dbId)->restore();
+    }
+
+    public function myDocu($id)
+    {
+        return Document::withTrashed()->find($id);
     }
 }

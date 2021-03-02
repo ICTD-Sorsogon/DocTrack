@@ -145,12 +145,12 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
-    async holdRejectDocumentConfirm({ commit }, form) {
-        await axios.post(`/api/hold_reject_document_confirm/${form.id}`, form)
+    async holdDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/hold_document_confirm/${form.id}`, form)
         .then(response => {
             const data = {
                 status: 'SUCCESS',
-                message: `${form.subject} was ${form.hold_reject}!`,
+                message: `${form.subject} was successfully hold!`,
             }
             commit('SNACKBAR_STATUS', data)
 
@@ -181,6 +181,24 @@ const actions = {
             commit('SNACKBAR_STATUS', error_data)
         });
     },
+    async releaseDocumentConfirm({ commit }, form) {
+        await axios.post(`/api/release_document_confirm/${form.id}`, form)
+        .then(response => {
+            const data = {
+                status: 'SUCCESS',
+                message: `${form.subject} was successfully released!`,
+            }
+            commit('SNACKBAR_STATUS', data)
+
+        })
+        .catch(error => {
+            const error_data = {
+                status: 'FAILED',
+                message: `The server replied with an error! Please Contact your administrator.`,
+            }
+            commit('SNACKBAR_STATUS', error_data)
+        });
+    },
     async documentReports({ commit }) {
         const response = await axios.get('/api/tracking_reports')
         commit('GET_TRACKING_REPORTS', response.data);
@@ -190,6 +208,19 @@ const actions = {
     },
     async unsetDocument({ commit }) {
         commit('UNSET_SELECTED_DOCUMENT');
+    },
+    async restoreDocument({ commit }, document) {
+        let status = {}
+        await axios.post('/api/restore_document', document)
+        .then(response => {
+            status.status = 'success'
+            status.message = `Document successfully restored!`
+        })
+        .catch(error => {
+            status.status = 'failed'
+            status.message = `Failed to restore document!`
+        });
+        commit('SNACKBAR_STATUS', status)
     }
 }
 
@@ -251,7 +282,6 @@ const mutations = {
                 state.documentsArchive[0].selected[filter].data = response.data
             }
         }
-        //state.documentsArchive = []
     },
     RESET_ARCHIVE_STATE(state) {
         state.documentsArchive = []

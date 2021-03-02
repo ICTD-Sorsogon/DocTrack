@@ -8,7 +8,7 @@
         >
             <v-list three-line color="#E1F3FC">
             <template v-for="(item, index) in notifs">
-                <div :key="index" @click="seen(index, item)" style="cursor:pointer;" class="notif_item"> 
+                <div :key="index" @click="seen(index, item)" style="cursor:pointer;" class="notif_item">
                     <v-divider
                     style="background-color:#E1E1E1"
                     :inset="item.inset"
@@ -19,7 +19,7 @@
                     ripple
                     >
                     <v-list-item-avatar class="elevation-3" >
-                        <v-img :src="item.avatar || default_image"></v-img>
+                        <v-img :src="baseURL + item.avatar || baseURL + default_image"></v-img>
                     </v-list-item-avatar>
 
                     <v-list-item-content>
@@ -46,9 +46,10 @@ export default {
     data(){
         return{
             dialog: false,
-            default_image:'/images/defaultpic.jpg',
+            default_image:'images/defaultpic.jpg',
             items: [],
             selected_document: {},
+            baseURL: window.location.origin + '/'
         }
     },
     computed:{

@@ -6,7 +6,6 @@
 		:items="extendedData"
 		:page.sync="page"
 		:items-per-page="itemsPerPage"
-		item-key="keys"
 		:loading="datatable_loader"
         :sort-by="['priority_level']"
         :sort-desc="[false]"
@@ -59,9 +58,9 @@
 		<template  v-slot:expanded-item="{ headers, item }">
 			<td :colspan="headers.length">
 				<v-row class="d-flex justify-space-around">
-					<v-col v-if="isEditable(item) && !item.acknowledged">
+					<v-col v-if="visibleButton('edit', item)">
 						<v-btn
-							@click="$emit('editDocument', item.id)"
+							@click="$emit('editDocument', item)"
 							text
 							color="#26A69A"
 							block
@@ -72,7 +71,7 @@
 							Edit
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && !item.received ">
+					<v-col v-if="visibleButton('receive', item)">
 						<v-btn @click.prevent="redirectToReceivePage(item, 'receive')" text color="#FFCA28" block >
 							<v-icon left>
                                 mdi-email-receive-outline
@@ -80,7 +79,7 @@
 							Receive
 						</v-btn>
 					</v-col>
-					<v-col v-if="(incoming || item.DO_reciever ) && (isAdmin || item.received) && !item.multiple && !item.forwarded">
+					<v-col v-if="visibleButton('forward', item)">
 						<v-btn
 							link @click.prevent="redirectToReceivePage(item, 'forward')" text color="#9575CD" block
 						>
@@ -90,7 +89,7 @@
 							Forward
 						</v-btn>
 					</v-col>
-					<v-col v-if="((isEditable(item) && item.acknowledged && item.received) ||  (!isAdmin && item.received))">
+					<v-col v-if="visibleButton('terminate', item)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'terminal')" text color="#F06292" block
 						>
 							<v-icon left>
@@ -99,7 +98,7 @@
 							Terminal
 						</v-btn>
 					</v-col>
-                    <v-col v-if="isAdmin && !item.acknowledged">
+                    <v-col v-if="visibleButton('acknowledge',item)">
 						<v-btn link @click.prevent="redirectToReceivePage(item, 'acknowledge')" text color="#4CAF50" block
 						>
 							<v-icon left>
@@ -117,13 +116,22 @@
 							Change Date
 						</v-btn>
 					</v-col>
-                    <v-col v-if="incoming && item.recieved && !item.forwarded">
-						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold or Reject')" text color="#F44336" block
+                    <v-col v-if="visibleButton('hold',item)">
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'Hold')" text color="#F44336" block
 						>
 							<v-icon left>
 								mdi-email-alert-outline
 							</v-icon>
-							Hold or Reject
+							Hold
+						</v-btn>
+					</v-col>
+                    <v-col v-if="visibleButton('release',item)">
+						<v-btn link @click.prevent="redirectToReceivePage(item, 'Release')" text color="#F50057" block
+						>
+							<v-icon left>
+								mdi-email-mark-as-unread
+							</v-icon>
+							Release
 						</v-btn>
 					</v-col>
 				</v-row>
@@ -177,18 +185,18 @@ export default {
 		},
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
-				doc.keys = doc.id + ' ' + (doc.recipient_id ?? '')
                 doc.is_external = doc.is_external ? 'External' : 'Internal'
 				doc.sender_name = doc.sender?.name ?? doc.sender_name
 				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';
-				doc.DO_reciever = doc.destination.find(target => target.office_code == "DO")
 
 
-				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
-                  doc[status] = doc.recipient.every( recipient => recipient[status] )
+				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected']){
+                  doc[status] = doc.document_recipient.every( recipient => recipient[status] )
                 }
+
+                doc.hold = doc.document_recipient.some( recipient => recipient.hold);
 
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'High'
@@ -219,6 +227,33 @@ export default {
         }
 	},
 	methods: {
+		visibleButton(type, item) {
+			let rules = {
+				'edit': () => {
+					return (this.isEditable(item) || this.isAdmin) && !item.acknowledged && !item.received
+				},
+				'acknowledge': () => {
+					return this.isAdmin && !item.acknowledged
+				},
+				'terminate': () => {
+					return (this.isEditable(item) && !item.acknowledged) ||  ((this.isReceiver(item)|| item.forwarded) && item.received && !item.hold) || (this.isAdmin && item.received && !item.hold)
+				},
+				'forward': () => {
+					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded && !item.hold
+				},
+				'receive': () => {
+					return (this.incoming || (this.isReceiver(item) && this.isAdmin)) && !item.received && !item.forwarded && item.acknowledged
+				},
+				'hold':() => {
+					return ((this.incoming && this.isReceiver(item)  && item.received) || (this.isAdmin && item.acknowledged)) && !item.forwarded && !item.hold
+				},
+                'release':() => {
+                    return ((this.incoming && this.isReceiver(item)  && item.hold) || (this.isAdmin && item.hold))
+                }
+			}
+			return rules[type]()
+
+		},
 		closeDialog(){
 			this.dialog = false
 		},
@@ -236,7 +271,10 @@ export default {
             }
         },
 		isEditable(docOrigin) {
-			return this.auth_user.office_id == docOrigin.origin_office?.id || this.isAdmin
+			return this.auth_user.office_id == docOrigin.origin_office?.id
+		},
+		isReceiver(doc){
+			return !!doc.destination.find(target => target.id == this.auth_user.office_id)
 		},
 		getTrackingCodeColor(document, document_type_id) {
             // document.color = colors[document_type_id];
