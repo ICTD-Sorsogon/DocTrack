@@ -22,6 +22,7 @@
                                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
                             </v-col>
                         </v-row>
+                        <!-- Kenneth -->
                         <!-- MASTER LIST -->
                         <v-row v-if="dialog_type == 'export' && dialog_for == 'masterList'">
                             <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
@@ -29,31 +30,48 @@
                             </v-col>
                         </v-row>
                         <!-- ADVANCE EXPORT -->
-                        <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                        <!-- <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
                             <v-autocomplete
                                 v-model="export_by"
                                 :items="export_list"
                                 item-text="key"
                                 dense
                                 filled
-                                label="Filled"
+                                label="Group by:"
+                                required
                             ></v-autocomplete>
+                        </v-col> -->
+
+                        <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
+                            <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
+                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips(item.name)">
+                                                {{item.name}}
+                                            </v-chip>
+                                        </template>
+                                        <span >{{item.name}}</span>
+                                    </v-tooltip>
+                                </template>
+                            </v-select>
                         </v-col>
-                        <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                        <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
                             <v-autocomplete
                                 v-model="source"
                                 :items="source_list"
                                 item-text="key"
                                 dense
                                 filled
-                                label="Filled"
+                                label="Source:"
                             ></v-autocomplete>
                         </v-col>
                         <v-row v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
                             <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                                <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
+                                <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
                             </v-col>
                         </v-row>
+                        <!-- END  -->
                         <v-row v-if="dialog_type == 'import'">
                             <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
                                 <v-file-input
@@ -140,9 +158,11 @@
                 tab: null,
                 excel_table_headers: [],
                 is_preview: false,
+                advanceBtn: true,
                 offices: [],
                 marian_blue: '0675BB',
-                export_by: '',
+                // export_by: null,
+                selected_type: [],
                 export_list: [
                     { key: 'Document Type', value: 'document_type'},
                     { key: 'Originating Office', value: 'origin_office'},
@@ -155,18 +175,13 @@
                ],
             }
         },
-        computed: {
-            ...mapGetters(['request']),
-
-            export_list_data () {
-                const type = this.$store.state.documents.documentsArchive[0].selected.filter;
-                const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
-
-                data.forEach((e, index) => {
-
-                })
+        watch: {
+            'selected_type'(val) {
+                this.advanceBtn = (val.length < 1)? true:false
             }
-
+        },
+        computed: {
+            ...mapGetters(['request', 'document_types']),
         },
         methods: {
             randomKey(){
@@ -428,15 +443,14 @@
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
-                console.log(data)
 
                 const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
 
                 let workbook = new Excel.Workbook()
 
-                const distinct_data = [...new Set(data.map(x => x[this.export_by]?.name ?? x[this.export_by]))]
+                // const distinct_data = [...new Set(data.map(x => x[this.export_by]?.name ?? x[this.export_by]))]
 
-                distinct_data.forEach((element_distinct, index_distinct) => {
+                this.selected_type.forEach((element_distinct) => {
                     let worksheet = workbook.addWorksheet(element_distinct)
                     worksheet.columns = [
                         { header: 'Tracking Code', key: 'tracking_code'},
@@ -457,7 +471,7 @@
 
                         e.destination.forEach(element => destination_list += element.name + ', ');
 
-                            if(element_distinct == e[this.export_by].name ?? e[this.export_by]){
+                            if(e.document_type.name == element_distinct){
                                 worksheet.addRow({
                                     tracking_code: e.tracking_code,
                                     subject: e.subject,
@@ -472,6 +486,7 @@
                                     remarks: e.remarks,
                                 })
                             }
+
                     })
 
                     let columnWidth = {}
@@ -479,7 +494,7 @@
                         const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 
                         headerColumns.forEach((v) => {
-                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
+                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length ?? 0
 
                             if(columnWidth[v] == undefined){
                                 columnWidth[v] = currentColumnLength
@@ -538,7 +553,7 @@
 
                 });
 
-                // data.length > 0 ? this.saveExcelFile('Archive Master List', workbook) : this.$store.dispatch('setSnackbar', { type: 'error', message: 'No Data Found' })
+                data.length > 0 ? this.saveExcelFile('Archive Master List', workbook) : this.$store.dispatch('setSnackbar', { type: 'error', message: 'No Data Found' })
 
             },
             masterList(){
@@ -603,7 +618,7 @@
                     const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 
                     headerColumns.forEach((v) => {
-                        let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
+                        let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length ?? 0
 
                         if(columnWidth[v] == undefined){
                             columnWidth[v] = currentColumnLength
@@ -642,6 +657,11 @@
                 //worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
                 this.saveExcelFile('Archive Master List', workbook);
             },
+
+            removeSelectedChips(item){
+                this.selected_type.splice(this.selected_type.indexOf(item), 1)
+                this.selected_type = [...this.selected_type]
+            },
             saveExcelFile(filename, workbook){
                 var buff = workbook.xlsx.writeBuffer().then(function (data) {
                     var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
@@ -656,8 +676,7 @@
             },
         },
         mounted() {
-            var samp = 5
-            console.log(Array.from({length: samp}, (x,i)=>(i+10).toString(36).toUpperCase()) )
+            this.selected_type = this.document_types.map(t => t.name)
         }
     }
 </script>
