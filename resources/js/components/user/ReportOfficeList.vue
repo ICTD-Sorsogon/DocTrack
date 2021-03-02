@@ -215,7 +215,7 @@
             closeDialog(key){
                 switch (key) {
                     case 'form':
-                        this.form_dialog = falsemasterList;
+                        this.form_dialog = false;
                         break;
                     case 'excel':
                         this.excel_dialog = false;

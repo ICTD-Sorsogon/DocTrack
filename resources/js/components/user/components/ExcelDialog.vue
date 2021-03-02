@@ -3,10 +3,10 @@
         <v-container fluid  class="pr-0 pl-0"  style="padding:0px;">
             <v-card style="overflow-x:hidden; overflow-y:auto">
                 <v-row>
-                    <v-col cols="6" sm="6">
+                    <v-col v-bind="bp([11,10,9,6,6])">
                         <v-card-title primary-title> {{ dialog_title }} </v-card-title>
                     </v-col>
-                    <v-col cols="6" sm="6">
+                    <v-col v-bind="bp([1,2,3,6,6])">
                         <v-card-actions class="mr-1">
                             <v-spacer></v-spacer>
                             <v-btn x-large color="gray" @click="$emit('close-dialog')" icon>
@@ -18,14 +18,14 @@
                 <v-card-text>
                     <v-form ref="form" lazy-validation>
                         <v-row v-if="dialog_type == 'export' && dialog_for != 'masterList' && dialog_for != 'advanceExport'">
-                            <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                            <v-col v-bind="bp(12)">
                                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
                             </v-col>
                         </v-row>
                         <!-- Kenneth -->
                         <!-- MASTER LIST -->
                         <v-row v-if="dialog_type == 'export' && dialog_for == 'masterList'">
-                            <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                            <v-col v-bind="bp(12)">
                                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Master List</v-btn>
                             </v-col>
                         </v-row>
@@ -42,7 +42,7 @@
                             ></v-autocomplete>
                         </v-col> -->
 
-                        <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
+                        <v-col v-bind="bp(12)" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
                             <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
@@ -56,7 +56,7 @@
                                 </template>
                             </v-select>
                         </v-col>
-                        <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
+                        <v-col v-bind="bp(12)" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
                             <v-autocomplete
                                 v-model="source"
                                 :items="source_list"
@@ -67,13 +67,13 @@
                             ></v-autocomplete>
                         </v-col>
                         <v-row v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
-                            <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
+                            <v-col v-bind="bp(12)">
                                 <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
                             </v-col>
                         </v-row>
                         <!-- END  -->
                         <v-row v-if="dialog_type == 'import'">
-                            <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
+                            <v-col v-bind="bp(10)">
                                 <v-file-input
                                     label="Browse Excel File"
                                     prepend-icon=""
@@ -89,7 +89,7 @@
                                     clear-icon="mdi-delete"
                                 />
                             </v-col>
-                            <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
+                            <v-col v-bind="bp(2)">
                                 <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_type == 'import'" @click="uploadToDatabase"> UPLOAD </v-btn>
                             </v-col>
                             <v-col v-show="is_preview && excel_data.length > 0 && excel_table_headers.length > 0">
@@ -184,6 +184,9 @@
             ...mapGetters(['request', 'document_types']),
         },
         methods: {
+            bp(col){
+                return breakpoint(col)
+            },
             randomKey(){
                 return Math.random().toString(36).substring(7)
             },
