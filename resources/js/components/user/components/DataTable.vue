@@ -191,9 +191,12 @@ export default {
                 doc.prio_text = '';
 
 
-				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected', 'hold']){
+				for(status of [ 'acknowledged', 'received', 'forwarded', 'rejected']){
                   doc[status] = doc.document_recipient.every( recipient => recipient[status] )
                 }
+
+                doc.hold = doc.document_recipient.some( recipient => recipient.hold);
+
                 if (doc.priority_level == 1) {
                     doc.prio_text = 'High'
                 }
@@ -237,7 +240,7 @@ export default {
 					return  (this.incoming || this.isReceiver(item)) && item.received && !item.multiple && !item.forwarded && !item.hold
 				},
 				'receive': () => {
-					return (this.incoming || this.isReceiver(item)) && !item.received && !item.forwarded
+					return (this.incoming || (this.isReceiver(item) && this.isAdmin)) && !item.received && !item.forwarded && item.acknowledged
 				},
 				'hold':() => {
 					return ((this.incoming && this.isReceiver(item)  && item.received) || (this.isAdmin && item.acknowledged)) && !item.forwarded && !item.hold
