@@ -36,7 +36,8 @@
                                 item-text="key"
                                 dense
                                 filled
-                                label="Filled"
+                                label="Group by:"
+                                required
                             ></v-autocomplete>
                         </v-col>
                         <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
@@ -46,12 +47,12 @@
                                 item-text="key"
                                 dense
                                 filled
-                                label="Filled"
+                                label="Source:"
                             ></v-autocomplete>
                         </v-col>
                         <v-row v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
                             <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                                <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
+                                <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
                             </v-col>
                         </v-row>
                         <v-row v-if="dialog_type == 'import'">
@@ -138,9 +139,10 @@
                 tab: null,
                 excel_table_headers: [],
                 is_preview: false,
+                advanceBtn: true,
                 offices: [],
                 marian_blue: '0675BB',
-                export_by: '',
+                export_by: null,
                 export_list: [
                     { key: 'Document Type', value: 'document_type'},
                     { key: 'Originating Office', value: 'origin_office'},
@@ -151,6 +153,11 @@
                     { key: 'External', db_name: 'is_external', value:0},
                     { key: 'Internal', db_name: 'is_external', value:1},
                ],
+            }
+        },
+        watch: {
+            'export_by'(val) {
+                this.advanceBtn = (val == null) ? true : false
             }
         },
         computed: {
@@ -423,7 +430,6 @@
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
-                console.log(data)
 
                 const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
 
@@ -515,7 +521,7 @@
 
                 });
 
-                // data.length > 0 ? this.saveExcelFile('Archive Master List', workbook) : this.$store.dispatch('setSnackbar', { type: 'error', message: 'No Data Found' })
+                data.length > 0 ? this.saveExcelFile('Archive Master List', workbook) : this.$store.dispatch('setSnackbar', { type: 'error', message: 'No Data Found' })
 
             },
             masterList(){
