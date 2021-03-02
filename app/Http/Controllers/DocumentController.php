@@ -337,4 +337,21 @@ class DocumentController extends Controller
         $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
         return $summary;
     }
+
+    public function restoreDocument(Request $request)
+    {
+        $docu = $this->myDocu($request->documentId);
+        $docu->status = 'received';
+        $docu->deleted_at = null;
+        $docu->save();
+
+        return ($request->isRoot)?
+            $this->myDocu($request->documentId)->incoming_trashed()->restore() :
+            DocumentRecipient::withTrashed()->where('recipient_id', $request->dbId)->restore();
+    }
+
+    public function myDocu($id)
+    {
+        return Document::withTrashed()->find($id);
+    }
 }
