@@ -53,4 +53,9 @@ class TrackingRecord extends Model
     {
         return $this->hasMany('App\Models\DocumentRecipient', 'document_id', 'document_id')->where('destination_office', $this->destination);
     }
+
+    public function forwardedByOffice()
+    {
+        return $this->hasOne('App\Models\Office','id','forwarded_by');
+    }
 }

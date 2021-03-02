@@ -33,4 +33,9 @@ class Office extends Model
     {
         return $this->hasMany('App\Models\Notification');
     }
+
+    public function report()
+    {
+        return $this->hasOne('App\Models\TrackingReport');
+    }
 }

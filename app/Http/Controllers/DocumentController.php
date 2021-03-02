@@ -11,12 +11,16 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Models\Document;
 use App\Models\DocumentRecipient;
 use App\Models\DocumentType;
+use App\Models\Office;
 use App\Models\TrackingRecord;
 use App\Models\TrackingSummary;
 use Illuminate\Http\Request;
+use App\Models\TrackingReport;
 
 class DocumentController extends Controller
 {
+    const PRIORITY_LEVEL = [ NULL, 604800000, 1296000000, 2592000000, 'Infinity'];
+
     public function __construct()
     {
         $this->middleware('auth:sanctum');
@@ -82,6 +86,19 @@ class DocumentController extends Controller
             'office_id' => auth()->user()->office_id
         ]);
 
+        $diff = $document->acknowledgedDiff();
+        $office = Office::whereOfficeCode('DO')->first();
+
+        auth()->user()->office->report->increment('transactions');
+
+        if(self::PRIORITY_LEVEL[$document->priority_level] < $diff){
+            $office->report->increment('delayed');
+        }
+
+        $office->report->update([
+            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
+        ]);
+
         return [$tracking_record];
     }
 
@@ -119,6 +136,18 @@ class DocumentController extends Controller
             throw $error;
         }
         DB::commit();
+
+        $office = auth()->user()->office;
+        $office->report->increment('transactions');
+        $diff = $document->receivedDiff();
+
+        if(self::PRIORITY_LEVEL[$document->priority_level] < $diff){
+           $office->report->increment('delayed');
+        }
+
+        $office->report->update([
+            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
+        ]);
 
         $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
         $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
@@ -198,8 +227,29 @@ class DocumentController extends Controller
             TrackingSummary::create([
                 'action' => 'acknowledged',
                 'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
+                'office_id' => auth()->user()->office_id
             ]);
+
+            $diff = $document->created_at->diffInSeconds(Carbon::now());
+            $office = $document->origin_office;
+
+            if($document->status == 'forwarded'){
+                $trackingRecord = $document->tracking_records->where('action', 'forwarded')->last();
+                $office = $trackingRecord->forwardedByOffice;
+                $diff = $trackingRecord->created_at->diffInSeconds(Carbon::now());
+            }
+
+
+            Office::whereOfficeCode('DO')->first()->report->increment('transactions');
+
+            if(self::PRIORITY_LEVEL[$tracking_record->document->priority_level] < $diff){
+                $office->report->increment('delayed');
+            }
+
+            $office->report->update([
+                'speeds' => $office->report->speeds?->push($diff) ?? [$diff] //use optional for php < 8
+            ]);
+            
             $user_id = Auth::user()->id;
 
         } catch (ValidationException $error) {
@@ -249,12 +299,14 @@ class DocumentController extends Controller
         $updatedTime = $request->date_filed. ' ' .$request->time_filed;
         DB::beginTransaction();
         try {
-            $tracking_record = TrackingRecord::find($request->id);
+            $tracking_record = TrackingRecord::where('document_id', $request->id)->first();
             $tracking_record->action = 'date changed';
             $tracking_record->update([
                 'last_touched' => Carbon::parse($updatedTime)
                 ]);
-
+            TrackingSummary::where('document_id', $tracking_record->document_id)
+                ->where('office_id', auth()->user()->office_id)
+                ->update(['created_at' => Carbon::parse($updatedTime)]);
         } catch (ValidationException $error) {
             DB::rollback();
             throw $error;
@@ -297,6 +349,8 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
+        // FIXME: Editing a document creates a new record in the tracking_summaries table
+        // TODO: Highlight in front end menu, Forward not tracked in fastest and slowest
        $document = $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
@@ -311,11 +365,6 @@ class DocumentController extends Controller
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ],
                 [ 'document_id' => $document->id, 'destination_office' => $office->id ]
             );
-            TrackingSummary::create([
-                'action' => 'created',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office->id
-            ]);
             TrackingRecord::create([
                 'action' => 'created',
                 'document_id' => $document->id,
@@ -325,6 +374,17 @@ class DocumentController extends Controller
                 'last_touched' => Carbon::now()
             ]);
         };
+        // Should only create one creation record in the summary
+        if($document->wasRecentlyCreated) {
+            TrackingSummary::create([
+                'action' => 'created',
+                'document_id' => $document->id,
+                'office_id' => auth()->user()->office_id
+            ]);
+
+            TrackingReport::firstOrCreate([ 'office_id' => auth()->user()->office_id])->increment('transactions');
+
+        }
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
@@ -334,7 +394,18 @@ class DocumentController extends Controller
 
     public function trackingReports()
     {
-        $summary = TrackingSummary::with('office', 'document')->get()->groupBy('document_id');
+       $summary = TrackingReport::with('office')->get();
+       if(!auth()->user()->isAdmin()){
+            return $summary->only(auth()->user()->office_id)->first();
+       }
+
+       return $summary;
+    }
+
+    public function officeReports()
+    {
+        $summary = TrackingSummary::with('office', 'document')->where('office_id', auth()->user()->office_id)
+        ->get();
         return $summary;
     }
 
