@@ -7,7 +7,6 @@
                 :items-per-page="10"
                 :headers="headers"
                 class="elevation-1"
-                :custom-filter="filterOnlyOffice"
             >
             <template v-slot:top>
                 <v-text-field
