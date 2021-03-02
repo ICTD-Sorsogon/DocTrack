@@ -14,8 +14,8 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item :key="1" @click.stop="openDialog('import_office')">
-                                <v-icon class="ma-1">mdi-file-export-outline</v-icon> GROUP BY OFFICE
+                            <v-list-item :key="1" @click.stop="openDialog('advance_export')">
+                                <v-icon class="ma-1">mdi-file-export-outline</v-icon> ADVANCE EXPORT
                             </v-list-item>
                             <v-list-item :key="2" @click.stop="openDialog('master_list')">
                                 <v-icon  class="ma-1">mdi-file-export-outline</v-icon> MASTER LIST
@@ -505,6 +505,12 @@
                     case 'master_list':
                         this.dialog_for = 'masterList';
                         this.dialog_title = 'Generate Master List';
+                        this.dialog_type = 'export';
+                        this.excel_dialog = true
+                        break;
+                    case 'advance_export':
+                        this.dialog_for = 'advanceExport';
+                        this.dialog_title = 'Advance Export';
                         this.dialog_type = 'export';
                         this.excel_dialog = true
                         break;
