@@ -470,7 +470,7 @@
                         const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 
                         headerColumns.forEach((v) => {
-                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length
+                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length ?? 0
 
                             if(columnWidth[v] == undefined){
                                 columnWidth[v] = currentColumnLength
