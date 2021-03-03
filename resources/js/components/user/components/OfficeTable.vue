@@ -3,7 +3,7 @@
         <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
             <v-card elevation="2" outlined color="#42ADC7">
                 <v-card-title>
-                    <v-icon large left>mdi-file-cabinet</v-icon>
+                    <v-icon large left>mdi-swap-horizontal-circle-outline</v-icon>
                     <span class="title font-weight-light" >
                         All Transaction
                     </span>
