@@ -39,7 +39,7 @@
         <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
             <v-card elevation="2" outlined color="#81D152">
                 <v-card-title>
-                    <v-icon large left>mdi-speedometer</v-icon>
+                    <v-icon large left>mdi-clock-fast</v-icon>
                     <span class="title font-weight-light" >
                         Fastest Transaction
                     </span>
@@ -57,7 +57,7 @@
         <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
             <v-card elevation="2" outlined color="#5B4DB7">
                 <v-card-title>
-                    <v-icon large left>mdi-speedometer-slow</v-icon>
+                    <v-icon large left>mdi-snail</v-icon>
                     <span class="title font-weight-light" >
                         Slowest Transaction
                     </span>
