@@ -45,14 +45,13 @@
                     v-bind="bp(12)"
                     >
                     <v-row class="d-flex align-center">
-                        <v-col cols="1">
+                        <v-col cols="1" v-if="isByGroup">
                             <v-radio
-                                v-if="isByGroup"
                                 label=""
                                 value="radio-3"
                             ></v-radio>
                         </v-col>
-                        <v-col cols="11">
+                        <v-col :cols="(isByGroup)?'11':'12'">
                             <v-combobox
                                 v-model="originating"
                                 :items="offices"
@@ -93,14 +92,13 @@
                     v-bind="bp(12)"
                     >
                     <v-row class="d-flex align-center">
-                        <v-col cols="1">
+                        <v-col cols="1" v-if="isByGroup">
                             <v-radio
-                                v-if="isByGroup"
                                 label=""
                                 value="radio-4"
                             ></v-radio>
                         </v-col>
-                        <v-col cols="11">
+                        <v-col :cols="(isByGroup)?'11':'12'">
                             <v-select :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
@@ -135,14 +133,13 @@
                         v-bind="bp(12)"
                         >
                         <v-row class="d-flex align-center">
-                            <v-col cols="1">
+                            <v-col cols="1" v-if="isByGroup">
                                 <v-radio
-                                    v-if="isByGroup"
                                     label=""
                                     value="radio-1"
                                 ></v-radio>
                             </v-col>
-                            <v-col cols="11">
+                            <v-col :cols="(isByGroup)?'11':'12'">
                                 <v-select :items="source_list" v-model="source" label="Document Source" dense clearable hide-selected multiple deletable-chips chips counter>
                                     <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                         <v-tooltip top>
