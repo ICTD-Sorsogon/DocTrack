@@ -142,13 +142,11 @@ class DocumentListener
             break;
 
             case 'terminated':
-                if(!$document->wasRecentlyCreated && $document->status != 'created' ){
-                    $log = new Log();
-                    $log->user_id = auth()->user()->id;
-                    $log->action = 'Document terminate';
-                    $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been successfully terminated,
-                        approved by {$approved_by} and leave the following remarks: {$remarks}";
-                }
+                $log = new Log();
+                $log->user_id = auth()->user()->id;
+                $log->action = 'Document terminate';
+                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been successfully terminated,
+                    approved by {$approved_by} and leave the following remarks: {$remarks}";
             break;
 
             case 'forwarded':
