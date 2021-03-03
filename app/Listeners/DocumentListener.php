@@ -162,7 +162,6 @@ class DocumentListener
             break;
         }
     }
-
     public function destinationOffice($document, $type) {
         $destinationOffce = '';
 
