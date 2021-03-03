@@ -159,7 +159,7 @@
                         ></v-select>
                         </ValidationProvider>
                     </v-col>
-                    <v-col cols="12" xl="6" lg="6" md="6" v-if="types=='Change Date'">
+                    <v-col cols="12" xl="6" lg="6" md="6" v-if="types=='Change Date' || ('forward' && isGO)">
                         <v-dialog
                             ref="date_dialog"
                             v-model="datepicker_modal"
@@ -189,7 +189,7 @@
                             </v-date-picker>
                         </v-dialog>
                     </v-col>
-                     <v-col cols="12" xl="6" lg="6" md="12" v-if="types=='Change Date'">
+                     <v-col cols="12" xl="6" lg="6" md="12" v-if="types=='Change Date' || ('forward' && isGO)">
                         <v-dialog
                             ref="time_dialog"
                             v-model="timepicker_modal"
@@ -420,6 +420,9 @@ export default {
         },
         isAdmin() {
 			return this.auth_user.role_id == 1
+		},
+        isGO() {
+			return this.auth_user.role_id == 3
 		},
     },
     watch: {
