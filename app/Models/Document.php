@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\DocumentEvent;
 use App\Models\Traits\TrackingNumberBuilder;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -103,6 +104,16 @@ class Document extends Model
     public function tracking_summaries()
     {
         return $this->hasMany('App\Models\TrackingSummary');
+    }
+
+    public function acknowledgedDiff()
+    {
+        return $this->tracker()->whereAction('acknowledged')->get()->last()->created_at->diffInSeconds(Carbon::now());
+    }
+
+    public function receivedDiff()
+    {
+        return $this->tracker()->whereAction('received')->get()->last()->created_at->diffInSeconds(Carbon::now());
     }
 
     public static function allDocuments(User $user)

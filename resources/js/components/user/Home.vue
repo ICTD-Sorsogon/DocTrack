@@ -66,7 +66,7 @@
                     <v-list-item-title>Archive</v-list-item-title>
                 </v-list-item>
                 <v-list-item
-                    :input-value="$route.name === 'Document Aging Report' ? true:false"
+                    :input-value="$route.name === 'Document Tracking Report' ? true:false"
                     link
                     @click.prevent="getTrackingReport"
                     v-ripple="{ class: 'white--text' }"

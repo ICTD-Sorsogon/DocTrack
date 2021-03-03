@@ -36,7 +36,7 @@ class DocumentNotificationListener
                 $notification->office_id = 37;
                 $notification->action = $action ? 'created' : 'updated';
                 $notification->status = 0;
-                $notification->message = "Document {$document->subject} with {$document->tracking_code} tracking code was {$notification->action} by " . auth()->user()->fullname . ".";
+                $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was {$notification->action} by " . auth()->user()->fullname . ".";
                 $notification->save();
             break;
 
@@ -62,7 +62,7 @@ class DocumentNotificationListener
                     $notification->save();
             break;
 
-            case 'holdreject':
+            case 'hold':
 
                 $notification = new Notification();
                 $notification->document_id = $document->id;
@@ -70,7 +70,7 @@ class DocumentNotificationListener
                 $notification->office_id = $document->origin_office->id;
                 $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
-                $notification->message = "Your document {$document->subject} with {$document->tracking_code} tracking code was hold/reject by" . auth()->user()->fullname . ".";
+                $notification->message = "Your document {$document->subject} with {$document->tracking_code} tracking code was hold by" . auth()->user()->fullname . ".";
                 $notification->save();
 
             break;
@@ -83,7 +83,7 @@ class DocumentNotificationListener
                 $notification->action = 'forwarded';
                 $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
-                $notification->message = "Document {$document->subject} with {$document->tracking_code} tracking code was forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->find($document->destination_office_id->first())->name}."; // trip lang 
+                $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->find($document->destination_office_id->first())->name}."; // trip lang
                 $notification->save();
 
                 $notification = new Notification();
@@ -113,7 +113,7 @@ class DocumentNotificationListener
                     $notification->office_id = 37;
                     $notification->action = 'received';
                     $notification->status = 0;
-                    $notification->message = "Document {$document->subject} with {$document->tracking_code} tracking code was received.";
+                    $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was received.";
                     $notification->save();
                 }
             break;

@@ -100,7 +100,7 @@
                         <ValidationProvider rules="required" v-slot="{ errors, valid }">
                         <v-select
                             v-model="form.forwarded_to"
-                            :items="offices"
+                            :items="offices_to"
                             item-text="name"
                             item-value="id"
                             label="Forwarded to"
@@ -394,7 +394,7 @@ export default {
         ValidationObserver
     },
     computed: {
-        ...mapGetters(['find_document' , 'documents' , 'find_document', 'is_admin', 'auth_user']),
+        ...mapGetters(['find_document' , 'documents' , 'find_document', 'is_admin', 'auth_user', 'offices']),
         types() {
             return this.$route.params.type;
         },
@@ -412,7 +412,7 @@ export default {
         request(){
             return this.$store.state.snackbars.request;
         },
-        offices() {
+        offices_to() {
             return this.$store.state.offices.offices.filter(office=>office.id != this.auth_user.office_id);
         },
         users() {

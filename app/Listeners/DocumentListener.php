@@ -106,10 +106,8 @@ class DocumentListener
                         $log = new Log();
                         $log->user_id = auth()->user()->id;
                         $log->new_values = $data;
-                        $log->action = 'Document create';
-                        $log->remarks = "New document has been successfully created with subject of : {$subject}";
-                        $log->remarks = "Document {$subject} with {$document->tracking_code} has been successfully
-                            created by " . auth()->user()->fullname . ".";
+                        $log->action = 'Document created';
+                        $log->remarks = 'New document was successfully created with subject of : '.$subject;
                         return $log->save();
                 }
             break;
@@ -120,8 +118,7 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document acknowledged';
-                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been
-                    acknowledge by " . auth()->user()->fullname . ".";
+                $log->remarks = $subject.' was successfully acknowledged with remarks:'.$remarks;
                 return $log->save();
             break;
 
@@ -146,6 +143,11 @@ class DocumentListener
                     return $log->save();
                 }
 
+                $log = new Log();
+                $log->user_id = auth()->user()->id;
+                $log->action = 'Document Hold';
+                $log->remarks = $subject.' was hold';
+                return $log->save();
             break;
 
             case 'terminated':
@@ -157,9 +159,9 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document terminate';
-                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been successfully terminated,
-                    approved by {$approved_by} and leave the following remarks: {$remarks}";
+                $log->action = 'Document terminated';
+                $log->remarks = $subject.' was successfully terminated and approved by:
+                    '.$approved_by.' with remarks: '.$remarks;
                 return $log->save();
             break;
 
@@ -173,9 +175,9 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document forward';
-                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been successfully
-                    forwarded through {$through}, approved by {$approved_by} and leave the following remarks: {$remarks}.";
+                $log->action = 'Document forwarded';
+                $log->remarks = $subject.' was successfully forwarded through '.$through.
+                ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
                 return $log->save();
             break;
 
@@ -189,9 +191,8 @@ class DocumentListener
 
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document receive';
-                $log->remarks = 'Document '.$subject.' with tracking code of '.$document->tracking_code.'
-                has been successfully received through '.$through.
+                $log->action = 'Document received';
+                $log->remarks = $subject.' was successfully received through '.$through.
                 ' and approved by: '.$approved_by.' with remarks of: '.$remarks;
                 $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been
                 received through {$through}, approved by {$approved_by} and leave the following remarks: {$remarks}.";
