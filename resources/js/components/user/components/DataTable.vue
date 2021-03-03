@@ -152,7 +152,6 @@
 import TableModal from './TableModal';
 import { colors, priority_level } from '../../../constants';
 import {mapGetters} from 'vuex'
-
 export default {
 	components: {TableModal},
 	props: ['documents', 'datatable_loader', 'incoming'],
@@ -203,7 +202,6 @@ export default {
                 }
                 else if(doc.priority_level == 2) {
                     doc.prio_text = 'Medium'
-
                 }
                 else if (doc.priority_level == 3) {
                      doc.prio_text = 'Low'
@@ -284,10 +282,8 @@ export default {
             return priority_level[type];
         }
 	}
-
 }
 </script>
-
 <style>
 .uniform {
     width: 100px;

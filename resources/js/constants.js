@@ -93,3 +93,6 @@ export const xstyle = (excel) => {
         })
     }); worksheet.views = [{state:'frozen', xSplit:0, ySplit:1, activeCell:'B2'}];
 }
+export const delay_filter = [
+    604800000, 1296000000, 2592000000, Infinity
+];
