@@ -131,9 +131,8 @@
 
 <script>
     import { mapGetters } from 'vuex';
-    import * as Excel from 'exceljs';
+    import { breakpoint } from '../../../constants';
 
-    import { breakpoint, xstyle } from '../../../constants';
 
     export default {
         props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
@@ -217,7 +216,9 @@
             download(){
                 this[this.dialog_for]()
             },
-            importOfficeList(file){
+            async importOfficeList(file){
+                const Excel = await require('exceljs');
+
                 this.excel_table_headers = [];
                 this.excel_table_headers.push(
                     { text: 'Office Name', align: 'start', value: 'Office_Name' },
@@ -328,209 +329,50 @@
                 });
             },
             exportLogs(){
-                const header_color = this.marian_blue;
-                const data = this.$store.state.users.logs;
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Logs')
-                worksheet.columns = [
-                    { header: 'User ID', key: 'user_id', width: 55 },
-                    { header: 'Action', key: 'action', width: 13 },
-                    { header: 'Remarks', key: 'remarks', width: 60 },
-                    { header: 'Original Values', key: 'original_values', width: 18 },
-                    { header: 'New Values', key: 'new_values', width: 35 }
-                ]
-                data.forEach((e, index) => {
-                    worksheet.addRow({
-                        user_id: e.user_id,
-                        action: e.action,
-                        remarks: e.remarks,
-                        original_values: e.original_values,
-                        new_values: e.new_values
-                    })
+                import('./modules').then(({logs}) => {
+                    logs({ data:this.$store.state.users.logs })
                 })
-                xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
-                this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
-                const header_color = this.marian_blue;
-                const data = this.$store.state.offices.offices;
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Office List')
-                worksheet.columns = [
-                    { header: 'Office Name', key: 'Office_Name', width: 55 },
-                    { header: 'Office Code', key: 'Office_Code', width: 13 },
-                    { header: 'Address', key: 'Address', width: 60 },
-                    { header: 'Contact Number', key: 'Contact_Number', width: 18 },
-                    { header: 'Email Address', key: 'Email_Address', width: 35 }
-                ]
-                data.forEach((e, index) => {
-                    worksheet.addRow({
-                        Office_Name: e.name,
-                        Office_Code: e.office_code,
-                        Address: e.address,
-                        Contact_Number: e.contact_number,
-                        Email_Address: e.contact_email
-                    })
+                import('./modules').then(({officelist}) => {
+                    officelist({ data:this.$store.state.offices.offices })
                 })
-                xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
-                this.saveExcelFile('Office List', workbook);
             },
             advanceExport(){
-                const header_color = this.marian_blue;
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
 
                 const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
 
-                let workbook = new Excel.Workbook()
-
-                this.selected_type.forEach((element_distinct) => {
-                    let worksheet = workbook.addWorksheet(element_distinct)
-                    worksheet.columns = [
-                        { header: 'Tracking Code', key: 'tracking_code'},
-                        { header: 'Subject', key: 'subject'},
-                        { header: 'Sender', key: 'sender'},
-                        { header: 'Priority Level', key: 'priority_level'},
-                        { header: 'Document Type', key: 'document_type'},
-                        { header: 'Status', key: 'status'},
-                        { header: 'Page Count', key: 'page_count'},
-                        { header: 'Attachment Page Count', key: 'attachment_page_count'},
-                        { header: 'Originating Office', key: 'origin_office'},
-                        { header: 'Destination', key: 'destination'},
-                        { header: 'Remarks', key: 'remarks'},
-                    ]
-
-                    data.forEach((e, index) => {
-                        let destination_list = ''
-
-                        e.destination.forEach(element => destination_list += element.name + ', ');
-
-                            if(e.document_type.name == element_distinct){
-                                worksheet.addRow({
-                                    tracking_code: e.tracking_code,
-                                    subject: e.subject,
-                                    sender: e.sender['name'],
-                                    priority_level: priority_list[e.priority_level-1],
-                                    document_type: e.document_type['name'],
-                                    status: e.status,
-                                    page_count: e.page_count,
-                                    attachment_page_count: e.attachment_page_count,
-                                    origin_office: e.origin_office['name'],
-                                    destination: destination_list.slice(0, -2),
-                                    remarks: e.remarks,
-                                })
-                            }
-
+                import('./modules').then(({archiveae}) => {
+                    archiveae({
+                        type: type,
+                        document_data: document_data,
+                        priority_list: priority_list,
+                        data:data,
+                        selected_type: this.selected_type
                     })
-
-                    let columnWidth = {}
-                    worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                        const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-
-                        headerColumns.forEach((v) => {
-                            let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length ?? 0
-
-                            if(columnWidth[v] == undefined){
-                                columnWidth[v] = currentColumnLength
-                            }else{
-                                columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
-                            }
-                        })
-
-                    })
-
-                    xstyle({ worksheet:worksheet, headercount:11, headercolor:this.marian_blue })
-                    Object.values(columnWidth).forEach((width, index) => {
-                        worksheet.getColumn(index+1).width = width + 5
-
-                    });
-
-                });
-
-                data.length > 0 ? this.saveExcelFile('Archive Master List', workbook) : this.$store.dispatch('setSnackbar', { type: 'error', message: 'No Data Found' })
-
+                })
             },
             masterList(){
-                const header_color = this.marian_blue;
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
 
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Archive Master List')
-                worksheet.columns = [
-                    { header: 'Tracking Code', key: 'tracking_code'},
-                    { header: 'Subject', key: 'subject'},
-                    { header: 'Sender', key: 'sender'},
-                    { header: 'Priority Level', key: 'priority_level'},
-                    { header: 'Document Type', key: 'document_type'},
-                    { header: 'Status', key: 'status'},
-                    { header: 'Page Count', key: 'page_count'},
-                    { header: 'Attachment Page Count', key: 'attachment_page_count'},
-                    { header: 'Originating Office', key: 'origin_office'},
-                    { header: 'Destination', key: 'destination'},
-                    { header: 'Remarks', key: 'remarks'},
-                ]
-
-                data.forEach((e, index) => {
-                    let destination_list = ''
-
-                    e.destination.forEach(element => destination_list += element.name + ', ');
-
-                    worksheet.addRow({
-                        tracking_code: e.tracking_code,
-                        subject: e.subject,
-                        sender: e.sender?.name,
-                        priority_level: priority_list[e.priority_level-1],
-                        document_type: e.document_type?.name,
-                        status: e.status,
-                        page_count: e.page_count,
-                        attachment_page_count: e.attachment_page_count,
-                        origin_office: e.origin_office?.name,
-                        destination: destination_list.slice(0, -2),
-                        remarks: e.remarks,
-                    })
-
-                })
-
-                let columnWidth = {}
-                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                    const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-                    headerColumns.forEach((v) => {
-                        let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value.toString().trim().length
-
-                        if(columnWidth[v] == undefined){
-                            columnWidth[v] = currentColumnLength
-                        }else{
-                            columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
-                        }
+                import('./modules').then(({archiveml}) => {
+                    archiveml({
+                        type: type,
+                        priority_list: priority_list,
+                        data:data,
                     })
                 })
-                xstyle({ worksheet:worksheet, headercount:11, headercolor:this.marian_blue })
-                Object.values(columnWidth).forEach((width, index) => {
-                    worksheet.getColumn(index+1).width = width + 5
-
-                });
-                this.saveExcelFile('Archive Master List', workbook);
             },
 
             removeSelectedChips(item){
                 this.selected_type.splice(this.selected_type.indexOf(item), 1)
                 this.selected_type = [...this.selected_type]
-            },
-            saveExcelFile(filename, workbook){
-                var buff = workbook.xlsx.writeBuffer().then(function (data) {
-                    var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    const date = new Date();
-                    link.setAttribute('download', `${filename} _${date.getFullYear()}${date.getMonth()+1}${date.getDate()}.xlsx`);
-                    document.body.appendChild(link);
-                    link.click();
-                });
-            },
+            }
         },
         mounted() {
             this.selected_type = this.document_types.map(t => t.name)
