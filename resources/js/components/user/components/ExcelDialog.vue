@@ -147,6 +147,7 @@
 
     import { breakpoint, xstyle } from '../../../constants';
 
+
     export default {
         props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
         data() {
@@ -337,55 +338,16 @@
                 });
             },
             exportLogs(){
-                const header_color = this.marian_blue;
-                const data = this.$store.state.users.logs;
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Logs')
-                worksheet.columns = [
-                    { header: 'User ID', key: 'user_id', width: 55 },
-                    { header: 'Action', key: 'action', width: 13 },
-                    { header: 'Remarks', key: 'remarks', width: 60 },
-                    { header: 'Original Values', key: 'original_values', width: 18 },
-                    { header: 'New Values', key: 'new_values', width: 35 }
-                ]
-                data.forEach((e, index) => {
-                    worksheet.addRow({
-                        user_id: e.user_id,
-                        action: e.action,
-                        remarks: e.remarks,
-                        original_values: e.original_values,
-                        new_values: e.new_values
-                    })
+                import('./Modules').then(({logs}) => {
+                    logs({ data:this.$store.state.users.logs })
                 })
-                xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
-                this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
-                const header_color = this.marian_blue;
-                const data = this.$store.state.offices.offices;
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Office List')
-                worksheet.columns = [
-                    { header: 'Office Name', key: 'Office_Name', width: 55 },
-                    { header: 'Office Code', key: 'Office_Code', width: 13 },
-                    { header: 'Address', key: 'Address', width: 60 },
-                    { header: 'Contact Number', key: 'Contact_Number', width: 18 },
-                    { header: 'Email Address', key: 'Email_Address', width: 35 }
-                ]
-                data.forEach((e, index) => {
-                    worksheet.addRow({
-                        Office_Name: e.name,
-                        Office_Code: e.office_code,
-                        Address: e.address,
-                        Contact_Number: e.contact_number,
-                        Email_Address: e.contact_email
-                    })
+                import('./Modules').then(({officelist}) => {
+                    officelist({ data:this.$store.state.offices.offices })
                 })
-                xstyle({ worksheet:worksheet, headercount:5, headercolor:this.marian_blue })
-                this.saveExcelFile('Office List', workbook);
             },
             advanceExport(){
-                const header_color = this.marian_blue;
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
@@ -463,7 +425,6 @@
 
             },
             masterList(){
-                const header_color = this.marian_blue;
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const priority_list = ['High', 'Medium', 'Low', 'Indefinite']

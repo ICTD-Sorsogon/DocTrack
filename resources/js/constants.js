@@ -92,4 +92,18 @@ export const xstyle = (excel) => {
             }
         })
     }); worksheet.views = [{state:'frozen', xSplit:0, ySplit:1, activeCell:'B2'}];
+
+    var workbook = excel.workbook
+    var filename = excel.filename
+
+    var buff = workbook.xlsx.writeBuffer().then(function (data) {
+        var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const date = new Date();
+        link.setAttribute('download', `${filename} _${date.getFullYear()}${date.getMonth()+1}${date.getDate()}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+    });
 }
