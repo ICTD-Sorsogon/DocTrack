@@ -64,7 +64,7 @@ class DocumentListener
                         $log->user_id = auth()->user()->id;
                         $log->new_values = $data;
                         $log->action = 'Document created';
-                        $log->remarks = "Document {$subject} with tracking code of {$tracking_code} was created by " . auth()->user()->fullname . ".";
+                        $log->remarks = "{$subject} with tracking code of {$tracking_code} was created by " . auth()->user()->fullname . ".";
                         return $log->save();
                 }
 
@@ -100,9 +100,9 @@ class DocumentListener
                     $log->user_id = auth()->user()->id;
                     $log->new_values = $new_data;
                     $log->original_values = $old_data;
-                    $log->action = 'Document update';
-                    $log->remarks = "Document {$old['subject']} with tracking code of {$document->tracking_code}
-                        has been successfully updated by " . auth()->user()->fullname . ".";
+                    $log->action = 'Document updated';
+                    $log->remarks = "{$old['subject']} with tracking code of {$tracking_code}
+                        was successfully updated by " . auth()->user()->fullname . ".";
                     return $log->save();
                 }
             break;
@@ -132,8 +132,8 @@ class DocumentListener
             case 'released':
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document release';
-                $log->remarks = "{$subject} with tracking code of {$tracking_code} has been released.";
+                $log->action = 'Document released';
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was released.";
                 return $log->save();
             break;
 
