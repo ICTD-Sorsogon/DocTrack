@@ -65,7 +65,6 @@
                                 required
                                 dense
                                 multiple
-                                full-width="100%"
                                 counter
                             >
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
@@ -101,8 +100,8 @@
                                 value="radio-4"
                             ></v-radio>
                         </v-col>
-                        <v-col cols="10">
-                            <v-select class="mx-4" width="100%" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
+                        <v-col cols="11">
+                            <v-select :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
                                         <template v-slot:activator="{ on, attrs }">
@@ -143,8 +142,8 @@
                                     value="radio-1"
                                 ></v-radio>
                             </v-col>
-                            <v-col cols="10">
-                                <v-select class="mx-4" full-width="100%" :items="source_list" v-model="source" label="Document Source" dense clearable hide-selected multiple deletable-chips chips counter>
+                            <v-col cols="11">
+                                <v-select :items="source_list" v-model="source" label="Document Source" dense clearable hide-selected multiple deletable-chips chips counter>
                                     <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                         <v-tooltip top>
                                             <template v-slot:activator="{ on, attrs }">
@@ -199,6 +198,9 @@ export default {
         },
         'wsType'(newVal){
             this.isByGroup = (newVal=='group')?true:false
+        },
+        'isByGroup'(newVal){
+            this.wsTypeSel = (newVal)?'radio-3':'';
         }
     },
     computed: {
