@@ -28,11 +28,11 @@
                     >
                     <v-radio
                         label="Single Excel WorkSheet"
-                        value="radio-1"
+                        value="single"
                     ></v-radio>
                     <v-radio
                         label="Group by Excel WorkSheet"
-                        value="radio-2"
+                        value="group"
                     ></v-radio>
                     </v-radio-group>
                 </v-col>
@@ -40,13 +40,14 @@
             <v-col v-bind="bp(12)" v-if="auth_user.role_id === 1 ">
                 <v-radio-group
                     class="mx-4"
-                    v-model="wsType"
+                    v-model="wsTypeSel"
                     row
                     v-bind="bp(12)"
                     >
                     <v-radio
+                    v-if="isByGroup"
                         label=""
-                        value="radio-1"
+                        value="radio-3"
                     ></v-radio>
 
                 <v-combobox
@@ -80,13 +81,14 @@
             <v-col v-bind="bp(12)">
                 <v-radio-group
                     class="mx-4"
-                    v-model="wsType"
+                    v-model="wsTypeSel"
                     row
                     v-bind="bp(12)"
                     >
                     <v-radio
+                    v-if="isByGroup"
                         label=""
-                        value="radio-1"
+                        value="radio-4"
                     ></v-radio>
 
                 <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
@@ -114,12 +116,13 @@
                 ></v-autocomplete>-->
 
                 <v-radio-group
-                    class="mx-4"
-                    v-model="wsType"
+                    class="mx-5"
+                    v-model="wsTypeSel"
                     row
                     v-bind="bp(12)"
                     >
                     <v-radio
+                    v-if="isByGroup"
                         label=""
                         value="radio-1"
                     ></v-radio>
@@ -165,12 +168,17 @@ export default {
             source: [],
             source_list: ['External', 'Internal'],
             originating: [],
-            wsType: 'radio-1'
+            wsType: 'single',
+            wsTypeSel: 'radio-3',
+            isByGroup: false
         }
     },
     watch: {
         'selected_type'(val) {
             this.advanceBtn = (val.length < 1)? true:false
+        },
+        'wsType'(newVal){
+            this.isByGroup = (newVal=='group')?true:false
         }
     },
     computed: {
