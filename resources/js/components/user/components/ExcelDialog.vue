@@ -24,25 +24,13 @@
                         </v-row>
                         <!-- Kenneth -->
                         <!-- MASTER LIST -->
-                        <v-row v-if="dialog_type == 'export' && dialog_for == 'masterList'">
+                        <v-row v-if="showSlot('export', 'masterList')">
                             <v-col v-bind="bp(12)">
                                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Master List</v-btn>
                             </v-col>
                         </v-row>
                         <!-- ADVANCE EXPORT -->
-                        <!-- <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                            <v-autocomplete
-                                v-model="export_by"
-                                :items="export_list"
-                                item-text="key"
-                                dense
-                                filled
-                                label="Group by:"
-                                required
-                            ></v-autocomplete>
-                        </v-col> -->
-
-                        <v-col v-bind="bp(12)" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
+                        <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport')">
                             <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
@@ -56,7 +44,7 @@
                                 </template>
                             </v-select>
                         </v-col>
-                        <v-col v-bind="bp(12)" v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
+                        <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport')">
                             <v-autocomplete
                                 v-model="source"
                                 :items="source_list"
@@ -66,7 +54,7 @@
                                 label="Source:"
                             ></v-autocomplete>
                         </v-col>
-                        <v-row v-if="dialog_type == 'export' && dialog_for == 'advanceExport'">
+                        <v-row v-if="showSlot('export', 'advanceExport')">
                             <v-col v-bind="bp(12)">
                                 <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
                             </v-col>
@@ -185,6 +173,9 @@
             ...mapGetters(['request', 'document_types']),
         },
         methods: {
+            showSlot(dialog_type, dialog_for){
+                return this.dialog_type == dialog_type && this.dialog_for == dialog_for
+            },
             bp(col){
                 return breakpoint(col)
             },
@@ -355,8 +346,6 @@
                 const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
 
                 let workbook = new Excel.Workbook()
-
-                // const distinct_data = [...new Set(data.map(x => x[this.export_by]?.name ?? x[this.export_by]))]
 
                 this.selected_type.forEach((element_distinct) => {
                     let worksheet = workbook.addWorksheet(element_distinct)
