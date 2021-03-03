@@ -22,14 +22,31 @@
                                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
                             </v-col>
                         </v-row>
-                        <!-- Kenneth -->
-                        <!-- MASTER LIST -->
+
+                        <archive-report
+                            v-if="this.dialog_type == 'export' && this.dialog_for == 'masterList' || this.dialog_for == 'advanceExport'"
+                            :dialog_for="dialog_for"
+                        />
+                        <!-- Kenneth
                         <v-row v-if="showSlot('export', 'masterList')">
                             <v-col v-bind="bp(12)">
                                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Master List</v-btn>
                             </v-col>
                         </v-row>
-                        <!-- ADVANCE EXPORT -->
+                        <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport') && auth_user.role_id === 1 ">
+                            <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Offices" dense clearable hide-selected multiple deletable-chips chips counter>
+                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips(item.name)">
+                                                {{item.name}}
+                                            </v-chip>
+                                        </template>
+                                        <span >{{item.name}}</span>
+                                    </v-tooltip>
+                                </template>
+                            </v-select>
+                        </v-col>
                         <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport')">
                             <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
@@ -59,7 +76,7 @@
                                 <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
                             </v-col>
                         </v-row>
-                        <!-- END  -->
+                        END  -->
                         <v-row v-if="dialog_type == 'import'">
                             <v-col v-bind="bp(10)">
                                 <v-file-input
@@ -132,10 +149,12 @@
 <script>
     import { mapGetters } from 'vuex';
     import { breakpoint } from '../../../constants';
+    import ArchiveReport from './ArchiveReport'
 
 
     export default {
         props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
+        components: {ArchiveReport},
         data() {
             return {
                 valid: false,
@@ -145,11 +164,11 @@
                 tab: null,
                 excel_table_headers: [],
                 is_preview: false,
-                advanceBtn: true,
+                //advanceBtn: true,
                 offices: [],
-                marian_blue: '0675BB',
+                //marian_blue: '0675BB',
                 // export_by: null,
-                selected_type: [],
+                /*selected_type: [],
                 export_list: [
                     { key: 'Document Type', value: 'document_type'},
                     { key: 'Originating Office', value: 'origin_office'},
@@ -159,21 +178,21 @@
                     { key: '', db_name: 'is_external', value:null},
                     { key: 'External', db_name: 'is_external', value:0},
                     { key: 'Internal', db_name: 'is_external', value:1},
-               ],
+               ],*/
             }
         },
-        watch: {
+        /*watch: {
             'selected_type'(val) {
                 this.advanceBtn = (val.length < 1)? true:false
             }
-        },
+        },*/
         computed: {
-            ...mapGetters(['request', 'document_types']),
+            ...mapGetters(['request', 'document_types', 'auth_user']),
         },
         methods: {
-            showSlot(dialog_type, dialog_for){
+            /*showSlot(dialog_type, dialog_for){
                 return this.dialog_type == dialog_type && this.dialog_for == dialog_for
-            },
+            },*/
             bp(col){
                 return breakpoint(col)
             },
@@ -338,7 +357,7 @@
                     officelist({ data:this.$store.state.offices.offices })
                 })
             },
-            advanceExport(){
+            /*advanceExport(){
                 const type = this.$store.state.documents.documentsArchive[0].selected.filter;
                 const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
                 const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
@@ -372,10 +391,10 @@
             removeSelectedChips(item){
                 this.selected_type.splice(this.selected_type.indexOf(item), 1)
                 this.selected_type = [...this.selected_type]
-            }
+            }*/
         },
         mounted() {
-            this.selected_type = this.document_types.map(t => t.name)
+            //this.selected_type = this.document_types.map(t => t.name)
         }
     }
 </script>
