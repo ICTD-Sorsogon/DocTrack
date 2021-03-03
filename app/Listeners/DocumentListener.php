@@ -34,50 +34,8 @@ class DocumentListener
     {
         extract(get_object_vars($event));
 
-        if(!$document->wasRecentlyCreated &&
-            $document->status != 'acknowledged' &&
-            $document->status != 'received' &&
-            $document->status != 'forwarded' &&
-            $document->status != 'terminated' &&
-            $document->status != 'on hold'
-
-            ){
-            $old = $document->getOriginal();
-            $new_destinationOffices = $this->destinationOffice($document, 'document');
-            $old_destinationOffices = $this->destinationOffice($old, 'old');
-
-            $new_object = (object) array(
-                'subject' => $document->subject,
-                'sender_name' => $document->sender_name,
-                'remarks' => $document->remarks,
-                'attachment_page_count' => $document->attachment_page_count,
-                'destination_office_id' => $new_destinationOffices,
-                'document_type_id' => $document->document_type_id,
-                'page_count' => $document->page_count,
-            );
-
-            $old_object = (object) array(
-                'subject' => $old['subject'],
-                'sender_name' => $old['sender_name'],
-                'remarks' => $old['remarks'],
-                'attachment_page_count' => $old['attachment_page_count'],
-                'destination_office_id' => $old_destinationOffices,
-                'document_type_id' => $old['document_type_id'],
-                'page_count' => $old['page_count'],
-            );
-
-            $new_data = json_encode($new_object);
-            $old_data = json_encode($old_object);
-
-            $log = new Log();
-            $log->user_id = auth()->user()->id;
-            $log->new_values = $new_data;
-            $log->original_values = $old_data;
-            $log->action = 'Document update';
-            $log->remarks = "Document {$old['subject']} with tracking code of {$document->tracking_code}
-                has been successfully updated by " . auth()->user()->fullname . ".";
-            return $log->save();
-        }
+        $remarks = $document->remarks;
+        $subject = $document->subject;
 
         switch($document->status){
             case 'created':
@@ -90,17 +48,15 @@ class DocumentListener
                     }
 
                         $data_object = (object) array(
-                            'subject' => $document->subject,
+                            'subject' => $subject,
                             'sender_name' => $document->sender_name,
-                            'remarks' => $document->remarks,
+                            'remarks' => $remarks,
                             'attachment_page_count' => $document->attachment_page_count,
                             'destination_office_id' => $destinationOffce,
                             'document_type_id' => $document->document_type_id,
                             'page_count' => $document->page_count,
                         );
 
-
-                        $subject = $document->subject;
                         $data = json_encode($data_object);
 
                         $log = new Log();
@@ -112,65 +68,90 @@ class DocumentListener
                             created by " . auth()->user()->fullname . ".";
                         return $log->save();
                 }
-            break;
 
+                else if(!$document->wasRecentlyCreated){
+                    $old = $document->getOriginal();
+                    $new_destinationOffices = $this->destinationOffice($document, 'new');
+                    $old_destinationOffices = $this->destinationOffice($old, 'old');
+
+                    $new_object = (object) array(
+                        'subject' => $document->subject,
+                        'sender_name' => $document->sender_name,
+                        'remarks' => $document->remarks,
+                        'attachment_page_count' => $document->attachment_page_count,
+                        'destination_office_id' => $new_destinationOffices,
+                        'document_type_id' => $document->document_type_id,
+                        'page_count' => $document->page_count,
+                    );
+
+                    $old_object = (object) array(
+                        'subject' => $old['subject'],
+                        'sender_name' => $old['sender_name'],
+                        'remarks' => $old['remarks'],
+                        'attachment_page_count' => $old['attachment_page_count'],
+                        'destination_office_id' => $old_destinationOffices,
+                        'document_type_id' => $old['document_type_id'],
+                        'page_count' => $old['page_count'],
+                    );
+
+                    $new_data = json_encode($new_object);
+                    $old_data = json_encode($old_object);
+
+                    $log = new Log();
+                    $log->user_id = auth()->user()->id;
+                    $log->new_values = $new_data;
+                    $log->original_values = $old_data;
+                    $log->action = 'Document update';
+                    $log->remarks = "Document {$old['subject']} with tracking code of {$document->tracking_code}
+                        has been successfully updated by " . auth()->user()->fullname . ".";
+                    return $log->save();
+                }
+            break;
+        }
+
+        $tracking_records = last($document->tracking_records->toArray());
+        $through = $tracking_records['through'];
+        $approved_by = $tracking_records['approved_by'];
+
+        switch($tracking_records['action']){
             case 'acknowledged':
-                $remarks = $document->remarks;
-                $subject = $document->subject;
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document acknowledged';
+                $log->action = 'Document acknowledge';
                 $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been
                     acknowledge by " . auth()->user()->fullname . ".";
                 return $log->save();
             break;
 
             case 'on hold':
-
-                $release_data = last($document->tracking_records->toArray());
-
-                if($release_data['action'] == 'released'){
-                    $log = new Log();
-                    $log->user_id = auth()->user()->id;
-                    $log->action = 'Document release';
-                    $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been released.";
-                    return $log->save();
-                } else {
-                    $status = $document->status;
-                    $subject = $document->subject;
-
-                    $log = new Log();
-                    $log->user_id = auth()->user()->id;
-                    $log->action = 'Document hold';
-                    $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} is put on hold by " . auth()->user()->fullname . ".";
-                    return $log->save();
-                }
-
-            break;
-
-            case 'terminated':
-                $received_data = last($document->tracking_records->toArray());
-
-                $subject = $document->subject;
-                $approved_by = $received_data['approved_by'];
-                $remarks = $document->remarks;
-
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document terminate';
-                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been successfully terminated,
-                    approved by {$approved_by} and leave the following remarks: {$remarks}";
+                $log->action = 'Document hold';
+                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} is put on
+                    hold by " . auth()->user()->fullname . ".";
                 return $log->save();
             break;
 
+            case 'released':
+                $log = new Log();
+                $log->user_id = auth()->user()->id;
+                $log->action = 'Document release';
+                $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has
+                    been released by " . auth()->user()->fullname . ".";
+                return $log->save();
+            break;
+
+            case 'terminated':
+                if(!$document->wasRecentlyCreated && $document->status != 'created' ){
+                    $log = new Log();
+                    $log->user_id = auth()->user()->id;
+                    $log->action = 'Document terminate';
+                    $log->remarks = "Document {$subject} with tracking code of {$document->tracking_code} has been successfully terminated,
+                        approved by {$approved_by} and leave the following remarks: {$remarks}";
+                }
+            break;
+
             case 'forwarded':
-                $forwarded_data = last($document->tracking_records->toArray());
-
-                $remarks = $document->remarks;
-                $subject = $document->subject;
-                $approved_by = $forwarded_data['approved_by'];
-                $through = $forwarded_data['through'];
-
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document forward';
@@ -180,13 +161,6 @@ class DocumentListener
             break;
 
             case 'received':
-                $received_data = last($document->tracking_records->toArray());
-
-                $through = $received_data['through'];
-                $approved_by = $received_data['approved_by'];
-                $remarks = $document->remarks;
-                $subject = $document->subject;
-
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document receive';

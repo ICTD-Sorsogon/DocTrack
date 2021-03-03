@@ -481,13 +481,13 @@
                     worksheet.addRow({
                         tracking_code: e.tracking_code,
                         subject: e.subject,
-                        sender: e.sender['name'],
+                        sender: e.sender?.name,
                         priority_level: priority_list[e.priority_level-1],
-                        document_type: e.document_type['name'],
+                        document_type: e.document_type?.name,
                         status: e.status,
                         page_count: e.page_count,
                         attachment_page_count: e.attachment_page_count,
-                        origin_office: e.origin_office['name'],
+                        origin_office: e.origin_office?.name,
                         destination: destination_list.slice(0, -2),
                         remarks: e.remarks,
                     })
