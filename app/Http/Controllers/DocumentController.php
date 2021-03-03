@@ -396,7 +396,7 @@ class DocumentController extends Controller
     {
        $summary = TrackingReport::with('office');
        if(!auth()->user()->isAdmin()){
-            return $summary->only(auth()->user()->office_id)->first();
+            return $summary->get()->only(auth()->user()->office_id)->first();
        }
 
        return $summary->where('transactions', '!=', 0)->get();
