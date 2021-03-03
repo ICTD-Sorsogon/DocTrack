@@ -96,7 +96,7 @@ class DocumentController extends Controller
         }
 
         $office->report->update([
-            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
+            'speeds' => optional($office->report->speeds)->push($diff) ?? [$diff]
         ]);
 
         return [$tracking_record];
@@ -146,7 +146,7 @@ class DocumentController extends Controller
         }
 
         $office->report->update([
-            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
+            'speeds' => optional($office->report->speeds)->push($diff) ?? [$diff]
         ]);
 
         $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
@@ -188,9 +188,6 @@ class DocumentController extends Controller
 
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
-
-            $document->status = 'terminated';
-            DocumentEvent::dispatch($document);
 
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
@@ -247,7 +244,7 @@ class DocumentController extends Controller
             }
 
             $office->report->update([
-                'speeds' => $office->report->speeds?->push($diff) ?? [$diff] //use optional for php < 8
+                'speeds' => optional($office->report->speeds)->push($diff) ?? [$diff] //use optional for php < 8
             ]);
 
             $user_id = Auth::user()->id;

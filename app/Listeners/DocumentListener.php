@@ -36,6 +36,7 @@ class DocumentListener
 
         $remarks = $document->remarks;
         $subject = $document->subject;
+        $tracking_code = $document->tracking_code;
 
         switch($document->status){
             case 'created':
@@ -52,7 +53,7 @@ class DocumentListener
                             'sender_name' => $document->sender_name,
                             'remarks' => $remarks,
                             'attachment_page_count' => $document->attachment_page_count,
-                            'destination_office_id' => $destinationOffce,
+                            'destination_office_id' => substr($destinationOffce, 0, -2),
                             'document_type_id' => $document->document_type_id,
                             'page_count' => $document->page_count,
                         );
@@ -63,7 +64,7 @@ class DocumentListener
                         $log->user_id = auth()->user()->id;
                         $log->new_values = $data;
                         $log->action = 'Document created';
-                        $log->remarks = "New document was successfully created with subject of : {$subject}";
+                        $log->remarks = "Document {$subject} with tracking code of {$tracking_code} was created by " . auth()->user()->fullname . ".";
                         return $log->save();
                 }
 
@@ -77,7 +78,7 @@ class DocumentListener
                         'sender_name' => $document->sender_name,
                         'remarks' => $document->remarks,
                         'attachment_page_count' => $document->attachment_page_count,
-                        'destination_office_id' => $new_destinationOffices,
+                        'destination_office_id' => substr($new_destinationOffices, 0, -2),
                         'document_type_id' => $document->document_type_id,
                         'page_count' => $document->page_count,
                     );
@@ -116,15 +117,15 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document acknowledged';
-                $log->remarks = "{$subject} was successfully acknowledged with remarks: {$remarks}";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully acknowledged with remarks: {$remarks} by " . auth()->user()->fullname . ".";
                 return $log->save();
             break;
 
             case 'on hold':
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
-                $log->action = 'Document Hold';
-                $log->remarks = "{$subject} was hold.";
+                $log->action = 'Document hold';
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was hold.";
                 return $log->save();
             break;
 
@@ -132,7 +133,7 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document release';
-                $log->remarks = "{$subject} has been released.";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} has been released.";
                 return $log->save();
             break;
 
@@ -140,7 +141,7 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document terminated';
-                $log->remarks = "{$subject} was successfully terminated and approved by: {$approved_by} with remarks: {$remarks}";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully terminated and approved by: {$approved_by} with remarks: {$remarks}";
                 return $log->save();
             break;
 
@@ -148,7 +149,7 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document forwarded';
-                $log->remarks = "{$subject} was successfully forwarded through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully forwarded through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
                 return $log->save();
             break;
 
@@ -156,7 +157,7 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document received';
-                $log->remarks = "{$subject} was successfully received through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
+                $log->remarks = "{$subject} wast tracking code of {$tracking_code} was successfully received through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
                 return $log->save();
             break;
         }
