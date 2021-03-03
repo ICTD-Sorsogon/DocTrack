@@ -41,39 +41,46 @@
                 <v-radio-group
                     class="mx-4"
                     v-model="wsType"
-                    row
                     v-bind="bp(12)"
                     >
-                    <v-radio
-                        label=""
-                        value="radio-1"
-                    ></v-radio>
+                    <v-row class="d-flex align-center">
+                        <v-col cols="1">
+                            <v-radio
+                                label=""
+                                value="radio-1"
+                            ></v-radio>
+                        </v-col>
+                        <v-col cols="11">
+                            <v-combobox
+                                v-model="originating"
+                                :items="offices"
+                                item-text="name"
+                                clearable
+                                hide-selected
+                                persistent-hint
+                                label="Select Office"
+                                chips
+                                required
+                                dense
+                                multiple
+                                full-width="100%"
+                                counter
+                            >
+                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeSelectedChips('originating', item)">
+                                                {{ item.office_code || item }}
+                                            </v-chip>
+                                        </template>
+                                        <span >{{item.name || item}}</span>
+                                    </v-tooltip>
+                                </template>
+                            </v-combobox>
 
-                <v-combobox
-                    v-model="originating"
-                    :items="offices"
-                    item-text="name"
-                    clearable
-                    hide-selected
-                    persistent-hint
-                    label="Select Office"
-                    chips
-                    required
-                    dense
-                    multiple
-                    counter
-                >
-                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeSelectedChips('originating', item)">
-                                    {{ item.office_code || item }}
-                                </v-chip>
-                            </template>
-                            <span >{{item.name || item}}</span>
-                        </v-tooltip>
-                    </template>
-                </v-combobox>
+                        </v-col>
+
+                    </v-row>
 
                  </v-radio-group>
             </v-col>
@@ -84,23 +91,29 @@
                     row
                     v-bind="bp(12)"
                     >
-                    <v-radio
-                        label=""
-                        value="radio-1"
-                    ></v-radio>
+                    <v-row class="d-flex align-center">
+                        <v-col cols="1">
+                            <v-radio
+                                label=""
+                                value="radio-1"
+                            ></v-radio>
+                        </v-col>
+                        <v-col cols="10">
+                            <v-select class="mx-4" width="100%" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
+                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('selected_type', item.name)">
+                                                {{item.name}}
+                                            </v-chip>
+                                        </template>
+                                        <span >{{item.name}}</span>
+                                    </v-tooltip>
+                                </template>
+                            </v-select>
+                        </v-col>
+                    </v-row>
 
-                <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
-                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('selected_type', item.name)">
-                                    {{item.name}}
-                                </v-chip>
-                            </template>
-                            <span >{{item.name}}</span>
-                        </v-tooltip>
-                    </template>
-                </v-select>
                  </v-radio-group>
             </v-col>
             <v-col v-bind="bp(12)">
@@ -113,29 +126,35 @@
                     label="Source:"
                 ></v-autocomplete>-->
 
-                <v-radio-group
-                    class="mx-4"
-                    v-model="wsType"
-                    row
-                    v-bind="bp(12)"
-                    >
-                    <v-radio
-                        label=""
-                        value="radio-1"
-                    ></v-radio>
-                <v-select class="mx-4" :items="source_list" v-model="source" label="Document Source" dense clearable hide-selected multiple deletable-chips chips counter>
-                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('source', item)">
-                                    {{item}}
-                                </v-chip>
-                            </template>
-                            <span >{{item}}</span>
-                        </v-tooltip>
-                    </template>
-                </v-select>
-                 </v-radio-group>
+                    <v-radio-group
+                        class="mx-4"
+                        v-model="wsType"
+                        row
+                        v-bind="bp(12)"
+                        >
+                        <v-row class="d-flex align-center">
+                            <v-col cols="1">
+                                <v-radio
+                                    label=""
+                                    value="radio-1"
+                                ></v-radio>
+                            </v-col>
+                            <v-col cols="10">
+                                <v-select class="mx-4" full-width="100%" :items="source_list" v-model="source" label="Document Source" dense clearable hide-selected multiple deletable-chips chips counter>
+                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('source', item)">
+                                                    {{item}}
+                                                </v-chip>
+                                            </template>
+                                            <span >{{item}}</span>
+                                        </v-tooltip>
+                                    </template>
+                                </v-select>
+                            </v-col>
+                        </v-row>
+                    </v-radio-group>
             </v-col>
             <v-row>
                 <v-col v-bind="bp(12)">
