@@ -140,7 +140,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import { breakpoint } from '../../../constants';
 
 export default {
@@ -237,9 +237,9 @@ export default {
         },
     },
     mounted(){
-        this.selected_type = this.document_types.map(t => t.name)
-        this.originating = this.offices
-        this.source = this.source_list
+        // this.selected_type = this.document_types.map(t => t.name)
+        // this.originating = this.offices
+        // this.source = this.source_list
     }
 
 }
