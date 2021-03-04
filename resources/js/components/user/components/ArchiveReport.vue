@@ -165,6 +165,11 @@ export default {
     watch: {
         'originating'(val){
             this.advanceBtn = this.disableBtn
+            val.forEach(currItem => {
+                if (!this.offices.map(o=>o.id).includes(currItem.id)) {
+                    this.originating.pop()
+                }
+            })
         },
         'source'(val){
             this.advanceBtn = this.disableBtn
