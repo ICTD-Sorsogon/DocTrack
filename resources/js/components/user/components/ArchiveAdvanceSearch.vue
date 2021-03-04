@@ -25,7 +25,7 @@
         </v-col>
 
         <v-col v-bind="bp(6)">
-            <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="advanceSearch.type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
+            <v-select ref="atype" class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="advanceSearch.type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                     <v-tooltip top>
                         <template v-slot:activator="{ on, attrs }">
@@ -41,6 +41,7 @@
 
         <v-col v-bind="bp(6)">
             <v-combobox
+                ref="aoriginating"
                 v-model="advanceSearch.originating"
                 :items="offices"
                 item-text="name"
@@ -70,6 +71,7 @@
 
         <v-col v-bind="bp(6)">
             <v-combobox
+                ref="adestination"
                 v-model="advanceSearch.destination"
                 :items="offices"
                 item-text="name"
@@ -267,6 +269,9 @@ export default {
                 })
             }
         }
+    },
+    mounted(){
+        ['atype', 'aoriginating', 'adestination'].forEach(b=>this.$refs[b].lastItem = 200)
     }
 }
 </script>
