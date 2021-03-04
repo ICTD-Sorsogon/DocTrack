@@ -17,6 +17,9 @@ class CreateTrackingRecordsTable extends Migration
             $table->id();
             $table->foreignId('document_id')->constrained('documents');
             $table->foreignId('destination')->nullable()->constrained('offices');
+            $table->integer('transaction_of')->nullable();
+            $table->boolean('delayed')->nullable();
+            $table->integer('speed')->nullable();
             $table->enum('action', ['created', 'received', 'forwarded', 'processing',
              'on hold', 'rejected', 'terminated' , 'acknowledged', 'date changed', 'edited', 'released']);
             $table->enum('through', ['docket office', 'personal', 'email', 'others'])->nullable();

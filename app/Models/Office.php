@@ -14,6 +14,11 @@ class Office extends Model
         'contact_number', 'contact_email'
     ];
 
+    public static function DocketOffice()
+    {
+        return self::whereOfficeCode('DO')->first()->id;
+    }
+
     public function users()
     {
         return $this->hasMany('App\Models\User');
@@ -24,9 +29,9 @@ class Office extends Model
         return $this->hasMany('App\Models\Document', 'originating_office');
     }
 
-    public function tracking_summaries()
+    public function tracker()
     {
-        return $this->hasMany('App\Models\TrackingSummary');
+        return $this->hasMany('App\Models\TrackingRecord', 'transaction_of');
     }
 
     public function notification()

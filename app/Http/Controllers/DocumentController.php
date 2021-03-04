@@ -8,14 +8,11 @@ use Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\Document;
-use App\Models\DocumentRecipient;
-use App\Models\DocumentType;
+use App\Models\{Document,DocumentRecipient, DocumentType};
 use App\Models\Office;
 use App\Models\TrackingRecord;
 use App\Models\TrackingSummary;
 use Illuminate\Http\Request;
-use App\Models\TrackingReport;
 
 class DocumentController extends Controller
 {
@@ -33,7 +30,7 @@ class DocumentController extends Controller
 
     public function getAllActiveDocuments(Document $documents)
     {
-        return $documents->allDocuments(Auth::user());
+        return $documents->all();
     }
 
     public function getAllArchiveDocuments(Document $documents, Request $request)
@@ -57,49 +54,26 @@ class DocumentController extends Controller
 
     public function receiveDocument(Document $document, Request $request)
     {
-        DB::beginTransaction();
-        try {
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $request->id;
-            $tracking_record->destination = $request->destination;
-            $tracking_record->action = 'received';
-            $tracking_record->through = $request->through;
-            $tracking_record->approved_by = $request->approved_by;
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->remarks = $request->documentRemarks;
-            $tracking_record->save();
-            $tracking_record->document->update(['status' => 'received']);
-        } catch (\Exception $error) {
-            DB::rollback();
-            throw $error;
-        }
-        DB::commit();
-
+        $document->update(['status' => 'received']);
         $document->document_recipient->where('destination_office', auth()->user()->office->id)->first()->update([
             'received' => true
         ]);
 
-        TrackingSummary::create([
+        $speed = $document->acknowledgedDiff();
+
+        return TrackingRecord::create([
+            'document_id' => $request->id,
+            'destination' => $request->destination,
             'action' => 'received',
-            'document_id' => $document->id,
-            'office_id' => auth()->user()->office_id
+            'through' => $request->through,
+            'approved_by' => $request->approved_by,
+            'touched_by' => Auth::user()->id,
+            'last_touched' => Carbon::now(),
+            'remarks' => $request->documentRemarks,
+            'transaction_of' => Office::DocketOffice(),
+            'speed' => $speed,
+            'delayed' => self::PRIORITY_LEVEL[$document->priority_level] < $speed
         ]);
-
-        $diff = $document->acknowledgedDiff();
-        $office = Office::whereOfficeCode('DO')->first();
-
-        auth()->user()->office->report->increment('transactions');
-
-        if(self::PRIORITY_LEVEL[$document->priority_level] < $diff){
-            $office->report->increment('delayed');
-        }
-
-        $office->report->update([
-            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
-        ]);
-
-        return [$tracking_record];
     }
 
     public function forwardDocument(Document $document, Request $request)
@@ -108,66 +82,34 @@ class DocumentController extends Controller
         abort_if($document->multiple, 403);
 
         $recipient = $document->document_recipient()->whereDestinationOffice($request->forwarded_to)->first();
-
-
-        DB::beginTransaction();
-        try {
-            $tracking_record = new TrackingRecord();
-            $tracking_record->document_id = $request->id;
-            $tracking_record->destination = $request->forwarded_to;
-            $tracking_record->action = 'forwarded';
-            $tracking_record->through = $request->through;
-            $tracking_record->approved_by = $request->approved_by;
-            $tracking_record->touched_by = Auth::user()->id;
-            $tracking_record->last_touched = Carbon::now();
-            $tracking_record->forwarded_by = $request->forwarded_by;
-            $tracking_record->forwarded_to = $request->forwarded_to;
-            $tracking_record->remarks = $request->documentRemarks;
-            $tracking_record->save();
-
-            TrackingSummary::create([
-                'action' => 'forwarded',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office_id
-            ]);
-
-        } catch (\Exception $error) {
-            DB::rollback();
-            throw $error;
-        }
-        DB::commit();
-
-        $office = auth()->user()->office;
-        $office->report->increment('transactions');
-        $diff = $document->receivedDiff();
-
-        if(self::PRIORITY_LEVEL[$document->priority_level] < $diff){
-           $office->report->increment('delayed');
-        }
-
-        $office->report->update([
-            'speeds' => $office->report->speeds?->push($diff) ?? [$diff]
-        ]);
-
         $document->document_recipient()->whereDestinationOffice(auth()->user()->office->id)->update(['forwarded' => true]);
         $document->update(['status' => 'forwarded', 'destination_office_id' => [$request->forwarded_to], 'priority_level' => null ]);
 
-        if(optional($recipient)->forwarded){
-           $recipient->update([
-                'acknowledged' => 0,
-                'received' => 0,
-                'forwarded' => 0
-            ]);
+        $speed = $document->receivedDiff();
 
-            return [$tracking_record];
+        if(optional($recipient)->forwarded){ // if destination is going back to origin, reset origin
+           $recipient->update([ 'acknowledged' => 0, 'received' => 0, 'forwarded' => 0 ]);
         }
 
-
-        $document->document_recipient()->create([
+        $document->document_recipient()->create([ // if not create a new one
             'document_id' => $document->id, 'destination_office' => $request->forwarded_to
         ]);
 
-        return [$tracking_record];
+        return TrackingRecord::create([
+            'document_id' => $document->id,
+            'destination' => $request->forwarded_to,
+            'action' => 'forwarded',
+            'through' => $request->through,
+            'approved_by' => $request->approved_by,
+            'touched_by' => Auth::user()->id,
+            'last_touched' => Carbon::now(),
+            'forwarded_by' => $request->forwarded_by,
+            'forwarded_to' => $request->forwarded_to,
+            'remarks' => $request->documentRemarks,
+            'speed' => $speed,
+            'transaction_of' => $request->forwarded_by,
+            'delayed' => self::PRIORITY_LEVEL[$document->priority_level] < $speed
+        ]);
     }
 
     public function terminateDocument(Document $document, Request $request)
@@ -209,58 +151,24 @@ class DocumentController extends Controller
     {
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
             ->update(['acknowledged' => true]);
-
-        DB::beginTransaction();
-        try {
-            foreach($document->destination as $destination) {
-                $tracking_record = new TrackingRecord();
-                $tracking_record->document_id = $request->id;
-                $tracking_record->action = 'acknowledged';
-                $tracking_record->destination = $destination->id;
-                $tracking_record->touched_by = Auth::user()->id;
-                $tracking_record->last_touched = Carbon::now();
-                $tracking_record->remarks = $request->documentRemarks;
-                $tracking_record->save();
-            }
-            $tracking_record->document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
-
-            TrackingSummary::create([
+        
+        $document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
+        $speed = $document->forwardeddiff();
+        foreach($document->destination as $destination) {
+            $tracking_record = TrackingRecord::create([
+                'document_id' => $request->id,
                 'action' => 'acknowledged',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office_id
+                'destination' => $destination->id,
+                'touched_by' => Auth::user()->id,
+                'last_touched' => Carbon::now(),
+                'remarks' => $request->documentRemarks,
+                'transaction_of' => $document->originating_office,
+                'speed' => $speed,
+                'delayed' => self::PRIORITY_LEVEL[$document->priority_level] < $speed
             ]);
-
-            $diff = $document->created_at->diffInSeconds(Carbon::now());
-            $office = $document->origin_office;
-
-            if($document->status == 'forwarded'){
-                $trackingRecord = $document->tracking_records->where('action', 'forwarded')->last();
-                $office = $trackingRecord->forwardedByOffice;
-                $diff = $trackingRecord->created_at->diffInSeconds(Carbon::now());
-            }
-
-
-            Office::whereOfficeCode('DO')->first()->report->increment('transactions');
-
-            if(self::PRIORITY_LEVEL[$tracking_record->document->priority_level] < $diff){
-                $office->report->increment('delayed');
-            }
-
-            $office->report->update([
-                'speeds' => $office->report->speeds?->push($diff) ?? [$diff] //use optional for php < 8
-            ]);
-
-            $user_id = Auth::user()->id;
-
-        } catch (ValidationException $error) {
-            DB::rollback();
-            throw $error;
-        } catch (\Exception $error) {
-            DB::rollback();
-            throw $error;
         }
-        DB::commit();
-        return [$tracking_record];
+
+        return $tracking_record;
     }
 
     public function holdDocument(Document $document, Request $request)
@@ -374,17 +282,6 @@ class DocumentController extends Controller
                 'last_touched' => Carbon::now()
             ]);
         };
-        // Should only create one creation record in the summary
-        if($document->wasRecentlyCreated) {
-            TrackingSummary::create([
-                'action' => 'created',
-                'document_id' => $document->id,
-                'office_id' => auth()->user()->office_id
-            ]);
-
-            TrackingReport::firstOrCreate([ 'office_id' => auth()->user()->office_id])->increment('transactions');
-
-        }
 
        DocumentRecipient::whereDocumentId($document->id)
             ->whereIn('destination_office', $diff->toArray())->forceDelete();
@@ -394,12 +291,13 @@ class DocumentController extends Controller
 
     public function trackingReports()
     {
-       $summary = TrackingReport::with('office');
+       $summary = TrackingRecord::whereNotNull('transaction_of')->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed']);
+
        if(!auth()->user()->isAdmin()){
-            return $summary->only(auth()->user()->office_id)->first();
+           return $summary->where('transaction_of', auth()->user()->office_id);
        }
 
-       return $summary->where('transactions', '!=', 0)->get();
+       return $summary;
     }
 
     public function officeReports()
