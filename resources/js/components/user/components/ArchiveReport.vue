@@ -1,55 +1,24 @@
 <template>
     <div>
-        <!-- Kenneth -->
-        <!-- MASTER LIST -->
         <v-row>
             <v-col v-bind="bp(12)" v-if="dialog_for=='masterList'">
                 <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Master List</v-btn>
             </v-col>
         </v-row>
-        <!-- ADVANCE EXPORT -->
         <div v-if="dialog_for=='advanceExport'">
             <v-row>
                 <v-col v-bind="bp(12)">
-                    <!--<v-radio
-                    class="mx-4"
-                        label="Radio 0"
-                        value="0"
-                    ></v-radio>
-                    <v-radio
-                    class="mx-4"
-                        label="Radio 1"
-                        value="1"
-                    ></v-radio>-->
-                    <v-radio-group
-                    class="mx-5"
-                    v-model="wsType"
-                    row
-                    >
-                    <v-radio
-                        label="Single Excel WorkSheet"
-                        value="single"
-                    ></v-radio>
-                    <v-radio
-                        label="Group by Excel WorkSheet"
-                        value="group"
-                    ></v-radio>
+                    <v-radio-group class="mx-5" v-model="wsType" row>
+                        <v-radio label="Single Worksheet" value="single"/>
+                        <v-radio label="Group by Worksheet" value="group"/>
                     </v-radio-group>
                 </v-col>
             </v-row>
             <v-col v-bind="bp(12)" v-if="auth_user.role_id === 1 ">
-                <v-radio-group
-                    class="mx-4"
-                    v-model="wsTypeSel"
-                    row
-                    v-bind="bp(12)"
-                    >
+                <v-radio-group class="mx-4" v-model="wsTypeSel" row v-bind="bp(12)">
                     <v-row class="d-flex align-center">
                         <v-col cols="1" v-if="isByGroup">
-                            <v-radio
-                                label=""
-                                value="radio-3"
-                            ></v-radio>
+                            <v-radio value="byOffice" @click="groupBy()"/>
                         </v-col>
                         <v-col :cols="(isByGroup)?'11':'12'">
                             <v-combobox
@@ -59,12 +28,15 @@
                                 clearable
                                 hide-selected
                                 persistent-hint
-                                label="Select Office"
+                                label="Select Office's"
                                 chips
                                 required
                                 dense
                                 multiple
                                 counter
+                                :dark="isByGroup && group.byOffice"
+                                :disabled="isByGroup && !group.byOffice"
+                                :filled="isByGroup && !group.byOffice"
                             >
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
@@ -77,29 +49,34 @@
                                     </v-tooltip>
                                 </template>
                             </v-combobox>
-
                         </v-col>
-
                     </v-row>
-
-                 </v-radio-group>
+                </v-radio-group>
             </v-col>
             <v-col v-bind="bp(12)">
-                <v-radio-group
-                    class="mx-4"
-                    v-model="wsTypeSel"
-                    row
-                    v-bind="bp(12)"
-                    >
+                <v-radio-group class="mx-4" v-model="wsTypeSel" row v-bind="bp(12)">
                     <v-row class="d-flex align-center">
                         <v-col cols="1" v-if="isByGroup">
-                            <v-radio
-                                label=""
-                                value="radio-4"
-                            ></v-radio>
+                            <v-radio value="byType" @click="groupBy()"/>
                         </v-col>
                         <v-col :cols="(isByGroup)?'11':'12'">
-                            <v-select :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
+                            <v-select
+                                :items="document_types"
+                                item-text="name"
+                                item-value="name"
+                                v-model="selected_type"
+                                label="Document Type"
+                                dense
+                                clearable
+                                hide-selected
+                                multiple
+                                deletable-chips
+                                chips
+                                counter
+                                :dark="isByGroup && group.byType"
+                                :disabled="isByGroup && !group.byType"
+                                :filled="isByGroup && !group.byType"
+                            >
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
                                         <template v-slot:activator="{ on, attrs }">
@@ -113,56 +90,51 @@
                             </v-select>
                         </v-col>
                     </v-row>
-
-                 </v-radio-group>
+                </v-radio-group>
             </v-col>
             <v-col v-bind="bp(12)">
-                <!--<v-autocomplete
-                    v-model="source"
-                    :items="source_list"
-                    item-text="key"
-                    dense
-                    filled
-                    label="Source:"
-                ></v-autocomplete>-->
-
-                    <v-radio-group
-                        class="mx-4"
-                        v-model="wsTypeSel"
-                        row
-                        v-bind="bp(12)"
-                        >
-                        <v-row class="d-flex align-center">
-                            <v-col cols="1" v-if="isByGroup">
-                                <v-radio
-                                    label=""
-                                    value="radio-1"
-                                ></v-radio>
-                            </v-col>
-                            <v-col :cols="(isByGroup)?'11':'12'">
-                                <v-select :items="source_list" v-model="source" label="Document Source" dense clearable hide-selected multiple deletable-chips chips counter>
-                                    <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                        <v-tooltip top>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('source', item)">
-                                                    {{item}}
-                                                </v-chip>
-                                            </template>
-                                            <span >{{item}}</span>
-                                        </v-tooltip>
-                                    </template>
-                                </v-select>
-                            </v-col>
-                        </v-row>
-                    </v-radio-group>
+                <v-radio-group class="mx-4" v-model="wsTypeSel" row v-bind="bp(12)">
+                    <v-row class="d-flex align-center">
+                        <v-col cols="1" v-if="isByGroup">
+                            <v-radio value="bySource" @click="groupBy()"/>
+                        </v-col>
+                        <v-col :cols="(isByGroup)?'11':'12'">
+                            <v-select
+                                :items="source_list"
+                                v-model="source"
+                                label="Document Source"
+                                dense
+                                clearable
+                                hide-selected
+                                multiple
+                                deletable-chips
+                                chips
+                                counter
+                                :dark="isByGroup && group.bySource"
+                                :disabled="isByGroup && !group.bySource"
+                                :filled="isByGroup && !group.bySource"
+                            >
+                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('source', item)">
+                                                {{item}}
+                                            </v-chip>
+                                        </template>
+                                        <span >{{item}}</span>
+                                    </v-tooltip>
+                                </template>
+                            </v-select>
+                        </v-col>
+                    </v-row>
+                </v-radio-group>
             </v-col>
             <v-row>
                 <v-col v-bind="bp(12)">
-                    <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
+                    <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Custom Report</v-btn>
                 </v-col>
             </v-row>
         </div>
-        <!-- END  -->
     </div>
 </template>
 
@@ -185,8 +157,13 @@ export default {
             source_list: ['External', 'Internal'],
             originating: [],
             wsType: 'single',
-            wsTypeSel: 'radio-3',
-            isByGroup: false
+            wsTypeSel: 'byOffice',
+            isByGroup: false,
+            group: {
+                byOffice: false,
+                byType: false,
+                bySource: false
+            }
         }
     },
     watch: {
@@ -197,13 +174,27 @@ export default {
             this.isByGroup = (newVal=='group')?true:false
         },
         'isByGroup'(newVal){
-            this.wsTypeSel = (newVal)?'radio-3':'';
+            if (newVal) {
+                this.wsTypeSel = 'byOffice';
+                this.group.byOffice = true
+            } else {
+                this.wsTypeSel = '';
+            }
         }
     },
     computed: {
-        ...mapGetters(['document_types', 'auth_user', 'offices']),
+        ...mapGetters(['document_types', 'auth_user']),
+        offices(){
+            return JSON.parse(JSON.stringify(this.$store.state.offices.offices))
+        }
     },
     methods: {
+        groupBy() {
+            this.group.byOffice = (this.wsTypeSel == this.group.byOffice)?true:false
+            this.group.byType = (this.wsTypeSel == this.group.byType)?true:false
+            this.group.bySource = (this.wsTypeSel == this.group.bySource)?true:false
+            this.group[this.wsTypeSel] = true
+        },
         removeSelectedChips(vars, item){
             this[vars].splice(this[vars].indexOf(item), 1)
             this[vars] = [...this[vars]]
@@ -249,7 +240,6 @@ export default {
         this.selected_type = this.document_types.map(t => t.name)
         this.originating = this.offices
         this.source = this.source_list
-        console.log(this.dialog_for)
     }
 
 }
