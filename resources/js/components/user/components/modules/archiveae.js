@@ -47,40 +47,53 @@ export default function archiveae(param) {
 
     if (param.type == 'group') {
         selected.data.forEach((element) => {
-            let worksheet = workbook.addWorksheet(element.office_code)
+            let source = ['Internal', 'External']
+            let worksheet = selected.type == 'byOffice' ? workbook.addWorksheet(element.office_code) : workbook.addWorksheet(element)
             columnHeader(worksheet)
-            data.forEach((e, index) => {
-                let destination_list = ''
-                e.destination.forEach(element => destination_list += element.name + ', ');
-
-                let destination = e.destination.map(des => des.name)
-
-                if(selected.type == 'byOffice'){
-                    if(e.origin_office.name == element.name || destination.includes(element.name)){
-                        worksheet.addRow({
-                            tracking_code: e.tracking_code,
-                            subject: e.subject,
-                            sender: e.sender?.name,
-                            document_type: e.document_type['name'],
-                            status: e.status,
-                            page_count: e.page_count,
-                            attachment_page_count: e.attachment_page_count,
-                            origin_office: e.origin_office['name'],
-                            destination: destination_list.slice(0, -2),
-                            remarks: e.remarks,
-                        })
+            if(selected.type == 'byOffice'){
+                data.forEach((e, index) => {
+                    let destination = e.destination.map(des => des.name)
+                        if(e.origin_office.name == element.name || destination.includes(element.name)){
+                            by(worksheet, e)
+                        }
+                })
+            } else if(selected.type == 'byType'){
+                data.forEach((e, index) => {
+                    if(e.document_type.name == element){
+                        by(worksheet, e)
                     }
-                }
-
-
-
-            })
+                })
+            } else if(selected.type == 'bySource'){
+                data.forEach((e, index) => {
+                    if(source[e.is_external] == element){
+                        by(worksheet, e)
+                    }
+                })
+            }
             xStyle(worksheet)
         });
     } else {
         //don't disturb me
     }
     download({ filename:'Logs', workbook:workbook })
+
+    function by(worksheet, e){
+        let destination_list = ''
+        e.destination.forEach(element => destination_list += element.name + ', ');
+        worksheet.addRow({
+            tracking_code: e.tracking_code,
+            subject: e.subject,
+            sender: e.sender?.name,
+            document_type: e.document_type['name'],
+            status: e.status,
+            page_count: e.page_count,
+            attachment_page_count: e.attachment_page_count,
+            origin_office: e.origin_office['name'],
+            destination: destination_list.slice(0, -2),
+            remarks: e.remarks,
+        })
+
+    }
 }
 
 

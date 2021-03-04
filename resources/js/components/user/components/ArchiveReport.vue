@@ -153,7 +153,7 @@ export default {
                 { key: 'Document Type', value: 'document_type'},
                 { key: 'Originating Office', value: 'origin_office'},
             ],
-            source: [],
+            source: ['External', 'Internal'],
             source_list: ['External', 'Internal'],
             originating: [],
             wsType: 'single',
@@ -248,10 +248,9 @@ export default {
     },
     mounted(){
         if (this.dialog_for == 'advanceExport') {
-            ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200)
+            ['byOffice', 'byType'].forEach(b=>this.$refs[b].lastItem = 200)
             this.selected_type = this.document_types.map(t => t.name)
             this.originating = this.offices
-            this.source = this.source_list
         }
     }
 
