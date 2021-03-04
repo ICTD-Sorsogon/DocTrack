@@ -51,20 +51,20 @@ export default function archiveae(param) {
             let worksheet = selected.type == 'byOffice' ? workbook.addWorksheet(element.office_code) : workbook.addWorksheet(element)
             columnHeader(worksheet)
             if(selected.type == 'byOffice'){
-                data.forEach((e, index) => {
+                data.forEach((e) => {
                     let destination = e.destination.map(des => des.name)
                         if(e.origin_office.name == element.name || destination.includes(element.name)){
                             by(worksheet, e)
                         }
                 })
             } else if(selected.type == 'byType'){
-                data.forEach((e, index) => {
+                data.forEach((e) => {
                     if(e.document_type.name == element){
                         by(worksheet, e)
                     }
                 })
             } else if(selected.type == 'bySource'){
-                data.forEach((e, index) => {
+                data.forEach((e) => {
                     if(source[e.is_external] == element){
                         by(worksheet, e)
                     }
