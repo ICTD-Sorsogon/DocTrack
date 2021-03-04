@@ -149,11 +149,7 @@ export default {
         return {
             advanceBtn: true,
             selected_type: [],
-            export_list: [
-                { key: 'Document Type', value: 'document_type'},
-                { key: 'Originating Office', value: 'origin_office'},
-            ],
-            source: [],
+            source: ['External', 'Internal'],
             source_list: ['External', 'Internal'],
             originating: [],
             wsType: 'single',
@@ -167,8 +163,14 @@ export default {
         }
     },
     watch: {
+        'originating'(val){
+            this.advanceBtn = this.disableBtn
+        },
+        'source'(val){
+            this.advanceBtn = this.disableBtn
+        },
         'selected_type'(val) {
-            this.advanceBtn = (val.length < 1)? true:false
+            this.advanceBtn = this.disableBtn
         },
         'wsType'(newVal){
             this.isByGroup = (newVal=='group')?true:false
@@ -191,6 +193,9 @@ export default {
         document_types(){
             var data = JSON.parse(JSON.stringify(this.$store.state.documents.document_types));
             return data
+        },
+        disableBtn(){
+            return (this.originating.length < 1 && this.selected_type.length < 1 && this.source.length < 1)? true:false
         }
     },
     methods: {
@@ -212,14 +217,16 @@ export default {
         },
         advanceExport(){
             const archive = this.$store.state.documents.documentsArchive[0].selected
-            const type = archive.filter;
-            const data = archive[type.toLowerCase()].data
-
+            const data = archive[archive.filter.toLowerCase()].data
 
             let selected = []
+            let filter = {}
             Object.entries(this.group).forEach(s =>{
                 if(s[1]==true){
                     selected = this.$refs[s[0]].value
+                }
+                if ((this.$refs[s[0]].value).length > 0) {
+                    filter[s[0]] = this.$refs[s[0]].value
                 }
             })
 
@@ -228,6 +235,7 @@ export default {
                     type: this.wsType,
                     data: data,
                     selected: selected,
+                    filter: filter
                 })
             })
         },
@@ -247,10 +255,9 @@ export default {
     },
     mounted(){
         if (this.dialog_for == 'advanceExport') {
-            ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200)
+            ['byOffice', 'byType'].forEach(b=>this.$refs[b].lastItem = 200)
             this.selected_type = this.document_types.map(t => t.name)
             this.originating = this.offices
-            this.source = this.source_list
         }
     }
 
