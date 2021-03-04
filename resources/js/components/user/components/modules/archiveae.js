@@ -35,34 +35,52 @@ export default function archiveae(param) {
                 }
             })
         })
-        Object.values(cWidth).forEach((width, index) => {
-            worksheet.getColumn(index+1).width = width + 5
-        });
+        Object.values(cWidth).forEach((width, index) => { worksheet.getColumn(index+1).width = width + 5 });
         style({ worksheet:worksheet, headercount:headerColumns.length })
     }
 
+    function addRowData(worksheet, docu){
+        let destination_list = ''
+        docu.destination.forEach(element => destination_list += element.name + ', ');
+        worksheet.addRow({
+            tracking_code: docu.tracking_code,
+            subject: docu.subject,
+            sender: docu.sender?.name,
+            document_type: docu.document_type['name'],
+            status: docu.status,
+            page_count: docu.page_count,
+            attachment_page_count: docu.attachment_page_count,
+            origin_office: docu.origin_office['name'],
+            destination: destination_list.slice(0, -2),
+            remarks: docu.remarks,
+        })
+    }
+
     if (param.type == 'group') {
-        selected.forEach((element) => {
-            let worksheet = workbook.addWorksheet(element)
+        selected.data.forEach((element) => {
+            let source = ['Internal', 'External']
+            let worksheet = selected.type == 'byOffice' ? workbook.addWorksheet(element.office_code) : workbook.addWorksheet(element)
             columnHeader(worksheet)
-            data.forEach((e, index) => {
-                let destination_list = ''
-                e.destination.forEach(element => destination_list += element.name + ', ');
-                if(e.document_type.name == element){
-                    worksheet.addRow({
-                        tracking_code: e.tracking_code,
-                        subject: e.subject,
-                        sender: e.sender?.name,
-                        document_type: e.document_type['name'],
-                        status: e.status,
-                        page_count: e.page_count,
-                        attachment_page_count: e.attachment_page_count,
-                        origin_office: e.origin_office['name'],
-                        destination: destination_list.slice(0, -2),
-                        remarks: e.remarks,
-                    })
-                }
-            })
+            if(selected.type == 'byOffice'){
+                data.forEach((docu) => {
+                    let destination = docu.destination.map(des => des.name)
+                        if(docu.origin_office.name == element.name || destination.includes(element.name)){
+                            addRowData(worksheet, docu)
+                        }
+                })
+            } else if(selected.type == 'byType'){
+                data.forEach((docu) => {
+                    if(docu.document_type.name == element){
+                        addRowData(worksheet, docu)
+                    }
+                })
+            } else if(selected.type == 'bySource'){
+                data.forEach((docu) => {
+                    if(source[docu.is_external] == element){
+                        addRowData(worksheet, docu)
+                    }
+                })
+            }
             xStyle(worksheet)
         });
     } else {
@@ -84,23 +102,12 @@ export default function archiveae(param) {
                 }
             })
             if (satisfied.every(i=>i==true)) {
-                let destination_list = ''
-                docu.destination.forEach(element => destination_list += element.name + ', ');
-                worksheet.addRow({
-                    tracking_code: docu.tracking_code,
-                    subject: docu.subject,
-                    sender: docu.sender?.name,
-                    document_type: docu.document_type['name'],
-                    status: docu.status,
-                    page_count: docu.page_count,
-                    attachment_page_count: docu.attachment_page_count,
-                    origin_office: docu.origin_office['name'],
-                    destination: destination_list.slice(0, -2),
-                    remarks: docu.remarks
-                })
+                addRowData(worksheet, docu)
             }
         })
         xStyle(worksheet)
     }
     download({ filename:'Document Custom Report', workbook:workbook })
 }
+
+

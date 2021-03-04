@@ -223,7 +223,8 @@ export default {
             let filter = {}
             Object.entries(this.group).forEach(s =>{
                 if(s[1]==true){
-                    selected = this.$refs[s[0]].value
+                    selected.type = s[0]
+                    selected.data = this.$refs[s[0]].value
                 }
                 if ((this.$refs[s[0]].value).length > 0) {
                     filter[s[0]] = this.$refs[s[0]].value
