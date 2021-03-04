@@ -41,7 +41,7 @@ export default function archiveae(param) {
 
     function addRowData(worksheet, docu){
         let destination_list = ''
-        docu.destination.forEach(element => destination_list += element.name + ', ');
+        docu.destination.forEach(element => destination_list += element.office_code + ', ');
         worksheet.addRow({
             tracking_code: docu.tracking_code,
             subject: docu.subject,
@@ -50,7 +50,7 @@ export default function archiveae(param) {
             status: docu.status,
             page_count: docu.page_count,
             attachment_page_count: docu.attachment_page_count,
-            origin_office: docu.origin_office['name'],
+            origin_office: docu.origin_office.office_code,
             destination: destination_list.slice(0, -2),
             remarks: docu.remarks,
         })
