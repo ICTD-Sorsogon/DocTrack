@@ -2,15 +2,11 @@ import {style, download} from './cmd';
 
 export default function archiveae(param) {
     const Excel = require('exceljs');
-
-    const type = param.type
-    const document_data = param.document_data
     const data = param.data
-    const priority_list = param.priority_list
-    const selected_type = param.selected_type
+    const selected = param.selected
 
     let workbook = new Excel.Workbook()
-    selected_type.forEach((element_distinct) => {
+    selected.forEach((element_distinct) => {
         let worksheet = workbook.addWorksheet(element_distinct)
         worksheet.columns = [
             { header: 'Tracking Code', key: 'tracking_code'},
@@ -36,7 +32,6 @@ export default function archiveae(param) {
                         tracking_code: e.tracking_code,
                         subject: e.subject,
                         sender: e.sender?.name,
-                        priority_level: priority_list[e.priority_level-1],
                         document_type: e.document_type['name'],
                         status: e.status,
                         page_count: e.page_count,

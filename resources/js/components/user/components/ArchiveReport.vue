@@ -140,7 +140,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import { breakpoint } from '../../../constants';
 
 export default {
@@ -211,19 +211,22 @@ export default {
             this[this.dialog_for]()
         },
         advanceExport(){
-            const type = this.$store.state.documents.documentsArchive[0].selected.filter;
-            const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
-            const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
+            const archive = this.$store.state.documents.documentsArchive[0].selected
+            const type = archive.filter;
+            const data = archive[type.toLowerCase()].data
 
-            const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
+
+            let selected = []
+            Object.entries(this.group).forEach(s =>{
+                if(s[1]==true){
+                    selected = this.$refs[s[0]].value
+                }
+            })
 
             import('./modules').then(({archiveae}) => {
                 archiveae({
-                    type: type,
-                    document_data: document_data,
-                    priority_list: priority_list,
-                    data:data,
-                    selected_type: this.selected_type
+                    data: data,
+                    selected: selected,
                 })
             })
         },
