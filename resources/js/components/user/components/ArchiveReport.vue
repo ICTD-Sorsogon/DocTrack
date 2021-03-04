@@ -242,10 +242,12 @@ export default {
         },
     },
     mounted(){
-        ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200)
-        this.selected_type = this.document_types.map(t => t.name)
-        this.originating = this.offices
-        this.source = this.source_list
+        if (this.dialog_for == 'advanceExport') {
+            ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200)
+            this.selected_type = this.document_types.map(t => t.name)
+            this.originating = this.offices
+            this.source = this.source_list
+        }
     }
 
 }

@@ -8,7 +8,7 @@ export default function archiveml(param) {
     const priority_list = param.priority_list
 
     let workbook = new Excel.Workbook()
-    let worksheet = workbook.addWorksheet('Archive Master List')
+    let worksheet = workbook.addWorksheet('Document Archive Master List')
     worksheet.columns = [
         { header: 'Tracking Code', key: 'tracking_code'},
         { header: 'Subject', key: 'subject'},
@@ -63,5 +63,5 @@ export default function archiveml(param) {
     });
 
     style({ worksheet:worksheet, headercount:11 })
-    download({ filename:'Logs', workbook:workbook })
+    download({ filename:'Document Archive Master List', workbook:workbook })
 }
