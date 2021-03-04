@@ -168,7 +168,7 @@ class Document extends Model
         $oId = auth()->user()->office->id;
         $in = Document::with('origin_office')->select(Document::raw('YEAR(created_at) as year'))->where('originating_office', $oId)->onlyTrashed()->get();
         $ot = DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))->where('destination_office', $oId)->onlyTrashed()->get();
-        return static::getYr($in)->merge(static::getYr($ot));
+        return collect(static::getYr($in)->merge(static::getYr($ot))->unique())->flatten();
     }
 
     public static function filter($document, $request)
