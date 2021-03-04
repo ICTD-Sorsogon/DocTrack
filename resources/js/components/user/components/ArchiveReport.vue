@@ -225,6 +225,7 @@ export default {
 
             import('./modules').then(({archiveae}) => {
                 archiveae({
+                    type: this.wsType,
                     data: data,
                     selected: selected,
                 })

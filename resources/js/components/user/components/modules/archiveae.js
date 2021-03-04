@@ -6,13 +6,12 @@ export default function archiveae(param) {
     const selected = param.selected
 
     let workbook = new Excel.Workbook()
-    selected.forEach((element_distinct) => {
-        let worksheet = workbook.addWorksheet(element_distinct)
+
+    function columnHeader(worksheet) {
         worksheet.columns = [
             { header: 'Tracking Code', key: 'tracking_code'},
             { header: 'Subject', key: 'subject'},
             { header: 'Sender', key: 'sender'},
-            { header: 'Priority Level', key: 'priority_level'},
             { header: 'Document Type', key: 'document_type'},
             { header: 'Status', key: 'status'},
             { header: 'Page Count', key: 'page_count'},
@@ -21,13 +20,35 @@ export default function archiveae(param) {
             { header: 'Destination', key: 'destination'},
             { header: 'Remarks', key: 'remarks'},
         ]
+    }
 
-        data.forEach((e, index) => {
-            let destination_list = ''
+    function xStyle(worksheet) {
+        let cWidth = {}
+        worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+            const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+            headerColumns.forEach((cLetter) => {
+                let cLength = worksheet.getCell(`${cLetter}${rowNumber}`).value?.toString().trim()?.length ?? 0
+                if(cWidth[cLetter] == undefined){
+                    cWidth[cLetter] = cLength
+                }else{
+                    cWidth[cLetter] = (cWidth[cLetter] <  cLength) ? cLength : cWidth[cLetter]
+                }
+            })
+        })
+        Object.values(cWidth).forEach((width, index) => {
+            worksheet.getColumn(index+1).width = width + 5
+        });
+        style({ worksheet:worksheet, headercount:10 })
+    }
 
-            e.destination.forEach(element => destination_list += element.name + ', ');
-
-                if(e.document_type.name == element_distinct){
+    if (param.type == 'group') {
+        selected.forEach((element) => {
+            let worksheet = workbook.addWorksheet(element)
+            columnHeader(worksheet)
+            data.forEach((e, index) => {
+                let destination_list = ''
+                e.destination.forEach(element => destination_list += element.name + ', ');
+                if(e.document_type.name == element){
                     worksheet.addRow({
                         tracking_code: e.tracking_code,
                         subject: e.subject,
@@ -41,36 +62,11 @@ export default function archiveae(param) {
                         remarks: e.remarks,
                     })
                 }
-
-        })
-
-        let columnWidth = {}
-        worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-            const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-
-            headerColumns.forEach((v) => {
-                let currentColumnLength = worksheet.getCell(`${v}${rowNumber}`).value?.toString().trim()?.length ?? 0
-
-                if(columnWidth[v] == undefined){
-                    columnWidth[v] = currentColumnLength
-                }else{
-                    columnWidth[v] = (columnWidth[v] <  currentColumnLength) ? currentColumnLength : columnWidth[v]
-                }
             })
-
-        })
-
-        Object.values(columnWidth).forEach((width, index) => {
-            worksheet.getColumn(index+1).width = width + 5
+            xStyle(worksheet)
         });
-
-        style({ worksheet:worksheet, headercount:11 })
-
-
-    });
-
-    //data.length > 0 ? download({ filename:'Logs', workbook:workbook }) : this.$store.dispatch('setSnackbar', { type: 'error', message: 'No Data Found' })
+    } else {
+        //don't disturb me
+    }
     download({ filename:'Logs', workbook:workbook })
-
-
 }

@@ -27,56 +27,7 @@
                             v-if="this.dialog_type == 'export' && this.dialog_for == 'masterList' || this.dialog_for == 'advanceExport'"
                             :dialog_for="dialog_for"
                         />
-                        <!-- Kenneth
-                        <v-row v-if="showSlot('export', 'masterList')">
-                            <v-col v-bind="bp(12)">
-                                <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>Export Master List</v-btn>
-                            </v-col>
-                        </v-row>
-                        <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport') && auth_user.role_id === 1 ">
-                            <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Offices" dense clearable hide-selected multiple deletable-chips chips counter>
-                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                    <v-tooltip top>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips(item.name)">
-                                                {{item.name}}
-                                            </v-chip>
-                                        </template>
-                                        <span >{{item.name}}</span>
-                                    </v-tooltip>
-                                </template>
-                            </v-select>
-                        </v-col>
-                        <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport')">
-                            <v-select class="mx-4" :items="document_types" item-text="name" item-value="name" v-model="selected_type" label="Document Type" dense clearable hide-selected multiple deletable-chips chips counter>
-                                <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
-                                    <v-tooltip top>
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips(item.name)">
-                                                {{item.name}}
-                                            </v-chip>
-                                        </template>
-                                        <span >{{item.name}}</span>
-                                    </v-tooltip>
-                                </template>
-                            </v-select>
-                        </v-col>
-                        <v-col v-bind="bp(12)" v-if="showSlot('export', 'advanceExport')">
-                            <v-autocomplete
-                                v-model="source"
-                                :items="source_list"
-                                item-text="key"
-                                dense
-                                filled
-                                label="Source:"
-                            ></v-autocomplete>
-                        </v-col>
-                        <v-row v-if="showSlot('export', 'advanceExport')">
-                            <v-col v-bind="bp(12)">
-                                <v-btn :disabled="advanceBtn" @click="download" color="primary" style="width:100%" elevation="4" depressed large>Advance Export</v-btn>
-                            </v-col>
-                        </v-row>
-                        END  -->
+
                         <v-row v-if="dialog_type == 'import'">
                             <v-col v-bind="bp(10)">
                                 <v-file-input
@@ -164,35 +115,13 @@
                 tab: null,
                 excel_table_headers: [],
                 is_preview: false,
-                //advanceBtn: true,
                 offices: [],
-                //marian_blue: '0675BB',
-                // export_by: null,
-                /*selected_type: [],
-                export_list: [
-                    { key: 'Document Type', value: 'document_type'},
-                    { key: 'Originating Office', value: 'origin_office'},
-               ],
-                source: null,
-                source_list: [
-                    { key: '', db_name: 'is_external', value:null},
-                    { key: 'External', db_name: 'is_external', value:0},
-                    { key: 'Internal', db_name: 'is_external', value:1},
-               ],*/
             }
         },
-        /*watch: {
-            'selected_type'(val) {
-                this.advanceBtn = (val.length < 1)? true:false
-            }
-        },*/
         computed: {
             ...mapGetters(['request', 'document_types', 'auth_user']),
         },
         methods: {
-            /*showSlot(dialog_type, dialog_for){
-                return this.dialog_type == dialog_type && this.dialog_for == dialog_for
-            },*/
             bp(col){
                 return breakpoint(col)
             },
@@ -266,7 +195,6 @@
                                 tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
                                 content: []
                             });
-                            // Preview
                             sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
                                 var rowIndex = rowNumber - 1;
                                 if (rowIndex > 0) {
@@ -281,7 +209,6 @@
                                             ((dataCol[5] == undefined)? null : dataCol[5])
                                     });
                                 }
-                            // Duplicate Validation
                                 row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
                                     var colIndex = colNumber - 1;
                                     if (rowIndex > 0 && colIndex < 3) {
@@ -357,44 +284,8 @@
                     officelist({ data:this.$store.state.offices.offices })
                 })
             },
-            /*advanceExport(){
-                const type = this.$store.state.documents.documentsArchive[0].selected.filter;
-                const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
-                const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
-
-                const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
-
-                import('./modules').then(({archiveae}) => {
-                    archiveae({
-                        type: type,
-                        document_data: document_data,
-                        priority_list: priority_list,
-                        data:data,
-                        selected_type: this.selected_type
-                    })
-                })
-            },
-            masterList(){
-                const type = this.$store.state.documents.documentsArchive[0].selected.filter;
-                const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
-                const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
-
-                import('./modules').then(({archiveml}) => {
-                    archiveml({
-                        type: type,
-                        priority_list: priority_list,
-                        data:data,
-                    })
-                })
-            },
-
-            removeSelectedChips(item){
-                this.selected_type.splice(this.selected_type.indexOf(item), 1)
-                this.selected_type = [...this.selected_type]
-            }*/
         },
         mounted() {
-            //this.selected_type = this.document_types.map(t => t.name)
         }
     }
 </script>
