@@ -149,7 +149,7 @@
         <v-app-bar-nav-icon class=".d-none .d-sm-flex .d-md-none" @click.stop="drawer = !drawer">
             <v-icon>mdi-menu</v-icon>
         </v-app-bar-nav-icon>
-        <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
+        <v-toolbar-title>Document Tracking System</v-toolbar-title>
         <v-spacer></v-spacer>
 
         <!-- NOTIFICATION!! -->
