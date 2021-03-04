@@ -27,11 +27,8 @@ export default {
     },
     mounted() {
         // console.log(this.auth_user);
-        this.$store.dispatch('officeReports');
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
-        this.$store.dispatch('getOfficeNameList');
-        // console.log(this.$store.getters.office_reports_get);
     }
 }
 </script>
