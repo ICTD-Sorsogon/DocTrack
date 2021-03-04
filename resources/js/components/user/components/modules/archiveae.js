@@ -64,9 +64,9 @@ export default function archiveae(param) {
             if(selected.type == 'byOffice'){
                 data.forEach((docu) => {
                     let destination = docu.destination.map(des => des.name)
-                        if(docu.origin_office.name == element.name || destination.includes(element.name)){
-                            addRowData(worksheet, docu)
-                        }
+                    if(docu.origin_office.name == element.name || destination.includes(element.name)){
+                        addRowData(worksheet, docu)
+                    }
                 })
             } else if(selected.type == 'byType'){
                 data.forEach((docu) => {
@@ -91,7 +91,7 @@ export default function archiveae(param) {
             Object.entries(param.filter).forEach((f)=>{
                 if (f[0] == 'byOffice') {
                     var fsel = f[1].map(o=>o.id)
-                    var exist = fsel.every(oi=>docu.destination.map(des=>des.id).includes(oi)) || f[1].map(o=>o.id).includes(docu.origin_office.id)
+                    var exist = fsel.every(oi=>docu.destination.map(des=>des.id).includes(oi)) || fsel.includes(docu.origin_office.id)
                     satisfied.push(exist)
                 }
                 if (f[0] == 'byType') {
