@@ -215,10 +215,18 @@ export default {
             const type = archive.filter;
             const data = archive[type.toLowerCase()].data
 
+
+            let selected = []
+            Object.entries(this.group).forEach(s =>{
+                if(s[1]==true){
+                    selected = this.$refs[s[0]].value
+                }
+            })
+
             import('./modules').then(({archiveae}) => {
                 archiveae({
                     data: data,
-                    selected: this.selected_type
+                    selected: selected,
                 })
             })
         },

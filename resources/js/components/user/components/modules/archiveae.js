@@ -32,7 +32,6 @@ export default function archiveae(param) {
                         tracking_code: e.tracking_code,
                         subject: e.subject,
                         sender: e.sender?.name,
-                        priority_level: priority_list[e.priority_level-1],
                         document_type: e.document_type['name'],
                         status: e.status,
                         page_count: e.page_count,
