@@ -216,10 +216,11 @@ export default {
             const data = archive[type.toLowerCase()].data
 
 
-            let selected = []
+            let selected = {}
             Object.entries(this.group).forEach(s =>{
                 if(s[1]==true){
-                    selected = this.$refs[s[0]].value
+                    selected.type = s[0]
+                    selected.data = this.$refs[s[0]].value
                 }
             })
 
