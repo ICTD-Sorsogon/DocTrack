@@ -34,7 +34,6 @@
                                 dense
                                 multiple
                                 counter
-                                :dark="isByGroup && group.byOffice"
                                 :disabled="isByGroup && !group.byOffice"
                                 :filled="isByGroup && !group.byOffice"
                             >
@@ -73,7 +72,6 @@
                                 deletable-chips
                                 chips
                                 counter
-                                :dark="isByGroup && group.byType"
                                 :disabled="isByGroup && !group.byType"
                                 :filled="isByGroup && !group.byType"
                             >
@@ -110,7 +108,6 @@
                                 deletable-chips
                                 chips
                                 counter
-                                :dark="isByGroup && group.bySource"
                                 :disabled="isByGroup && !group.bySource"
                                 :filled="isByGroup && !group.bySource"
                             >
@@ -183,9 +180,14 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['document_types', 'auth_user']),
+        ...mapGetters(['auth_user']),
         offices(){
-            return JSON.parse(JSON.stringify(this.$store.state.offices.offices))
+            var data = JSON.parse(JSON.stringify(this.$store.state.offices.offices));
+            return data
+        },
+        document_types(){
+            var data = JSON.parse(JSON.stringify(this.$store.state.documents.document_types));
+            return data
         }
     },
     methods: {
@@ -237,9 +239,9 @@ export default {
         },
     },
     mounted(){
-        this.selected_type = this.document_types.map(t => t.name)
-        this.originating = this.offices
-        this.source = this.source_list
+        //this.selected_type = this.document_types.map(t => t.name)
+        //this.originating = this.offices
+        //this.source = this.source_list
     }
 
 }
