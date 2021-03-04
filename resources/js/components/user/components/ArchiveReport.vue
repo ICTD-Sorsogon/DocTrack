@@ -22,6 +22,7 @@
                         </v-col>
                         <v-col :cols="(isByGroup)?'11':'12'">
                             <v-combobox
+                                ref="byOffice"
                                 v-model="originating"
                                 :items="offices"
                                 item-text="name"
@@ -60,6 +61,7 @@
                         </v-col>
                         <v-col :cols="(isByGroup)?'11':'12'">
                             <v-select
+                                ref="byType"
                                 :items="document_types"
                                 item-text="name"
                                 item-value="name"
@@ -98,6 +100,7 @@
                         </v-col>
                         <v-col :cols="(isByGroup)?'11':'12'">
                             <v-select
+                                ref="bySource"
                                 :items="source_list"
                                 v-model="source"
                                 label="Document Source"
@@ -239,9 +242,10 @@ export default {
         },
     },
     mounted(){
-        // this.selected_type = this.document_types.map(t => t.name)
-        // this.originating = this.offices
-        // this.source = this.source_list
+        ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200);
+        this.selected_type = this.document_types.map(t => t.name)
+        this.originating = this.offices
+        this.source = this.source_list
     }
 
 }
