@@ -211,19 +211,14 @@ export default {
             this[this.dialog_for]()
         },
         advanceExport(){
-            const type = this.$store.state.documents.documentsArchive[0].selected.filter;
-            const document_data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
-            const data = this.source == null ? document_data : document_data.filter(document => document.is_external == this.source)
-
-            const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
+            const archive = this.$store.state.documents.documentsArchive[0].selected
+            const type = archive.filter;
+            const data = archive[type.toLowerCase()].data
 
             import('./modules').then(({archiveae}) => {
                 archiveae({
-                    type: type,
-                    document_data: document_data,
-                    priority_list: priority_list,
-                    data:data,
-                    selected_type: this.selected_type
+                    data: data,
+                    selected: this.selected_type
                 })
             })
         },
@@ -242,10 +237,12 @@ export default {
         },
     },
     mounted(){
-        ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200);
-        this.selected_type = this.document_types.map(t => t.name)
-        this.originating = this.offices
-        this.source = this.source_list
+        if(this.dialog_for == 'advanceExport') {
+            ['byOffice', 'byType', 'bySource'].forEach(b=>this.$refs[b].lastItem = 200);
+            this.selected_type = this.document_types.map(t => t.name)
+            this.originating = this.offices
+            this.source = this.source_list
+        }
     }
 
 }
