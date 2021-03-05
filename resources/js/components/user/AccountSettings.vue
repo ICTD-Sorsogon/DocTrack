@@ -1,13 +1,6 @@
 <template>
     <v-card class="mx-auto" flat>
-        <v-card-title>
-            <v-icon
-            left
-            >
-                mdi-account-edit
-            </v-icon>
-            <span class="title">Edit Account Info</span>
-        </v-card-title>
+        <v-card-title primary-title>Account Settings</v-card-title>
 
         <v-card-text class="headline font-weight-bold">
             <v-expansion-panels
