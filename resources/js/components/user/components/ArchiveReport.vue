@@ -165,8 +165,10 @@ export default {
     watch: {
         'originating'(val){
             this.advanceBtn = this.disableBtn
-            if (!(val[val.length-1] instanceof Object)) {
-                this.originating.pop()
+            if(this.originating.length > 0) {
+                if (!(val[val.length-1] instanceof Object)) {
+                    this.originating.pop()
+                }
             }
         },
         'source'(val){
