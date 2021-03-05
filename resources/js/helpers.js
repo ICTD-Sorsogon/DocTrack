@@ -17,9 +17,7 @@ export function getRecordSpeed(arr, operator) {
 		if(operator == 'slow') {
 			speed = speed.speed > record.speed ? speed : record
 		}
-
 		speed[operator] = formatDistanceStrict(0, speed.speed * 1000)
-
 		return speed
-	}, arr.shift())
+	}, arr[0])
 }
