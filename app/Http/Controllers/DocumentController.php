@@ -30,7 +30,7 @@ class DocumentController extends Controller
 
     public function getAllActiveDocuments(Document $documents)
     {
-        return $documents->all();
+        return $documents->allDocuments(Auth::user());
     }
 
     public function getAllArchiveDocuments(Document $documents, Request $request)
@@ -294,7 +294,7 @@ class DocumentController extends Controller
        $summary = TrackingRecord::whereNotNull('transaction_of')->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed']);
 
        if(!auth()->user()->isAdmin()){
-           return $summary->where('transaction_of', auth()->user()->office_id);
+           return $summary->whereStrict('transaction_of', auth()->user()->office_id);
        }
 
        return $summary;
