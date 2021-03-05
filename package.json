@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@mdi/font": "^5.6.55",
+        "date-fns": "^2.19.0",
         "draggable": "^4.2.0",
         "es6-promise": "^4.2.8",
         "exceljs": "^4.2.0",

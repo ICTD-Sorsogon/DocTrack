@@ -14,11 +14,11 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item :key="1" @click.stop="openDialog('advance_export')">
-                                <v-icon class="ma-1">mdi-file-export-outline</v-icon> CUSTOM REPORT
-                            </v-list-item>
                             <v-list-item :key="2" @click.stop="openDialog('master_list')">
                                 <v-icon  class="ma-1">mdi-file-export-outline</v-icon> MASTER LIST
+                            </v-list-item>
+                            <v-list-item :key="1" @click.stop="openDialog('advance_export')">
+                                <v-icon class="ma-1">mdi-cogs</v-icon> CUSTOM REPORT
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -357,8 +357,20 @@
                 } return false
             },
             advanceSearchQuery(param) {
-                //console.log('search param:')
-                //console.log(param)
+                console.log('search param:', param)
+                /*delete param.optionSource
+                delete param.optionDateCreated
+
+                var filter = []
+                Object.entries(param).forEach(f=>{
+                    if (f[0] == 'dateCreated' && f[1] != null) {
+                        filter.push({key:f[0], value:f[1]})
+                    } else if (f[1].length > 0) {
+                        filter.push({key:f[0], value:f[1]})
+                    }
+                })
+                console.log(filter)*/
+
                 var parameter = []
                 const column = ['trackingId', 'subject', 'source', 'type', 'originating', 'destination', 'sender', 'dateCreated']
                 const {trackingId, subject, source, type, originating, destination, sender, dateCreated} = param;
@@ -377,9 +389,11 @@
                     }
                 })
 
+                console.log('param:', parameter)
+
                 var data = this.extendedData.filter((document)=>{
                     var findedData = false
-                    parameter.forEach((par)=>{
+                    /*parameter.forEach((par)=>{
                     return ptrackingId == document.tracking_code ||
                            psubject == document.subject ||
                            psource.includes(document.is_external) ||
@@ -389,6 +403,83 @@
                            //todo sender
                            pdateCreated == document.created_at;
                     })
+                    return findedData*/
+
+                    /*var satisfied = []
+                    Object.entries(param.filter).forEach((f)=>{
+                        if (f[0] == 'byOffice') {
+                            var fsel = f[1].map(o=>o.id)
+                            var exist = fsel.every(oi=>docu.destination.map(des=>des.id).includes(oi)) || fsel.includes(docu.origin_office.id)
+                            satisfied.push(exist)
+                        }
+                        if (f[0] == 'byType') {
+                            satisfied.push(f[1].includes(docu.document_type.name))
+                        }
+                        if (f[0] == 'bySource') {
+                            satisfied.push(f[1].includes((docu.is_external)?'External':'Internal'))
+                        }
+                    })*/
+
+                    console.log('doc:',document)
+
+                    var satisfied = []
+                    parameter.forEach((par)=>{
+                            console.log('par:', par)
+                            console.log(eval(par))
+                            switch (par) {
+                                case 'ptrackingId':
+                                    satisfied.push((ptrackingId == document.tracking_code)?true:false)
+                                    break;
+                                case 'psubject':
+                                    satisfied.push((psubject == document.subject)?true:false)
+                                    break;
+                                case 'psource':
+                                    satisfied.push((psource.includes((document.is_external)?'External':'Internal'))?true:false)
+                                    break;
+                                case 'ptype':
+                                    satisfied.push((ptype.includes(document.document_type.name))?true:false)
+                                    break;
+                                case 'poriginating':
+                                    satisfied.push((poriginating.map(o=>o.id).includes(document.origin_office.id))?true:false)
+                                    break;
+                                case 'pdestination':
+                                    //every has 1 or more display
+                                    //const array = [1, 2, 3, 4, 5];
+                                    //var h = [1, 6]
+                                    //console.log(array.some((element) => h.includes(element) ));
+
+                                    satisfied.push((pdestination.map(o=>o.id).includes(document.origin_office.id))?true:false)
+                                    .every(oi=>document.destination.map(des=>des.id).includes(oi))
+                                    break;
+                                case 'psender':
+                                    satisfied.push((ptrackingId == document.tracking_code)?true:false)
+                                    break;
+                                case 'pdateCreated':
+                                    satisfied.push((ptrackingId == document.tracking_code)?true:false)
+                                    break;
+                            }
+                           /*console.log(ptrackingId)
+                           console.log(psubject)
+                           console.log(psource)
+                           console.log(ptype)
+                           console.log(poriginating)
+                           console.log(pdestination)
+                           //todo sender
+                           console.log(psender.map(s=>s.id))
+                           console.log(pdateCreated)*/
+                    })
+
+                    /*parameter.forEach((par)=>{
+                    return ptrackingId == document.tracking_code ||
+                           psubject == document.subject ||
+                           psource.includes(document.is_external) ||
+                           ptype.includes(document.document_type.name) ||
+                           poriginating.map(o=>o.id).includes(document.origin_office.id) ||
+                           pdestination.map(o=>o.id).includes(document.origin_office.id) ||
+                           //todo sender
+                           pdateCreated == document.created_at;
+                    })*/
+
                     return findedData
 
                        //console.log(poriginating.map(o=>o.id).includes(document.origin_office.id))
