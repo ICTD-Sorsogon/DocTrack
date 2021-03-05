@@ -1,6 +1,6 @@
 import {style, download} from './cmd';
 
-export default function logs(param) {
+export function logs(param) {
     const Excel = require('exceljs');
 
     let workbook = new Excel.Workbook()
@@ -22,6 +22,6 @@ export default function logs(param) {
         })
     })
 
-    style({ worksheet:worksheet, headercount:5 })
+    style({ worksheet:worksheet, headercount:5, autowidth:true })
     download({ filename:'Logs', workbook:workbook })
 }

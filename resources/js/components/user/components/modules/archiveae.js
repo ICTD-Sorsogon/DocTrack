@@ -1,60 +1,12 @@
-import {style, download} from './cmd';
+import {download} from './cmd';
+import {columnHeader, addRowData, xStyle} from './docuprop';
 
-export default function archiveae(param) {
+export function archiveae(param) {
     const Excel = require('exceljs');
     const data = param.data
     const selected = param.selected
 
     let workbook = new Excel.Workbook()
-
-    function columnHeader(worksheet) {
-        worksheet.columns = [
-            { header: 'Tracking Code', key: 'tracking_code'},
-            { header: 'Subject', key: 'subject'},
-            { header: 'Sender', key: 'sender'},
-            { header: 'Document Type', key: 'document_type'},
-            { header: 'Status', key: 'status'},
-            { header: 'Page Count', key: 'page_count'},
-            { header: 'Attachment Page Count', key: 'attachment_page_count'},
-            { header: 'Originating Office', key: 'origin_office'},
-            { header: 'Destination', key: 'destination'},
-            { header: 'Remarks', key: 'remarks'},
-        ]
-    }
-
-    function xStyle(worksheet) {
-        const headerColumns = ['A','B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        let cWidth = {}
-        worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-            headerColumns.forEach((cLetter) => {
-                let cLength = worksheet.getCell(`${cLetter}${rowNumber}`).value?.toString().trim()?.length ?? 0
-                if(cWidth[cLetter] == undefined){
-                    cWidth[cLetter] = cLength
-                }else{
-                    cWidth[cLetter] = (cWidth[cLetter] <  cLength) ? cLength : cWidth[cLetter]
-                }
-            })
-        })
-        Object.values(cWidth).forEach((width, index) => { worksheet.getColumn(index+1).width = width + 5 });
-        style({ worksheet:worksheet, headercount:headerColumns.length })
-    }
-
-    function addRowData(worksheet, docu){
-        let destination_list = ''
-        docu.destination.forEach(element => destination_list += element.office_code + ', ');
-        worksheet.addRow({
-            tracking_code: docu.tracking_code,
-            subject: docu.subject,
-            sender: docu.sender?.name,
-            document_type: docu.document_type['name'],
-            status: docu.status,
-            page_count: docu.page_count,
-            attachment_page_count: docu.attachment_page_count,
-            origin_office: docu.origin_office.office_code,
-            destination: destination_list.slice(0, -2),
-            remarks: docu.remarks,
-        })
-    }
 
     if (param.type == 'group') {
         selected.data.forEach((element) => {

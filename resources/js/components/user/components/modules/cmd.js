@@ -1,8 +1,17 @@
 export const style = (excel) => {
     var worksheet = excel.worksheet
     var headerColumns = Array.from({length: excel.headercount}, (x,i)=>(i+10).toString(36).toUpperCase())
+    let cWidth = {}
     worksheet.eachRow({ includeEmpty:false }, (row, rowNumber) => {
         headerColumns.forEach((columnLetter) => {
+            if (excel.autowidth) {
+                let cLength = worksheet.getCell(`${columnLetter}${rowNumber}`).value?.toString().trim()?.length ?? 0
+                if(cWidth[columnLetter] == undefined){
+                    cWidth[columnLetter] = cLength
+                }else{
+                    cWidth[columnLetter] = (cWidth[columnLetter] <  cLength) ? cLength : cWidth[columnLetter]
+                }
+            }
             if (rowNumber == 1){
                 worksheet.getCell(`${columnLetter}${rowNumber}`).style = {
                     fill: {type:'pattern', pattern:'solid', fgColor:{argb:'0675BB'}},
@@ -15,6 +24,9 @@ export const style = (excel) => {
             }
         })
     }); worksheet.views = [{state:'frozen', xSplit:0, ySplit:1, activeCell:'B2'}];
+    if (excel.autowidth) {
+        Object.values(cWidth).forEach((width, index) => { worksheet.getColumn(index+1).width = width + 5 });
+    }
 };
 
 export const download = (excel) => {

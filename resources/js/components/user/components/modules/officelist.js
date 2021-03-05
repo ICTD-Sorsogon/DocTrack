@@ -1,6 +1,6 @@
 import {style, download} from './cmd';
 
-export default function officelist(param) {
+export function officelist(param) {
     const Excel = require('exceljs');
 
     let workbook = new Excel.Workbook()
@@ -12,6 +12,7 @@ export default function officelist(param) {
         { header: 'Contact Number', key: 'Contact_Number', width: 18 },
         { header: 'Email Address', key: 'Email_Address', width: 35 }
     ]
+
     param.data.forEach((e, index) => {
         worksheet.addRow({
             Office_Name: e.name,
@@ -22,6 +23,6 @@ export default function officelist(param) {
         })
     })
 
-    style({ worksheet:worksheet, headercount:5 })
+    style({ worksheet:worksheet, headercount:5, autowidth:true })
     download({ filename:'Office List', workbook:workbook })
 }

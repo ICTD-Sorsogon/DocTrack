@@ -275,12 +275,12 @@
                 });
             },
             exportLogs(){
-                import('./modules').then(({logs}) => {
+                import('./modules/logs').then(({logs}) => {
                     logs({ data:this.$store.state.users.logs })
                 })
             },
             exportOfficeList(){
-                import('./modules').then(({officelist}) => {
+                import('./modules/officelist').then(({officelist}) => {
                     officelist({ data:this.$store.state.offices.offices })
                 })
             },

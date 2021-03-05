@@ -234,7 +234,7 @@ export default {
                 }
             })
 
-            import('./modules').then(({archiveae}) => {
+            import('./modules/archiveae').then(({archiveae}) => {
                 archiveae({
                     type: this.wsType,
                     data: data,
@@ -248,10 +248,8 @@ export default {
             const data = this.$store.state.documents.documentsArchive[0].selected[type.toLowerCase()].data
             const priority_list = ['High', 'Medium', 'Low', 'Indefinite']
 
-            import('./modules').then(({archiveml}) => {
+            import('./modules/archiveml').then(({archiveml}) => {
                 archiveml({
-                    type: type,
-                    priority_list: priority_list,
                     data:data,
                 })
             })
