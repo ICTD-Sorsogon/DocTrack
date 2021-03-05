@@ -12,7 +12,7 @@
                 <v-card-text>
                     <v-row align="center">
                         <v-col class="display-3" cols="6">
-                        {{office.transactions}}
+                        {{office.transaction}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -48,7 +48,7 @@
                 <v-card-text>
                     <v-row align="center">
                         <v-col class="display-3" cols="6">
-                        {{office.fastest}}
+                        {{office.fast.fast}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -66,7 +66,7 @@
                 <v-card-text>
                     <v-row align="center">
                         <v-col class="display-3" cols="6">
-                        {{office.slowest}}
+                        {{office.slow.slow}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -113,15 +113,15 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 export default {
+    props: ['stats'],
     computed: {
         ...mapGetters(['auth_user']),
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         office(){
-            return this.tracking_reports
+            return this.stats[0]
         }
     },
     mounted() {
-        console.log(JSON.parse(JSON.stringify(this.$store.getters.office_reports_get)));
     }
 }
 </script>
