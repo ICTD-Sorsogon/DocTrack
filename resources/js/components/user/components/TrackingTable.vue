@@ -3,10 +3,11 @@
         <v-col cols="12">
             <v-data-table
                 :search="search"
-                :items="tracking_reports"
+                :items="stats"
                 :items-per-page="10"
                 :headers="headers"
                 class="elevation-1"
+                :custom-filter="filterOnlyOffice"
             >
             <template v-slot:top>
                 <v-text-field
@@ -21,30 +22,33 @@
     </v-row>
 </template>
 <script>
-import {mapState} from 'vuex';
 
 export default {
+    props:['stats'],
     data() {
         return {
             search: '',
             headers: [
-                { text: 'Office', align: 'start',value: 'office.name'},
-                { text: 'All Transaction', value: 'transactions', filterable:false},
+                { text: 'Office', align: 'start',value: 'office'},
+                { text: 'All Transaction', value: 'transaction', filterable:false},
                 { text: 'Delayed Document', value: 'delayed', filterable:false},
-                { text: 'Fastest Transaction', value: 'fastest', filterable:false},
-                { text: 'Slowest Transaction', value: 'slowest', filterable:false},
+                { text: 'Fastest Transaction', value: 'fast.fast', filterable:false},
+                { text: 'Slowest Transaction', value: 'slow.slow', filterable:false},
                 { text: 'Average Transaction Speed', value: 'average', filterable:false},
                 { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
             ],
         }
     },
-    computed: {
-        ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
+    methods: {
+        filterOnlyOffice (value, search, item) {
+            return value != null &&
+            search != null &&
+            typeof value === 'string' &&
+            value.toString().toLowerCase().indexOf(search) !== -1
+        },
     },
-    mounted() {
-        this.$store.dispatch('unsetLoader');
-        this.$store.dispatch('documentReports');
-        this.$store.dispatch('getOfficeNameList');
+    mounted(){
+       this.data
     }
 }
 </script>

@@ -12,10 +12,8 @@ class TrackingRecord extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $fillable = [
-        'document_id', 'action', 'status',
-        'approved_by', 'touched_by', 'last_touched',
-        'forwarded_by', 'forwarded_to', 'remarks','destination'
+    protected $guarded = [
+        'id', 'updated_at'
     ];
 
     protected $appends = [
@@ -25,7 +23,7 @@ class TrackingRecord extends Model
 
     public function getTouchedUserAttribute($value)
     { 
-        $value = $this->attributes['touched_by'];
+        $value = $this->attributes['touched_by'] ?? NULL;
         return User::with('office')->find($value)->only('avatar', 'office');
     }
 
@@ -41,7 +39,7 @@ class TrackingRecord extends Model
 
     public function office()
     {
-        return $this->belongsTo('App\Models\Office');
+        return $this->belongsTo('App\Models\Office','transaction_of', 'id');
     }
 
     public function document()

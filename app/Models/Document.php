@@ -116,6 +116,11 @@ class Document extends Model
         return $this->tracker()->whereAction('received')->get()->last()->created_at->diffInSeconds(Carbon::now());
     }
 
+    public function forwardedDiff()
+    {
+        return ($this->tracker()->whereAction('forwarded')->get()->last() ?? $this)->created_at->diffInSeconds(Carbon::now());
+    }
+
     public static function allDocuments(User $user)
     {
         $document = static::with(['document_type','origin_office', 'sender', 'tracking_records', 'document_recipient']);
