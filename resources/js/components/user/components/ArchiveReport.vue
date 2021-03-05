@@ -261,7 +261,8 @@ export default {
     },
     mounted(){
         if (this.dialog_for == 'advanceExport') {
-            ['byOffice', 'byType'].forEach(b=>this.$refs[b].lastItem = 200)
+            let groupBy = this.auth_user.role_id === 1 ? ['byOffice', 'byType'] : ['byType']
+            groupBy.forEach(b=>this.$refs[b].lastItem = 200)
             this.selected_type = this.document_types.map(t => t.name)
             this.originating = this.offices
         }
