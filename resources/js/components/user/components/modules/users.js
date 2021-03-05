@@ -9,11 +9,11 @@ export function users(param) {
     status.forEach(element => {
         let worksheet = workbook.addWorksheet(element)
         worksheet.columns = [
-            { header: 'ID Number', key: 'id_number', width: 35 },
-            { header: 'Username', key: 'username', width: 55 },
-            { header: 'Fullname', key: 'full_name', width: 13 },
-            { header: 'Gender', key: 'gender', width: 60 },
-            { header: 'Birthday', key: 'birthday', width: 18 },
+            { header: 'ID Number', key: 'id_number'},
+            { header: 'Username', key: 'username'},
+            { header: 'Fullname', key: 'full_name'},
+            { header: 'Gender', key: 'gender'},
+            { header: 'Birthday', key: 'birthday'},
         ]
 
         param.data.forEach((user) => {
@@ -30,5 +30,5 @@ export function users(param) {
         style({ worksheet:worksheet, headercount:5, autowidth:true })
     });
 
-    download({ filename:'User Export', workbook:workbook })
+    download({ filename:'User List', workbook:workbook })
 }
