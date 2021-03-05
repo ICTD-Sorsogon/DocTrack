@@ -131,9 +131,6 @@ class DocumentController extends Controller
             DocumentRecipient::where(['document_id' => $request->id,
                                       'destination_office' => auth()->user()->office->id])->delete();
 
-            $document->status = 'terminated';
-            DocumentEvent::dispatch($document);
-
             if($admin){
                 $tracking_record->document->update(['status' => 'terminated']);
                 $tracking_record->document->delete();
@@ -151,7 +148,7 @@ class DocumentController extends Controller
     {
         DocumentRecipient::whereIn('recipient_id', $document->document_recipient->pluck('recipient_id'))
             ->update(['acknowledged' => true]);
-        
+
         $document->update(['status' => 'acknowledged', 'priority_level' => $request->priority_levels]);
         $speed = $document->forwardeddiff();
         foreach($document->destination as $destination) {
