@@ -89,11 +89,11 @@ class DocumentController extends Controller
 
         if(optional($recipient)->forwarded){ // if destination is going back to origin, reset origin
            $recipient->update([ 'acknowledged' => 0, 'received' => 0, 'forwarded' => 0 ]);
+        } else {
+            $document->document_recipient()->create([ // if not create a new one
+                'document_id' => $document->id, 'destination_office' => $request->forwarded_to
+            ]);
         }
-
-        $document->document_recipient()->create([ // if not create a new one
-            'document_id' => $document->id, 'destination_office' => $request->forwarded_to
-        ]);
 
         return TrackingRecord::create([
             'document_id' => $document->id,
