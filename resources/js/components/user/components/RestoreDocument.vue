@@ -132,6 +132,7 @@
                                 this.$emit('reload-data', (this.param.filter=='Year')?true:false, (this.param.filter=='Date')?true:false)
                                 this.confirmField = ''
                                 this.confirmDialog = false
+                                this.$store.dispatch("getActiveDocuments")
                             });
                         } else if(this.request.status == 'failed'){
                             this.$store.dispatch('setSnackbar', {

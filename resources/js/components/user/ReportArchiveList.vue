@@ -14,11 +14,11 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item :key="1" @click.stop="openDialog('import_office')">
-                                <v-icon class="ma-1">mdi-file-export-outline</v-icon> GROUP BY OFFICE
+                            <v-list-item :key="1" @click.stop="openDialog('advance_export')">
+                                <v-icon class="ma-1">mdi-file-export-outline</v-icon> CUSTOM REPORT
                             </v-list-item>
-                            <v-list-item :key="2" @click.stop="openDialog('export_office')">
-                                <v-icon  class="ma-1">mdi-file-export-outline</v-icon> SELECTED DATA
+                            <v-list-item :key="2" @click.stop="openDialog('master_list')">
+                                <v-icon  class="ma-1">mdi-file-export-outline</v-icon> MASTER LIST
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -226,6 +226,7 @@
             :excel_dialog="excel_dialog"
             :dialog_title="dialog_title"
             :dialog_for="dialog_for"
+            :dialog_type="dialog_type"
             @close-dialog="closeDialog('excel')"
         />
 
@@ -270,6 +271,7 @@
                 excel_dialog: false,
                 dialog_for: 'new_office',
                 dialog_title: '',
+                dialog_type: '',
                 filterDateDialogFrom: false,
                 filterDateFrom: new Date().toISOString().substr(0, 10),
                 filterDateDialogTo: false,
@@ -542,9 +544,16 @@
                         this.dialog_title = 'Import Office List Via Excel File';
                         this.excel_dialog = true
                         break;
-                    case 'export_office':
-                        this.dialog_for = 'exportOfficeList';
-                        this.dialog_title = 'Export Office List Via Excel File';
+                    case 'master_list':
+                        this.dialog_for = 'masterList';
+                        this.dialog_title = 'Master List - Excel';
+                        this.dialog_type = 'export';
+                        this.excel_dialog = true
+                        break;
+                    case 'advance_export':
+                        this.dialog_for = 'advanceExport';
+                        this.dialog_title = 'Custom Report - Excel';
+                        this.dialog_type = 'export';
                         this.excel_dialog = true
                         break;
                 }
