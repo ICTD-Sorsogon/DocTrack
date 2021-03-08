@@ -53,7 +53,13 @@ export const priority_level = {
     1 : '#F44336'
 };
 
-export const breakpoint = (col) => {
+/**
+ * Breakpoint Function - inside constant js
+ * @param {(Number, Array)} col Number or Array[xs:Number, sm:Number, md:Number, lg:Number, xl:Number]
+ * @description accept Number[1 parameter(1-12)] or Array[5 element(1-12)] and return breakpoint attribute
+ * @returns Object
+ */
+export function breakpoint(col) {
     if (Array.isArray(col)) {
         return {
             cols: "12",
