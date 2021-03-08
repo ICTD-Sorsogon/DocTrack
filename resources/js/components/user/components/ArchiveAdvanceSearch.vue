@@ -247,6 +247,7 @@ export default {
                                     destination.length > 0 ||
                                     sender.length > 0 ||
                                     dateCreated != null;
+            if (!watchSearchParam) this.$emit('noSearchParam');
             return (watchSearchParam)? true:false
         }
     },
