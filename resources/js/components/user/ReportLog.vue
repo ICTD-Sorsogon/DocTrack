@@ -234,8 +234,8 @@ import ExcelDialog from './components/ExcelDialog'
                 var new_logs = JSON.parse(JSON.stringify(this.$store.state.users.logs))
                 if(new_logs.length > 0){
                     new_logs.forEach(log => {
-                        let timestamp = new Date(log.created_at).toString().replace(" GMT+0800 (Taipei Standard Time)", "")
-                        log.created_at = timestamp
+                        let timestamp = new Date(log.created_at).toString().split(' ', 5)
+                        log.created_at = timestamp.toString().replaceAll(',', ' ')
 
                         // Rename Keys from Logs
                         const clone = (obj) => Object.assign({}, obj);
