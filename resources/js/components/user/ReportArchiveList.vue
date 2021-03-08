@@ -177,10 +177,10 @@
                 </template>
 
                 <template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip class='trackin' label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click="printDetails(item)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
-	        	</template>
+		        </template>
 
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-row>
@@ -238,6 +238,8 @@
             @close-dialog="closeDialog('restore')"
         />
 
+        <print-bar-code :item="item" @closeDialog="printDialog = false" :printDialog="printDialog"/>
+
     </div>
 </template>
 
@@ -250,10 +252,13 @@
     import AdvanceSearch from './components/ArchiveAdvanceSearch';
     import restoreDocument from './components/RestoreDocument'
     import RestoreDocument from './components/RestoreDocument.vue';
+
+    import PrintBarCode from './components/PrintBarCode'
+
 import { tr } from 'date-fns/locale';
 
     export default {
-        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument },
+        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument, PrintBarCode },
         data() {
             return {
                 activeDoc: null,
@@ -288,7 +293,9 @@ import { tr } from 'date-fns/locale';
                 filter: {},
                 tableData: [],
                 restore: false,
-                restoreParam: []
+                restoreParam: [],
+                printDialog: false,
+                item: null
             }
         },
         computed: {
@@ -520,6 +527,10 @@ import { tr } from 'date-fns/locale';
             },
             getTrackingCodeColor(document, document_type_id) {
                 return colors[document_type_id];
+            },
+            printDetails(item){
+                this.item = item
+                this.printDialog = item && true
             },
             openDialog(key){
                 switch (key) {
