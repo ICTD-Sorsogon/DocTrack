@@ -162,7 +162,7 @@ class DocumentController extends Controller
                 'touched_by' => Auth::user()->id,
                 'last_touched' => Carbon::now(),
                 'remarks' => $request->documentRemarks,
-                'transaction_of' => $document->originating_office,
+                'transaction_of' => $document->status == 'forwarded' ?  $document->lastForwarded()->forwardedByOffice : $document->originating_office,
                 'speed' => $speed,
                 'delayed' => self::PRIORITY_LEVEL[$document->priority_level] < $speed
             ]);

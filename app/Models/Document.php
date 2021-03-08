@@ -118,7 +118,12 @@ class Document extends Model
 
     public function forwardedDiff()
     {
-        return ($this->tracker()->whereAction('forwarded')->get()->last() ?? $this)->created_at->diffInSeconds(Carbon::now());
+        return ($this->lastForwarded() ?? $this)->created_at->diffInSeconds(Carbon::now());
+    }
+
+    public function lastForwarded()
+    {
+        return $this->tracker()->whereAction('forwarded')->get()->last(); 
     }
 
     public static function allDocuments(User $user)
