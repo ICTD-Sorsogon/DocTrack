@@ -4,7 +4,7 @@
             <v-card-title primary-title>
                 Logs
                 <v-row align="center" justify="end" class="pr-4">
-                    <v-btn color="primary" @click="excel_dialog = true; dialog_title ='Logs'">
+                    <v-btn color="primary" @click="xDialog.visible = true;">
                         <v-icon small class="mr-2">
                             mdi-export
                         </v-icon>
@@ -111,14 +111,13 @@
             </template>
 
         </v-card>
+
         <excel-dialog
-            v-if="dialog_title && excel_dialog == true"
-            :excel_dialog="excel_dialog"
-            :dialog_title="dialog_title"
-            dialog_type='export'
-            :dialog_for="dialog_for"
+            v-if="xDialog.visible"
+            :param="xDialog"
             @close-dialog="closeDialog()"
         />
+
     </v-container>
 
 </template>
@@ -134,12 +133,8 @@ import ExcelDialog from './components/ExcelDialog'
         data() {
             return {
                 emptyLogDialog: false,
-                excel_dialog: false,
-                dialog_for: 'exportLogs',
-                dialog_title: null,
                 dialog: false,
                 dialogDelete: false,
-
                 search: '',
                 editedIndex: -1,
                 editedItem: {
@@ -165,8 +160,14 @@ import ExcelDialog from './components/ExcelDialog'
                     { text: 'New Values ', value: 'new_values' },
                     { text: 'Original Values ', value: 'original_values' },
                 ],
-                export_excel: [],
-                data: []
+                data: [],
+                xDialog : {
+                    title: 'Logs',
+                    func: 'exportLogs',
+                    type: 'export',
+                    data: [],
+                    visible: false
+                }
             }
         },
         methods:{
@@ -175,9 +176,8 @@ import ExcelDialog from './components/ExcelDialog'
                 this.dialog = true
             },
             closeDialog(){
-                this.excel_dialog = false;
+                this.xDialog.visible = false
             },
-
             initialize () {this.logs},
             editItem (item) {
                 this.editedIndex = this.final_data.indexOf(item)
@@ -220,10 +220,6 @@ import ExcelDialog from './components/ExcelDialog'
                     this.editedItem = Object.assign({}, this.defaultItem)
                     this.editedIndex = -1
                 })
-            },
-
-            closeDialog(){
-                this.excel_dialog = false;
             }
         },
 

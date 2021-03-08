@@ -239,11 +239,15 @@ export default {
 
             let selected = []
             let filter = {}
-            Object.entries(this.group).forEach(s =>{
+            let group = JSON.parse(JSON.stringify(this.group))
+            delete group.byOC
+            delete group.byTC
+            delete group.bySC
+            Object.entries(group).forEach(s =>{
                 if(s[1]==true){
                     selected.type = s[0]
                     selected.data = this.$refs[s[0]].value
-                }
+                } console.log('--', this.$refs[s[0]])
                 if ((this.$refs[s[0]].value).length > 0) {
                     filter[s[0]] = this.$refs[s[0]].value
                 }

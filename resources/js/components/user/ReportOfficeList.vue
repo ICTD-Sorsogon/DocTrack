@@ -96,11 +96,8 @@
         />
 
         <excel-dialog
-            v-if="dialog_title && excel_dialog == true"
-            :excel_dialog="excel_dialog"
-            :dialog_title="dialog_title"
-            :dialog_type="dialog_type"
-            :dialog_for="dialog_for"
+            v-if="xDialog.visible"
+            :param="xDialog"
             @close-dialog="closeDialog('excel')"
         />
 
@@ -127,15 +124,18 @@
                 ],
                 search: '',
                 form_dialog: false,
-                excel_dialog: false,
-                dialog_for: 'new_office',
-                dialog_type: '',
-                dialog_title: '',
                 office_info: '',
                 delete_dialog: false,
                 delete_info: {
                     id: '',
                     name: ''
+                },
+                xDialog : {
+                    title: '',
+                    func: '',
+                    type: '',
+                    data: [],
+                    visible: false
                 }
             }
         },
@@ -199,18 +199,17 @@
                         this.form_dialog = true
                         break;
                     case 'import_office':
-                        this.dialog_for = 'importOfficeList';
-                        this.dialog_title = 'Import Office List Via Excel File';
-                        this.dialog_type = 'import';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Import Office List Via Excel File'
+                        this.xDialog.func = 'importOfficeList'
+                        this.xDialog.type = 'import'
                         break;
                     case 'export_office':
-                        this.dialog_for = 'exportOfficeList';
-                        this.dialog_title = 'Export Office List Via Excel File';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Export Office List Via Excel File'
+                        this.xDialog.func = 'exportOfficeList'
+                        this.xDialog.type = 'export'
                         break;
                 }
+                this.xDialog.visible = true
             },
             closeDialog(key){
                 switch (key) {
@@ -218,19 +217,12 @@
                         this.form_dialog = false;
                         break;
                     case 'excel':
-                        this.excel_dialog = false;
+                        this.xDialog.visible = false
                         break;
                 }
             }
         },
         mounted() {
-            // Echo.channel('offices')
-            // .listen('OfficeEvent', (e) =>{
-            //     console.log(e)
-            //     console.log('working echo')
-
-            // })
-
             this.$store.dispatch('unsetLoader');
         }
     }

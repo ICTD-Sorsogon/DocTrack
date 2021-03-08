@@ -223,11 +223,8 @@
         </v-card>
 
         <excel-dialog
-            v-if="dialog_title && excel_dialog == true"
-            :excel_dialog="excel_dialog"
-            :dialog_title="dialog_title"
-            :dialog_for="dialog_for"
-            :dialog_type="dialog_type"
+            v-if="xDialog.visible"
+            :param="xDialog"
             @close-dialog="closeDialog('excel')"
         />
 
@@ -248,14 +245,10 @@
     import TableModal from './components/TableModal';
     import { colors, breakpoint } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
-
     import AdvanceSearch from './components/ArchiveAdvanceSearch';
     import restoreDocument from './components/RestoreDocument'
     import RestoreDocument from './components/RestoreDocument.vue';
-
     import PrintBarCode from './components/PrintBarCode'
-
-import { tr } from 'date-fns/locale';
 
     export default {
         components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument, PrintBarCode },
@@ -275,10 +268,6 @@ import { tr } from 'date-fns/locale';
                     { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
-                excel_dialog: false,
-                dialog_for: '',
-                dialog_title: '',
-                dialog_type: '',
                 filterDateDialogFrom: false,
                 filterDateFrom: new Date().toISOString().substr(0, 10),
                 filterDateDialogTo: false,
@@ -295,7 +284,14 @@ import { tr } from 'date-fns/locale';
                 restore: false,
                 restoreParam: [],
                 printDialog: false,
-                item: null
+                item: null,
+                xDialog : {
+                    title: '',
+                    func: '',
+                    type: '',
+                    data: [],
+                    visible: false
+                }
             }
         },
         computed: {
@@ -535,18 +531,16 @@ import { tr } from 'date-fns/locale';
             openDialog(key){
                 switch (key) {
                     case 'master_list':
-                        this.dialog_for = 'masterList';
-                        this.dialog_title = 'Master List - Excel';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Master List - Excel'
+                        this.xDialog.func = 'masterList'
                         break;
                     case 'advance_export':
-                        this.dialog_for = 'advanceExport';
-                        this.dialog_title = 'Custom Report - Excel';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Custom Report - Excel'
+                        this.xDialog.func = 'advanceExport'
                         break;
                 }
+                this.xDialog.type = 'export'
+                this.xDialog.visible = true
             },
             selectDoc(id){
                 this.activeDoc = id
@@ -554,7 +548,7 @@ import { tr } from 'date-fns/locale';
             closeDialog(key){
                 switch (key) {
                     case 'excel':
-                        this.excel_dialog = false;
+                        this.xDialog.visible = false
                         break;
                     case 'dialog':
                         this.viewDialog = false
