@@ -77,6 +77,7 @@
                     <v-list-item-title>Tracking</v-list-item-title>
                 </v-list-item>
                 <v-list-item
+                    v-if="auth_user.role_id === 1"
                     :input-value="$route.name === 'Office List' ? true:false"
                     link
                     @click.prevent="getOfficeListReport"
