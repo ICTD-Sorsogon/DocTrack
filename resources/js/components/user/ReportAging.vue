@@ -29,7 +29,7 @@
                         <v-date-picker
                             v-model="filterDateFrom"
                             scrollable
-                            
+
                         >
                             <v-spacer/>
                             <v-btn text color="primary" @click="filterDateDialogFrom = false"> Cancel </v-btn>
@@ -53,7 +53,7 @@
                                 readonly
                                 v-bind="attrs"
                                 v-on="on"
-                                
+
                                 outlined
                                 dense
                             />
@@ -61,7 +61,7 @@
                         <v-date-picker
                             v-model="filterDateTo"
                             scrollable
-                            
+
                         >
                             <v-spacer/>
                             <v-btn text color="primary" @click="filterDateDialogTo = false"> Cancel </v-btn>
@@ -132,10 +132,10 @@ export default {
             let summary = [];
             let record = groupBy(this.tracking_reports_data, 'transaction_of')
             for(let i in record) {
-                let transaction = record[i].length   
+                let transaction = record[i].length
                 let delayed = record[i].filter(r=>r.delayed).length
                 let efficiency = ((transaction - delayed) / transaction * 100).toFixed(2) + '%'
-                let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 100); 
+                let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000);
                 let slow =  getRecordSpeed(record[i], 'slow')
                 let fast =  getRecordSpeed(record[i], 'fast')
                 let office = offices[i-1]
