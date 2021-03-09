@@ -153,7 +153,7 @@ export default {
             let summary = {};
             console.log('length',this.tracking_reports_data.length)
             let record = this.tracking_reports_data.length ? groupBy(this.tracking_reports_data, 'transaction_of') : false
-            
+
             if (record) {
                 for(let i in record) {
                     let transaction = record[i].length   
@@ -167,7 +167,6 @@ export default {
                 } 
             }
             let officeReport = this.auth_user.office.office_code == "DO" ? groupBy(this.office_reports_get, 'touched_by') : { [this.auth_user.id]: [this.office_reports_get]}
-            
             for (let n in officeReport) {
                 summary[n] = {...summary[n], ...officeReport[n].reduce((accumulator , value) => {
                     accumulator.office = {name: offices[n-1], id: n}
@@ -183,7 +182,6 @@ export default {
                     return accumulator
                 }, {'created': 0 , 'acknowledged': 0, 'forwarded': 0, 'received': 0, office: {}})}
             }
-            console.log('summary ', summary)
             return Object.values(summary)
         },
         tracking_reports_data: {

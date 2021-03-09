@@ -318,7 +318,6 @@ export default {
         })
         this.$store.dispatch('officeReports');
         this.$store.dispatch('documentReports');
-        console.log('asdasdasd')
     },
     beforeCreate() {
         this.$store.dispatch('getDocumentTypes')
