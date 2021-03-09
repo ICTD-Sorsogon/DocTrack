@@ -202,14 +202,15 @@
                         this.xDialog.title = 'Import Office List Via Excel File'
                         this.xDialog.func = 'importOfficeList'
                         this.xDialog.type = 'import'
+                        this.xDialog.visible = true
                         break;
                     case 'export_office':
                         this.xDialog.title = 'Export Office List Via Excel File'
                         this.xDialog.func = 'exportOfficeList'
                         this.xDialog.type = 'export'
+                        this.xDialog.visible = true
                         break;
                 }
-                this.xDialog.visible = true
             },
             closeDialog(key){
                 switch (key) {
