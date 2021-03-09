@@ -145,7 +145,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{(office.average || {}).average || 0}}
+                        {{office.average}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -168,7 +168,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{(office.efficiency || {}).efficiency || 0}}
+                        {{office.efficiency}}
                         </v-col>
                     </v-row>
                 </v-card-text>
