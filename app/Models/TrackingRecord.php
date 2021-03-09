@@ -23,13 +23,13 @@ class TrackingRecord extends Model
 
     public function getTouchedUserAttribute($value)
     { 
-        $value = $this->attributes['touched_by'] ?? NULL;
-        return User::with('office')->find($value)->only('avatar', 'office');
+        $value = isset($this->attributes['touched_by']) ? $this->attributes['touched_by'] : null;
+        return optional(User::with('office')->find($value))->only('avatar', 'office');
     }
 
     public function getDateFiledAttribute()
     {
-        return Carbon::parse($this->attributes['last_touched'])->diffForHumans();
+        return isset($this->attributes['last_touched']) ? Carbon::parse($this->attributes['last_touched'])->diffForHumans() : null;
     }
 
     public function user()

@@ -16,8 +16,8 @@
                 </v-card-text>
                 <v-card-text v-else>
                     <v-row>
-                        <v-col class="display-2">
-                        {{office.transaction}} Documents
+                        <v-col  class="display-2">
+                        {{office.transaction ? office.transaction : 'No'}} Documents
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -40,7 +40,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.delayed}} Documents
+                        {{ office.delayed || 0}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -63,7 +63,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.fast.fast}}
+                        {{(office.fast || {}).fast || 0}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -78,9 +78,9 @@
                 <v-card-text v-else>
                     <v-row >
                         <v-col>
-                            Action: {{office.fast.action.replace(/\w/, val=>val.toUpperCase())}} <br>
-                            Subject: {{office.fast.document.subject}} <br>
-                            Tracking Code: {{office.fast.document.tracking_code}}
+                            Action: {{office.fast ? office.fast.action.replace(/\w/, val=>val.toUpperCase()) : 'None' }} <br>
+                            Subject: {{office.fast ? office.fast.document.subject : 'None'}} <br>
+                            Tracking Code: {{office.fast? office.fast.document.tracking_code : 'None'}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -104,7 +104,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.slow.slow}}
+                        {{(office.slow || {}).slow || 0}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -119,9 +119,9 @@
                 <v-card-text v-else>
                     <v-row >
                         <v-col>
-                            Action: {{office.slow.action.replace(/\w/, val=>val.toUpperCase())}} <br>
-                            Subject: {{office.slow.document.subject}} <br>
-                            Tracking Code: {{office.slow.document.tracking_code}}
+                            Action: {{office.slow ? office.slow .action.replace(/\w/, val=>val.toUpperCase()) : 'None'}} <br>
+                            Subject: {{office.slow ? office.slow.document.subject : 'None'}} <br>
+                            Tracking Code: {{office.slow ? office.slow.document.tracking_code : 'None'}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -145,7 +145,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.average}}
+                        {{(office.average || {}).average || 0}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -168,7 +168,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.efficiency}}
+                        {{(office.efficiency || {}).efficiency || 0}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -184,7 +184,7 @@ export default {
         ...mapGetters(['auth_user']),
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         office(){
-            return this.stats[0] ?? []
+            return this.stats.find(stat=> stat.office.id == this.auth_user.office_id ?? false);
         }
     },
     mounted() {
