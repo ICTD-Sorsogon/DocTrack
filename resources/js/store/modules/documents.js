@@ -11,8 +11,8 @@ const state = {
     selected_document: {},
     id: '',
     tracking_reports: [],
-    office_reports: []
-
+    office_reports: [],
+    tabs: 0
 }
 
 const getters = {
@@ -22,7 +22,8 @@ const getters = {
     documentsArchive: state => state.documentsArchive,
     document_types: state => state.document_types,
     selected_document: state => state.selected_document,
-    office_reports_get: state => state.office_reports
+    office_reports_get: state => state.office_reports,
+    tabs: state => state.tabs
 }
 
 const actions = {
@@ -312,6 +313,9 @@ const mutations = {
     },
     GET_OFFICE_REPORTS(state, reports) {
         state.office_reports = reports;
+    },
+    UPDATE_TAB(state, location){
+        state.tabs = location
     }
 }
 

@@ -177,10 +177,10 @@
                 </template>
 
                 <template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip class='trackin' label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click="printDetails(item)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
-	        	</template>
+		        </template>
 
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-row>
@@ -223,11 +223,8 @@
         </v-card>
 
         <excel-dialog
-            v-if="dialog_title && excel_dialog == true"
-            :excel_dialog="excel_dialog"
-            :dialog_title="dialog_title"
-            :dialog_for="dialog_for"
-            :dialog_type="dialog_type"
+            v-if="xDialog.visible"
+            :param="xDialog"
             @close-dialog="closeDialog('excel')"
         />
 
@@ -238,6 +235,8 @@
             @close-dialog="closeDialog('restore')"
         />
 
+        <print-bar-code :item="item" @closeDialog="printDialog = false" :printDialog="printDialog"/>
+
     </div>
 </template>
 
@@ -246,14 +245,13 @@
     import TableModal from './components/TableModal';
     import { colors, breakpoint } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
-
     import AdvanceSearch from './components/ArchiveAdvanceSearch';
     import restoreDocument from './components/RestoreDocument'
     import RestoreDocument from './components/RestoreDocument.vue';
-import { tr } from 'date-fns/locale';
+    import PrintBarCode from './components/PrintBarCode'
 
     export default {
-        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument },
+        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument, PrintBarCode },
         data() {
             return {
                 activeDoc: null,
@@ -270,10 +268,6 @@ import { tr } from 'date-fns/locale';
                     { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
-                excel_dialog: false,
-                dialog_for: '',
-                dialog_title: '',
-                dialog_type: '',
                 filterDateDialogFrom: false,
                 filterDateFrom: new Date().toISOString().substr(0, 10),
                 filterDateDialogTo: false,
@@ -288,7 +282,16 @@ import { tr } from 'date-fns/locale';
                 filter: {},
                 tableData: [],
                 restore: false,
-                restoreParam: []
+                restoreParam: [],
+                printDialog: false,
+                item: null,
+                xDialog : {
+                    title: '',
+                    func: '',
+                    type: '',
+                    data: [],
+                    visible: false
+                }
             }
         },
         computed: {
@@ -521,21 +524,23 @@ import { tr } from 'date-fns/locale';
             getTrackingCodeColor(document, document_type_id) {
                 return colors[document_type_id];
             },
+            printDetails(item){
+                this.item = item
+                this.printDialog = item && true
+            },
             openDialog(key){
                 switch (key) {
                     case 'master_list':
-                        this.dialog_for = 'masterList';
-                        this.dialog_title = 'Master List - Excel';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Master List - Excel'
+                        this.xDialog.func = 'masterList'
                         break;
                     case 'advance_export':
-                        this.dialog_for = 'advanceExport';
-                        this.dialog_title = 'Custom Report - Excel';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Custom Report - Excel'
+                        this.xDialog.func = 'advanceExport'
                         break;
                 }
+                this.xDialog.type = 'export'
+                this.xDialog.visible = true
             },
             selectDoc(id){
                 this.activeDoc = id
@@ -543,7 +548,7 @@ import { tr } from 'date-fns/locale';
             closeDialog(key){
                 switch (key) {
                     case 'excel':
-                        this.excel_dialog = false;
+                        this.xDialog.visible = false
                         break;
                     case 'dialog':
                         this.viewDialog = false
