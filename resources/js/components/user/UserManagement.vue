@@ -6,23 +6,11 @@
                 <v-toolbar-title>User Management</v-toolbar-title>
                 <v-spacer/>
                 <v-btn color="primary" dark class="mb-2 ma-1" @click="userAE='true'">
-                    <v-icon>mdi-plus</v-icon> ADD
+                    <v-icon left>mdi-plus</v-icon> ADD
                 </v-btn>
-                <v-menu left bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn color="primary" dark class="mb-2 ma-1" v-bind="attrs" v-on="on">
-                            <v-icon>mdi-dots-vertical</v-icon> EXCEL
-                        </v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-item :key="1" @click.stop="openDialog('import_office')">
-                            <v-icon class="ma-1">mdi-file-upload-outline</v-icon> Import
-                        </v-list-item>
-                        <v-list-item :key="2" @click.stop="openDialog('export_office')">
-                            <v-icon  class="ma-1">mdi-file-export-outline</v-icon> Export
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+                <v-btn color="primary" dark class="mb-2 ma-1" @click.stop="exportUser">
+                    <v-icon medium left>mdi-file-export-outline</v-icon> Export
+                </v-btn>
             </v-toolbar>
         </v-card-title>
             <v-data-table
@@ -224,14 +212,23 @@
                 </v-card>
             </v-dialog>
         </v-row>
+
+        <excel-dialog
+            v-if="xDialog.visible"
+            :param="xDialog"
+            @close-dialog="closeDialog()"
+        />
+
     </div>
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
+import ExcelDialog from './components/ExcelDialog'
+import { tr } from 'date-fns/locale';
 
 export default {
-    components: { ValidationProvider, ValidationObserver },
+    components: { ValidationProvider, ValidationObserver, ExcelDialog },
     computed: {
 
         offices() {
@@ -292,6 +289,13 @@ export default {
                 password:'',
             },
             editedIndex: -1,
+            xDialog : {
+                title: 'Export User',
+                func: 'exportUser',
+                type: 'export',
+                data: [],
+                visible: false
+            }
         }
     },
     watch: {
@@ -306,6 +310,12 @@ export default {
         },
     },
     methods: {
+        exportUser(){
+            this.xDialog.visible = true
+        },
+        closeDialog(){
+            this.xDialog.visible = false
+        },
         editUser (item) {
             this.editedIndex = this.users.indexOf(item)
             this.form = Object.assign({}, item)

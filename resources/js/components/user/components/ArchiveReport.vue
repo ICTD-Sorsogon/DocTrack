@@ -36,12 +36,11 @@
                                 multiple
                                 counter
                                 :disabled="isByGroup && !group.byOffice"
-                                :filled="isByGroup && !group.byOffice"
                             >
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
                                         <template v-slot:activator="{ on, attrs }">
-                                            <v-chip color="primary" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeSelectedChips('originating', item)">
+                                            <v-chip :color="group.byOC" v-bind="attrs" v-on="on" small @click="select" :input-value="selected" close @click:close="removeSelectedChips('originating', item)">
                                                 {{ item.office_code || item }}
                                             </v-chip>
                                         </template>
@@ -75,12 +74,11 @@
                                 chips
                                 counter
                                 :disabled="isByGroup && !group.byType"
-                                :filled="isByGroup && !group.byType"
                             >
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
                                         <template v-slot:activator="{ on, attrs }">
-                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('selected_type', item.name)">
+                                            <v-chip :color="group.byTC" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('selected_type', item.name)">
                                                 {{item.name}}
                                             </v-chip>
                                         </template>
@@ -112,12 +110,11 @@
                                 chips
                                 counter
                                 :disabled="isByGroup && !group.bySource"
-                                :filled="isByGroup && !group.bySource"
                             >
                                 <template v-slot:selection="{ attrs, item, parent, select, selected, index }">
                                     <v-tooltip top>
                                         <template v-slot:activator="{ on, attrs }">
-                                            <v-chip color="primary" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('source', item)">
+                                            <v-chip :color="group.bySC" v-bind="attrs" v-on="on" small  @click="select" :input-value="selected" close @click:close="removeSelectedChips('source', item)">
                                                 {{item}}
                                             </v-chip>
                                         </template>
@@ -158,7 +155,10 @@ export default {
             group: {
                 byOffice: false,
                 byType: false,
-                bySource: false
+                bySource: false,
+                byOC: 'primary',
+                byTC: 'primary',
+                bySC: 'primary'
             }
         }
     },
@@ -179,6 +179,15 @@ export default {
         },
         'wsType'(newVal){
             this.isByGroup = (newVal=='group')?true:false
+            if (newVal == 'group') {
+                this.group.byOC = 'primary'
+                this.group.byTC = ''
+                this.group.bySC = ''
+            } else {
+                this.group.byOC = 'primary'
+                this.group.byTC = 'primary'
+                this.group.bySC = 'primary'
+            }
         },
         'isByGroup'(newVal){
             if (newVal) {
@@ -205,9 +214,13 @@ export default {
     },
     methods: {
         groupBy() {
-            this.group.byOffice = (this.wsTypeSel == this.group.byOffice)?true:false
-            this.group.byType = (this.wsTypeSel == this.group.byType)?true:false
-            this.group.bySource = (this.wsTypeSel == this.group.bySource)?true:false
+            this.group.byOffice = false
+            this.group.byType = false
+            this.group.bySource = false
+            this.group.byOC = (this.wsTypeSel=='byOffice')?'primary':''
+            this.group.byTC = (this.wsTypeSel=='byType')?'primary':''
+            this.group.bySC = (this.wsTypeSel=='bySource')?'primary':''
+
             this.group[this.wsTypeSel] = true
         },
         removeSelectedChips(vars, item){
@@ -226,7 +239,9 @@ export default {
 
             let selected = []
             let filter = {}
-            Object.entries(this.group).forEach(s =>{
+            let group = JSON.parse(JSON.stringify(this.group));
+            ['byOC', 'byTC', 'bySC'].forEach(key => delete group[key]);
+            Object.entries(group).forEach(s =>{
                 if(s[1]==true){
                     selected.type = s[0]
                     selected.data = this.$refs[s[0]].value

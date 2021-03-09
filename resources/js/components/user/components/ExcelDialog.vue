@@ -104,7 +104,7 @@
 
 
     export default {
-        props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
+        props: ['param'],
         components: {ArchiveReport},
         data() {
             return {
@@ -120,6 +120,18 @@
         },
         computed: {
             ...mapGetters(['request', 'document_types', 'auth_user']),
+            excel_dialog() {
+                return this.param.visible
+            },
+            dialog_title() {
+                return this.param.title
+            },
+            dialog_for() {
+                return this.param.func
+            },
+            dialog_type() {
+                return this.param.type
+            }
         },
         methods: {
             bp(col){
@@ -277,6 +289,11 @@
             exportLogs(){
                 import('./modules/logs').then(({logs}) => {
                     logs({ data:this.$store.state.users.logs })
+                })
+            },
+            exportUser(){
+                import('./modules/users').then(({users}) => {
+                    users({ data:this.$store.state.users.all_users })
                 })
             },
             exportOfficeList(){

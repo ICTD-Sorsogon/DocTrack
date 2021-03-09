@@ -61,8 +61,13 @@ export default {
           item: null,
         }
     },
+    watch: {
+        'tab'(location){
+            if (this.auth_user.role_id != 1) this.$store.commit('UPDATE_TAB', location);
+        }
+    },
     computed: {
-        ...mapGetters(['documents', 'datatable_loader', 'auth_user']),
+        ...mapGetters(['documents', 'datatable_loader', 'auth_user', 'tabs']),
         userDocuments() {
             let type = this.tab ? 'outgoing' : 'incoming'
             return JSON.parse(JSON.stringify(this.documents))[type]
@@ -107,6 +112,7 @@ export default {
     this.$store.dispatch("unsetLoader");
     this.$store.dispatch("unsetDataTableLoader");
     this.$store.dispatch("getAllUsers");
+    if (this.auth_user.role_id != 1) this.tab = this.tabs;
   },
 };
 </script>

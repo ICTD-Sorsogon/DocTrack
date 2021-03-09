@@ -31,23 +31,23 @@ class DocumentEvent implements ShouldBroadcast
         $this->user = Auth()->user();
 
         if($document->status == 'created'){
-            array_push($this->broadcastMe, new Channel('documents37'));
+            array_push($this->broadcastMe, new Channel('documents' . Office::docketOffice()) );
         }
 
         if($document->status == 'received'){
             array_push($this->broadcastMe,
                     new Channel('documents'. json_decode($document->originating_office)),
-                    new Channel('documents37'));
+                    new Channel('documents' . Office::docketOffice()));
         }
 
         if($document->status == 'forwarded'){
-            array_push($this->broadcastMe, new Channel('documents37'));
+            array_push($this->broadcastMe, new Channel('documents' . Office::docketOffice()));
             array_push($this->broadcastMe, new Channel('documents'. $document->originating_office));
         }
 
         if($document->status == 'terminated'){
             array_push($this->broadcastMe, new Channel('documents'. json_decode($document->originating_office)));
-            array_push($this->broadcastMe, new Channel('documents37'));
+            array_push($this->broadcastMe, new Channel('documents' . Office::docketOffice()));
         }
 
         if($document->status == 'acknowledged'){

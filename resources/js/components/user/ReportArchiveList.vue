@@ -14,11 +14,11 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item :key="1" @click.stop="openDialog('advance_export')">
-                                <v-icon class="ma-1">mdi-file-export-outline</v-icon> CUSTOM REPORT
-                            </v-list-item>
                             <v-list-item :key="2" @click.stop="openDialog('master_list')">
                                 <v-icon  class="ma-1">mdi-file-export-outline</v-icon> MASTER LIST
+                            </v-list-item>
+                            <v-list-item :key="1" @click.stop="openDialog('advance_export')">
+                                <v-icon class="ma-1">mdi-cogs</v-icon> CUSTOM REPORT
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -163,7 +163,8 @@
                         <advance-search
                            :minimumYear="Math.min(...distinctYearFromDB).toString()"
                            @searchParameter="advanceSearchQuery"
-                           @changeSearch="searchOption = 'normal'"
+                           @changeSearch="resetAdvanceSearch"
+                           @noSearchParam="resetData"
                         />
                     </v-card>
 
@@ -176,10 +177,10 @@
                 </template>
 
                 <template v-slot:[`item.tracking_code`] = "{ item }">
-					<v-chip class='trackin' label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
+					<v-chip class='trackin' @click="printDetails(item)" label dark :color="getTrackingCodeColor(item, item.document_type_id)" >
 						{{ item.tracking_code }}
 					</v-chip>
-	        	</template>
+		        </template>
 
                 <template v-slot:[`item.actions`]="{ item }">
                     <v-row>
@@ -222,11 +223,8 @@
         </v-card>
 
         <excel-dialog
-            v-if="dialog_title && excel_dialog == true"
-            :excel_dialog="excel_dialog"
-            :dialog_title="dialog_title"
-            :dialog_for="dialog_for"
-            :dialog_type="dialog_type"
+            v-if="xDialog.visible"
+            :param="xDialog"
             @close-dialog="closeDialog('excel')"
         />
 
@@ -237,6 +235,8 @@
             @close-dialog="closeDialog('restore')"
         />
 
+        <print-bar-code :item="item" @closeDialog="printDialog = false" :printDialog="printDialog"/>
+
     </div>
 </template>
 
@@ -245,13 +245,13 @@
     import TableModal from './components/TableModal';
     import { colors, breakpoint } from '../../constants';
     import { mapGetters, mapActions } from "vuex";
-
     import AdvanceSearch from './components/ArchiveAdvanceSearch';
     import restoreDocument from './components/RestoreDocument'
     import RestoreDocument from './components/RestoreDocument.vue';
+    import PrintBarCode from './components/PrintBarCode'
 
     export default {
-        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument },
+        components: { ExcelDialog, TableModal, AdvanceSearch, RestoreDocument, PrintBarCode },
         data() {
             return {
                 activeDoc: null,
@@ -268,10 +268,6 @@
                     { text: 'Action', value: 'actions', align: 'center', },
                 ],
                 search: '',
-                excel_dialog: false,
-                dialog_for: 'new_office',
-                dialog_title: '',
-                dialog_type: '',
                 filterDateDialogFrom: false,
                 filterDateFrom: new Date().toISOString().substr(0, 10),
                 filterDateDialogTo: false,
@@ -286,7 +282,16 @@
                 filter: {},
                 tableData: [],
                 restore: false,
-                restoreParam: []
+                restoreParam: [],
+                printDialog: false,
+                item: null,
+                xDialog : {
+                    title: '',
+                    func: '',
+                    type: '',
+                    data: [],
+                    visible: false
+                }
             }
         },
         computed: {
@@ -356,9 +361,7 @@
                     return document.incoming_trashed.find(o => o.destination_office == this.auth_user.office_id)
                 } return false
             },
-            advanceSearchQuery(param) {
-                //console.log('search param:')
-                //console.log(param)
+            async advanceSearchQuery(param) {
                 var parameter = []
                 const column = ['trackingId', 'subject', 'source', 'type', 'originating', 'destination', 'sender', 'dateCreated']
                 const {trackingId, subject, source, type, originating, destination, sender, dateCreated} = param;
@@ -371,71 +374,55 @@
                 let psender = (sender.length > 0)? sender : ''
                 let pdateCreated = (dateCreated != null)? dateCreated : ''
 
-                column.forEach((col)=>{
-                    if (eval('p'+col) != '') {
-                        parameter.push('p'+col)
-                    }
-                })
-
+                column.forEach(col=>{ if (eval('p'+col) != '') parameter.push('p'+col); })
                 var data = this.extendedData.filter((document)=>{
                     var findedData = false
+                    var satisfied = []
                     parameter.forEach((par)=>{
-                    return ptrackingId == document.tracking_code ||
-                           psubject == document.subject ||
-                           psource.includes(document.is_external) ||
-                           ptype.includes(document.document_type.name) ||
-                           poriginating.map(o=>o.id).includes(document.origin_office.id) ||
-                           pdestination.map(o=>o.id).includes(document.origin_office.id) ||
-                           //todo sender
-                           pdateCreated == document.created_at;
+                        switch (par) {
+                            case 'ptrackingId':
+                                satisfied.push((ptrackingId == document.tracking_code)?true:false)
+                                break;
+                            case 'psubject':
+                                function map(str){ return str.replace(/  +/g, ' ').split(" ") }
+                                var s = []
+                                map(document.subject).some( (el) => {
+                                    if (map(psubject).includes(el)) s.push(true);
+                                    s.push(false)
+                                })
+                                satisfied.push((s.filter(x=>x==true).length >= 1)?true:false)
+                                break;
+                            case 'psource':
+                                satisfied.push((psource.includes(document.is_external)?true:false))
+                                break;
+                            case 'ptype':
+                                satisfied.push((ptype.includes(document.document_type.name))?true:false)
+                                break;
+                            case 'poriginating':
+                                satisfied.push((poriginating.map(o=>o.id).includes(document.origin_office.id))?true:false)
+                                break;
+                            case 'pdestination':
+                                satisfied.push((document.destination.map(d=>d.id).some((d) => pdestination.map(o=>o.id).includes(d)))?true:false)
+                                break;
+                            case 'psender':
+                                satisfied.push((psender.map(s=>s.id).includes(document.sender.id))?true:false)
+                                break;
+                            case 'pdateCreated':
+                                satisfied.push((pdateCreated == document.created_at)?true:false)
+                                break;
+                        }
                     })
+                    if (satisfied.every(i=>i==true)) findedData = true;
                     return findedData
-
-                       //console.log(poriginating.map(o=>o.id).includes(document.origin_office.id))
-                    /*var hh = false
-                    parameter.forEach((par)=>{
-                        if (par == 'ptrackingId' && document.tracking_code == eval(par)) {
-                            hh = true
-                        }
-                        if (par == 'psubject' && document.subject == eval(par)) {
-                            hh = true
-                        }
-                        if (par == 'psource') {
-                            eval(par).forEach((source)=>{
-                                if (document.is_external == source){
-                                    hh = true
-                                    //console.log('gg')
-                                }
-                            })
-                            //console.log(document,eval(par))
-                        }
-                        if (par == 'ptype') {
-                            eval(par).forEach((type)=>{
-                                if (document.document_type.name == type){
-                                    hh = true
-                                }
-                            })
-                        }
-                        hh = false
-                    })
-                    return hh*/
                 })
-
-                //setTimeout(() => {
-                    //console.log(data)
-                //}, 5000);
-
-                //console.log('param:' + ptrackingId, psubject)
-                /*let watchSearchParam =  trackingId == null? '' : trackingId.trim() != ''? true:false ||
-                                        subject == null? '' : subject.trim() != ''? true:false ||
-                                        source.length > 0 ||
-                                        type.length > 0 ||
-                                        originating.length > 0 ||
-                                        destination.length > 0 ||
-                                        sender.length > 0 ||
-                                        dateCreated != null;
-                return (watchSearchParam)? true:false*/
-
+                this.tableData = data
+            },
+            resetAdvanceSearch(){
+                this.searchOption = 'normal'
+                this.resetData()
+            },
+            resetData(){
+                this.tableData = this.extendedData
             },
             bp(col){
                 return breakpoint(col)
@@ -537,26 +524,23 @@
             getTrackingCodeColor(document, document_type_id) {
                 return colors[document_type_id];
             },
+            printDetails(item){
+                this.item = item
+                this.printDialog = item && true
+            },
             openDialog(key){
                 switch (key) {
-                    case 'import_office':
-                        this.dialog_for = 'importOfficeList';
-                        this.dialog_title = 'Import Office List Via Excel File';
-                        this.excel_dialog = true
-                        break;
                     case 'master_list':
-                        this.dialog_for = 'masterList';
-                        this.dialog_title = 'Master List - Excel';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Master List - Excel'
+                        this.xDialog.func = 'masterList'
                         break;
                     case 'advance_export':
-                        this.dialog_for = 'advanceExport';
-                        this.dialog_title = 'Custom Report - Excel';
-                        this.dialog_type = 'export';
-                        this.excel_dialog = true
+                        this.xDialog.title = 'Custom Report - Excel'
+                        this.xDialog.func = 'advanceExport'
                         break;
                 }
+                this.xDialog.type = 'export'
+                this.xDialog.visible = true
             },
             selectDoc(id){
                 this.activeDoc = id
@@ -564,7 +548,7 @@
             closeDialog(key){
                 switch (key) {
                     case 'excel':
-                        this.excel_dialog = false;
+                        this.xDialog.visible = false
                         break;
                     case 'dialog':
                         this.viewDialog = false

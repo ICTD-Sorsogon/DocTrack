@@ -7,7 +7,14 @@
                         All Transaction
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row>
+                        <v-col class="display-2">
+                        No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row>
                         <v-col  class="display-2">
                         {{office.transaction ? office.transaction : 'No'}} Documents
@@ -23,7 +30,14 @@
                         Delayed Documents
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row>
+                        <v-col class="display-2">
+                        No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
                         {{ office.delayed || 0}}
@@ -39,7 +53,14 @@
                         Fastest Transaction
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row>
+                        <v-col class="display-2">
+                        No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
                         {{(office.fast || {}).fast || 0}}
@@ -47,7 +68,14 @@
                     </v-row>
                 </v-card-text>
                 <div>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row >
+                        <v-col>
+                            No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row >
                         <v-col>
                             Action: {{office.fast ? office.fast.action.replace(/\w/, val=>val.toUpperCase()) : 'None' }} <br>
@@ -66,7 +94,14 @@
                         Slowest Transaction
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row>
+                        <v-col class="display-2">
+                            No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
                         {{(office.slow || {}).slow || 0}}
@@ -74,7 +109,14 @@
                     </v-row>
                 </v-card-text>
                 <div>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row >
+                        <v-col>
+                            No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row >
                         <v-col>
                             Action: {{office.slow ? office.slow .action.replace(/\w/, val=>val.toUpperCase()) : 'None'}} <br>
@@ -93,7 +135,14 @@
                         Average Transaction Speed
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row>
+                        <v-col class="display-2">
+                        No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
                         {{(office.average || {}).average || 0}}
@@ -109,7 +158,14 @@
                         Efficiency Rating
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text>
+                <v-card-text v-if="this.office==''">
+                    <v-row>
+                        <v-col class="display-2">
+                        No Data Available
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
                         {{(office.efficiency || {}).efficiency || 0}}
@@ -132,6 +188,7 @@ export default {
         }
     },
     mounted() {
+        console.log(this.office)
     }
 }
 </script>

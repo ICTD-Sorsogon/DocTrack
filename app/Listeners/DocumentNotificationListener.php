@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\DocumentEvent;
 use App\Models\Notification;
+use App\Models\Office;
 
 class DocumentNotificationListener
 {
@@ -33,7 +34,7 @@ class DocumentNotificationListener
                 $notification = new Notification();
                 $notification->document_id = $document->id;
                 $notification->user_id = auth()->user()->id;
-                $notification->office_id = 37;
+                $notification->office_id = Office::docketOffice();
                 $notification->action = $action ? 'created' : 'updated';
                 $notification->status = 0;
                 $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was {$notification->action} by " . auth()->user()->fullname . ".";
@@ -79,7 +80,7 @@ class DocumentNotificationListener
                 $notification = new Notification();
                 $notification->document_id = $document->id;
                 $notification->user_id = auth()->user()->id;
-                $notification->office_id = 37;
+                $notification->office_id = Office::docketOffice();
                 $notification->action = 'forwarded';
                 $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
@@ -110,7 +111,7 @@ class DocumentNotificationListener
                     $notification = new Notification();
                     $notification->document_id = $document->id;
                     $notification->user_id = auth()->user()->id;
-                    $notification->office_id = 37;
+                    $notification->office_id = Office::docketOffice();
                     $notification->action = 'received';
                     $notification->status = 0;
                     $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was received.";

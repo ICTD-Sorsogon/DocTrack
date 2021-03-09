@@ -47,7 +47,7 @@
                         <v-date-picker
                             v-model="filterDateFrom"
                             scrollable
-                            
+
                         >
                             <v-spacer/>
                             <v-btn text color="primary" @click="filterDateDialogFrom = false"> Cancel </v-btn>
@@ -71,7 +71,7 @@
                                 readonly
                                 v-bind="attrs"
                                 v-on="on"
-                                
+
                                 outlined
                                 dense
                             />
@@ -79,7 +79,7 @@
                         <v-date-picker
                             v-model="filterDateTo"
                             scrollable
-                            
+
                         >
                             <v-spacer/>
                             <v-btn text color="primary" @click="filterDateDialogTo = false"> Cancel </v-btn>
