@@ -29,13 +29,17 @@ export default {
         return {
             search: '',
             headers: [
-                { text: 'Office', align: 'start',value: 'office'},
+                { text: 'Office', align: 'start',value: 'office.name'},
                 { text: 'All Transaction', value: 'transaction', filterable:false},
+                { text: 'Created', value: 'created', filterable:false},
+                { text: 'Acknowledged', value: 'acknowledged', filterable:false},
+                { text: 'Forwarded', value: 'forwarded', filterable:false},
+                { text: 'Received', value: 'received', filterable:false},
                 { text: 'Delayed Document', value: 'delayed', filterable:false},
                 { text: 'Fastest Transaction', value: 'fast.fast', filterable:false},
                 { text: 'Slowest Transaction', value: 'slow.slow', filterable:false},
                 { text: 'Average Transaction Speed', value: 'average', filterable:false},
-                { text: 'Efficiency Rating', value: 'efficiency', filterable:false},
+                { text: 'Efficiency Rating*', value: 'efficiency', filterable:false},
             ],
         }
     },
@@ -48,7 +52,6 @@ export default {
         },
     },
     mounted(){
-       this.data
     }
 }
 </script>

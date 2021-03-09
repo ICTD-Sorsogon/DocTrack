@@ -316,6 +316,9 @@ export default {
             this.$store.dispatch('getActiveDocuments');
             this.$store.dispatch('getNotifs');
         })
+        this.$store.dispatch('officeReports');
+        this.$store.dispatch('documentReports');
+        console.log('asdasdasd')
     },
     beforeCreate() {
         this.$store.dispatch('getDocumentTypes')

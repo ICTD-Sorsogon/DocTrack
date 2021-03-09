@@ -289,7 +289,7 @@ class DocumentController extends Controller
     public function trackingReports()
     {
        $summary = TrackingRecord::with('document')->whereNotNull('transaction_of')->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
-
+       
        if(!auth()->user()->isAdmin()){
            return $summary->whereStrict('transaction_of', auth()->user()->office_id);
        }
@@ -299,8 +299,12 @@ class DocumentController extends Controller
 
     public function officeReports()
     {
-        $summary = TrackingSummary::with('office', 'document')->where('office_id', auth()->user()->office_id)
-        ->get();
+        $summary = TrackingRecord::get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
+        if(!auth()->user()->isAdmin()) {
+            return $summary->filter(function ($value, $key) {
+                return $value->touched_by == auth()->user()->office_id;
+        });
+        }
         return $summary;
     }
 

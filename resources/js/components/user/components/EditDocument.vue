@@ -286,6 +286,7 @@ export default {
                             this.$refs.form.reset();
                             this.$refs.observer.reset();
                         }
+                        this.$store.dispatch('officeReports');
                         this.$store.dispatch('getActiveDocuments');
                         this.$router.push({ name: "All Active Documents"});
                     });
