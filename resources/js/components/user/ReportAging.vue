@@ -159,7 +159,7 @@ export default {
                     let transaction = record[i].length   
                     let delayed = record[i].filter(r=>r.delayed).length
                     let efficiency = ((transaction - delayed) / transaction * 100).toFixed(2) + '%'
-                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 100); 
+                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000); 
                     let slow =  getRecordSpeed(record[i], 'slow')
                     let fast =  getRecordSpeed(record[i], 'fast')
                     let office = {name: offices[i-1], id: i} //change this
