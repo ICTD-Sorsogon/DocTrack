@@ -40,7 +40,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{ office.delayed || 0}}
+                        {{ office.delayed || 0}} Documents
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -145,7 +145,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.average}}
+                        {{office.average ? office.average : 'None'}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -168,7 +168,7 @@
                 <v-card-text v-else>
                     <v-row>
                         <v-col class="display-2">
-                        {{office.efficiency}}
+                        {{office.efficiency ? office.efficiency : 'None'}}
                         </v-col>
                     </v-row>
                 </v-card-text>
