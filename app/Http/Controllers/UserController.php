@@ -38,6 +38,11 @@ class UserController extends Controller
     public function getAllUsers(): Collection
     {
         abort_if(!in_array(auth()->user()->role_id, [1,2,3]), 403);
+
+        if(auth()->user()->isAdmin()){
+            return User::with('office')->get();
+        }
+
         return User::with('office')->get(['id', 'first_name', 'last_name', 'middle_name', 'suffix']);
     }
 
