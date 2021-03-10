@@ -13,16 +13,16 @@ use Illuminate\Queue\SerializesModels;
 class NotificationEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $notification;
+    public $document;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($notification)
+    public function __construct($document)
     {
-        $this->notification = $notification;
+        $this->document = $document;
     }
 
     /**

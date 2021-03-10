@@ -4,13 +4,10 @@ namespace App\Console;
 
 use App\Events\NotificationEvent;
 use App\Models\Document;
-use App\Models\DocumentRecipient;
 use App\Models\Notification;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\DB;
 
 class Kernel extends ConsoleKernel
 {
@@ -31,50 +28,29 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
         $schedule->call(function () {
-            $seven_days = 604800000; // 7 Days
-            $notification = Notification::get();
-            foreach ($notification as $notif){
-                $is_terminated = DocumentRecipient::find($notif->document_id)->onlyTrashed();
-                $updated_at = Carbon::parse($notif->updated_at)->getPreciseTimestamp(3);
-                $expired_at_7 = Carbon::now()->getPreciseTimestamp(3) < $updated_at+$seven_days;
+            $document_delete = Notification::where('status', 1)
+            ->orWhereHas('document', function($query){$query
+            ->whereNotNull('deleted_at');})
+            ->get();
 
-                if($notif->action = 'Reminder' && $notif->status == 1 && $expired_at_7){
-                    $notif->delete();
-                }else if($notif->status == 1 && $expired_at_7 && $is_terminated && $notif->action != 'Reminder') {
-                    $notif->delete();
+            foreach($document_delete as $to_delete){
+                $days = Carbon::now()->diffInDays($to_delete->updated_at);
+
+                if($days > 7){
+                    $to_delete->delete();
                 }
-
             }
         })->weeklyOn(1, '8:00');
 
         $schedule->call(function () {
-            $document = Document::withTrashed();
-            $incoming_trashed = $document->with(['incoming_trashed'])->get();
+            $document_recipient = Document::with(['document_recipient'])
+            ->whereHas('document_recipient', function($query){
+                $query->where('acknowledged', 1)->whereNull('deleted_at');
+            })->get();
 
-            foreach ($incoming_trashed as $doc){
-                foreach($doc->incoming_trashed as $incoming){
-                    if(!$incoming->deleted_at){
-                        $originating_office = $doc->originating_office;
-                        $document = $incoming;
-                        $priority_level = $doc->priority_level;
-                        $users = User::find($originating_office);
-
-                        $notification_data = (object)
-                            array('users' => $users,
-                            'document' => $document,
-                            'priority_level' => $priority_level
-                        );
-
-                        event(new NotificationEvent($notification_data));
-                    }
-
-                }
-
-            }
+            event(new NotificationEvent($document_recipient));
         })->weeklyOn(1, '8:00');
-
 
     }
 
