@@ -184,11 +184,10 @@ export default {
         ...mapGetters(['auth_user']),
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         office(){
-            return this.stats.find(stat=> stat.office.id == this.auth_user.office_id ?? false);
+            return this.stats.length > 0 ? this.stats.find(stat=> stat.office.id == this.auth_user.office_id ?? false) : '';
         }
     },
     mounted() {
-        console.log(this.office)
     }
 }
 </script>
