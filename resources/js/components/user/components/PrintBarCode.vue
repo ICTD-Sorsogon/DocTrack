@@ -44,7 +44,7 @@
 			<strong>Originating Office:</strong> {{item.originating_office}}
 		</div>
 		<div class="">
-			<strong>Destination Office:</strong> <v-chip x-small v-for="office in item.destination_office_id" :key="office.office_code" >
+			<strong>Destination Office:</strong> <v-chip x-small v-for="office in item.destination" :key="office.office_code" >
 				{{office.office_code}} 
 			</v-chip>
 		</div>
