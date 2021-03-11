@@ -286,10 +286,10 @@ export default {
                             this.$refs.form.reset();
                             this.$refs.observer.reset();
                         }
-                        this.$store.dispatch('officeReports');
-                        this.$store.dispatch('getActiveDocuments');
                         this.$router.push({ name: "All Active Documents"});
                     });
+                    this.$store.dispatch('officeReports');
+                    this.$store.dispatch('getActiveDocuments');
                 } else if(this.request.status == 'failed'){
                     this.$store.dispatch('setSnackbar', {
                         type: 'error',

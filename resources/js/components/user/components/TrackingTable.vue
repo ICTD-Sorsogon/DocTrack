@@ -17,6 +17,24 @@
                     class="mx-4"
                 />
             </template>
+            <template v-slot:item.transaction="{item}">
+                {{item.transaction ? item.transaction : "N/A"}}
+            </template>
+            <template v-slot:item.delayed="{item}">
+                {{item.delayed ? item.delayed : "0"}}
+            </template>
+            <template v-slot:item.fast.fast="{item}">
+                {{item.fast ? item.fast.fast : "N/A"}}
+            </template>
+            <template v-slot:item.slow.slow="{item}">
+                {{item.slow ? item.slow.slow : "N/A"}}
+            </template>
+            <template v-slot:item.average="{item}">
+                {{item.average ? item.average : "N/A"}}
+            </template>
+            <template v-slot:item.efficiency="{item}">
+                {{item.efficiency ? item.efficiency : "N/A"}}
+            </template>
             </v-data-table>
         </v-col>
     </v-row>
