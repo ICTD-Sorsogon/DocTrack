@@ -3,6 +3,7 @@
         <v-container>
             <h1 style="margin-bottom:20px"> Email</h1>
             <v-combobox
+                ref="office_email"
                 v-model="emails.selected_offices"
                 :items="offices"
                 item-text="name"
@@ -57,11 +58,14 @@
             label="Message"
             ></v-textarea>
 
-            <v-btn
-            color="primary"
-            @click="send_email">
-                Send
-            </v-btn>
+            <div class="text-end">
+                <v-btn
+                color="primary"
+                @click="send_email">
+                    Send
+                </v-btn>
+            </div>
+
         </v-container>
     </v-card>
 </template>
@@ -117,6 +121,7 @@ export default {
     mounted() {
         this.$store.dispatch("unsetLoader");
         this.$store.dispatch("getOffices");
+        this.$refs.office_email.lastItem = 200
     }
 }
 </script>
