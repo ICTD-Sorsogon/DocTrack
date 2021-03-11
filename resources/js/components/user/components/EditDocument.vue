@@ -5,8 +5,9 @@
             Document
             <v-row align="center" justify="end" class="pr-4">
                 <v-btn color="primary" @click.prevent="navigateAllDocuments"
-                    >Back</v-btn
-                >
+                >Back
+                </v-btn
+            >
             </v-row>
         </v-card-title>
 
