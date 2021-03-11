@@ -11,6 +11,7 @@ import ReportArchiveList from './components/user/ReportArchiveList';
 import ReportAging from './components/user/ReportAging';
 import ReportLog from './components/user/ReportLog';
 import ReportOfficeList from './components/user/ReportOfficeList';
+import Email from './components/user/Email';
 
 import Login from './components/Login';
 import HomeContainer from './components/HomeContainer';
@@ -119,6 +120,11 @@ export default {
                     path: 'user_management',
                     component: UserManagement,
                     name: 'User Management'
+                },
+                {
+                    path: 'email',
+                    component: Email,
+                    name: 'Email'
                 }
             ]
         },

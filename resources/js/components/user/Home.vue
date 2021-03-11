@@ -145,6 +145,21 @@
                         <v-list-item-title>User Management</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
+                <v-list-item
+                    :input-value="
+                        $route.name === 'Email' ? true : false
+                    "
+                    v-if="auth_user.role_id === 1"
+                    link
+                    @click.prevent="getEmail"
+                >
+                    <v-list-item-icon>
+                        <v-icon> mdi-email </v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title>Email</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
             </v-list>
             <template v-slot:append>
                 <div class="pa-2">
@@ -335,6 +350,15 @@ export default {
                 this.$router.push({
                     name: "User Management",
                     params: { user: this.user }
+                });
+            }
+        },
+        getEmail() {
+            if (this.$route.name !== "Email") {
+                this.$store.dispatch("setLoader");
+                this.$store.commit("TOGGLE_SUBMENU", false);
+                this.$router.push({
+                    name: "Email",
                 });
             }
         }
