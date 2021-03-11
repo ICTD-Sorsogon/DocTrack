@@ -84,7 +84,7 @@
                     v-ripple="{ class: 'white--text' }"
                 >
                     <v-list-item-icon>
-                    <v-icon>mdi-office-building</v-icon>
+                    <v-icon>mdi-card-text-outline</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Offices</v-list-item-title>
                 </v-list-item>
@@ -96,7 +96,7 @@
                     v-ripple="{ class: 'white--text' }"
                 >
                     <v-list-item-icon>
-                    <v-icon>mdi-timeline-clock-outline</v-icon>
+                    <v-icon>mdi-history</v-icon>
                     </v-list-item-icon>
                     <v-list-item-title>Logs</v-list-item-title>
                 </v-list-item>
