@@ -191,7 +191,6 @@
 <script>
 import Notification from './Notification'
 import NotificationItem from './NotificationItem'
-// TODO: Directly modify State through Mutation in Setting and Unsetting loaders instead of adding Actions
 import { mapGetters, mapActions } from "vuex";
 import LogoutDialog from './components/LogoutDialog';
 export default {

@@ -117,7 +117,7 @@
 </template>
 
 <script>
-// TODO: Backend functionality
+
 export default {
     data() {
         return {

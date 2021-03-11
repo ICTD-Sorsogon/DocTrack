@@ -84,7 +84,7 @@ class DocumentNotificationListener
                 $notification->action = 'forwarded';
                 $notification->sender_name = auth()->user()->fullname;
                 $notification->status = 0;
-                $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->find($document->destination_office_id->first())->name}."; // trip lang
+                $notification->message = "{$document->subject} with {$document->tracking_code} tracking code was forwarded by " . auth()->user()->fullname . " to {$document->destination->first()->find($document->destination_office_id->first())->name}.";
                 $notification->save();
 
                 $notification = new Notification();

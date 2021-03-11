@@ -1,4 +1,3 @@
-// TODO: Do this to make reusable pagination
 <template>
     <v-pagination
         v-model="page"

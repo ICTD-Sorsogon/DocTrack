@@ -118,7 +118,6 @@ const actions = {
             commit('SNACKBAR_STATUS', data)
         })
         .catch(error => {
-            console.log(error);
             const error_data = {
                 status: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,
@@ -150,7 +149,6 @@ const actions = {
             commit('SNACKBAR_STATUS', data)
         })
         .catch(error => {
-            console.log(error);
             const error_data = {
                 status: 'FAILED',
                 message: `The server replied with an error! Please Contact your administrator.`,

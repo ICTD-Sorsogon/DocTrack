@@ -66,8 +66,6 @@ class DocumentEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-
-        // return [ new Channel('documents'.$this->document->office_id) ];
         return $this->broadcastMe;
     }
 }

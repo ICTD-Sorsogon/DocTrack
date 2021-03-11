@@ -28,7 +28,6 @@ class Document extends Model
 
     protected $dispatchesEvents = [
         'saved' => DocumentEvent::class,
-        // 'deleting' => DocumentEvent::class,
     ];
 
     protected $casts = [
@@ -123,7 +122,7 @@ class Document extends Model
 
     public function lastForwarded()
     {
-        return $this->tracker()->whereAction('forwarded')->get()->last(); 
+        return $this->tracker()->whereAction('forwarded')->get()->last();
     }
 
     public static function allDocuments(User $user)

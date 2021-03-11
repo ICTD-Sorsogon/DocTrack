@@ -96,7 +96,7 @@ export default {
                     component: DocumentAction,
                     name: 'Terminal Document'
                 },
-                // FIXME: Fix bug for submenu when using reports/'pathname'
+
                 {
                     path: 'tracking_report',
                     component: ReportAging,

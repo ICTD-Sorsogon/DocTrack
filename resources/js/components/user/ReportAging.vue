@@ -151,20 +151,19 @@ export default {
         data(){
             let offices = pluck(this.offices, 'name')
             let summary = {};
-            console.log('length',this.tracking_reports_data.length)
             let record = this.tracking_reports_data.length ? groupBy(this.tracking_reports_data, 'transaction_of') : false
 
             if (record) {
                 for(let i in record) {
-                    let transaction = record[i].length   
+                    let transaction = record[i].length
                     let delayed = record[i].filter(r=>r.delayed).length
                     let efficiency = ((transaction - delayed) / transaction * 100).toFixed(2) + '%'
-                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000); 
+                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000);
                     let slow =  getRecordSpeed(record[i], 'slow')
                     let fast =  getRecordSpeed(record[i], 'fast')
                     let office = {name: offices[i-1], id: i} //change this
                     summary[i] = {transaction, delayed, efficiency, slow, fast, average, office}
-                } 
+                }
             }
             let officeReport = this.auth_user.office.office_code == "DO" ? groupBy(this.office_reports_get, 'touched_by') : { [this.auth_user.id]: [this.office_reports_get]}
             for (let n in officeReport) {

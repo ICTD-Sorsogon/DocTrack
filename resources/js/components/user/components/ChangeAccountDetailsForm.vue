@@ -119,7 +119,6 @@ export default {
         this.name_form.last_name = this.$store.state.users.user.last_name;
         this.name_form.name_suffix = this.$store.state.users.user.name_suffix;
         this.name_form.id = this.$store.state.users.user.id;
-        console.log(this.$store.state.users.user)
     }
 }
 </script>

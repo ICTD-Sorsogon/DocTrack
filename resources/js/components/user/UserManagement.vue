@@ -345,7 +345,7 @@ export default {
             })
         },
         save () {
-            if (this.editedIndex > -1) { //edit
+            if (this.editedIndex > -1) {
                 this.btnloading = true;
                     this.$store.dispatch('updateExistingUser', this.form).then(() => {
                         if(this.request.status == 'SUCCESS') {
@@ -368,7 +368,7 @@ export default {
                             });
                         }
                     });
-            } else { //add
+            } else {
                 this.btnloading = true;
                 this.$store.dispatch("addNewUser", this.form).then(() => {
                     if(this.request.status == 'SUCCESS') {

@@ -275,7 +275,6 @@ export default {
 			return !!doc.destination.find(target => target.id == this.auth_user.office_id)
 		},
 		getTrackingCodeColor(document, document_type_id) {
-            // document.color = colors[document_type_id];
             return colors[document_type_id];
         },
         getPriorityLevelColor(document, type){
