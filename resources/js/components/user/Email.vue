@@ -1,16 +1,16 @@
 <template>
-    <div>
+    <v-container>
+        <h1>Email</h1>
         <v-combobox
-            v-model="selected_offices"
+            v-model="emails.selected_offices"
             :items="offices"
             item-text="name"
             clearable
             hide-selected
             persistent-hint
-            label="Originating Office"
+            label="Office Lists"
             chips
             required
-            class="mx-4"
             dense
             multiple
             counter
@@ -44,7 +44,25 @@
             </template>
         </v-combobox>
 
-    </div>
+        <v-text-field
+        v-model="emails.title"
+        label="Title"
+        hide-details="auto"
+        ></v-text-field>
+
+        <v-textarea
+        v-model="emails.body"
+        autocomplete="email"
+        label="Message"
+        ></v-textarea>
+
+        <v-btn
+        color="primary"
+        @click="send_email">
+            Send
+        </v-btn>
+
+    </v-container>
 </template>
 
 <script>
@@ -53,15 +71,18 @@ export default {
 
     data(){
         return {
-            selected_offices: []
-
+            emails: {
+                selected_offices: [],
+                body: '',
+                title: '',
+            }
         }
     },
     watch: {
-        "selected_offices"(newVal) {
+        "emails.selected_offices"(newVal) {
             newVal.forEach(currItem => {
                 if (!this.offices.map(o => o.id).includes(currItem.id)) {
-                    this.selected_offices.pop();
+                    this.emails.selected_offices.pop();
                 }
             });
         },
@@ -70,12 +91,26 @@ export default {
         ...mapGetters(["offices"]),
     },
     methods:{
+        async send_email(){
+            this.emails.selected_offices.forEach(element => {
+                element.body = this.emails.body
+                element.title = this.emails.title
+            });
+
+            await axios.post('api/send_email', this.emails)
+            .then(
+                this.emails.selected_offices = [],
+                this.emails.body = '',
+                this.emails.title = '',
+            )
+
+        },
         removeSelectedChips(el, item) {
-            this.selected_offices.splice(
-                this.selected_offices.indexOf(item),
+            this.emails.selected_offices.splice(
+                this.emails.selected_offices.indexOf(item),
                 1
             );
-            this.selected_offices = [...this.selected_offices];
+            this.emails.selected_offices = [...this.emails.selected_offices];
         },
     },
     mounted() {

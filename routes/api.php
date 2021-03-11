@@ -55,6 +55,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('badge', 'NotificationController@seen_badge');
 
         Route::get('office_reports', 'DocumentController@officeReports');
+
+        Route::post('send_email', 'SendMailController@index');
     });
 
     Route::get('/authenticated', function () {
