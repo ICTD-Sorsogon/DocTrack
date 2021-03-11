@@ -24,7 +24,7 @@
             </v-card-title>
             <v-row
             >
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12" >
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="4" >
                     <v-dialog
                         ref="dialog"
                         v-model="filterDateDialogFrom"
@@ -55,7 +55,7 @@
                         </v-date-picker>
                     </v-dialog>
                 </v-col>
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12">
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="4">
                     <v-dialog
                         ref="dialog1"
                         v-model="filterDateDialogTo"
@@ -91,7 +91,7 @@
                         </v-date-picker>
                     </v-dialog>
                 </v-col>
-                <v-col cols="12" xl="12" lg="4" md="4" sm="12" xs="12">
+                <v-col cols="12" xl="4" lg="4" md="4" sm="12" xs="12">
                     <v-row>
                         <v-col  cols="12" xl="6" lg="6" md="6" sm="6" xs="6">
                             <v-btn

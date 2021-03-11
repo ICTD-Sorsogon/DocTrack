@@ -55,7 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('notifs', 'NotificationController@index');
         Route::put('notifs/{notifs}', 'NotificationController@seen_notif');
         Route::put('badge', 'NotificationController@seen_badge');
-        
+
         Route::get('office_reports', 'DocumentController@officeReports');
 
     });

@@ -19,11 +19,11 @@
                     ripple
                     >
                     <v-list-item-avatar class="elevation-3" >
-                        <v-img :src="baseURL + item.avatar || baseURL + default_image"></v-img>
+                        <v-img :src="item.action == 'Reminder' ? baseURL + 'images/reminder.png' : (baseURL + item.avatar || baseURL + default_image)"></v-img>
                     </v-list-item-avatar>
 
                     <v-list-item-content>
-                        <v-list-item-title style="color:black;" v-html="item.office_code"></v-list-item-title>
+                        <v-list-item-title style="color:black;" v-html="item.action == 'Reminder' ? '<span style=color:red>REMINDER</span>' : item.office_code"></v-list-item-title>
                         <v-list-item-subtitle style="color:black" v-html="item.message"></v-list-item-subtitle>
                         <h6 style="font-weight:50; color: gray" v-html="item.created_at"></h6>
                     </v-list-item-content>

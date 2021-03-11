@@ -50,6 +50,10 @@
                     </v-row>
                 </template>
 
+                <v-alert slot="no-results" :value="true" type="error" icon="mdi-alert" align="left">
+                    Your search for "{{ search }}" found no results.
+                </v-alert>
+
             </v-data-table>
         </v-card>
 

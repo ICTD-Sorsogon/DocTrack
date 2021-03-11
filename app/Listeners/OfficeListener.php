@@ -32,7 +32,7 @@ class OfficeListener
                 $office_name = $event->request_obj->name;
                 $office_code = $event->request_obj->office_code;
                 $data = json_encode($event->request_obj);
-        
+
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
@@ -47,13 +47,13 @@ class OfficeListener
                 $data = json_encode($event->old_values);
                 $name = json_decode($data)->name;
                 $code = json_decode($data)->office_code;
-        
+
                 $log = new Log;
                 $log->user_id = $event->user_id;
                 $log->new_values = $data;
                 $log->original_values = $old_values;
                 $log->action = 'Office update';
-                $log->remarks = 'Office has been successfully updated with new office name of : 
+                $log->remarks = 'Office has been successfully updated with new office name of :
                     '.$name.' and office code of: '.$code;
                 return $log->save();
             break;
@@ -65,7 +65,7 @@ class OfficeListener
                 $log = new Log;
                 $log->user_id = $event->user_id;
                 $log->action = 'Office delete';
-                $log->remarks = 'Office has been successfully deleted with office name of : 
+                $log->remarks = 'Office has been successfully deleted with office name of :
                     '.$office_name.' and office code of: '.$office_code;
                 return $log->save();
             break;

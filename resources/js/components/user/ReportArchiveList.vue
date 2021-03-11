@@ -302,7 +302,7 @@
                     var dataRes = (selected.filter == 'Year')? selected.year.data : selected.date.data
                     var data = JSON.parse(JSON.stringify(dataRes)).map(doc=>{
                         doc.is_external = doc.is_external ? 'External' : 'Internal'
-                        doc.sender_name = doc.sender?.name ?? doc.sender_name
+                        doc.sender_name = doc.sender?.fullname ?? doc.sender_name
                         doc.originating_office = doc.origin_office?.name ?? doc.originating_office
                         doc.created_at = new Date(doc.created_at).toISOString().substr(0, 10)
                         return doc
