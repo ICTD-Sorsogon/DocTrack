@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\NotificationEvent;
+use App\Models\DocumentRecipient;
 use App\Models\Notification;
 use App\Models\User;
 class NotificationListener
@@ -28,11 +29,11 @@ class NotificationListener
         extract(get_object_vars($event));
 
         foreach($document as $doc){
-            if(Notification::find($doc->id)->expire()){
+            if(DocumentRecipient::find($doc->id)->expire()){
                 foreach($doc->document_recipient as $doc_recip){
                     $notification = new Notification();
                     $notification->document_id = $doc->id;
-                    $notification->user_id = User::find($doc->originating_office);
+                    $notification->user_id = User::find($doc->originating_office)->id;
                     $notification->office_id = $doc_recip->destination_office;
                     $notification->action = 'Reminder';
                     $notification->status = 0;
