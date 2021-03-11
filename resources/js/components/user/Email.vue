@@ -1,68 +1,69 @@
 <template>
-    <v-container>
-        <h1>Email</h1>
-        <v-combobox
-            v-model="emails.selected_offices"
-            :items="offices"
-            item-text="name"
-            clearable
-            hide-selected
-            persistent-hint
-            label="Office Lists"
-            chips
-            required
-            dense
-            multiple
-            counter
-        >
-            <template
-                v-slot:selection="{
-                    item,
-                    select,
-                    selected
-                }"
+    <v-card>
+        <v-container>
+            <h1 style="margin-bottom:20px"> Email</h1>
+            <v-combobox
+                v-model="emails.selected_offices"
+                :items="offices"
+                item-text="name"
+                clearable
+                hide-selected
+                persistent-hint
+                label="Office Lists"
+                chips
+                required
+                dense
+                multiple
+                counter
             >
-                <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-chip
-                            color="primary"
-                            v-bind="attrs"
-                            v-on="on"
-                            small
-                            @click="select"
-                            :input-value="selected"
-                            close
-                            @click:close="
-                                removeSelectedChips('originating', item)
-                            "
-                        >
-                            {{ item.office_code || item }}
-                        </v-chip>
-                    </template>
-                    <span>{{ item.name || item }}</span>
-                </v-tooltip>
-            </template>
-        </v-combobox>
+                <template
+                    v-slot:selection="{
+                        item,
+                        select,
+                        selected
+                    }"
+                >
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                color="primary"
+                                v-bind="attrs"
+                                v-on="on"
+                                small
+                                @click="select"
+                                :input-value="selected"
+                                close
+                                @click:close="
+                                    removeSelectedChips('originating', item)
+                                "
+                            >
+                                {{ item.office_code || item }}
+                            </v-chip>
+                        </template>
+                        <span>{{ item.name || item }}</span>
+                    </v-tooltip>
+                </template>
+            </v-combobox>
 
-        <v-text-field
-        v-model="emails.title"
-        label="Title"
-        hide-details="auto"
-        ></v-text-field>
+            <v-text-field
+            v-model="emails.title"
+            label="Title"
+            hide-details="auto"
+            ></v-text-field>
 
-        <v-textarea
-        v-model="emails.body"
-        autocomplete="email"
-        label="Message"
-        ></v-textarea>
+            <v-textarea
+            v-model="emails.body"
+            autocomplete="email"
+            label="Message"
+            ></v-textarea>
 
-        <v-btn
-        color="primary"
-        @click="send_email">
-            Send
-        </v-btn>
-
-    </v-container>
+            <v-btn
+            color="primary"
+            @click="send_email">
+                Send
+            </v-btn>
+        </v-container>
+    </v-card>
 </template>
 
 <script>
