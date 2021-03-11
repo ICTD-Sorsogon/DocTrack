@@ -93,6 +93,28 @@ const actions = {
     async getOfficeNameList({ commit }) {
         const response = await axios.get("api/list_office_names");
         commit("GET_LIST_OFFICE_NAMES", response.data);
+    },
+    async sendEmail({ commit }, email_info) {
+        try {
+            await axios.post('api/send_email', email_info)
+
+            await commit("SET_SNACKBAR", {
+                showing: true,
+                title: "SUCCESS",
+                text: "Email Sent Successfully!",
+                color: "#5BB55E",
+                icon: "mdi-check-bold"
+            });
+        }
+        catch(e) {
+            await commit("SET_SNACKBAR", {
+                showing: true,
+                title: "FAILED",
+                text: "Error fetching data",
+                color: "#F45448",
+                icon: "mdi-close-thick"
+            });
+        }
     }
 };
 

@@ -60,9 +60,10 @@
 
             <div class="text-end">
                 <v-btn
+                large
                 color="primary"
                 @click="send_email">
-                    Send
+                  <v-icon left>mdi-send</v-icon>  Send
                 </v-btn>
             </div>
 
@@ -96,19 +97,18 @@ export default {
         ...mapGetters(["offices"]),
     },
     methods:{
-        async send_email(){
+        send_email(){
             this.emails.selected_offices.forEach(element => {
                 element.body = this.emails.body
                 element.title = this.emails.title
             });
 
-            await axios.post('api/send_email', this.emails)
+            this.$store.dispatch("sendEmail", this.emails)
             .then(
                 this.emails.selected_offices = [],
                 this.emails.body = '',
-                this.emails.title = '',
+                this.emails.title = ''
             )
-
         },
         removeSelectedChips(el, item) {
             this.emails.selected_offices.splice(
