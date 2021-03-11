@@ -235,7 +235,10 @@ export default {
                 ? this.stats.find(
                       stat =>
                           stat.office.id == this.auth_user.office_id ?? false
-                  )
+                  ) != undefined ? this.stats.find(
+                      stat =>
+                          stat.office.id == this.auth_user.office_id ?? false
+                  ) : false
                 : "";
         }
     },
