@@ -285,7 +285,7 @@ class DocumentController extends Controller
 
     public function trackingReports()
     {
-       $summary = TrackingRecord::with('document')->whereNotNull('transaction_of')->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
+       $summary = TrackingRecord::with(['document' => function ($query) {$query->withTrashed();}])->whereNotNull('transaction_of')->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
 
        if(!auth()->user()->isAdmin()){
            return $summary->whereStrict('transaction_of', auth()->user()->office_id);
