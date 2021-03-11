@@ -1,52 +1,59 @@
-import { extend } from 'vee-validate';
-import { required, email, max, min, confirmed, alpha_spaces, numeric, size } from 'vee-validate/dist/rules';
+import { extend } from "vee-validate";
+import {
+    required,
+    email,
+    max,
+    min,
+    confirmed,
+    alpha_spaces,
+    numeric,
+    size
+} from "vee-validate/dist/rules";
 
-extend ('size', {
+extend("size", {
     ...size,
-    message: 'Avatar size should be less than 3 MB!'
-  });
-
-extend ('required', {
-  ...required,
-  message: 'This field is required'
+    message: "Avatar size should be less than 3 MB!"
 });
 
-extend ('max', {
-  ...max,
-  message: 'This field must be {length} characters or less'
+extend("required", {
+    ...required,
+    message: "This field is required"
 });
 
-extend ('min', {
-  ...min,
-  message: 'This field must be {length} characters or more'
+extend("max", {
+    ...max,
+    message: "This field must be {length} characters or less"
 });
 
-extend ('email', {
-  ...email,
-  message: 'This field must be a valid email'
+extend("min", {
+    ...min,
+    message: "This field must be {length} characters or more"
 });
 
-
-extend ('confirmed', {
-  ...confirmed,
-  message: 'The value for {_field_} field does not match'
+extend("email", {
+    ...email,
+    message: "This field must be a valid email"
 });
 
-
-extend ('password', {
-  params: ['target'],
-  validate(value, { target }) {
-    return value === target;
-  },
-  message: 'Password confirmation does not match'
+extend("confirmed", {
+    ...confirmed,
+    message: "The value for {_field_} field does not match"
 });
 
-extend ('alpha_spaces', {
-  ...alpha_spaces,
-  message: 'Suffix may only contain alphabetic characters'
-})
+extend("password", {
+    params: ["target"],
+    validate(value, { target }) {
+        return value === target;
+    },
+    message: "Password confirmation does not match"
+});
 
-extend ('numeric', {
-  ...numeric,
-  message: 'This field must only contain numerical values'
+extend("alpha_spaces", {
+    ...alpha_spaces,
+    message: "Suffix may only contain alphabetic characters"
+});
+
+extend("numeric", {
+    ...numeric,
+    message: "This field must only contain numerical values"
 });

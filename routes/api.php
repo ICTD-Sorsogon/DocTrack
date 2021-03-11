@@ -1,7 +1,5 @@
 <?php
 
-use App\Events\Hello;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,7 +55,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('badge', 'NotificationController@seen_badge');
 
         Route::get('office_reports', 'DocumentController@officeReports');
-
     });
 
     Route::get('/authenticated', function () {

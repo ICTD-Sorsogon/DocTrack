@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\DocumentEvent;
 use App\Http\Requests\DocumentPostRequest;
 use Auth;
 use Illuminate\Support\Facades\DB;

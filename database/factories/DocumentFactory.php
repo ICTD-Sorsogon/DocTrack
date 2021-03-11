@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Document;
 use App\Models\Traits\TrackingNumberBuilder;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,10 +24,8 @@ class DocumentFactory extends Factory
      */
     public function definition()
     {
-        $dateFilled = Carbon::createFromTimeStamp($this->faker->dateTimeBetween('-360 days', 'now')->getTimestamp());
         $source = rand(0, 1);
         $status = ['created', 'received', 'forwarded', 'on hold', 'rejected', 'terminated', 'acknowledged'];
-
 
         return [
             'subject' => strtoupper($this->faker->realText(20)),

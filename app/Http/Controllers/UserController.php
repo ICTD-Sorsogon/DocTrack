@@ -3,13 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\AccountEvent;
-use App\Events\AccountFullnameUpdateEvent;
-use App\Events\AccountPasswordUpdateEvent;
-use App\Events\AccountUsernameUpdateEvent;
-use App\Events\UserCreateEvent;
-use App\Events\UserDeleteEvent;
 use App\Events\UserEvent;
-use App\Events\UserUpdateEvent;
 use Auth;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
@@ -19,10 +13,7 @@ use App\Models\User;
 use App\Http\Requests\ChangePasswordPutRequest;
 use App\Http\Requests\ChangeUsernamePutRequest;
 use App\Http\Requests\ChangeFullnamePutRequest;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use stdClass;
-
+use Illuminate\Support\Facades\Storage;;
 class UserController extends Controller
 {
     public function __construct()
@@ -92,7 +83,10 @@ class UserController extends Controller
     public function updateExistingUser(Request $request): Array
     {
 
-        $old_values = User::select('role_id','first_name','middle_name','last_name','suffix', 'gender', 'birthday', 'id_number', 'office_id', 'is_active', 'username')->where('id', $request->id)->get();
+        $old_values = User::select(
+            'role_id','first_name','middle_name','last_name','suffix',
+            'gender', 'birthday', 'id_number', 'office_id', 'is_active',
+            'username')->where('id', $request->id)->get();
 
         DB::beginTransaction();
         try {
@@ -172,7 +166,8 @@ class UserController extends Controller
 
     public function updateFullname(ChangeFullnamePutRequest $request)
     {
-        $old_values = User::select('first_name','middle_name','last_name','suffix')->where('id', $request->id)->get();
+        $old_values = User::select('first_name','middle_name','last_name','suffix')
+            ->where('id', $request->id)->get();
 
         $user = User::findOrFail(Auth::user()->id);
         $user->first_name=$request->first_name;

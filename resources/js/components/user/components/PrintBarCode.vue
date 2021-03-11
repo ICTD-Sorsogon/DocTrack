@@ -162,7 +162,6 @@ export default {
 	mounted() {
     this.$nextTick(function() {
 		window.addEventListener('resize', this.getWindowSize)
-
 		this.getWindowSize()
 	})
 
