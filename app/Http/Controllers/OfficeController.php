@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Events\OfficeEvent;
-use App\Models\Document;
 use Auth;
 use DB;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Office;
-use App\Models\TrackingRecord;
 use Illuminate\Http\Request;
 
 class OfficeController extends Controller
@@ -91,7 +89,8 @@ class OfficeController extends Controller
 
     public function updateExistingOffice(Request $request): Array
     {
-        $old_values = Office::select('id','name','address','office_code','contact_number','contact_email')->where('id', $request->id)->get();
+        $old_values = Office::select('id','name','address','office_code','contact_number','contact_email')
+            ->where('id', $request->id)->get();
 
         DB::beginTransaction();
         try {

@@ -12,31 +12,31 @@
                 right
                 top
             >
-                <v-alert
-                    prominent
-                    color="transparent"
-                    :icon="snackbar.icon"
-                >
+                <v-alert prominent color="transparent" :icon="snackbar.icon">
                     <div class="title">
-                        {{snackbar.title}}
+                        {{ snackbar.title }}
                     </div>
-                    <div v-if="typeof snackbar.text === 'object' && snackbar.text !== null">
-                        <div v-for="(text, index) in snackbar.text" :key="index">
+                    <div
+                        v-if="
+                            typeof snackbar.text === 'object' &&
+                                snackbar.text !== null
+                        "
+                    >
+                        <div
+                            v-for="(text, index) in snackbar.text"
+                            :key="index"
+                        >
                             <ul>
-                                <li>{{text[0]}}</li>
+                                <li>{{ text[0] }}</li>
                             </ul>
                         </div>
                     </div>
                     <div v-else>
-                        {{snackbar.text}}
+                        {{ snackbar.text }}
                     </div>
                 </v-alert>
                 <template v-slot:action="{ attrs }">
-                    <v-btn
-                        text
-                        v-bind="attrs"
-                        @click="closeSnackbar"
-                    >
+                    <v-btn text v-bind="attrs" @click="closeSnackbar">
                         Close
                     </v-btn>
                 </template>
@@ -47,7 +47,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import UserHomeComponent from './user/Home';
+import UserHomeComponent from "./user/Home";
 export default {
     name: "HomeContainer",
     components: {
@@ -55,21 +55,21 @@ export default {
     },
     computed: {
         ...mapGetters(["auth_user"]),
-        snackbar(){
+        snackbar() {
             var snackbar = this.$store.state.snackbars.snackbar;
-            if(!snackbar.showing){
-                this.$store.dispatch('unsetSnackbar');
+            if (!snackbar.showing) {
+                this.$store.dispatch("unsetSnackbar");
             }
-            return snackbar
+            return snackbar;
         }
     },
     methods: {
-        closeSnackbar(){
-            this.$store.dispatch('unsetSnackbar');
+        closeSnackbar() {
+            this.$store.dispatch("unsetSnackbar");
         }
     },
     mounted() {
-        this.$store.dispatch('getAuthUser');
+        this.$store.dispatch("getAuthUser");
     }
-}
+};
 </script>

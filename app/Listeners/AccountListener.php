@@ -4,9 +4,6 @@ namespace App\Listeners;
 
 use App\Events\AccountEvent;
 use App\Models\Log;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-
 class AccountListener
 {
     /**
@@ -41,7 +38,7 @@ class AccountListener
                 $log->new_values = $data;
                 $log->original_values = $old_values;
                 $log->action = 'Account fullname update';
-                $log->remarks = 'Account fullname has been successfully updated to : 
+                $log->remarks = 'Account fullname has been successfully updated to :
                     '.$last_name.', '.$first_name.', '.$middle_name.' '.$suffix;
                 return $log->save();
             break;
@@ -62,7 +59,7 @@ class AccountListener
                 $log = new Log();
                 $log->user_id = $event->user_id;
                 $log->action = 'Account username update';
-                $log->remarks = 'Account username has been successfully updated from : 
+                $log->remarks = 'Account username has been successfully updated from :
                     '.$old_values.' to '.$username;
                 return $log->save();
             break;

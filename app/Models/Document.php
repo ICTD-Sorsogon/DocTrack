@@ -28,7 +28,6 @@ class Document extends Model
 
     protected $dispatchesEvents = [
         'saved' => DocumentEvent::class,
-        // 'deleting' => DocumentEvent::class,
     ];
 
     protected $casts = [
@@ -55,7 +54,8 @@ class Document extends Model
 
     public function getDestinationAttribute()
     {
-        $value = auth()->user()->can('update', $this) ? json_decode(optional($this->attributes)['destination_office_id']) : [auth()->user()->office->id];
+        $value = auth()->user()->can('update', $this) ?
+            json_decode(optional($this->attributes)['destination_office_id']) : [auth()->user()->office->id];
         return Office::get()->only($value);
     }
 
@@ -108,12 +108,14 @@ class Document extends Model
 
     public function acknowledgedDiff()
     {
-        return $this->tracker()->whereAction('acknowledged')->get()->last()->created_at->diffInSeconds(Carbon::now());
+        return $this->tracker()->whereAction('acknowledged')->get()
+            ->last()->created_at->diffInSeconds(Carbon::now());
     }
 
     public function receivedDiff()
     {
-        return $this->tracker()->whereAction('received')->get()->last()->created_at->diffInSeconds(Carbon::now());
+        return $this->tracker()->whereAction('received')->get()
+            ->last()->created_at->diffInSeconds(Carbon::now());
     }
 
     public function forwardedDiff()
@@ -123,7 +125,7 @@ class Document extends Model
 
     public function lastForwarded()
     {
-        return $this->tracker()->whereAction('forwarded')->get()->last(); 
+        return $this->tracker()->whereAction('forwarded')->get()->last();
     }
 
     public static function allDocuments(User $user)
@@ -133,12 +135,14 @@ class Document extends Model
         }, 'tracking_records', 'document_recipient']);
         if($user->isUser()){
 
-            $outgoing = (clone $document)->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();
+            $outgoing = (clone $document)->whereOriginatingOffice($user->office_id)
+                ->orderBy('documents.created_at', 'DESC')->get();
             $incoming = $document
-                        ->with(['document_recipient' => function($query) use($user) {
-                            $query->whereDestinationOffice($user->office->id)->get();
-                        }])
-                        ->whereHas('document_recipient', function($query) use($user){ $query->whereRaw("destination_office = {$user->office_id} AND acknowledged = 1 AND hold = 0");})->get();
+                ->with(['document_recipient' => function($query) use($user) {
+                $query->whereDestinationOffice($user->office->id)->get();}])
+                ->whereHas('document_recipient', function($query) use($user){ $query
+                ->whereRaw("destination_office = {$user->office_id}
+                AND acknowledged = 1 AND hold = 0");})->get();
 
             return compact('incoming', 'outgoing');
         }
@@ -150,18 +154,20 @@ class Document extends Model
     public static function allDocumentsArchive(User $user, $request)
     {
         $document = static::select('documents.*', static::raw('YEAR(created_at) as year'))
-                        ->with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed'])->withTrashed()
-                        ->whereHas('incoming_trashed', function($query){ $query->whereNotNull('deleted_at'); });
+            ->with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed'])
+            ->withTrashed()->whereHas('incoming_trashed', function($query){ $query
+            ->whereNotNull('deleted_at'); });
         $year = static::getYr($document);
         static::filter($document, $request);
         if ($user->isUser()) {
-            $ot = $document->where('originating_office', auth()->user()->office->id)->orderBy('created_at', 'DESC')->get();
-            $in = Document::with(['document_type','origin_office', 'sender', 'tracking_records', 'incoming_trashed' => function ($query){
-                                $query->whereDestinationOffice(auth()->user()->office->id);
-                            }])->withTrashed()
-                            ->whereHas('incoming_trashed', function($query) use($user, $request){
-                                static::filter($query->where('destination_office', $user->office_id)->onlyTrashed(), $request);
-                            })->get();
+            $ot = $document->where('originating_office', auth()->user()->office->id)
+                ->orderBy('created_at', 'DESC')->get();
+            $in = Document::with([
+                'document_type','origin_office', 'sender', 'tracking_records','incoming_trashed' => function ($query){
+                $query->whereDestinationOffice(auth()->user()->office->id);}])->withTrashed()
+                ->whereHas('incoming_trashed', function($query) use($user, $request){
+                static::filter($query->where('destination_office', $user->office_id)
+                ->onlyTrashed(), $request);})->get();
             $document = $ot->merge($in);
         }
         return response()->json([
@@ -178,8 +184,10 @@ class Document extends Model
     public static function userYearCollection()
     {
         $oId = auth()->user()->office->id;
-        $in = Document::with('origin_office')->select(Document::raw('YEAR(created_at) as year'))->where('originating_office', $oId)->onlyTrashed()->get();
-        $ot = DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))->where('destination_office', $oId)->onlyTrashed()->get();
+        $in = Document::with('origin_office')->select(Document::raw('YEAR(created_at) as year'))
+            ->where('originating_office', $oId)->onlyTrashed()->get();
+        $ot = DocumentRecipient::select(DocumentRecipient::raw('YEAR(created_at) as year'))
+            ->where('destination_office', $oId)->onlyTrashed()->get();
         return collect(static::getYr($in)->merge(static::getYr($ot))->unique())->flatten();
     }
 

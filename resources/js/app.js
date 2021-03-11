@@ -24,8 +24,6 @@ Vue.use(Vuex);
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 import movable from "v-movable"
 Vue.use(movable)
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\DocumentEvent;
 use App\Http\Requests\DocumentPostRequest;
 use Auth;
 use Illuminate\Support\Facades\DB;
@@ -254,8 +253,6 @@ class DocumentController extends Controller
 
     public function addNewDocument(Document $document, DocumentPostRequest $request)
     {
-        // FIXME: Editing a document creates a new record in the tracking_summaries table
-        // TODO: Highlight in front end menu, Forward not tracked in fastest and slowest
        $document = $document->updateOrCreate(
             ['id' => $document->id],
             $request->validated()
@@ -289,7 +286,7 @@ class DocumentController extends Controller
     public function trackingReports()
     {
        $summary = TrackingRecord::with('document')->whereNotNull('transaction_of')->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
-       
+
        if(!auth()->user()->isAdmin()){
            return $summary->whereStrict('transaction_of', auth()->user()->office_id);
        }
