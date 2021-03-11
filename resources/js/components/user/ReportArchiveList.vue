@@ -271,7 +271,7 @@
                         label
                         dark
                         :color="
-                            getTrackingCodeColor(item, item.document_type_id)
+                            getTrackingCodeColor(item.document_type_id)
                         "
                     >
                         {{ item.tracking_code }}
