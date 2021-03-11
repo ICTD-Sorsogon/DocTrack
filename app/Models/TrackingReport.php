@@ -20,23 +20,27 @@ class TrackingReport extends Model
 
     public function getAverageAttribute()
     {
-        return $this->speeds ? CarbonInterval::seconds($this->speeds->average())->cascade()->forHumans(['short' => true, 'parts' => 1]) : 'NOT AVALABLE';
+        return $this->speeds ? CarbonInterval::seconds($this->speeds->average())->cascade()
+            ->forHumans(['short' => true, 'parts' => 1]) : 'NOT AVALABLE';
     }
 
     public function getFastestAttribute()
     {
-        return $this->speeds ? CarbonInterval::seconds($this->speeds->min())->cascade()->forHumans(['short' => true, 'parts' => 1]) : 'NOT AVALABLE';
+        return $this->speeds ? CarbonInterval::seconds($this->speeds->min())->cascade()
+            ->forHumans(['short' => true, 'parts' => 1]) : 'NOT AVALABLE';
     }
 
     public function getSlowestAttribute()
     {
-        return  $this->speeds ? CarbonInterval::seconds($this->speeds->max())->cascade()->forHumans(['short' => true, 'parts' => 1]) : 'NOT AVALABLE';
+        return  $this->speeds ? CarbonInterval::seconds($this->speeds->max())->cascade()
+            ->forHumans(['short' => true, 'parts' => 1]) : 'NOT AVALABLE';
     }
 
     public function getEfficiencyAttribute()
     {
         extract($this->only('transactions', 'delayed'));
-        return $transactions ? number_format(($transactions - $delayed) / $transactions * 100, 2) . '%' : 'NOT AVAILABLE';
+        return $transactions ?
+            number_format(($transactions - $delayed) / $transactions * 100, 2) . '%' : 'NOT AVAILABLE';
     }
 
     public function office()

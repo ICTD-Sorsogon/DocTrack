@@ -3,12 +3,7 @@
         <v-card-title primary-title>Account Settings</v-card-title>
 
         <v-card-text class="headline font-weight-bold">
-            <v-expansion-panels
-                focusable
-                flat
-                v-model="panel"
-                multiple
-            >
+            <v-expansion-panels focusable flat v-model="panel" multiple>
                 <v-expansion-panel>
                     <v-expansion-panel-header disable-icon-rotate>
                         Change Profile Picture
@@ -19,7 +14,7 @@
                         </template>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                        <change-profile-picture-form/>
+                        <change-profile-picture-form />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
@@ -31,8 +26,8 @@
                             </v-icon>
                         </template>
                     </v-expansion-panel-header>
-                    <v-expansion-panel-content class='formpanel'>
-                        <change-account-details-form/>
+                    <v-expansion-panel-content class="formpanel">
+                        <change-account-details-form />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
@@ -44,8 +39,8 @@
                             </v-icon>
                         </template>
                     </v-expansion-panel-header>
-                    <v-expansion-panel-content class='formpanel'>
-                        <change-username-form/>
+                    <v-expansion-panel-content class="formpanel">
+                        <change-username-form />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel>
@@ -57,8 +52,8 @@
                             </v-icon>
                         </template>
                     </v-expansion-panel-header>
-                    <v-expansion-panel-content class='formpanel'>
-                        <change-password-form/>
+                    <v-expansion-panel-content class="formpanel">
+                        <change-password-form />
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -67,11 +62,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import ChangeProfilePictureForm from './components/ChangeProfilePictureForm';
-import ChangeUsernameForm from './components/ChangeUsernameForm';
-import ChangeAccountDetailsForm from './components/ChangeAccountDetailsForm';
-import ChangePasswordForm from './components/ChangePasswordForm';
+import { mapGetters } from "vuex";
+import ChangeProfilePictureForm from "./components/ChangeProfilePictureForm";
+import ChangeUsernameForm from "./components/ChangeUsernameForm";
+import ChangeAccountDetailsForm from "./components/ChangeAccountDetailsForm";
+import ChangePasswordForm from "./components/ChangePasswordForm";
 export default {
     components: {
         ChangeUsernameForm,
@@ -79,11 +74,11 @@ export default {
         ChangePasswordForm,
         ChangeProfilePictureForm
     },
-    computed: mapGetters(['auth_user']),
-    data () {
+    computed: mapGetters(["auth_user"]),
+    data() {
         return {
-            panel: [],
-        }
+            panel: []
+        };
     },
     methods: {
         fillForm() {
@@ -92,12 +87,12 @@ export default {
         }
     },
     mounted() {
-        this.$store.dispatch('unsetLoader');
+        this.$store.dispatch("unsetLoader");
     }
-}
+};
 </script>
 <style scoped>
-.formpanel{
+.formpanel {
     padding-top: 20px;
 }
 </style>

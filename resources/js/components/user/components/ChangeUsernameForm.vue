@@ -37,10 +37,7 @@
                 </v-col>
             </v-row>
             <v-row>
-                <v-col
-                    align="center"
-                    justify="end"
-                >
+                <v-col align="center" justify="end">
                     <v-btn
                         color="primary"
                         :dark="!invalid"
@@ -55,18 +52,18 @@
                 </v-col>
             </v-row>
             <v-row justify="center">
-                <v-dialog
-                    v-model="dialog"
-                    persistent
-                    max-width="450px"
-                >
+                <v-dialog v-model="dialog" persistent max-width="450px">
                     <v-card color="grey lighten-2">
                         <v-card-title class="headline grey lighten-2">
-                            <v-icon class="mr-2" size="30px">mdi-alert-octagon</v-icon> Edit Username
+                            <v-icon class="mr-2" size="30px"
+                                >mdi-alert-octagon</v-icon
+                            >
+                            Edit Username
                         </v-card-title>
                         <v-card-text>
                             <v-spacer></v-spacer>
-                            Are you sure you want to change your account username?
+                            Are you sure you want to change your account
+                            username?
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
@@ -93,8 +90,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
+import { mapGetters } from "vuex";
+import { ValidationObserver, ValidationProvider } from "vee-validate";
 export default {
     components: {
         ValidationProvider,
@@ -105,29 +102,30 @@ export default {
         return {
             dialog: false,
             username_form: {
-                form_type: 'account_username',
-                new_username: '',
-                new_username_confirmation: '',
+                form_type: "account_username",
+                new_username: "",
+                new_username_confirmation: ""
             },
             loader: null,
-            loading_edit_username: false,
-        }
+            loading_edit_username: false
+        };
     },
     methods: {
         editUsernameHandler() {
             const isValid = this.$refs.observer.validate();
-            if(isValid) {
-                this.$store.dispatch('updateUsername', this.username_form)
-                .then(()=> {
-                    this.$store.dispatch('setSnackbar', this.request);
-                    if (this.request.type !=  'error') {
-                        this.$refs.form.reset();
-                        this.$refs.observer.reset();
-                    }
-                    this.dialog = false;
-                });
+            if (isValid) {
+                this.$store
+                    .dispatch("updateUsername", this.username_form)
+                    .then(() => {
+                        this.$store.dispatch("setSnackbar", this.request);
+                        if (this.request.type != "error") {
+                            this.$refs.form.reset();
+                            this.$refs.observer.reset();
+                        }
+                        this.dialog = false;
+                    });
             }
-        },
+        }
     }
-}
+};
 </script>

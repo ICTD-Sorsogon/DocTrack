@@ -1,4 +1,3 @@
-import Dashboard from './components/user/Dashboard';
 import DocumentRecords from './components/user/DocumentRecords';
 import AccountSettings from './components/user/AccountSettings';
 import UserManagement from './components/user/UserManagement';
@@ -11,7 +10,6 @@ import DocumentAction from './components/user/DocumentAction';
 import ReportArchiveList from './components/user/ReportArchiveList';
 import ReportAging from './components/user/ReportAging';
 import ReportLog from './components/user/ReportLog';
-import ReportMasterList from './components/user/ReportMasterList';
 import ReportOfficeList from './components/user/ReportOfficeList';
 
 import Login from './components/Login';
@@ -96,7 +94,7 @@ export default {
                     component: DocumentAction,
                     name: 'Terminal Document'
                 },
-                // FIXME: Fix bug for submenu when using reports/'pathname'
+
                 {
                     path: 'tracking_report',
                     component: ReportAging,

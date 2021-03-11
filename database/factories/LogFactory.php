@@ -22,7 +22,8 @@ class LogFactory extends Factory
     public function definition()
     {
         $status = ['create', 'edit', 'delete'];
-        $remarks = ['Create New User', 'Edit User', 'Delete User', 'Create Document', 'Delete Document', 'Edit Document'];
+        $remarks = ['Create New User', 'Edit User', 'Delete User',
+            'Create Document', 'Delete Document', 'Edit Document'];
 
         return [
            'user_id' => null,

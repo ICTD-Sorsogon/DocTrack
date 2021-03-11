@@ -22,14 +22,15 @@ class TrackingRecord extends Model
     ];
 
     public function getTouchedUserAttribute($value)
-    { 
+    {
         $value = isset($this->attributes['touched_by']) ? $this->attributes['touched_by'] : null;
         return optional(User::with('office')->find($value))->only('avatar', 'office');
     }
 
     public function getDateFiledAttribute()
     {
-        return isset($this->attributes['last_touched']) ? Carbon::parse($this->attributes['last_touched'])->diffForHumans() : null;
+        return isset($this->attributes['last_touched']) ? Carbon::parse($this->attributes['last_touched'])
+            ->diffForHumans() : null;
     }
 
     public function user()
@@ -49,7 +50,8 @@ class TrackingRecord extends Model
 
     public function document_recipient()
     {
-        return $this->hasMany('App\Models\DocumentRecipient', 'document_id', 'document_id')->where('destination_office', $this->destination);
+        return $this->hasMany('App\Models\DocumentRecipient', 'document_id', 'document_id')
+            ->where('destination_office', $this->destination);
     }
 
     public function forwardedByOffice()

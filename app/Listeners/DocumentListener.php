@@ -5,13 +5,6 @@ namespace App\Listeners;
 use App\Events\DocumentEvent;
 use App\Models\Log;
 use App\Models\Office;
-use App\Models\TrackingRecord;
-use Carbon\Carbon;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use PHP_CodeSniffer\Standards\Squiz\Sniffs\Scope\MethodScopeSniff;
-use Symfony\Component\VarDumper\VarDumper;
-
 class DocumentListener
 {
     /**
@@ -64,7 +57,8 @@ class DocumentListener
                         $log->user_id = auth()->user()->id;
                         $log->new_values = $data;
                         $log->action = 'Document created';
-                        $log->remarks = "{$subject} with tracking code of {$tracking_code} was created by " . auth()->user()->fullname . ".";
+                        $log->remarks = "{$subject} with tracking code of {$tracking_code} was created
+                            by " . auth()->user()->fullname . ".";
                         return $log->save();
                 }
 
@@ -101,8 +95,8 @@ class DocumentListener
                     $log->new_values = $new_data;
                     $log->original_values = $old_data;
                     $log->action = 'Document updated';
-                    $log->remarks = "{$old['subject']} with tracking code of {$tracking_code}
-                        was successfully updated by " . auth()->user()->fullname . ".";
+                    $log->remarks = "{$old['subject']} with tracking code of {$tracking_code} was successfully
+                        updated by " . auth()->user()->fullname . ".";
                     return $log->save();
                 }
             break;
@@ -117,7 +111,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document acknowledged';
-                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully acknowledged with remarks: {$remarks} by " . auth()->user()->fullname . ".";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully
+                    acknowledged with remarks: {$remarks} by " . auth()->user()->fullname . ".";
                 return $log->save();
             break;
 
@@ -141,7 +136,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document terminated';
-                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully terminated and approved by: {$approved_by} with remarks: {$remarks}";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully
+                    terminated and approved by: {$approved_by} with remarks: {$remarks}";
                 return $log->save();
             break;
 
@@ -149,7 +145,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document forwarded';
-                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully forwarded through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
+                $log->remarks = "{$subject} with tracking code of {$tracking_code} was successfully
+                    forwarded through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
                 return $log->save();
             break;
 
@@ -157,7 +154,8 @@ class DocumentListener
                 $log = new Log();
                 $log->user_id = auth()->user()->id;
                 $log->action = 'Document received';
-                $log->remarks = "{$subject} wast tracking code of {$tracking_code} was successfully received through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
+                $log->remarks = "{$subject} wast tracking code of {$tracking_code} was successfully
+                    received through {$through} and approved by: {$approved_by} with remarks of: {$remarks}";
                 return $log->save();
             break;
         }

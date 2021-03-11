@@ -11,7 +11,7 @@
 		</v-tabs>
 	</v-container>
 	<v-card-text>
-	<v-row class="row ma-1">	
+	<v-row class="row ma-1">
 		<v-btn color="primary" @click="print">Print</v-btn>
 	</v-row>
 	<v-tabs-items v-model="tab">
@@ -45,11 +45,11 @@
 		</div>
 		<div class="">
 			<strong>Destination Office:</strong> <v-chip x-small v-for="office in item.destination" :key="office.office_code" >
-				{{office.office_code}} 
+				{{office.office_code}}
 			</v-chip>
 		</div>
 		<div class="">
-			<strong>Date Filed:</strong> {{dateFiled}} 
+			<strong>Date Filed:</strong> {{dateFiled}}
 		</div>
 		<div class="">
 			<strong>Remarks:</strong> {{item.remarks}}
@@ -162,8 +162,6 @@ export default {
 	mounted() {
     this.$nextTick(function() {
 		window.addEventListener('resize', this.getWindowSize)
-
-		//Init
 		this.getWindowSize()
 	})
 

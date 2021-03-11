@@ -5,9 +5,6 @@ namespace App\Listeners;
 use App\Events\LoginEvent;
 use App\Models\Log;
 use Carbon\Carbon;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-
 class LoginListener
 {
     /**
