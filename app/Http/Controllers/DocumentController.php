@@ -299,13 +299,13 @@ class DocumentController extends Controller
 
     public function officeReports()
     {
-        $summary = TrackingRecord::get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
+        $summary = new TrackingRecord;
+
         if(!auth()->user()->isAdmin()) {
-            return $summary->filter(function ($value, $key) {
-                return $value->touched_by == auth()->user()->office_id;
-        });
+            $summary->whereTransacationOf(auth()->user()->office_id)->whereOrTouchedBy(auth()->user()->office_id);
         }
-        return $summary;
+
+        return $summary->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
     }
 
     public function restoreDocument(Request $request)

@@ -148,12 +148,34 @@ export default {
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         ...mapGetters(['offices','auth_user', 'office_reports_get']),
         ...mapActions(['officeReports']),
+        newData(){
+            let summary = {}
+            for(let record of this.office_reports_get){
+                let i = record.transaction_of ?? record.touched_by
+                summary[i] = summary[i] ?? {}
+                summary[i]['transaction'] = (summary[i]['transaction'] || 0) + !!record.transaction_of
+                summary[i]['delayed'] = (summary[i]['delayed'] || 0) + record.delayed
+                summary[i]['efficiency'] =  ((summary[i]['transaction'] - summary[i]['delayed']) / summary[i]['transaction'] * 100).toFixed(2) + '%'
+                summary[i]['created'] = (summary[i]['created'] || 0) + !!(record.action == 'created')
+                summary[i]['acknowledged'] = (summary[i]['acknowledged'] || 0) + !!(record.action == 'acknowledged')
+                summary[i]['received'] = (summary[i]['received'] || 0) + !!(record.action == 'received')
+                summary[i]['forwarded'] = (summary[i]['forwarded'] || 0) + !!(record.action == 'forwarded')
+                if(record.transaction_of){
+                    summary[i]['fast'] = summary[i]['fast']?.speed < record.speed ? summary[i]['fast'] : record
+                    summary[i]['slow'] = summary[i]['slow']?.speed < record.speed ? summary[i]['slow'] : record
+                    summary[i]['sum'] = ((summary[i]['sum'] || 0) + record.speed) 
+                    summary[i]['average'] = summary[i]['sum'] / summary[i]['transaction'] 
+                }
+
+
+            }
+                                            debugger
+            return summmary
+        },
         data(){
             let offices = pluck(this.offices, 'name')
             let summary = {};
-            console.log('length',this.tracking_reports_data.length)
             let record = this.tracking_reports_data.length ? groupBy(this.tracking_reports_data, 'transaction_of') : false
-
             if (record) {
                 for(let i in record) {
                     let transaction = record[i].length   
@@ -198,6 +220,7 @@ export default {
         this.$store.dispatch('documentReports');
         this.$store.dispatch('officeReports');
         this.tracking_reports_data = this.tracking_reports;
+        this.newData
     },
     methods: {
         clearFilter() {
