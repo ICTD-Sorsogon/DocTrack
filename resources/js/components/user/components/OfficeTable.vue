@@ -7,7 +7,7 @@
                         All Transaction
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office == false">
                     <v-row>
                         <v-col class="display-2">
                         No Data Available
@@ -25,12 +25,12 @@
             </v-col>
             <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
             <v-card elevation="2" outlined dark color="#EF5350">
-                <v-card-title class="headline">
+                <v-card-title class="headline">transaction
                     <v-icon large left>mdi-clock-alert-outline</v-icon>
                         Delayed Documents
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row>
                         <v-col class="display-2">
                         No Data Available
@@ -53,7 +53,7 @@
                         Fastest Transaction
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row>
                         <v-col class="display-2">
                         No Data Available
@@ -65,10 +65,10 @@
                         <v-col class="display-2">
                         {{(office.fast || {}).fast || 0}}
                         </v-col>
-                    </v-row>
+                    </v-row>transaction
                 </v-card-text>
                 <div>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row >
                         <v-col>
                             No Data Available
@@ -79,8 +79,8 @@
                     <v-row >
                         <v-col>
                             Action: {{office.fast ? office.fast.action.replace(/\w/, val=>val.toUpperCase()) : 'None' }} <br>
-                            Subject: {{office.fast ? office.fast.document.subject : 'None'}} <br>
-                            Tracking Code: {{office.fast? office.fast.document.tracking_code : 'None'}}
+                            Subject: {{office.fast.document ? office.fast.document.subject : 'None'}} <br>
+                            Tracking Code: {{office.fast.document? office.fast.document.tracking_code : 'None'}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -94,7 +94,7 @@
                         Slowest Transaction
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row>
                         <v-col class="display-2">
                             No Data Available
@@ -109,7 +109,7 @@
                     </v-row>
                 </v-card-text>
                 <div>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row >
                         <v-col>
                             No Data Available
@@ -120,8 +120,8 @@
                     <v-row >
                         <v-col>
                             Action: {{office.slow ? office.slow .action.replace(/\w/, val=>val.toUpperCase()) : 'None'}} <br>
-                            Subject: {{office.slow ? office.slow.document.subject : 'None'}} <br>
-                            Tracking Code: {{office.slow ? office.slow.document.tracking_code : 'None'}}
+                            Subject: {{office.slow.document ? office.slow.document.subject : 'None'}} <br>
+                            Tracking Code: {{office.slow.document ? office.slow.document.tracking_code : 'None'}}
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -135,7 +135,7 @@
                         Average Transaction Speed
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row>
                         <v-col class="display-2">
                         No Data Available
@@ -158,7 +158,7 @@
                         Efficiency Rating
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-card-text v-if="this.office==''">
+                <v-card-text v-if="this.office==false">
                     <v-row>
                         <v-col class="display-2">
                         No Data Available
@@ -184,11 +184,10 @@ export default {
         ...mapGetters(['auth_user']),
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         office(){
-            return this.stats.find(stat=> stat.office.id == this.auth_user.office_id ?? false);
+            return this.stats.find(stat=> stat.office.id == this.auth_user.office_id) ?? false
         }
     },
     mounted() {
-        console.log(this.office)
     }
 }
 </script>

@@ -1,29 +1,6 @@
 <template>
-    <v-tabs
-        fixed-tabs
-    >
-    <v-tab>
-        Office Reports
-    </v-tab>
-    <v-tab v-if="auth_user.role_id == 1">
-        Other Offices
-    </v-tab>
-    <v-tab-item>
-        <v-card flat>
-        <v-card-title primary-title>
-            Tracking Summary
-        </v-card-title>
-        <office-table :stats="data"/>
-        </v-card>
-    </v-tab-item>
-    <v-tab-item>
-        <v-card flat>
-        <div v-if="auth_user.role_id == 1">
-            <v-card-title primary-title>
-                Tracking Table
-            </v-card-title>
-            <v-row
-            >
+    <div>
+        <v-row>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12" >
                     <v-dialog
                         ref="dialog"
@@ -47,7 +24,7 @@
                         <v-date-picker
                             v-model="filterDateFrom"
                             scrollable
-
+                            :max="filterDateTo"
                         >
                             <v-spacer/>
                             <v-btn text color="primary" @click="filterDateDialogFrom = false"> Cancel </v-btn>
@@ -71,7 +48,6 @@
                                 readonly
                                 v-bind="attrs"
                                 v-on="on"
-
                                 outlined
                                 dense
                             />
@@ -79,7 +55,8 @@
                         <v-date-picker
                             v-model="filterDateTo"
                             scrollable
-
+                            :max="new Date().toISOString().slice(0,10)"
+                            :min="filterDateFrom"
                         >
                             <v-spacer/>
                             <v-btn text color="primary" @click="filterDateDialogTo = false"> Cancel </v-btn>
@@ -111,23 +88,47 @@
                         </v-col>
                     </v-row>
                 </v-col>
-            </v-row>
-            <tracking-table :stats="data"/>
-            <v-card-subtitle>
-                * exclude created/received
-            </v-card-subtitle>
-        </div>
-    </v-card>
-    </v-tab-item>
-    </v-tabs>
+        </v-row>
+        <v-tabs
+            full-width
+            grow
+            centered
+        >
+        <v-tab>
+            Office Reports
+        </v-tab>
+        <v-tab v-if="auth_user.role_id == 1">
+            Other Offices
+        </v-tab>
+        <v-tab-item>
+            <v-card flat>
+                <v-card-title primary-title>
+                    Tracking Summary
+                </v-card-title>
+                <office-table :stats="data"/>
+            </v-card>
+        </v-tab-item>
+        <v-tab-item>
+            <v-card flat>
+                <div v-if="auth_user.role_id == 1">
+                    <v-card-title primary-title>
+                        Tracking Table
+                    </v-card-title>
+                    <tracking-table :stats="data"/>
+                    <v-card-subtitle>
+                        * exclude created/received
+                    </v-card-subtitle>
+                </div>
+            </v-card>
+        </v-tab-item>
+        </v-tabs>
+    </div>
 </template>
 <script>
 import TrackingTable from './components/TrackingTable';
 import OfficeTable from './components/OfficeTable';
 import OfficeTableModal from './components/OfficeTableModal.vue';
 import { mapState, mapGetters, mapActions } from 'vuex';
-import { groupBy, pluck, getRecordSpeed } from '../../helpers';
-import { formatDistanceStrict } from 'date-fns';
 
 export default {
     components:{
@@ -148,7 +149,7 @@ export default {
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         ...mapGetters(['offices','auth_user', 'office_reports_get']),
         ...mapActions(['officeReports']),
-        newData(){
+        data(){
             let summary = {}
             for(let record of this.office_reports_get){
                 let i = record.transaction_of ?? record.touched_by
@@ -166,85 +167,33 @@ export default {
                     summary[i]['sum'] = ((summary[i]['sum'] || 0) + record.speed) 
                     summary[i]['average'] = summary[i]['sum'] / summary[i]['transaction'] 
                 }
-
-
-            }
-                                            debugger
-            return summmary
-        },
-        data(){
-            let offices = pluck(this.offices, 'name')
-            let summary = {};
-            let record = this.tracking_reports_data.length ? groupBy(this.tracking_reports_data, 'transaction_of') : false
-            if (record) {
-                for(let i in record) {
-                    let transaction = record[i].length   
-                    let delayed = record[i].filter(r=>r.delayed).length
-                    let efficiency = ((transaction - delayed) / transaction * 100).toFixed(2) + '%'
-                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000); 
-                    let slow =  getRecordSpeed(record[i], 'slow')
-                    let fast =  getRecordSpeed(record[i], 'fast')
-                    let office = {name: offices[i-1], id: i} //change this
-                    summary[i] = {transaction, delayed, efficiency, slow, fast, average, office}
-                } 
-            }
-            let officeReport = this.auth_user.office.office_code == "DO" ? groupBy(this.office_reports_get, 'touched_by') : { [this.auth_user.id]: [this.office_reports_get]}
-            for (let n in officeReport) {
-                summary[n] = {...summary[n], ...officeReport[n].reduce((accumulator , value) => {
-                    accumulator.office = {name: offices[n-1], id: n}
-                    if (value.action == 'created') {
-                        accumulator.created +=1
-                    } else if (value.action == 'acknowledged') {
-                        accumulator.acknowledged +=1
-                    } else if (value.action == 'forwarded') {
-                        accumulator.forwarded +=1
-                    } else if (value.action == 'received') {
-                        accumulator.received +=1
-                    }
-                    return accumulator
-                }, {'created': 0 , 'acknowledged': 0, 'forwarded': 0, 'received': 0, office: {}})}
+                summary[i]['office'] = this.offices.find(office => office.id == i)
             }
             return Object.values(summary)
-        },
-        tracking_reports_data: {
-                get: function () {
-                    return JSON.parse(JSON.stringify(Object.values(this.filterData)))
-                },
-                set : function (val) {
-                    this.filterData = val;
-                }
         },
     },
     mounted() {
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
-        this.$store.dispatch('officeReports');
-        this.tracking_reports_data = this.tracking_reports;
-        this.newData
+        this.clearFilter()
     },
     methods: {
         clearFilter() {
-            this.filterDateFrom = this.filterDateTo = '';
-            this.tracking_reports_data = this.tracking_reports;
+            this.filterDateTo = new Date().toISOString().slice(0,10)
+            this.filterDateFrom = (new Date(new Date().setDate(new Date().getDate() - 30))).toISOString().slice(0,10)
+            this.$store.dispatch('officeReports', {now : this.filterDateTo, from: null});
         },
         filterTrackingReport(){
             if (this.filterDateFrom != '' &&  this.filterDateTo != '') {
                 let start = new Date(this.filterDateFrom + " 00:00:00").getTime();
                 let end = new Date(this.filterDateTo + " 23:59:59").getTime();
-                let filter = this.tracking_reports_data.filter(item => {
-                    return new Date(item.last_touched).getTime() >= start &&
-                    new Date(item.last_touched).getTime() <= end;
-                });
-                this.tracking_reports_data = filter;
+                this.$store.dispatch('officeReports', {now : start, from: end});
             } else {
                 this.$store.dispatch('setSnackbar', {
                         type: 'error',
                         message: 'Please input valid date!'
                     })
             }
-        },
-        bp(col){
-            return breakpoint(col)
         },
     }
 }

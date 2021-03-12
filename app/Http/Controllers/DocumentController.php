@@ -297,15 +297,16 @@ class DocumentController extends Controller
        return $summary;
     }
 
-    public function officeReports()
+    public function officeReports(Request $filter)
     {
+        $to = $filter->now ?? date("Y-m-d H:i:s");
+        $from = $filter->from ?? Carbon::create($to)->subDay(30);
         $summary = new TrackingRecord;
-
         if(!auth()->user()->isAdmin()) {
             $summary->whereTransacationOf(auth()->user()->office_id)->whereOrTouchedBy(auth()->user()->office_id);
         }
-
-        return $summary->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
+        return $summary->whereBetween('last_touched', [$from, $to])
+            ->get(['transaction_of', 'document_id', 'action', 'speed', 'delayed', 'last_touched','touched_by']);
     }
 
     public function restoreDocument(Request $request)

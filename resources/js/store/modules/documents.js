@@ -212,8 +212,8 @@ const actions = {
     async unsetDocument({ commit }) {
         commit('UNSET_SELECTED_DOCUMENT');
     },
-    async officeReports({ commit }) {
-        const response = await axios.get('/api/office_reports')
+    async officeReports({ commit }, filter) {
+        const response = await axios.get(`/api/office_reports`, { params: filter})
         commit('GET_OFFICE_REPORTS', response.data);
     },
     async restoreDocument({ commit }, document) {
@@ -293,6 +293,7 @@ const mutations = {
     RESET_ARCHIVE_STATE(state) {
         state.documentsArchive = []
     },
+    console.log('office ',this.office)
     SET_CURRENT_PAGE(state, data) {
         state.documents.current_page = data;
     },
