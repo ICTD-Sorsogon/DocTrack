@@ -24,7 +24,7 @@
             </v-card-title>
             <v-row
             >
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12" >
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="4" >
                     <v-dialog
                         ref="dialog"
                         v-model="filterDateDialogFrom"
@@ -55,7 +55,7 @@
                         </v-date-picker>
                     </v-dialog>
                 </v-col>
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12">
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="4">
                     <v-dialog
                         ref="dialog1"
                         v-model="filterDateDialogTo"
@@ -91,7 +91,7 @@
                         </v-date-picker>
                     </v-dialog>
                 </v-col>
-                <v-col cols="12" xl="12" lg="4" md="4" sm="12" xs="12">
+                <v-col cols="12" xl="4" lg="4" md="4" sm="12" xs="12">
                     <v-row>
                         <v-col  cols="12" xl="6" lg="6" md="6" sm="6" xs="6">
                             <v-btn
@@ -156,15 +156,15 @@ export default {
 
             if (record) {
                 for(let i in record) {
-                    let transaction = record[i].length   
+                    let transaction = record[i].length
                     let delayed = record[i].filter(r=>r.delayed).length
                     let efficiency = ((transaction - delayed) / transaction * 100).toFixed(2) + '%'
-                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000); 
+                    let average = formatDistanceStrict(0, record[i].reduce((counter,value,index)=>{return (counter*index+value.speed)/(index+1)},0)* 1000);
                     let slow =  getRecordSpeed(record[i], 'slow')
                     let fast =  getRecordSpeed(record[i], 'fast')
                     let office = {name: offices[i-1], id: i} //change this
                     summary[i] = {transaction, delayed, efficiency, slow, fast, average, office}
-                } 
+                }
             }
             let officeReport = this.auth_user.office.office_code == "DO" ? groupBy(this.office_reports_get, 'touched_by') : { [this.auth_user.id]: [this.office_reports_get]}
             for (let n in officeReport) {
