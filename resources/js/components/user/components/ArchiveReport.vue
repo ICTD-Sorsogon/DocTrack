@@ -181,7 +181,7 @@ export default {
             this.isByGroup = (newVal=='group')?true:false
             if (newVal == 'group') {
                 this.group.byOC = 'primary'
-                this.group.byTC = ''
+                this.group.byTC = (this.auth_user.role_id ==1)?'':'primary';
                 this.group.bySC = ''
             } else {
                 this.group.byOC = 'primary'
@@ -191,8 +191,13 @@ export default {
         },
         'isByGroup'(newVal){
             if (newVal) {
-                this.wsTypeSel = 'byOffice';
-                this.group.byOffice = true
+                if(this.auth_user.role_id == 1) {
+                    this.wsTypeSel = 'byOffice';
+                    this.group.byOffice = true
+                } else {
+                    this.wsTypeSel = 'byType';
+                    this.group.byType = true
+                }
             } else {
                 this.wsTypeSel = '';
             }
@@ -239,6 +244,9 @@ export default {
 
             let selected = []
             let filter = {}
+            let group = JSON.parse(JSON.stringify(this.group));
+            ['byOC', 'byTC', 'bySC'].forEach(key => delete group[key]);
+            if(this.auth_user.role_id != 1) delete group.byOffice;
             Object.entries(this.group).forEach(s =>{
                 if(s[1]==true){
                     selected.type = s[0]

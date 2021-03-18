@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Office;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,25 +10,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OfficeEvent
+class NotificationEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    public $notification;
 
-    public $user_id;
-    public $request_obj;
-    public $type;
-    public $old_values;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($user_id, $request_obj, $old_values, $type)
+    public function __construct($notification)
     {
-        $this->user_id = $user_id;
-        $this->request_obj = $request_obj;
-        $this->old_values = $old_values;
-        $this->type = $type;
+        $this->notification = $notification;
     }
 
     /**

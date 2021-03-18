@@ -21,7 +21,7 @@ class Notification extends Model
     {
         return $this->user->avatar;
     }
-    
+
     public function getOfficeCodeAttribute()
     {
         return $this->user->office->name;
@@ -46,5 +46,6 @@ class Notification extends Model
     {
         return $this->hasMany('App\Models\Document', 'document_id');
     }
+
 }
 
