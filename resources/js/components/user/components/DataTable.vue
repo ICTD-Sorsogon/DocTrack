@@ -185,7 +185,7 @@ export default {
 		extendedData() {
 			return JSON.parse(JSON.stringify( this.documents)).map(doc=>{
                 doc.is_external = doc.is_external ? 'External' : 'Internal'
-				doc.sender_name = doc.sender?.name ?? doc.sender_name
+				doc.sender_name = doc.sender?.fullname ?? doc.sender_name
 				doc.destination = doc.destination_office ? [doc.destination.find(destination => destination.id == doc.destination_office)] : doc.destination
                 doc.originating_office = doc.origin_office?.office_code ?? doc.originating_office
                 doc.prio_text = '';

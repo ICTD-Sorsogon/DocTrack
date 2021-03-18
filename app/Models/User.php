@@ -41,7 +41,7 @@ class User extends Authenticatable
 
     public function getFullnameAttribute()
     {
-        return implode(' ', $this->only('first_name', 'middle_name', 'last_name'));
+        return implode(' ', $this->only('first_name', 'middle_name', 'last_name', 'suffix'));
     }
 
     public function role()

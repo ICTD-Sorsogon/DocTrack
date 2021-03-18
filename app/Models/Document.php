@@ -93,7 +93,7 @@ class Document extends Model
 
     public function sender()
     {
-        return $this->belongsTo('App\Models\Personnel', 'sender_name');
+        return $this->belongsTo('App\Models\User', 'sender_name');
     }
 
     public function tracker()
@@ -128,7 +128,9 @@ class Document extends Model
 
     public static function allDocuments(User $user)
     {
-        $document = static::with(['document_type','origin_office', 'sender', 'tracking_records', 'document_recipient']);
+        $document = static::with(['document_type','origin_office', 'sender' => function ($query) {
+            $query->select('id','first_name', 'middle_name', 'last_name');
+        }, 'tracking_records', 'document_recipient']);
         if($user->isUser()){
 
             $outgoing = (clone $document)->whereOriginatingOffice($user->office_id)->orderBy('documents.created_at', 'DESC')->get();

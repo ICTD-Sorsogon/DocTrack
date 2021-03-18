@@ -47,22 +47,6 @@ const actions = {
             }
             commit('SNACKBAR_STATUS', res)
         });
-
-        /*await axios.post('/api/add_new_office', form)
-        .then(response => {
-            let res = {
-                status: 'success',
-                message: `${form.name} was successfully added!`
-            }
-            commit('SNACKBAR_STATUS', res)
-        })
-        .catch(error => {
-            let res = {
-                status: 'failed',
-                message: 'The server replied with an error! Please Contact your administrator.'
-            }
-            commit('SNACKBAR_STATUS', res)
-        });*/
     },
     async updateExistingOffice({ commit }, form) {
         await axios.post('/api/update_existing_office', form)
@@ -86,7 +70,7 @@ const actions = {
         .then(response => {
             let res = {
                 status: 'success',
-                message: `${response.data[0].name} \nwas successfully deleted!`
+                message: `Office successfully deleted!`
             }
             commit('SNACKBAR_STATUS', res)
         })

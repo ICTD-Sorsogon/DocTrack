@@ -247,7 +247,7 @@ export default {
             let group = JSON.parse(JSON.stringify(this.group));
             ['byOC', 'byTC', 'bySC'].forEach(key => delete group[key]);
             if(this.auth_user.role_id != 1) delete group.byOffice;
-            Object.entries(this.group).forEach(s =>{
+            Object.entries(group).forEach(s =>{
                 if(s[1]==true){
                     selected.type = s[0]
                     selected.data = this.$refs[s[0]].value

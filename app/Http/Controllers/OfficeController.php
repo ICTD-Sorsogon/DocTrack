@@ -60,15 +60,6 @@ class OfficeController extends Controller
 
     public function importNewOffice(Request $request): Array
     {
-        /*dd($request['office_list']);
-        foreach($request['office_data'] as $office_data){
-            //dd($office_data['tab']);
-            foreach($office_data['content'] as $office){
-                //dd($office['Office_Name']);
-            }
-        }*/
-
-
         DB::beginTransaction();
         try {
             foreach($request['office_data'] as $office_data){

@@ -214,19 +214,18 @@
         </v-row>
 
         <excel-dialog
-            v-if="excel_dialog == true"
-            :excel_dialog="excel_dialog"
-            dialog_title="Export User"
-            dialog_type='export'
-            dialog_for="exportUser"
+            v-if="xDialog.visible"
+            :param="xDialog"
             @close-dialog="closeDialog()"
         />
+
     </div>
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate';
 import ExcelDialog from './components/ExcelDialog'
+import { tr } from 'date-fns/locale';
 
 export default {
     components: { ValidationProvider, ValidationObserver, ExcelDialog },
@@ -255,7 +254,6 @@ export default {
                 { text: 'Is Active', value: 'is_active', sortable: false },
                 { text: 'Actions', value: 'actions', sortable: false },
             ],
-            excel_dialog: false,
             search: '',
             userAE: false,
             menu: false,
@@ -291,6 +289,13 @@ export default {
                 password:'',
             },
             editedIndex: -1,
+            xDialog : {
+                title: 'Export User',
+                func: 'exportUser',
+                type: 'export',
+                data: [],
+                visible: false
+            }
         }
     },
     watch: {
@@ -306,10 +311,10 @@ export default {
     },
     methods: {
         exportUser(){
-            this.excel_dialog = true;
+            this.xDialog.visible = true
         },
         closeDialog(){
-            this.excel_dialog = false;
+            this.xDialog.visible = false
         },
         editUser (item) {
             this.editedIndex = this.users.indexOf(item)
