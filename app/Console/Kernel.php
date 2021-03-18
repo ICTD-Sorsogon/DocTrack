@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
 
                 if($notif->action = 'Reminder' && $notif->status == 1 && $expired_at_7){
                     $notif->delete();
-                }else if($notif->status == 1 && $expired_at_7 && $is_terminated) {
+                }else if($notif->status == 1 && $expired_at_7 && $is_terminated && $notif->action != 'Reminder') {
                     $notif->delete();
                 }
 
