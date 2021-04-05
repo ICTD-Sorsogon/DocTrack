@@ -3,10 +3,10 @@
         <v-container fluid  class="pr-0 pl-0"  style="padding:0px;">
             <v-card style="overflow-x:hidden; overflow-y:auto">
                 <v-row>
-                    <v-col cols="6" sm="6">
+                    <v-col v-bind="bp([11,10,9,6,6])">
                         <v-card-title primary-title> {{ dialog_title }} </v-card-title>
                     </v-col>
-                    <v-col cols="6" sm="6">
+                    <v-col v-bind="bp([1,2,3,6,6])">
                         <v-card-actions class="mr-1">
                             <v-spacer></v-spacer>
                             <v-btn x-large color="gray" @click="$emit('close-dialog')" icon>
@@ -17,13 +17,19 @@
                 </v-row>
                 <v-card-text>
                     <v-form ref="form" lazy-validation>
-                        <v-row v-if="dialog_type == 'export'">
-                            <v-col cols="12" xs="12" sm="12" md="12" lg="12" xl="12">
-                                <v-btn @click="dowload" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
+                        <v-row v-if="dialog_type == 'export' && dialog_for != 'masterList' && dialog_for != 'advanceExport'">
+                            <v-col v-bind="bp(12)">
+                                <v-btn @click="download" color="primary" style="width:100%" elevation="4" depressed large>CONFIRM EXPORT</v-btn>
                             </v-col>
                         </v-row>
+
+                        <archive-report
+                            v-if="this.dialog_type == 'export' && this.dialog_for == 'masterList' || this.dialog_for == 'advanceExport'"
+                            :dialog_for="dialog_for"
+                        />
+
                         <v-row v-if="dialog_type == 'import'">
-                            <v-col cols="12" xs="10" sm="10" md="10" lg="10" xl="10">
+                            <v-col v-bind="bp(10)">
                                 <v-file-input
                                     label="Browse Excel File"
                                     prepend-icon=""
@@ -39,7 +45,7 @@
                                     clear-icon="mdi-delete"
                                 />
                             </v-col>
-                            <v-col cols="12" xs="2" sm="2" md="2" lg="2" xl="2">
+                            <v-col v-bind="bp(2)">
                                 <v-btn color="primary" style="width:100%" large :dark="valid" :loading="btnloading" :disabled="!valid" v-if="dialog_type == 'import'" @click="uploadToDatabase"> UPLOAD </v-btn>
                             </v-col>
                             <v-col v-show="is_preview && excel_data.length > 0 && excel_table_headers.length > 0">
@@ -93,10 +99,13 @@
 
 <script>
     import { mapGetters } from 'vuex';
-    import * as Excel from 'exceljs';
+    import { breakpoint } from '../../../constants';
+    import ArchiveReport from './ArchiveReport'
+
 
     export default {
         props: ['excel_dialog', 'dialog_title', 'dialog_for', 'dialog_type'],
+        components: {ArchiveReport},
         data() {
             return {
                 valid: false,
@@ -107,13 +116,15 @@
                 excel_table_headers: [],
                 is_preview: false,
                 offices: [],
-                marian_blue: '0675BB'
             }
         },
         computed: {
-            ...mapGetters(['request'])
+            ...mapGetters(['request', 'document_types', 'auth_user']),
         },
         methods: {
+            bp(col){
+                return breakpoint(col)
+            },
             randomKey(){
                 return Math.random().toString(36).substring(7)
             },
@@ -150,10 +161,12 @@
                     this.btnloading = false;
                 }
             },
-            dowload(){
+            download(){
                 this[this.dialog_for]()
             },
-            importOfficeList(file){
+            async importOfficeList(file){
+                const Excel = await require('exceljs');
+
                 this.excel_table_headers = [];
                 this.excel_table_headers.push(
                     { text: 'Office Name', align: 'start', value: 'Office_Name' },
@@ -182,7 +195,6 @@
                                 tab: (workbook.worksheets[sheetIndex].name).toUpperCase(),
                                 content: []
                             });
-                            // Preview
                             sheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
                                 var rowIndex = rowNumber - 1;
                                 if (rowIndex > 0) {
@@ -197,7 +209,6 @@
                                             ((dataCol[5] == undefined)? null : dataCol[5])
                                     });
                                 }
-                            // Duplicate Validation
                                 row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
                                     var colIndex = colNumber - 1;
                                     if (rowIndex > 0 && colIndex < 3) {
@@ -264,118 +275,14 @@
                 });
             },
             exportLogs(){
-                const header_color = this.marian_blue;
-                const data = this.$store.state.users.logs;
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Logs')
-                worksheet.columns = [
-                    { header: 'User ID', key: 'user_id', width: 55 },
-                    { header: 'Action', key: 'action', width: 13 },
-                    { header: 'Remarks', key: 'remarks', width: 60 },
-                    { header: 'Original Values', key: 'original_values', width: 18 },
-                    { header: 'New Values', key: 'new_values', width: 35 }
-                ]
-                data.forEach((e, index) => {
-                    worksheet.addRow({
-                        user_id: e.user_id,
-                        action: e.action,
-                        remarks: e.remarks,
-                        original_values: e.original_values,
-                        new_values: e.new_values
-                    })
+                import('./modules/logs').then(({logs}) => {
+                    logs({ data:this.$store.state.users.logs })
                 })
-                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                    const headerColumns = ['A','B', 'C', 'D', 'E']
-                    headerColumns.forEach((v) => {
-                        if(rowNumber == 1){
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                fill: {
-                                    type: 'pattern',
-                                    pattern:'solid',
-                                    fgColor:{ argb: header_color }
-                                },
-                                font: {
-                                    color: {argb: "ffffff"},
-                                    bold: true
-                                }
-                            }
-                        }else{
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                border: {
-                                    top: { style: 'thin' },
-                                    left: { style: 'thin' },
-                                    bottom: { style: 'thin' },
-                                    right: { style: 'thin' }
-                                }
-                            }
-                        }
-                    })
-                })
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
-                this.saveExcelFile('Logs', workbook);
             },
             exportOfficeList(){
-                const header_color = this.marian_blue;
-                const data = this.$store.state.offices.offices;
-                let workbook = new Excel.Workbook()
-                let worksheet = workbook.addWorksheet('Office List')
-                worksheet.columns = [
-                    { header: 'Office Name', key: 'Office_Name', width: 55 },
-                    { header: 'Office Code', key: 'Office_Code', width: 13 },
-                    { header: 'Address', key: 'Address', width: 60 },
-                    { header: 'Contact Number', key: 'Contact_Number', width: 18 },
-                    { header: 'Email Address', key: 'Email_Address', width: 35 }
-                ]
-                data.forEach((e, index) => {
-                    worksheet.addRow({
-                        Office_Name: e.name,
-                        Office_Code: e.office_code,
-                        Address: e.address,
-                        Contact_Number: e.contact_number,
-                        Email_Address: e.contact_email
-                    })
+                import('./modules/officelist').then(({officelist}) => {
+                    officelist({ data:this.$store.state.offices.offices })
                 })
-                worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-                    const headerColumns = ['A','B', 'C', 'D', 'E']
-                    headerColumns.forEach((v) => {
-                        if(rowNumber == 1){
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                fill: {
-                                    type: 'pattern',
-                                    pattern:'solid',
-                                    fgColor:{ argb: header_color }
-                                },
-                                font: {
-                                    color: {argb: "ffffff"},
-                                    bold: true
-                                }
-                            }
-                        }else{
-                            worksheet.getCell(`${v}${rowNumber}`).style = {
-                                border: {
-                                    top: { style: 'thin' },
-                                    left: { style: 'thin' },
-                                    bottom: { style: 'thin' },
-                                    right: { style: 'thin' }
-                                }
-                            }
-                        }
-                    })
-                })
-                worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1, activeCell: 'B2' }]
-                this.saveExcelFile('Office List', workbook);
-            },
-            saveExcelFile(filename, workbook){
-                var buff = workbook.xlsx.writeBuffer().then(function (data) {
-                    var blob = new Blob([data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    const date = new Date();
-                    link.setAttribute('download', `${filename} _${date.getFullYear()}${date.getMonth()+1}${date.getDate()}.xlsx`);
-                    document.body.appendChild(link);
-                    link.click();
-                });
             },
         },
         mounted() {

@@ -285,10 +285,5 @@ class OfficesTableSeeder extends Seeder
             ],
         ];
         DB::table('offices')->insert($offices);
-
-        Office::all()->each(function($office, $key){
-            TrackingReport::create(['office_id' => $office->id]);
-        });
-
     }
 }

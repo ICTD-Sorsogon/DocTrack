@@ -1,127 +1,137 @@
 <template>
-    <v-row>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card elevation="2" outlined color="#42ADC7">
-                <v-card-title>
-                    <v-icon large left>mdi-file-cabinet</v-icon>
-                    <span class="title font-weight-light" >
+        <v-row dense>
+            <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card elevation="2" dark outlined color="#03A9F4">
+                <v-card-title class="headline">
+                    <v-icon large left>mdi-swap-horizontal-circle-outline</v-icon>
                         All Transaction
-                    </span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <v-row align="center">
-                        <v-col class="display-3" cols="6">
-                        {{office.transactions}}
+                    <v-row>
+                        <v-col class="display-2">
+                        {{office.transaction}} Documents
                         </v-col>
                     </v-row>
                 </v-card-text>
             </v-card>
-        </v-col>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card elevation="2" outlined color="#FF5347">
-                <v-card-title>
+            </v-col>
+            <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card elevation="2" outlined dark color="#EF5350">
+                <v-card-title class="headline">
                     <v-icon large left>mdi-clock-alert-outline</v-icon>
-                    <span class="title font-weight-light" >
                         Delayed Documents
-                    </span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <v-row align="center">
-                        <v-col class="display-3" cols="6">
+                    <v-row>
+                        <v-col class="display-2">
                         {{office.delayed}}
                         </v-col>
                     </v-row>
                 </v-card-text>
             </v-card>
-        </v-col>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card elevation="2" outlined color="#81D152">
-                <v-card-title>
-                    <v-icon large left>mdi-speedometer</v-icon>
-                    <span class="title font-weight-light" >
+            </v-col>
+            <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card elevation="2" outlined dark color="#43A047">
+                <v-card-title class="headline">
+                    <v-icon large left>mdi-clock-fast</v-icon>
                         Fastest Transaction
-                    </span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <v-row align="center">
-                        <v-col class="display-3" cols="6">
-                        {{office.fastest}}
+                    <v-row>
+                        <v-col class="display-2">
+                        {{office.fast.fast}}
                         </v-col>
                     </v-row>
                 </v-card-text>
+                <div>
+                <v-card-text>
+                    <v-row >
+                        <v-col>
+                            Action: {{office.fast.action.replace(/\w/, val=>val.toUpperCase())}} <br>
+                            Subject: {{office.fast.document.subject}} <br>
+                            Tracking Code: {{office.fast.document.tracking_code}}
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                </div>
             </v-card>
-        </v-col>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card elevation="2" outlined color="#5B4DB7">
-                <v-card-title>
-                    <v-icon large left>mdi-speedometer-slow</v-icon>
-                    <span class="title font-weight-light" >
+            </v-col>
+            <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card elevation="2" outlined dark color="#FB8C00">
+                <v-card-title class="headline">
+                    <v-icon large left>mdi-snail</v-icon>
                         Slowest Transaction
-                    </span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <v-row align="center">
-                        <v-col class="display-3" cols="6">
-                        {{office.slowest}}
+                    <v-row>
+                        <v-col class="display-2">
+                        {{office.slow.slow}}
                         </v-col>
                     </v-row>
                 </v-card-text>
+                <div>
+                <v-card-text>
+                    <v-row >
+                        <v-col>
+                            Action: {{office.slow.action.replace(/\w/, val=>val.toUpperCase())}} <br>
+                            Subject: {{office.slow.document.subject}} <br>
+                            Tracking Code: {{office.slow.document.tracking_code}}
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                </div>
             </v-card>
-        </v-col>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card elevation="2" outlined color="#FF9D4F">
-                <v-card-title>
+            </v-col>
+            <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card elevation="2" outlined dark color="#AB47BC">
+                <v-card-title class="headline">
                     <v-icon large left>mdi-speedometer-medium</v-icon>
-                    <span class="title font-weight-light" >
                         Average Transaction Speed
-                    </span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <v-row align="center">
-                        <v-col class="display-3" cols="6">
+                    <v-row>
+                        <v-col class="display-2">
                         {{office.average}}
                         </v-col>
                     </v-row>
                 </v-card-text>
             </v-card>
-        </v-col>
-        <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
-            <v-card elevation="2" outlined color="#F5F263">
-                <v-card-title>
-                     <v-icon large left>mdi-cog-clockwise</v-icon>
-                    <span class="title font-weight-light" >
+            </v-col>
+            <v-col cols="12" xl="6" lg="6" md="6" sm="12" xs="12">
+            <v-card elevation="2" outlined dark color="#EC407A">
+                <v-card-title class="headline">
+                    <v-icon large left>mdi-cog-clockwise</v-icon>
                         Efficiency Rating
-                    </span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                    <v-row align="center">
-                        <v-col class="display-3" cols="6">
+                    <v-row>
+                        <v-col class="display-2">
                         {{office.efficiency}}
                         </v-col>
                     </v-row>
                 </v-card-text>
             </v-card>
-        </v-col>
-    </v-row>
+            </v-col>
+        </v-row>
 </template>
 <script>
 import { mapGetters, mapState } from 'vuex';
 export default {
+    props: ['stats'],
     computed: {
         ...mapGetters(['auth_user']),
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         office(){
-            return this.tracking_reports
+            return this.stats[0]
         }
     },
     mounted() {
-        console.log(JSON.parse(JSON.stringify(this.$store.getters.office_reports_get)));
     }
 }
 </script>

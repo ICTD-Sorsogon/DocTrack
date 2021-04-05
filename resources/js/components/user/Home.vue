@@ -77,6 +77,7 @@
                     <v-list-item-title>Tracking</v-list-item-title>
                 </v-list-item>
                 <v-list-item
+                    v-if="auth_user.role_id === 1"
                     :input-value="$route.name === 'Office List' ? true:false"
                     link
                     @click.prevent="getOfficeListReport"
@@ -149,7 +150,7 @@
         <v-app-bar-nav-icon class=".d-none .d-sm-flex .d-md-none" @click.stop="drawer = !drawer">
             <v-icon>mdi-menu</v-icon>
         </v-app-bar-nav-icon>
-        <v-toolbar-title>{{currentRouteName}}</v-toolbar-title>
+        <v-toolbar-title>Document Tracking System</v-toolbar-title>
         <v-spacer></v-spacer>
 
         <!-- NOTIFICATION!! -->
@@ -317,8 +318,8 @@ export default {
         })
     },
     beforeCreate() {
-        this.$store.dispatch('getOffices')
         this.$store.dispatch('getDocumentTypes')
+        this.$store.dispatch('getOffices')
         this.$store.dispatch("getActiveDocuments")
 
     },
