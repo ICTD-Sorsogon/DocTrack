@@ -160,7 +160,7 @@ export default {
     methods: {
         clearFilter() {
             this.filterDateFrom = this.filterDateTo = '';
-            this.filterData = this.tracking_reports;
+            this.tracking_reports_data = this.tracking_reports;
         },
         filterTrackingReport(){
             let start = new Date(this.filterDateFrom + " 00:00:00").getTime();
