@@ -141,10 +141,7 @@ export default {
         },
         tracking_reports_data: {
                 get: function () {
-                    // if (this.filterDateFrom == '' && this.filterDateTo == '') {
-                        return JSON.parse(JSON.stringify(Object.values(this.filterData)))
-                        
-                    // }
+                    return JSON.parse(JSON.stringify(Object.values(this.filterData)))
                 },
                 set : function (val) {
                     this.filterData = val;
