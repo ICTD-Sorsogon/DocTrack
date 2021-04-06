@@ -147,7 +147,6 @@ export default {
                     // }
                 },
                 set : function (val) {
-                    this.filterData = [];
                     this.filterData = val;
                 }
         }
