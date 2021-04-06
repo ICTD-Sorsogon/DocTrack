@@ -4,6 +4,92 @@
             Tracking Reports
         </v-card-title>
         <div v-if="auth_user.role_id == 1">
+            <v-row>
+                <v-col cols="12" xm="12" sm="12" lg="4" xl="5" >
+                    <v-dialog
+                        ref="dialog"
+                        v-model="filterDateDialogFrom"
+                        :return-value.sync="filterDateFrom"
+                        persistent
+                        width="290px"
+                    >
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                                v-model="filterDateFrom"
+                                label="FROM"
+                                prepend-icon=""
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                                
+                                outlined
+                                dense
+                            />
+                        </template>
+                        <v-date-picker
+                            v-model="filterDateFrom"
+                            scrollable
+                            
+                        >
+                            <v-spacer/>
+                            <v-btn text color="primary" @click="filterDateDialogFrom = false"> Cancel </v-btn>
+                            <v-btn text color="primary" @click="$refs.dialog.save(filterDateFrom);"> OK </v-btn>
+                        </v-date-picker>
+                    </v-dialog>
+                </v-col>
+                <v-col cols="12" xm="12" sm="12" lg="4" xl="5">
+                    <v-dialog
+                        ref="dialog1"
+                        v-model="filterDateDialogTo"
+                        :return-value.sync="filterDateTo"
+                        persistent
+                        width="290px"
+                    >
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                                v-model="filterDateTo"
+                                label="TO"
+                                prepend-icon=""
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                                
+                                outlined
+                                dense
+                            />
+                        </template>
+                        <v-date-picker
+                            v-model="filterDateTo"
+                            scrollable
+                            
+                        >
+                            <v-spacer/>
+                            <v-btn text color="primary" @click="filterDateDialogTo = false"> Cancel </v-btn>
+                            <v-btn
+                                text
+                                color="primary"
+                                @click="$refs.dialog1.save(filterDateTo);"
+                            > OK </v-btn>
+                        </v-date-picker>
+                    </v-dialog>
+                </v-col>
+                <v-col cols="12" xl="2" lg="2" sm="12" xm="12">
+                    <v-btn
+                        color="primary"
+                        elevation="4"
+                        outlined
+                        @click="filterTrackingReport()"
+                    >Filter</v-btn>
+                </v-col>
+                <v-col cols="12" xl="2" lg="2" sm="12" xm="12">
+                    <v-btn
+                        color="primary"
+                        elevation="4"
+                        outlined
+                        @click="clearFilter()"
+                    >Reset</v-btn>
+                </v-col>
+            </v-row>
             <tracking-table :stats="data"/>
         </div>
         <div v-else>
@@ -25,13 +111,22 @@ export default {
         OfficeTable,
         OfficeTableModal
     },
+    data() {
+        return {
+            filterDateDialogFrom: false,
+            filterDateFrom: '',
+            filterDateDialogTo: false,
+            filterDateTo: '',
+            filterData: []
+        }
+    },
     computed: {
         ...mapState({'tracking_reports': state => state.documents.tracking_reports}),
         ...mapGetters(['offices','auth_user']),
         data(){
             let offices = pluck(this.offices, 'name')
             let summary = [];
-            let record = groupBy(JSON.parse(JSON.stringify(Object.values(this.tracking_reports))), 'transaction_of')
+            let record = groupBy(this.tracking_reports_data, 'transaction_of')
             for(let i in record) {
                 let transaction = record[i].length   
                 let delayed = record[i].filter(r=>r.delayed).length
@@ -43,12 +138,42 @@ export default {
                 summary.push({transaction, delayed, efficiency, slow, fast, average, office})
             }
             return summary
+        },
+        tracking_reports_data: {
+                get: function () {
+                    // if (this.filterDateFrom == '' && this.filterDateTo == '') {
+                        return JSON.parse(JSON.stringify(Object.values(this.filterData)))
+                        
+                    // }
+                },
+                set : function (val) {
+                    this.filterData = [];
+                    this.filterData = val;
+                }
         }
     },
     mounted() {
-        // console.log(this.auth_user);
+        this.filterData = this.tracking_reports;
         this.$store.dispatch('unsetLoader');
         this.$store.dispatch('documentReports');
+    },
+    methods: {
+        clearFilter() {
+            this.filterDateFrom = this.filterDateTo = '';
+            this.filterData = this.tracking_reports;
+        },
+        filterTrackingReport(){
+            let start = new Date(this.filterDateFrom + " 00:00:00").getTime();
+            let end = new Date(this.filterDateTo + " 23:59:59").getTime();
+            let filter = this.tracking_reports_data.filter(item => {
+                return new Date(item.last_touched).getTime() >= start &&
+                new Date(item.last_touched).getTime() <= end;
+            });
+            this.tracking_reports_data = filter;
+        },
+        bp(col){
+                return breakpoint(col)
+        },
     }
 }
 </script>
