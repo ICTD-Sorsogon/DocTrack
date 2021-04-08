@@ -17,7 +17,7 @@
                         <template v-slot:activator="{ on, attrs }">
                             <v-text-field
                                 v-model="filterDateFrom"
-                                label="FROM"
+                                label="From"
                                 prepend-icon=""
                                 readonly
                                 v-bind="attrs"
@@ -48,7 +48,7 @@
                         <template v-slot:activator="{ on, attrs }">
                             <v-text-field
                                 v-model="filterDateTo"
-                                label="TO"
+                                label="To"
                                 prepend-icon=""
                                 readonly
                                 v-bind="attrs"
@@ -80,7 +80,6 @@
                                 block
                                 color="primary"
                                 outlined
-                                v-if="filterDateFrom != '' && filterDateTo != ''"
                                 @click="filterTrackingReport()"
                             >Filter</v-btn>
                         </v-col>
@@ -89,7 +88,6 @@
                                 block
                                 color="primary"
                                 outlined
-                                v-if="filterDateFrom != '' && filterDateTo != ''"
                                 @click="clearFilter()"
                             >Reset</v-btn>
                         </v-col>
@@ -124,7 +122,6 @@ export default {
             filterDateDialogTo: false,
             filterDateTo: '',
             filterData: [],
-            btnFilter : false,
         }
     },
     computed: {
@@ -177,7 +174,7 @@ export default {
             } else {
                 this.$store.dispatch('setSnackbar', {
                         type: 'error',
-                        message: 'Invalid date'
+                        message: 'Please input valid date!'
                     })
             }
         },
