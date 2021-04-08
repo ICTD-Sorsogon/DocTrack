@@ -4,8 +4,9 @@
             Tracking Reports
         </v-card-title>
         <div v-if="auth_user.role_id == 1">
-            <v-row>
-                <v-col cols="12" xm="12" sm="12" lg="4" xl="5" >
+            <v-row
+            >
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12" >
                     <v-dialog
                         ref="dialog"
                         v-model="filterDateDialogFrom"
@@ -21,7 +22,6 @@
                                 readonly
                                 v-bind="attrs"
                                 v-on="on"
-                                
                                 outlined
                                 dense
                             />
@@ -37,7 +37,7 @@
                         </v-date-picker>
                     </v-dialog>
                 </v-col>
-                <v-col cols="12" xm="12" sm="12" lg="4" xl="5">
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4" xl="12">
                     <v-dialog
                         ref="dialog1"
                         v-model="filterDateDialogTo"
@@ -73,24 +73,30 @@
                         </v-date-picker>
                     </v-dialog>
                 </v-col>
-                <v-col cols="12" xl="2" lg="2" sm="12" xm="12">
-                    <v-btn
-                        color="primary"
-                        elevation="4"
-                        outlined
-                        @click="filterTrackingReport()"
-                    >Filter</v-btn>
+                <v-col cols="12" xl="12" lg="4" md="4" sm="12" xs="12">
+                    <v-row>
+                        <v-col  cols="12" xl="6" lg="6" md="6" sm="6" xs="6">
+                            <v-btn
+                                block
+                                color="primary"
+                                outlined
+                                v-if="filterDateFrom != '' && filterDateTo != ''"
+                                @click="filterTrackingReport()"
+                            >Filter</v-btn>
+                        </v-col>
+                        <v-col cols="12" xl="6" lg="6" md="6" sm="6" xs="6">
+                            <v-btn
+                                block
+                                color="primary"
+                                outlined
+                                v-if="filterDateFrom != '' && filterDateTo != ''"
+                                @click="clearFilter()"
+                            >Reset</v-btn>
+                        </v-col>
+                    </v-row>
                 </v-col>
-                <v-col cols="12" xl="2" lg="2" sm="12" xm="12">
-                    <v-btn
-                        color="primary"
-                        elevation="4"
-                        outlined
-                        @click="clearFilter()"
-                    >Reset</v-btn>
-                </v-col>
+                <tracking-table :stats="data"/>
             </v-row>
-            <tracking-table :stats="data"/>
         </div>
         <div v-else>
             <office-table :stats="data"/>
@@ -117,7 +123,8 @@ export default {
             filterDateFrom: '',
             filterDateDialogTo: false,
             filterDateTo: '',
-            filterData: []
+            filterData: [],
+            btnFilter : false,
         }
     },
     computed: {
@@ -159,16 +166,23 @@ export default {
             this.tracking_reports_data = this.tracking_reports;
         },
         filterTrackingReport(){
-            let start = new Date(this.filterDateFrom + " 00:00:00").getTime();
-            let end = new Date(this.filterDateTo + " 23:59:59").getTime();
-            let filter = this.tracking_reports_data.filter(item => {
-                return new Date(item.last_touched).getTime() >= start &&
-                new Date(item.last_touched).getTime() <= end;
-            });
-            this.tracking_reports_data = filter;
+            if (this.filterDateFrom != '' &&  this.filterDateTo != '') {
+                let start = new Date(this.filterDateFrom + " 00:00:00").getTime();
+                let end = new Date(this.filterDateTo + " 23:59:59").getTime();
+                let filter = this.tracking_reports_data.filter(item => {
+                    return new Date(item.last_touched).getTime() >= start &&
+                    new Date(item.last_touched).getTime() <= end;
+                });
+                this.tracking_reports_data = filter;
+            } else {
+                this.$store.dispatch('setSnackbar', {
+                        type: 'error',
+                        message: 'Invalid date'
+                    })
+            }
         },
         bp(col){
-                return breakpoint(col)
+            return breakpoint(col)
         },
     }
 }
